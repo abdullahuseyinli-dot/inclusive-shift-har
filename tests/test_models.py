@@ -17,6 +17,7 @@ from inclusive_shift_har.models import MoReHAR, build_baseline, trainable_parame
         "compact_residual_64",
         "compact_residual_32",
         "static_dual_branch",
+        "static_dual_branch_matched",
     ],
 )
 def test_baseline_tensor_contract(name: str) -> None:
@@ -36,6 +37,13 @@ def test_more_har_factorization_contract_and_parameter_limit() -> None:
     assert output.descriptor_prediction is not None
     assert output.descriptor_prediction.shape == (4, 8)
     assert trainable_parameter_count(model) < 2_000_000
+
+
+def test_static_dual_branch_is_parameter_matched_to_more_har() -> None:
+    proposed = MoReHAR(num_classes=3)
+    matched = build_baseline("static_dual_branch_matched", num_classes=3)
+    ratio = trainable_parameter_count(matched) / trainable_parameter_count(proposed)
+    assert 0.95 <= ratio <= 1.05
 
 
 def test_model_rejects_wrong_channel_interface() -> None:

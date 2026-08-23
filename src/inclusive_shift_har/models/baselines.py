@@ -240,6 +240,11 @@ def build_baseline(name: str, *, num_classes: int, input_channels: int = 6) -> n
         "static_dual_branch": lambda classes, channels: (
             StaticDualBranchHAR(classes) if channels == 6 else _raise_dual_branch_channels(channels)
         ),
+        "static_dual_branch_matched": lambda classes, channels: (
+            StaticDualBranchHAR(classes, width=120)
+            if channels == 6
+            else _raise_dual_branch_channels(channels)
+        ),
     }
     try:
         factory = factories[name.casefold()]

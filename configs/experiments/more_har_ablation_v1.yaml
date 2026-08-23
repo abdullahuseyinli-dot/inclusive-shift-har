@@ -40,5 +40,5 @@ ablations:
   - id: full_without_gyroscope
     input_ablation: gyroscope_zeroed_after_training_normalization
   - id: parameter_controlled_static_dual_branch
-    registry_model: static_dual_branch
+    registry_model: static_dual_branch_matched
 interpretation_gate: "Support requires improvement in both mean and lower-tail target participant macro-F1 against the strongest adequately tuned baseline without source degradation beyond the predeclared margin."

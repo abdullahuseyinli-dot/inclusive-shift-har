@@ -20,9 +20,13 @@ models:
     family: local_compact_residual
   - id: static_dual_branch
     family: local_parameter_controlled_ablation
+  - id: static_dual_branch_matched
+    family: local_parameter_matched_ablation
+    width: 120
+    matching_target: more-har-v1
+    matching_tolerance: "within 5 percent trainable parameters for the three-class track"
 forbidden_aliases_without_faithful_implementation:
   - TinyHAR
   - TinierHAR
   - CNN-HAR
   - HARMamba
-
