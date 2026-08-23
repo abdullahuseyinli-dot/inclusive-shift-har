@@ -1,0 +1,44 @@
+schema_version: "1.0.0"
+experiment_id: "more-har-ablation-v1"
+status: "predeclared_before_target_unlock"
+base_model: "configs/models/more_har_v1.yaml"
+shared_protocol: "configs/protocols/inclusivehar_released_block_v1_2.yaml"
+shared_tuning_budget: "configs/experiments/inclusivehar_source_development_v1.yaml"
+ablations:
+  - id: compact_backbone_only
+    augmentation: false
+    content_loss: false
+    realization_factorization: false
+    group_dro: false
+  - id: backbone_plus_augmentation
+    augmentation: true
+    content_loss: false
+    realization_factorization: false
+    group_dro: false
+  - id: plus_content_consistency_contrastive
+    augmentation: true
+    content_loss: true
+    realization_factorization: false
+    group_dro: false
+  - id: plus_realization_factorization
+    augmentation: true
+    content_loss: true
+    realization_factorization: true
+    group_dro: false
+  - id: plus_group_dro
+    augmentation: false
+    content_loss: false
+    realization_factorization: false
+    group_dro: true
+  - id: full_model
+    augmentation: true
+    content_loss: true
+    realization_factorization: true
+    group_dro: true
+  - id: full_without_accelerometer
+    input_ablation: accelerometer_zeroed_after_training_normalization
+  - id: full_without_gyroscope
+    input_ablation: gyroscope_zeroed_after_training_normalization
+  - id: parameter_controlled_static_dual_branch
+    registry_model: static_dual_branch
+interpretation_gate: "Support requires improvement in both mean and lower-tail target participant macro-F1 against the strongest adequately tuned baseline without source degradation beyond the predeclared margin."

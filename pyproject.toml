@@ -35,6 +35,14 @@ dependencies = [
   "pyyaml>=6.0.2,<7",
 ]
 
+[project.optional-dependencies]
+training-cpu = [
+  "torch==2.12.0",
+]
+training-cuda = [
+  "torch==2.12.0",
+]
+
 [project.scripts]
 inclusive-shift-har = "inclusive_shift_har.cli:main"
 
@@ -55,10 +63,40 @@ dev = [
   { include-group = "lint" },
   { include-group = "type" },
 ]
+research = [
+  "matplotlib>=3.10,<4",
+  "pandas>=2.2,<4",
+  "psutil>=7,<8",
+  "scikit-learn>=1.6,<2",
+  "scipy>=1.15,<2",
+  "xgboost>=3,<4",
+]
 
 [tool.uv]
 default-groups = ["dev"]
 package = true
+conflicts = [
+  [
+    { extra = "training-cpu" },
+    { extra = "training-cuda" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "training-cpu" },
+  { index = "pytorch-cu132", extra = "training-cuda" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/inclusive_shift_har"]

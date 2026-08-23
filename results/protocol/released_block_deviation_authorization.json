@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0.0",
+  "gate": "released_block_protocol_revision",
+  "status": "approved",
+  "authorized_date_utc": "2026-08-23",
+  "exact_authorization_time_status": "not_recorded",
+  "authorization_source": "explicit user instruction relayed to the Stage 4 protocol task",
+  "dataset_id": "inclusivehar_v4",
+  "stage3_audit_report_sha256": "673917d3bfd4b3f283a1ae521ae4a7d548e3facadd2ae89ce33b2e27153500e8",
+  "stage3_status_preserved": "integrity_pass_protocol_quarantine",
+  "approved_revision": {
+    "boundary_unit": "released_contiguous_subject_activity_block",
+    "window_length_samples": 128,
+    "window_stride_samples": 128,
+    "remainder_policy": "drop_tail_shorter_than_128_per_released_block",
+    "participant_partition_before_windowing": true,
+    "claim_language": "participant-exclusive released-block protocol"
+  },
+  "accepted_residual_risk": {
+    "hidden_trial_boundaries_known": false,
+    "conditional_join_bound": "at most two crossing windows per released block only if the reported three repetitions are exactly the hidden contiguous recordings and there are no additional joins",
+    "unconditional_contamination_bound": 1.0,
+    "trial_safe_claim_authorized": false
+  },
+  "still_forbidden": [
+    "claiming trial-exclusive or hidden-join-free windows",
+    "overlapping windows",
+    "participant overlap",
+    "target performance inspection during split construction",
+    "validation or target data in normalization fitting",
+    "training before the split audit and protocol lock validate",
+    "confirmatory evaluation without a separate final-evaluation unlock"
+  ],
+  "supersession_scope": "Conditionally supersedes only the Stage 3 split/window block; it does not erase or relabel the Stage 3 quarantine evidence."
+}

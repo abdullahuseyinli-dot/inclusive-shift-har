@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "artifact_kind": "corrected_legacy_reproduction_status",
+  "dataset_id": "uci_har_v1",
+  "created_at_utc": "2026-08-23T21:44:26.6065212Z",
+  "evidence_status": "corrected_source_development_no_model_results",
+  "status": "configured_not_run",
+  "inputs": {
+    "dataset_manifest_sha256": "a7d016ffde65917f0edd410f27e263d7f00e42f8bc498b7584cab91812d17c5c",
+    "processed_archive_sha256": "2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0",
+    "data_audit_report_sha256": "414ae1c33a9abb41f2f1f3710e6c8eba6eb13d60656b2390c867f0bb6ae1c1fd",
+    "source_protocol_sha256": "f210b961530fbef3436f51b61011fd6948db77e9f0f35f1f3a56737ae77d60a8",
+    "architecture_spec_report_sha256": "d9574fa71fdbe877c5c4dbd5d04ae9ac4f14ff53f3d1300e2f6e9ce2833d58cf"
+  },
+  "completed": {
+    "official_acquisition_and_hash_pinning": true,
+    "conflicting_license_notice_preservation": true,
+    "processed_schema_and_crc_audit": true,
+    "stable_window_identity": true,
+    "participant_grouped_source_folds": true,
+    "exact_legacy_architecture_reconstruction": true,
+    "targeted_synthetic_tests_passed": 14,
+    "full_repository_synthetic_tests_passed": 135
+  },
+  "not_run": {
+    "model_training": "training_gate_not_invoked",
+    "official_test_model_evaluation": "legacy_consumed_and_not_scheduled",
+    "inclusivehar_target_evaluation": "outside_scope_and_not_opened"
+  },
+  "claim_limits": [
+    "No corrected accuracy or macro-F1 result exists yet.",
+    "The official UCI test cannot become fresh confirmatory evidence.",
+    "No InclusiveHAR target prediction or metric was produced."
+  ],
+  "report_sha256": "2cb8a78a756fafa3770611f2b0eec973c1f4c66e116529c148b7ef046b8d09f8"
+}

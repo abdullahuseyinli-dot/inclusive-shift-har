@@ -1,0 +1,39 @@
+schema_version: "1.0.0"
+model_id: "more-har-v1"
+status: "source_development_candidate_not_yet_selected"
+implementation: "inclusive_shift_har.models.more_har.MoReHAR"
+claim_status: "experimental_hypothesis_not_assumed_novel_or_superior"
+input:
+  shape: [128, 6]
+  channel_order:
+    - motionUserAccelerationX
+    - motionUserAccelerationY
+    - motionUserAccelerationZ
+    - motionRotationRateX
+    - motionRotationRateY
+    - motionRotationRateZ
+architecture:
+  separate_accelerometer_and_gyroscope_stems: true
+  stem_channels: 32
+  multi_resolution_kernels: [3, 7, 15]
+  temporal_channels: 96
+  residual_dilations: [1, 2, 4, 8]
+  pooling: attentive_weighted_mean_and_standard_deviation
+  content_dim: 96
+  realization_dim: 48
+  descriptor_dim: 8
+  parameter_limit_strictly_less_than: 2000000
+inference:
+  classifier_input: z_content_only
+  disability_status_input: false
+  assistive_device_status_input: false
+  participant_identity_input: false
+  realization_branch_required_after_training: false
+objective:
+  classification: 1.0
+  supervised_contrastive_content: 0.1
+  clean_augmented_consistency: 0.2
+  realization_descriptor_prediction: 0.1
+  cross_covariance_factorization: 0.01
+  status: "initial_source_only_candidate_coefficients"
+

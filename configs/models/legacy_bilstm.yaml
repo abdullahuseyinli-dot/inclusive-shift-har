@@ -1,0 +1,22 @@
+schema_version: "1.0.0"
+model_family: legacy_bilstm
+status: architecture_reconstructed_not_trained
+backend_reference: pytorch_2.12.0_locked_profile
+implementation: inclusive_shift_har.models.legacy_models.LegacyLSTMNet
+source_notebook_sha256: c25d78ad1a21e485a7bd0d9dd5cc74bba4d3872465be300d7be56d8b829f636
+source_cells: ["10/11/4929a1ae", "26/27/12004a09"]
+input_channels: 6
+class_count: 6
+recurrent:
+  type: lstm
+  hidden_size: 192
+  layers: 2
+  bidirectional: true
+  dropout: 0.3
+head:
+  temporal_max_pool: false
+  layer_norm: true
+  dropout: 0.3
+  linear_classes: 6
+parameter_count: 1198086
+evidence_status: architecture_reconstruction_no_model_result

@@ -1,0 +1,395 @@
+{
+  "audit": {
+    "all_source_subjects_covered": true,
+    "fold_count": 5,
+    "folds": [
+      {
+        "fold_id": "uci_source_cv_01",
+        "train_subject_count": 16,
+        "train_window_count": 5489,
+        "validation_activity_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation_subject_count": 5,
+        "validation_window_count": 1863
+      },
+      {
+        "fold_id": "uci_source_cv_02",
+        "train_subject_count": 17,
+        "train_window_count": 5941,
+        "validation_activity_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation_subject_count": 4,
+        "validation_window_count": 1411
+      },
+      {
+        "fold_id": "uci_source_cv_03",
+        "train_subject_count": 17,
+        "train_window_count": 5970,
+        "validation_activity_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation_subject_count": 4,
+        "validation_window_count": 1382
+      },
+      {
+        "fold_id": "uci_source_cv_04",
+        "train_subject_count": 17,
+        "train_window_count": 5959,
+        "validation_activity_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation_subject_count": 4,
+        "validation_window_count": 1393
+      },
+      {
+        "fold_id": "uci_source_cv_05",
+        "train_subject_count": 17,
+        "train_window_count": 6049,
+        "validation_activity_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation_subject_count": 4,
+        "validation_window_count": 1303
+      }
+    ],
+    "participant_overlap": false,
+    "status": "pass",
+    "validation_subject_once": true,
+    "window_overlap": false
+  },
+  "class_count_policy": "fixed_locked_uci_native_ontology_six_never_test_derived",
+  "dataset_id": "uci_har_v1",
+  "dataset_manifest_sha256": "a7d016ffde65917f0edd410f27e263d7f00e42f8bc498b7584cab91812d17c5c",
+  "evidence_status": "corrected_source_development_protocol_no_model_results",
+  "fold_assignment": {
+    "algorithm": "sha256_rank_then_round_robin",
+    "folds": [
+      {
+        "fold_id": "uci_source_cv_01",
+        "normalization_fit_subjects": [
+          3,
+          5,
+          6,
+          7,
+          8,
+          14,
+          15,
+          16,
+          17,
+          19,
+          22,
+          23,
+          26,
+          27,
+          28,
+          29
+        ],
+        "train_subject_ids": [
+          3,
+          5,
+          6,
+          7,
+          8,
+          14,
+          15,
+          16,
+          17,
+          19,
+          22,
+          23,
+          26,
+          27,
+          28,
+          29
+        ],
+        "train_window_count": 5489,
+        "train_window_ids_sha256": "efd53ae3fdbb9077535ffec76a38eae0e472d5dda87b7d8fe270798c13ad5fa8",
+        "validation_subject_ids": [
+          1,
+          11,
+          21,
+          25,
+          30
+        ],
+        "validation_window_count": 1863,
+        "validation_window_ids_sha256": "7773af96400cf132fa93f9a0f21619e1a861530bdcafbe1148f3e04c0e4b20d1"
+      },
+      {
+        "fold_id": "uci_source_cv_02",
+        "normalization_fit_subjects": [
+          1,
+          5,
+          6,
+          7,
+          8,
+          11,
+          14,
+          16,
+          17,
+          21,
+          22,
+          23,
+          25,
+          26,
+          27,
+          29,
+          30
+        ],
+        "train_subject_ids": [
+          1,
+          5,
+          6,
+          7,
+          8,
+          11,
+          14,
+          16,
+          17,
+          21,
+          22,
+          23,
+          25,
+          26,
+          27,
+          29,
+          30
+        ],
+        "train_window_count": 5941,
+        "train_window_ids_sha256": "c8cf30ee17a219f21a4fcff874f3339e96584c184e7005f4f24f558adc887534",
+        "validation_subject_ids": [
+          3,
+          15,
+          19,
+          28
+        ],
+        "validation_window_count": 1411,
+        "validation_window_ids_sha256": "e6612260b6220def41d9c32bff012a9565e49c64e8d99c04e948fa3b529f442c"
+      },
+      {
+        "fold_id": "uci_source_cv_03",
+        "normalization_fit_subjects": [
+          1,
+          3,
+          5,
+          6,
+          7,
+          8,
+          11,
+          15,
+          17,
+          19,
+          21,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "train_subject_ids": [
+          1,
+          3,
+          5,
+          6,
+          7,
+          8,
+          11,
+          15,
+          17,
+          19,
+          21,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "train_window_count": 5970,
+        "train_window_ids_sha256": "8a4533eeec582b2f795c784072730c817df595f3785aaa174460069152d974fb",
+        "validation_subject_ids": [
+          14,
+          16,
+          22,
+          23
+        ],
+        "validation_window_count": 1382,
+        "validation_window_ids_sha256": "8bf157a13c34ed9dc21fd5af88067b57c30a890bc4ba7b8dd248cca0920192c3"
+      },
+      {
+        "fold_id": "uci_source_cv_04",
+        "normalization_fit_subjects": [
+          1,
+          3,
+          5,
+          6,
+          7,
+          11,
+          14,
+          15,
+          16,
+          17,
+          19,
+          21,
+          22,
+          23,
+          25,
+          28,
+          30
+        ],
+        "train_subject_ids": [
+          1,
+          3,
+          5,
+          6,
+          7,
+          11,
+          14,
+          15,
+          16,
+          17,
+          19,
+          21,
+          22,
+          23,
+          25,
+          28,
+          30
+        ],
+        "train_window_count": 5959,
+        "train_window_ids_sha256": "06369c552ce3d6f7e60eb49d1d2875df6ebe6fb9d2e2227f23f3c39ef7618d6c",
+        "validation_subject_ids": [
+          8,
+          26,
+          27,
+          29
+        ],
+        "validation_window_count": 1393,
+        "validation_window_ids_sha256": "296d2b03188bf5f45a29d3a1123c6b47632fb1fae21e439ef2b6e709362a573a"
+      },
+      {
+        "fold_id": "uci_source_cv_05",
+        "normalization_fit_subjects": [
+          1,
+          3,
+          8,
+          11,
+          14,
+          15,
+          16,
+          19,
+          21,
+          22,
+          23,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "train_subject_ids": [
+          1,
+          3,
+          8,
+          11,
+          14,
+          15,
+          16,
+          19,
+          21,
+          22,
+          23,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "train_window_count": 6049,
+        "train_window_ids_sha256": "a9cf487cf0807ceb05b1bda7d587f1f0c0737a4584c0cfc48b2bb2e46e90bc4a",
+        "validation_subject_ids": [
+          5,
+          6,
+          7,
+          17
+        ],
+        "validation_window_count": 1303,
+        "validation_window_ids_sha256": "579f4a68704e8c0e40dcc1b480c4c1d45334a5f969cd9dc61c685ab98547a969"
+      }
+    ],
+    "namespace": "inclusive-shift-har|uci_har_v1|source_grouped_cv_v1",
+    "seed": 5062
+  },
+  "input": {
+    "archive_sha256": "2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0",
+    "channels": [
+      "body_acc_x",
+      "body_acc_y",
+      "body_acc_z",
+      "body_gyro_x",
+      "body_gyro_y",
+      "body_gyro_z"
+    ],
+    "released_split": "train",
+    "subject_count": 21,
+    "window_count": 7352,
+    "window_ids_sha256": "b4a50caa8cd3b0a54fddf773b7c8eec89ff814d86aa9853f2be27b1d9f279564"
+  },
+  "label_ontology": {
+    "activity_ids": {
+      "1": "WALKING",
+      "2": "WALKING_UPSTAIRS",
+      "3": "WALKING_DOWNSTAIRS",
+      "4": "SITTING",
+      "5": "STANDING",
+      "6": "LAYING"
+    },
+    "source": "locked_release_metadata_not_test_inference"
+  },
+  "leakage_controls": {
+    "normalization": "fit_on_each_fold_training_windows_only",
+    "official_test_opened_for_protocol_construction": false,
+    "official_test_status": "legacy_exploratory_development_consumed",
+    "overlapping_released_windows_cross_partitions": false,
+    "participant_partition_before_model_preprocessing": true,
+    "raw_sample_overlap_proof_basis": "participant_exclusivity"
+  },
+  "protocol_algorithm_version": "1.0.0",
+  "protocol_id": "uci_har_v1_source_grouped_cv_v1",
+  "protocol_sha256": "f210b961530fbef3436f51b61011fd6948db77e9f0f35f1f3a56737ae77d60a8",
+  "source_pretraining_policy": {
+    "allowed_training_partition": "official_train_only",
+    "cross_source_mapping_controlled_by_locked_ontology": true,
+    "official_test_allowed_for_new_claims": false
+  },
+  "status": "source_protocol_ready_no_training_run"
+}

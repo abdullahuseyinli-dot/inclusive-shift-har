@@ -1,0 +1,18 @@
+schema_version: "1.0.0"
+model_family: legacy_cnn1d
+status: architecture_reconstructed_not_trained
+backend_reference: pytorch_2.12.0_locked_profile
+implementation: inclusive_shift_har.models.legacy_models.LegacyCNN1D
+source_notebook_sha256: c25d78ad1a21e485a7bd0d9dd5cc74bba4d3872465be300d7be56d8b829f636
+source_cells: ["12/13/cc39cfc2", "26/27/12004a09"]
+input_channels: 6
+class_count: 6
+blocks:
+  - {out_channels: 128, kernel_size: 7, padding: 3, batch_norm: true, activation: relu, max_pool: 2}
+  - {out_channels: 256, kernel_size: 5, padding: 2, batch_norm: true, activation: relu, max_pool: 2}
+  - {out_channels: 512, kernel_size: 3, padding: 1, batch_norm: true, activation: relu, adaptive_avg_pool: 1}
+head:
+  dropout: 0.15
+  linear_classes: 6
+parameter_count: 568198
+evidence_status: architecture_reconstruction_no_model_result

@@ -1,0 +1,36 @@
+schema_version: "1.0.0"
+experiment_id: uci_har_corrected_legacy_reproduction_v1
+status: configured_not_run
+evidence_status: corrected_source_development_no_results
+dataset: configs/datasets/uci_har_v1.yaml
+protocol: configs/protocols/uci_har_source_grouped_v1.yaml
+input_shape: [128, 6]
+label_track: uci_native_six
+models:
+  - configs/models/legacy_bilstm.yaml
+  - configs/models/legacy_bilstm_temporal.yaml
+  - configs/models/legacy_cnn1d.yaml
+  - configs/models/legacy_joint_dual_branch.yaml
+training:
+  backend_reference: pytorch_2.12.0_locked_cpu_or_cuda_profile
+  epochs_max: 40
+  batch_size_probe_required: true
+  initial_batch_size: 128
+  optimizer: adamw
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  warmup_epochs: 3
+  early_stopping_patience: 8
+  checkpoint_metric: validation_participant_macro_f1
+  normalization: fold_training_windows_only
+  seeds: [42, 1337, 2025, 31415, 271828]
+comparison_policy:
+  equal_predeclared_tuning_budget: true
+  common_selection_metric: true
+  official_test_evaluation: legacy_consumed_descriptive_only_not_scheduled
+  no_test_derived_class_count: true
+  negative_and_failed_runs_preserved: true
+outputs:
+  required_evidence_status: corrected_source_development
+  participant_level_metrics: true
+  no_inclusivehar_target_evaluation: true

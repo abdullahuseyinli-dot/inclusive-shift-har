@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "ontology_lock",
+  "status": "locked_conditional_released_block_protocol",
+  "locked_date_utc": "2026-08-23",
+  "exact_lock_time_status": "not_recorded",
+  "dataset_id": "inclusivehar_v4",
+  "ontology_id": "inclusivehar-v4-ontology-v1.1",
+  "ontology_config_path": "configs/ontologies/inclusivehar_v1_1.yaml",
+  "ontology_config_file_sha256": "c1d532caf873a2e580be9fa5ed897d2d408f4fc6f67434188057c5c333d340d9",
+  "ontology_config_canonical_sha256": "85f6d8ed911420f51c971da05539b739bad30c9e1816d376445abd18ade6d03e",
+  "numeric_class_schemas": {
+    "functional_core": {
+      "class_count": 3,
+      "class_order": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "index_by_class": {
+        "mobility": 0,
+        "sitting": 1,
+        "standing": 2
+      },
+      "class_schema_sha256": "8fd23761b03ea39ebfc1fffc23430b31add0968fe6fc8522d035e7d0d9d704b4"
+    },
+    "inclusive_native": {
+      "class_count": 6,
+      "class_order": [
+        "jogging",
+        "ramp_ascent",
+        "ramp_descent",
+        "sitting",
+        "standing",
+        "walking"
+      ],
+      "index_by_class": {
+        "jogging": 0,
+        "ramp_ascent": 1,
+        "ramp_descent": 2,
+        "sitting": 3,
+        "standing": 4,
+        "walking": 5
+      },
+      "class_schema_sha256": "5c4531052ffcf9fe2b2e3ea5b81a396349f68b4ebc8e56af3c1ab04551f2f197"
+    }
+  },
+  "blocked_tracks": {
+    "cross_source_core": "Only sitting is exact; classification remains blocked until at least two exact classes are locked.",
+    "ambulatory_walking_sensitivity": "Blocked until a predeclared participant-eligibility rule is locked."
+  },
+  "class_schema_source": "repository-authored locked ontology only; no validation or sealed-target label inference",
+  "target_performance_or_predictions_accessed": false,
+  "supersedes_record": "results/protocol/ontology_lock_v1.json",
+  "record_sha256": "c2b4e178afb3d285cc76745182edb1868099eb1e607dbebfcee263c973a81e33"
+}

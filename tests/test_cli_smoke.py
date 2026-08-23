@@ -184,12 +184,6 @@ def test_validate_artifacts_cli_checks_complete_synthetic_checkpoint(
 @pytest.mark.parametrize(
     ("command", "expected_code", "required_gate"),
     [
-        ("build-splits", "DATA_AUDIT_GATE_CLOSED", "data_audit_pass"),
-        (
-            "audit-splits",
-            "SPLIT_MANIFEST_GATE_CLOSED",
-            "data_audit_pass_and_split_manifest_present",
-        ),
         ("train", "TRAINING_GATE_CLOSED_NOT_IMPLEMENTED", "split_audit_pass"),
         (
             "evaluate",
@@ -221,3 +215,63 @@ def test_unimplemented_cli_stages_are_visible_gates_not_false_successes(
         "status": "gated_not_implemented",
     }
     assert payload["message"]
+
+
+def test_build_and_audit_splits_cli_never_opens_target_performance(
+    tmp_path: Path,
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    split_path = tmp_path / "split.json"
+    built = _run_cli(
+        [
+            "build-splits",
+            "--output",
+            str(split_path),
+            "--allowed-root",
+            str(tmp_path),
+            "--json",
+        ],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    built_payload = _json_stdout(built)
+    assert built.returncode == 0, built_payload
+    assert built_payload["status"] == "built_conditional_released_block"
+    assert built_payload["window_count"] == 3042
+    assert built_payload["target_performance_or_prediction_accessed"] is False
+
+    audited = _run_cli(
+        [
+            "audit-splits",
+            "--split-manifest",
+            str(split_path),
+            "--json",
+        ],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    audited_payload = _json_stdout(audited)
+    assert audited.returncode == 0, audited_payload
+    assert audited_payload["status"] == "pass_conditional_released_block"
+    assert audited_payload["report"]["target_performance_or_prediction_accessed"] is False
+
+    source_path = tmp_path / "source-windows.json"
+    source_built = _run_cli(
+        [
+            "build-source-windows",
+            "--split-manifest",
+            str(split_path),
+            "--output",
+            str(source_path),
+            "--allowed-root",
+            str(tmp_path),
+            "--json",
+        ],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    source_payload = _json_stdout(source_built)
+    assert source_built.returncode == 0, source_payload
+    assert source_payload["source_window_count"] == 1443
+    assert source_payload["target_subject_or_window_records_included"] is False

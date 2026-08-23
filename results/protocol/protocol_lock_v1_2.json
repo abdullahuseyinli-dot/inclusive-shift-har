@@ -1,0 +1,98 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "conditional_protocol_lock",
+  "status": "locked_conditional_local_worktree",
+  "locked_date_utc": "2026-08-23",
+  "exact_lock_time_status": "not_recorded",
+  "protocol_id": "inclusivehar-released-block-v1.2",
+  "evidence_language": "participant-exclusive released-block protocol; not trial-safe",
+  "authorization": {
+    "path": "results/protocol/released_block_deviation_authorization.json",
+    "canonical_sha256": "1c0d40e1cf65cab9371669a094ce35d6835f9bb6d5dd47c7dc04847917a44354",
+    "file_sha256": "2986c318e4e86dcca86dc2408785e85ad8fadd0f7294133159e85a95eccdc82d"
+  },
+  "stage3_audit": {
+    "path": "results/data_audit/inclusivehar_v4.audit.json",
+    "report_sha256": "673917d3bfd4b3f283a1ae521ae4a7d548e3facadd2ae89ce33b2e27153500e8",
+    "file_sha256": "b85e641da9fdc3ac61b6c8440a78c2b6aee625c160b095c8170c0b9d1a4a4204",
+    "quarantine_preserved": true
+  },
+  "configurations": {
+    "protocol": {
+      "path": "configs/protocols/inclusivehar_released_block_v1_2.yaml",
+      "canonical_sha256": "d3425c88b0f003aa4a1a57524ceefc105d4f607c8bd2e9d859ff0056e3577220",
+      "file_sha256": "639bd19a4c5da503c56e3ddc93eba77e07e35cdcb7c12e737d8d10829f2916df"
+    },
+    "ontology": {
+      "path": "configs/ontologies/inclusivehar_v1_1.yaml",
+      "canonical_sha256": "85f6d8ed911420f51c971da05539b739bad30c9e1816d376445abd18ade6d03e",
+      "file_sha256": "c1d532caf873a2e580be9fa5ed897d2d408f4fc6f67434188057c5c333d340d9",
+      "lock_record_sha256": "c2b4e178afb3d285cc76745182edb1868099eb1e607dbebfcee263c973a81e33"
+    },
+    "preprocessing": {
+      "path": "configs/preprocessing/inclusivehar_primary_128.yaml",
+      "canonical_sha256": "48515caf9da8e20510913baab0bcf9dd874af26e6ca415663e36be81d7848125",
+      "file_sha256": "bb23327375f491708c81aa2a605b0a24e9a8274a20dee9ef66b8232cc9525145"
+    }
+  },
+  "split": {
+    "path": "results/protocol/splits/inclusivehar_v4_released_block_v1_2.json",
+    "manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+    "file_sha256": "af909c7d914b68c417b238b576945c112aa58740859a7d998b6b77219dfb1920",
+    "window_count": 3042,
+    "used_rows": 389376,
+    "dropped_tail_rows": 7226
+  },
+  "split_audit": {
+    "path": "results/protocol/split_audit_v1_2.json",
+    "report_sha256": "45c49761a92b9f9f3e4cabe4e3a9dbf72b4114795948ba7104f8ed0dff37bdd8",
+    "file_sha256": "08dbba5b68514e5ff0f379710aedf21dcdaad6b6e71d264b5c59cfebb924ef6e",
+    "status": "pass_conditional_released_block",
+    "error_count": 0,
+    "warning_codes": [
+      "TRIAL_BOUNDARIES_UNRECOVERABLE",
+      "CONDITIONAL_BOUND_ONLY",
+      "DECLARED_RATE_UNVERIFIED"
+    ]
+  },
+  "source_materialization": {
+    "path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+    "manifest_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522",
+    "file_sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+    "source_window_count": 1443,
+    "target_subject_or_window_records_included": false
+  },
+  "numeric_class_schemas": {
+    "functional_core_sha256": "8fd23761b03ea39ebfc1fffc23430b31add0968fe6fc8522d035e7d0d9d704b4",
+    "inclusive_native_sha256": "5c4531052ffcf9fe2b2e3ea5b81a396349f68b4ebc8e56af3c1ab04551f2f197"
+  },
+  "target_seal": {
+    "path": "results/protocol/target_seal_v1_2.json",
+    "target_seal_id": "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d",
+    "record_sha256": "2f9a9fe6eb9341fca4e2d27e2cdb5833ae079672a2138ee77210b5ed9d82849d",
+    "unlock_record": null,
+    "target_predictions_accessed": false,
+    "target_performance_accessed": false
+  },
+  "validation_snapshot": {
+    "pytest": "143 passed",
+    "ruff_check": "passed",
+    "ruff_format_check": "94 files formatted",
+    "mypy": "79 source files passed",
+    "dataset_manifests": "2 passed",
+    "split_audit": "pass_conditional_released_block",
+    "deterministic_rebuild_matches": true,
+    "prelock_artifact_validation_report_sha256": "e99004f3f155f7ea30a337846e090c2a5cefcebc879abb4494bf4bfcc8c49bf7",
+    "prelock_artifact_validation_scope": "existing Stage 3 artifact manifest; active protocol artifact manifest is validated after publication"
+  },
+  "repository_state": {
+    "base_commit": "0e07162bc10d68b51d7e995683574220e4171d09",
+    "working_tree_clean": false,
+    "working_tree_status": "documented concurrent Stage 4 and implementation changes",
+    "protocol_lock_tag": null
+  },
+  "development_training_started_by_this_gate": false,
+  "confirmatory_target_opening_authorized": false,
+  "final_evaluation_unlock": null,
+  "record_sha256": "71f3fdb2de0e6e0aa8feaff8b8726bfbc999fd1423568251744a29ab541e9e3a"
+}

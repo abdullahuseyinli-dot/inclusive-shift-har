@@ -1,0 +1,28 @@
+schema_version: "1.0.0"
+status: "source_development_candidates"
+implementation_module: "inclusive_shift_har.models.baselines"
+provenance_warning: "These are locally specified controlled baselines, not bit-for-bit third-party reproductions. Published names are not used for architecture approximations."
+models:
+  - id: cnn1d
+    family: legacy_corrected
+  - id: bilstm
+    family: legacy_corrected
+  - id: joint_cnn_bilstm
+    family: legacy_corrected_joint_feature_fusion
+    ensemble_claim_allowed: false
+  - id: deepconvlstm
+    family: local_deep_convolutional_recurrent
+  - id: compact_residual_96
+    family: local_compact_residual
+  - id: compact_residual_64
+    family: local_compact_residual
+  - id: compact_residual_32
+    family: local_compact_residual
+  - id: static_dual_branch
+    family: local_parameter_controlled_ablation
+forbidden_aliases_without_faithful_implementation:
+  - TinyHAR
+  - TinierHAR
+  - CNN-HAR
+  - HARMamba
+

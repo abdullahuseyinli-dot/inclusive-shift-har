@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -16,10 +16,21 @@ from inclusive_shift_har.data.inclusivehar import (
     InclusiveHARAuditError,
     audit_inclusivehar_v4_dataset,
 )
+from inclusive_shift_har.manifests.canonical import load_json_strict
 from inclusive_shift_har.manifests.validation import (
     ManifestValidationError,
     validate_manifest_directory,
     validate_manifest_file,
+)
+from inclusive_shift_har.protocols.audit import (
+    audit_split_manifest_file,
+    write_split_audit_new,
+)
+from inclusive_shift_har.protocols.splits import (
+    build_released_block_split_manifest,
+    build_source_window_manifest,
+    write_source_window_manifest_new,
+    write_split_manifest_new,
 )
 
 EXIT_SUCCESS = 0
@@ -28,16 +39,6 @@ EXIT_VALIDATION = 2
 EXIT_GATE_CLOSED = 3
 
 _GATED_COMMANDS: dict[str, dict[str, str]] = {
-    "build-splits": {
-        "code": "DATA_AUDIT_GATE_CLOSED",
-        "required_gate": "data_audit_pass",
-        "message": "split construction is gated and not implemented until the data audit passes",
-    },
-    "audit-splits": {
-        "code": "SPLIT_MANIFEST_GATE_CLOSED",
-        "required_gate": "data_audit_pass_and_split_manifest_present",
-        "message": "split audit is gated and not implemented until a deterministic split manifest exists",
-    },
     "train": {
         "code": "TRAINING_GATE_CLOSED_NOT_IMPLEMENTED",
         "required_gate": "split_audit_pass",
@@ -198,6 +199,110 @@ def _validate_artifacts(args: argparse.Namespace) -> int:
     return EXIT_SUCCESS if report.valid else EXIT_VALIDATION
 
 
+def _build_splits(args: argparse.Namespace) -> int:
+    try:
+        manifest = build_released_block_split_manifest(
+            audit_report_path=args.audit_report,
+            protocol_config_path=args.protocol_config,
+            ontology_config_path=args.ontology_config,
+            preprocessing_config_path=args.preprocessing_config,
+            authorization_path=args.authorization,
+        )
+        published = write_split_manifest_new(
+            manifest,
+            args.output,
+            allowed_root=args.allowed_root,
+        )
+    except (OSError, PermissionError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "SPLIT_BUILD_VALIDATION_ERROR",
+            "command": "build-splits",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "command": "build-splits",
+        "output": published.as_posix(),
+        "split_manifest_sha256": manifest["split_manifest_sha256"],
+        "status": "built_conditional_released_block",
+        "target_performance_or_prediction_accessed": False,
+        "window_count": manifest["window_count"],
+    }
+    _emit(payload, as_json=args.json)
+    return EXIT_SUCCESS
+
+
+def _audit_splits(args: argparse.Namespace) -> int:
+    try:
+        report = audit_split_manifest_file(
+            split_manifest_path=args.split_manifest,
+            audit_report_path=args.audit_report,
+            protocol_config_path=args.protocol_config,
+            ontology_config_path=args.ontology_config,
+            preprocessing_config_path=args.preprocessing_config,
+            authorization_path=args.authorization,
+        )
+        published: Path | None = None
+        if args.output is not None:
+            published = write_split_audit_new(
+                report,
+                args.output,
+                allowed_root=args.allowed_root,
+            )
+    except (OSError, PermissionError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "SPLIT_AUDIT_VALIDATION_ERROR",
+            "command": "audit-splits",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "command": "audit-splits",
+        "output": published.as_posix() if published is not None else None,
+        "report": report,
+        "status": report["status"],
+    }
+    _emit(payload, as_json=args.json)
+    return EXIT_SUCCESS if report["valid"] else EXIT_VALIDATION
+
+
+def _build_source_windows(args: argparse.Namespace) -> int:
+    try:
+        parsed = load_json_strict(args.split_manifest)
+        if not isinstance(parsed, Mapping):
+            raise ValueError("split manifest root must be an object")
+        manifest = build_source_window_manifest(parsed)
+        published = write_source_window_manifest_new(
+            manifest,
+            args.output,
+            allowed_root=args.allowed_root,
+        )
+    except (OSError, PermissionError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "SOURCE_WINDOW_MANIFEST_VALIDATION_ERROR",
+            "command": "build-source-windows",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "command": "build-source-windows",
+        "output": published.as_posix(),
+        "source_window_count": manifest["source_window_count"],
+        "source_window_manifest_sha256": manifest["source_window_manifest_sha256"],
+        "status": "built_source_only_materialization_manifest",
+        "target_performance_or_prediction_accessed": False,
+        "target_subject_or_window_records_included": False,
+    }
+    _emit(payload, as_json=args.json)
+    return EXIT_SUCCESS
+
+
 def _gated(args: argparse.Namespace) -> int:
     payload = gated_command_payload(args.command)
     _emit(payload, as_json=args.json)
@@ -263,6 +368,59 @@ def build_parser() -> argparse.ArgumentParser:
     artifact_parser.add_argument("--require-artifacts", action="store_true")
     artifact_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     artifact_parser.set_defaults(handler=_validate_artifacts)
+
+    split_defaults = {
+        "audit_report": "results/data_audit/inclusivehar_v4.audit.json",
+        "authorization": "results/protocol/released_block_deviation_authorization.json",
+        "ontology_config": "configs/ontologies/inclusivehar_v1_1.yaml",
+        "preprocessing_config": "configs/preprocessing/inclusivehar_primary_128.yaml",
+        "protocol_config": "configs/protocols/inclusivehar_released_block_v1_2.yaml",
+    }
+    build_split_parser = subparsers.add_parser(
+        "build-splits",
+        help="build the authorized deterministic participant-exclusive released-block split",
+    )
+    build_split_parser.add_argument("--audit-report", default=split_defaults["audit_report"])
+    build_split_parser.add_argument("--protocol-config", default=split_defaults["protocol_config"])
+    build_split_parser.add_argument("--ontology-config", default=split_defaults["ontology_config"])
+    build_split_parser.add_argument(
+        "--preprocessing-config", default=split_defaults["preprocessing_config"]
+    )
+    build_split_parser.add_argument("--authorization", default=split_defaults["authorization"])
+    build_split_parser.add_argument(
+        "--output",
+        default="results/protocol/splits/inclusivehar_v4_released_block_v1_2.json",
+    )
+    build_split_parser.add_argument("--allowed-root", default="results/protocol")
+    build_split_parser.add_argument("--json", action="store_true")
+    build_split_parser.set_defaults(handler=_build_splits)
+
+    audit_split_parser = subparsers.add_parser(
+        "audit-splits",
+        help="rebuild and independently audit a released-block split without reading signals",
+    )
+    audit_split_parser.add_argument("--split-manifest", required=True)
+    audit_split_parser.add_argument("--audit-report", default=split_defaults["audit_report"])
+    audit_split_parser.add_argument("--protocol-config", default=split_defaults["protocol_config"])
+    audit_split_parser.add_argument("--ontology-config", default=split_defaults["ontology_config"])
+    audit_split_parser.add_argument(
+        "--preprocessing-config", default=split_defaults["preprocessing_config"]
+    )
+    audit_split_parser.add_argument("--authorization", default=split_defaults["authorization"])
+    audit_split_parser.add_argument("--output")
+    audit_split_parser.add_argument("--allowed-root", default="results/protocol")
+    audit_split_parser.add_argument("--json", action="store_true")
+    audit_split_parser.set_defaults(handler=_audit_splits)
+
+    source_window_parser = subparsers.add_parser(
+        "build-source-windows",
+        help="derive a source-only materialization manifest from a sealed audited split",
+    )
+    source_window_parser.add_argument("--split-manifest", required=True)
+    source_window_parser.add_argument("--output", required=True)
+    source_window_parser.add_argument("--allowed-root", default="results/protocol")
+    source_window_parser.add_argument("--json", action="store_true")
+    source_window_parser.set_defaults(handler=_build_source_windows)
 
     for command in _GATED_COMMANDS:
         gated_parser = subparsers.add_parser(command, help=_GATED_COMMANDS[command]["message"])

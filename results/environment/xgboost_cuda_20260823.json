@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "status": "synthetic_cuda_smoke_pass",
+  "recorded_date_utc": "2026-08-23",
+  "xgboost": "3.2.0",
+  "device_requested": "cuda",
+  "booster_device_observed": "cuda:0",
+  "training_input": "synthetic_only",
+  "sample_count": 300,
+  "feature_pipeline": "repository engineered inertial features",
+  "probability_shape": [30, 3],
+  "probabilities_finite": true,
+  "scientific_result": false,
+  "prediction_note": "NumPy prediction used XGBoost's documented device-mismatch DMatrix fallback because the trained booster was on cuda:0 and prediction input was CPU-resident; this smoke record is not a latency result."
+}

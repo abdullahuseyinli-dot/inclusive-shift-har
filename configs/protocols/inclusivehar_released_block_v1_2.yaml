@@ -1,0 +1,112 @@
+schema_version: "1.0.0"
+protocol_id: "inclusivehar-released-block-v1.2"
+status: "locked_conditional_user_authorized_deviation"
+dataset_id: "inclusivehar_v4"
+stage3_audit_report_sha256: "673917d3bfd4b3f283a1ae521ae4a7d548e3facadd2ae89ce33b2e27153500e8"
+stage3_audit_file_sha256: "b85e641da9fdc3ac61b6c8440a78c2b6aee625c160b095c8170c0b9d1a4a4204"
+authorization_record: "results/protocol/released_block_deviation_authorization.json"
+ontology_config: "configs/ontologies/inclusivehar_v1_1.yaml"
+ontology_schema_policy: "Require an explicit ordered numeric class schema for every runnable track."
+preprocessing_config: "configs/preprocessing/inclusivehar_primary_128.yaml"
+evidence_language:
+  allowed: "participant-exclusive released-block protocol"
+  forbidden:
+    - "trial-safe"
+    - "trial-exclusive"
+    - "timestamp-discontinuity-safe"
+    - "hidden-join-free"
+windowing:
+  length_samples: 128
+  stride_samples: 128
+  partition_subjects_before_windowing: true
+  boundary_unit: "released_contiguous_subject_activity_block"
+  remainder_policy: "drop_tail_shorter_than_128_per_released_block"
+  raw_overlap_allowed: false
+hidden_join_risk:
+  reported_repetitions_per_subject_activity: 3
+  conditional_hidden_joins_per_released_block: 2
+  conditional_bound_formula: "crossing_windows <= sum_b min(hidden_joins_b, floor(block_rows_b / 128))"
+  unconditional_bound_without_join_metadata: 1.0
+  interpretation: "The two-join bound is conditional on exactly three contiguous repetitions and no other joins; without that assumption the only valid bound is 100 percent."
+participants:
+  source_subjects: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  target_subjects: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+source_grouped_cv:
+  - fold_id: "source_cv_01"
+    validation_subjects: ["1", "4"]
+  - fold_id: "source_cv_02"
+    validation_subjects: ["6", "7"]
+  - fold_id: "source_cv_03"
+    validation_subjects: ["2", "3"]
+  - fold_id: "source_cv_04"
+    validation_subjects: ["5", "9"]
+  - fold_id: "source_cv_05"
+    validation_subjects: ["8", "10"]
+source_fold_derivation:
+  algorithm: "Sort lowercase SHA-256(subject token) ascending, pair adjacent subjects."
+  token_template: "inclusive-shift-har|inclusivehar_v4|source_cv_v1|{subject_id}"
+  algorithm_version: "sha256-adjacent-pairs-v1"
+source_nested_cv_policy:
+  outer_test_folds: "Each source_grouped_cv pair serves once as untouched outer test."
+  inner_validation_folds: "For each outer test pair, rotate each of the other four pairs once as inner validation."
+  normalization_scope: "Fit separately on the six inner-training participants only."
+  outer_test_allowed_for_selection: false
+final_source_split:
+  train_subjects: ["1", "2", "3", "4", "5", "6", "7", "9"]
+  validation_subjects: ["8", "10"]
+  derivation: "Use the last adjacent SHA-256 pair from source_fold_derivation as validation."
+zero_shot_target:
+  subjects: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+  status: "sealed"
+  maximum_confirmatory_openings: 1
+  selection_inputs_allowed: false
+few_person_outer_folds:
+  - fold_id: "target_outer_01"
+    evaluation_subjects: ["12", "18"]
+    inclusion_order: ["13", "15", "17", "19", "16", "14", "11", "20"]
+  - fold_id: "target_outer_02"
+    evaluation_subjects: ["13", "15"]
+    inclusion_order: ["18", "12", "17", "19", "16", "14", "11", "20"]
+  - fold_id: "target_outer_03"
+    evaluation_subjects: ["17", "19"]
+    inclusion_order: ["18", "12", "13", "15", "16", "14", "11", "20"]
+  - fold_id: "target_outer_04"
+    evaluation_subjects: ["14", "16"]
+    inclusion_order: ["18", "12", "13", "15", "17", "19", "11", "20"]
+  - fold_id: "target_outer_05"
+    evaluation_subjects: ["11", "20"]
+    inclusion_order: ["18", "12", "13", "15", "17", "19", "16", "14"]
+target_fold_derivation:
+  algorithm: "Sort lowercase SHA-256(subject token) ascending, pair adjacent subjects; each fold's inclusion order is the same global order with its evaluation pair removed."
+  token_template: "inclusive-shift-har|inclusivehar_v4|target_outer_v1|{subject_id}"
+  algorithm_version: "sha256-adjacent-pairs-with-prefix-order-v1"
+few_person_k_values: [1, 2, 4]
+few_person_policy:
+  nested_prefixes_of_inclusion_order: true
+  source_hyperparameters_fixed: true
+  source_validation_only: true
+  normalization_reused_from_source_train_only: true
+  zero_shot_must_be_completed_before_target_adaptation: true
+normalization:
+  fit_partition: "source_train"
+  validation_excluded: true
+  target_excluded: true
+  few_person_reuses_source_only_statistics: true
+calibration:
+  fit_partition: "source_validation"
+  target_excluded: true
+selection:
+  target_labels_or_performance_allowed: false
+  source_nested_outer_test_allowed_for_selection: false
+  primary_checkpoint_selection: "source_validation_macro_f1"
+  equal_tuning_budget_required: true
+final_training_rule:
+  epoch_count: "Median of source-CV best epochs; if the median is non-integral, use the lower integer; earliest epoch wins metric ties."
+  preprocessing_fit_subjects: "The active source-training subjects only; never source validation or target."
+  calibration_partition: "source_validation"
+statistics:
+  final_seeds: [11, 23, 47, 89, 131]
+  primary_endpoint: "mean_target_participant_macro_f1"
+  lower_tail_endpoint: "worst_participant_and_lower_decile_macro_f1"
+  source_noninferiority_margin_absolute_macro_f1: 0.02
+  participant_clustered_inference: true

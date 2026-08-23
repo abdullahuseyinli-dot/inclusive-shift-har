@@ -1,0 +1,45 @@
+schema_version: "1.0.0"
+protocol_id: uci_har_v1_source_grouped_cv_v1
+status: source_protocol_ready_no_training_run
+dataset_id: uci_har_v1
+dataset_manifest: manifests/datasets/uci_har_v1.json
+dataset_manifest_sha256: a7d016ffde65917f0edd410f27e263d7f00e42f8bc498b7584cab91812d17c5c
+processed_archive_sha256: 2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0
+evidence_status: corrected_source_development_protocol_no_model_results
+source_scope:
+  released_split: train
+  subject_count: 21
+  window_count: 7352
+  official_test_allowed_for_selection: false
+  official_test_status: legacy_exploratory_development_consumed
+fold_assignment:
+  algorithm: sha256_rank_then_round_robin
+  namespace: inclusive-shift-har|uci_har_v1|source_grouped_cv_v1
+  seed: 5062
+  fold_count: 5
+  validation_subjects:
+    uci_source_cv_01: [1, 11, 21, 25, 30]
+    uci_source_cv_02: [3, 15, 19, 28]
+    uci_source_cv_03: [14, 16, 22, 23]
+    uci_source_cv_04: [8, 26, 27, 29]
+    uci_source_cv_05: [5, 6, 7, 17]
+leakage_controls:
+  participant_partition_before_preprocessing: true
+  normalization_fit: fold_training_subjects_only
+  overlapping_released_windows_cross_partitions: false
+  raw_sample_overlap_basis: participant_exclusivity
+  class_count_source: locked_uci_native_ontology_six
+  test_based_early_stopping: false
+  test_based_calibration: false
+model_selection:
+  primary_metric: mean_validation_participant_macro_f1
+  tie_breakers: [worst_validation_participant_macro_f1, lower_parameter_count]
+  seeds: [42, 1337, 2025, 31415, 271828]
+final_source_pretraining:
+  refit_subjects: all_official_train_subjects
+  normalization_fit: all_official_train_subjects
+  official_test_inclusion: forbidden
+limitations:
+  - Processed v1 has no trial identifiers or raw-sample indices.
+  - Released windows have provider-reported 50 percent overlap.
+  - The official test cannot support a fresh confirmatory claim.

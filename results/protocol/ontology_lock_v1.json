@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "ontology_lock",
+  "status": "locked_conditional_released_block_protocol",
+  "locked_date_utc": "2026-08-23",
+  "exact_lock_time_status": "not_recorded",
+  "dataset_id": "inclusivehar_v4",
+  "ontology_id": "inclusivehar-v4-ontology-v1",
+  "ontology_config_path": "configs/ontologies/inclusivehar_v1.yaml",
+  "ontology_config_file_sha256": "8e1b1671b02e2bca094d083768dd0fde8be1d9378d256d8d0597e759d3d9a667",
+  "ontology_config_canonical_sha256": "00364403a75cddf13b0f1fe4e4663383ec2d608d7b5d31105fbc7f6d78ea039b",
+  "released_labels": [
+    "Ramp ascent",
+    "Ramp descent",
+    "Sitting",
+    "Standing",
+    "Walking",
+    "jogging"
+  ],
+  "tracks": {
+    "inclusive_native": {
+      "status": "runnable_after_split_audit",
+      "role": "secondary",
+      "class_count": 6
+    },
+    "functional_core": {
+      "status": "primary_runnable_after_split_audit",
+      "role": "primary_ability_shift",
+      "mapping": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Walking": "mobility"
+      }
+    },
+    "cross_source_core": {
+      "status": "blocked_not_classification_ready",
+      "exact_mapping": {
+        "Sitting": "sitting"
+      },
+      "provisional_mapping": {
+        "Standing": "standing"
+      }
+    },
+    "ambulatory_walking_sensitivity": {
+      "status": "blocked_pending_participant_eligibility_lock",
+      "role": "exploratory_only"
+    }
+  },
+  "semantic_guards": [
+    "Wheelchair-user Walking denotes manual propulsion and is not ordinary gait.",
+    "InclusiveHAR ramp ascent and descent are not UCI-HAR stair classes.",
+    "Standing realization for wheelchair users is not documented and remains provisional cross-source semantics.",
+    "Class counts and mappings come only from the locked ontology, never validation or sealed-target labels."
+  ],
+  "target_performance_or_predictions_accessed": false,
+  "record_sha256": "c4f2a474e597aeaca1da2918ead8e90099e7671338f132ab62d7f08beda556e8"
+}

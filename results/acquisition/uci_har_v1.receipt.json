@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "receipt_kind": "official_dataset_acquisition",
+  "dataset_id": "uci_har_v1",
+  "status": "official_verified_with_preserved_path_failure",
+  "retrieval_date": "2026-08-23",
+  "official_catalog": {
+    "dataset_id": 240,
+    "doi": "10.24432/C54S4K",
+    "landing_url": "https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones",
+    "metadata_endpoint": "https://archive.ics.uci.edu/api/dataset?id=240",
+    "catalog_last_updated": "Sun Mar 10 2024",
+    "catalog_license_identifier": "CC-BY-4.0"
+  },
+  "retrievals": [
+    {
+      "artifact_id": "uci_har_v1_dataset_zip",
+      "completed_at_utc": "2026-08-23T21:22:11.197545Z",
+      "source_url": "https://archive.ics.uci.edu/static/public/240/human+activity+recognition+using+smartphones.zip",
+      "canonical_storage_path": "data/raw/uci_har/v1/human+activity+recognition+using+smartphones.zip",
+      "size_bytes": 61005872,
+      "sha256": "c00b803081a5c797cd5e4b83700a9810b38d53d9d84e01917e090e1fdbc81031",
+      "provider_hash_was_published": false,
+      "hash_status": "locally_pinned_after_first_official_https_retrieval",
+      "read_only": true,
+      "zip_crc_status": "pass"
+    },
+    {
+      "artifact_id": "uci_har_v1_names",
+      "completed_at_utc": "2026-08-23T21:22:46.748501Z",
+      "source_url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.names",
+      "canonical_storage_path": "data/raw/uci_har/v1/UCI HAR Dataset.names",
+      "size_bytes": 6304,
+      "sha256": "eaee53f45825f349681a1a1b92a997a0082648f9b5bf93ddb3290caeede4b3a8",
+      "hash_status": "matched_previously_locally_observed_official_https_hash",
+      "read_only": true
+    }
+  ],
+  "official_wrapper_inventory": {
+    "member_count": 2,
+    "members": [
+      {
+        "path": "UCI HAR Dataset.names",
+        "size_bytes": 6304,
+        "crc32": "2e002145",
+        "sha256": "eaee53f45825f349681a1a1b92a997a0082648f9b5bf93ddb3290caeede4b3a8"
+      },
+      {
+        "path": "UCI HAR Dataset.zip",
+        "size_bytes": 60999314,
+        "crc32": "2c58e81c",
+        "sha256": "2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0"
+      }
+    ],
+    "names_member_is_byte_identical_to_direct_names_download": true
+  },
+  "materialized_processed_archive": {
+    "source_outer_member": "UCI HAR Dataset.zip",
+    "method": "streamed_create_only_then_hard_link_publication",
+    "storage_path": "data/raw/uci_har/v1/UCI HAR Dataset.zip",
+    "size_bytes": 60999314,
+    "sha256": "2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0",
+    "member_count_including_directories": 74,
+    "uncompressed_size_bytes": 282568739,
+    "zip_crc_status": "pass",
+    "read_only": true
+  },
+  "preserved_failure_evidence": {
+    "code": "ACQUISITION_DESTINATION_ROOT_APPLIED_TWICE",
+    "cause": "relative destination already contained data/raw when passed to a root-relative safety helper",
+    "preserved_path": "data/raw/data/raw/uci_har/v1/human+activity+recognition+using+smartphones.zip",
+    "canonical_path": "data/raw/uci_har/v1/human+activity+recognition+using+smartphones.zip",
+    "recovery": "create_only_hard_link_at_canonical_path_no_deletion",
+    "same_ntfs_file_id": "0x0000000000000000000500000000412a",
+    "hard_link_count_observed": 2,
+    "both_paths_read_only": true,
+    "both_paths_sha256": "c00b803081a5c797cd5e4b83700a9810b38d53d9d84e01917e090e1fdbc81031",
+    "preservation_status": "retained_visible_outside_git"
+  },
+  "license": {
+    "status": "conflicting_notices",
+    "catalog_notice": "CC-BY-4.0",
+    "embedded_version_1_notice": "publication_acknowledgement_required_and_commercial_use_prohibited",
+    "resolution": "unresolved_preserve_both_do_not_redistribute_raw"
+  },
+  "git_policy": {
+    "raw_paths_ignored_by": ".gitignore:/data/raw/",
+    "raw_paths_staged": false,
+    "raw_redistribution": "forbidden"
+  },
+  "receipt_sha256": "1cf84969a5c92196f0f728be6c0859a72e4682e4dc12d6aaec51eb8cd6b4b4b8"
+}

@@ -16,7 +16,7 @@ Results must be presented under exactly one of these evidence classes. They are 
 | **Corrected reproduction / development** | Subject-grouped reproduction, baseline development, ablations, debugging, and tuning conducted under explicit development protocols. | Not yet reported. These results will not be called confirmatory. |
 | **Locked confirmatory** | A preregistered configuration evaluated once on a sealed target cohort only after manifests, splits, code, and artifacts pass all gates. | **No locked confirmatory result exists.** |
 
-The legacy audit is in [`docs/LEGACY_AUDIT.md`](docs/LEGACY_AUDIT.md). The current InclusiveHAR audit, data card, and hardware record are in [`docs/DATA_AUDIT.md`](docs/DATA_AUDIT.md), [`docs/data/INCLUSIVEHAR_V4.md`](docs/data/INCLUSIVEHAR_V4.md), and [`docs/HARDWARE.md`](docs/HARDWARE.md). Machine-readable legacy evidence is under [`legacy/`](legacy/README.md).
+The legacy audit is in [`docs/LEGACY_AUDIT.md`](docs/LEGACY_AUDIT.md). The current InclusiveHAR audit, data card, conditionally locked protocol, and hardware record are in [`docs/DATA_AUDIT.md`](docs/DATA_AUDIT.md), [`docs/data/INCLUSIVEHAR_V4.md`](docs/data/INCLUSIVEHAR_V4.md), [`docs/LOCKED_PROTOCOL.md`](docs/LOCKED_PROTOCOL.md), and [`docs/HARDWARE.md`](docs/HARDWARE.md). Machine-readable legacy evidence is under [`legacy/`](legacy/README.md).
 
 ## Research question
 
@@ -53,16 +53,24 @@ src/inclusive_shift_har/
     artifacts/
     data/
     manifests/
+    preprocessing/
+    protocols/
     py.typed
+configs/
+    ontologies/
+    preprocessing/
+    protocols/
 manifests/datasets/
 results/
     data_audit/
     gates/
+    protocol/
 docs/
     DATA_AUDIT.md
     HARDWARE.md
     LEGACY_AUDIT.md
     LITERATURE_MATRIX.md
+    LOCKED_PROTOCOL.md
     PROJECT_STATUS.md
     data/INCLUSIVEHAR_V4.md
 legacy/
@@ -72,7 +80,7 @@ legacy/
     metric_reconstruction.json
 ```
 
-The repository now includes immutable dataset manifests, safe acquisition/audit primitives, artifact validation, and a privacy-preserving InclusiveHAR v4 audit. Split construction, model training, evaluation, and calibration are not implemented or authorized; their visible placeholders remain fail-closed.
+The repository now includes immutable dataset manifests, safe acquisition/audit primitives, artifact validation, a privacy-preserving InclusiveHAR v4 audit, and deterministic released-block split construction/auditing. The Stage 4 split is participant-exclusive and raw-row-disjoint but explicitly not trial-safe. Model training and evaluation remain separate gates, and no InclusiveHAR target predictions or performance have been produced.
 
 ## Environment
 
@@ -90,6 +98,9 @@ The console entry point exposes validated provenance and audit commands:
 
 - `validate-manifests`
 - `audit-data` (no-access dry run by default; raw reads require a matching gate record)
+- `build-splits` (create-only construction from the frozen aggregate audit; no raw signal read)
+- `audit-splits` (deterministic rebuild and independent leakage/boundary audit)
+- `build-source-windows` (derive a source-only materialization manifest with no target records)
 - `validate-artifacts`
 
 The full privacy-safe InclusiveHAR audit is explicit and gated:
@@ -98,7 +109,7 @@ The full privacy-safe InclusiveHAR audit is explicit and gated:
 uv run inclusive-shift-har audit-data --manifest manifests/history/inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json --profile inclusivehar-v4 --read-only --data-root data/raw --gate-record results/gates/raw_data_read_access_inclusivehar_v4.json --json
 ```
 
-`build-splits`, `audit-splits`, `train`, and `evaluate` are visible fail-closed gates. They exit non-zero with machine-readable `gated_not_implemented` status until their implementations and prerequisite evidence exist.
+`train` and `evaluate` remain visible fail-closed gates. `evaluate` requires a separate one-time final-evaluation unlock; none exists.
 
 `uv.lock` records the software environment only. Dataset versions and immutable source hashes belong in separate data manifests because a Python dependency lock cannot establish data provenance.
 
@@ -106,7 +117,7 @@ uv run inclusive-shift-har audit-data --manifest manifests/history/inclusivehar_
 
 - Download datasets only from official, versioned sources after recording URL/DOI, version, retrieval date, size, SHA-256, licence, citation, and expected schema.
 - Keep raw data immutable and outside normal Git history.
-- Partition participants before windowing; never window across participants, trials, discontinuities, or activity boundaries.
+- Partition participants before windowing; never cross participant, known trial/discontinuity, activity, or released-block boundaries. InclusiveHAR hidden trials are unrecoverable, so its authorized released-block protocol retains a 100% unconditional hidden-join contamination bound and may not be called trial-safe.
 - Fit normalization on training data only and tune/calibrate on validation only.
 - Do not derive class mappings or output dimensions from confirmatory test labels.
 - Preserve manifests, configurations, predictions, failures, checkpoints, and protocol-opening records.
@@ -118,7 +129,9 @@ The local `.audit/` directory contains preserved Stage 0 extraction evidence. It
 
 The Stage 0 archive-integrity and legacy-artifact gate passes. It validates the checksum, complete archive inventory, and internal consistency of saved predictions—not the scientific validity of the old protocol.
 
-The two official InclusiveHAR v4 artifacts have been acquired into immutable, Git-ignored local raw storage and verified against the versioned provider sizes and SHA-256 values. Stage 3 passes artifact, schema, numeric-integrity, participant, group, and label-coverage checks, but remains **protocol quarantined**: the release has no timestamp, trial, session, recording, or raw-sample identifier, so trial-safe windowing cannot be demonstrated. Stage 4 and all split/training/evaluation work are blocked pending authoritative boundaries or an explicit locked protocol revision.
+The two official InclusiveHAR v4 artifacts have been acquired into immutable, Git-ignored local raw storage and verified against the versioned provider sizes and SHA-256 values. Stage 3 passes artifact, schema, numeric-integrity, participant, group, and label-coverage checks, while its original trial-boundary quarantine remains preserved.
+
+Stage 4 now has an explicit user-authorized, conditionally locked revision: assign participants first, then extract non-overlapping length/stride-128 windows strictly within each released subject-label block. The structural audit validates 3,042 raw-row-disjoint windows and 7,226 dropped tail rows. The conditional three-repetition assumption bounds hidden-join crossings by 240/3,042 (7.8895%); because that assumption is unverified, the unconditional bound remains 100%. The target cohort remains sealed and no final-evaluation unlock exists.
 
 No corrected reproduction, development model result, or locked confirmatory result is reported.
 

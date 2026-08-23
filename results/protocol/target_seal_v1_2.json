@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "zero_shot_target_seal",
+  "status": "sealed",
+  "sealed_date_utc": "2026-08-23",
+  "exact_seal_time_status": "not_recorded",
+  "dataset_id": "inclusivehar_v4",
+  "target_seal_id": "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d",
+  "split_manifest_path": "results/protocol/splits/inclusivehar_v4_released_block_v1_2.json",
+  "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+  "target_subject_ids": [
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20"
+  ],
+  "maximum_confirmatory_openings": 1,
+  "target_predictions_accessed": false,
+  "target_performance_accessed": false,
+  "unlock_record": null,
+  "unlock_contract": {
+    "gate": "final_evaluation_unlock",
+    "required_status": "approved",
+    "required_opening_number": 1,
+    "required_reason": "locked_confirmatory_evaluation",
+    "required_gates": [
+      "artifact_validation_passed",
+      "configuration_validation_passed",
+      "manifest_validation_passed",
+      "protocol_lock_present",
+      "split_audit_passed",
+      "tests_passed",
+      "type_checks_passed",
+      "working_tree_clean_or_documented"
+    ]
+  },
+  "few_person_policy": "The source-only zero-shot evaluation must complete before a separate target-adaptation authorization; this seal does not authorize either action.",
+  "supersedes_record": "results/protocol/target_seal_v1.json",
+  "record_sha256": "2f9a9fe6eb9341fca4e2d27e2cdb5833ae079672a2138ee77210b5ed9d82849d"
+}

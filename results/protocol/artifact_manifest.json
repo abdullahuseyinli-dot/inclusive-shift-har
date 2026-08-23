@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_kind": "artifact",
+  "artifact_id": "inclusivehar-v4-released-block-protocol-v1.2",
+  "artifact_type": "protocol_evidence",
+  "status": "conditional",
+  "evidence_status": "participant_exclusive_released_block_not_trial_safe_target_sealed",
+  "created_date_utc": "2026-08-23",
+  "exact_creation_time_status": "not_recorded",
+  "provenance": {
+    "code_commit": "uncommitted_stage4_worktree_base_0e07162bc10d68b51d7e995683574220e4171d09",
+    "configuration_sha256": "d3425c88b0f003aa4a1a57524ceefc105d4f607c8bd2e9d859ff0056e3577220",
+    "dataset_manifest_sha256": "cbdceaa9fa1d50862d76130e271f4b40943c903fcfc5442e10209bb1133022d5"
+  },
+  "files": [
+    {
+      "role": "protocol_deviation_authorization",
+      "path": "protocol/released_block_deviation_authorization.json",
+      "size_bytes": 1766,
+      "sha256": "2986c318e4e86dcca86dc2408785e85ad8fadd0f7294133159e85a95eccdc82d"
+    },
+    {
+      "role": "ontology_lock",
+      "path": "protocol/ontology_lock_v1_1.json",
+      "size_bytes": 2013,
+      "sha256": "bf1b6187428f970304bd41fbb5c0b7da9705bc6a4150b1002b4dbc57a6454040"
+    },
+    {
+      "role": "target_seal",
+      "path": "protocol/target_seal_v1_2.json",
+      "size_bytes": 1567,
+      "sha256": "3e123e92c6efeb026ed4b8358206c72d5fdce9ab1ac7e36dd5382cf397e647df"
+    },
+    {
+      "role": "protocol_lock",
+      "path": "protocol/protocol_lock_v1_2.json",
+      "size_bytes": 4714,
+      "sha256": "d39548f5d477114a160eda2f93f02921a347bc8ed4146001a39378bf106b0e29"
+    },
+    {
+      "role": "split_manifest",
+      "path": "protocol/splits/inclusivehar_v4_released_block_v1_2.json",
+      "size_bytes": 1755961,
+      "sha256": "af909c7d914b68c417b238b576945c112aa58740859a7d998b6b77219dfb1920"
+    },
+    {
+      "role": "split_audit",
+      "path": "protocol/split_audit_v1_2.json",
+      "size_bytes": 1289,
+      "sha256": "08dbba5b68514e5ff0f379710aedf21dcdaad6b6e71d264b5c59cfebb924ef6e"
+    },
+    {
+      "role": "source_window_manifest",
+      "path": "protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+      "size_bytes": 815930,
+      "sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+    },
+    {
+      "role": "v1_supersession",
+      "path": "protocol/released_block_v1_supersession.json",
+      "size_bytes": 2042,
+      "sha256": "710a103c3f0d12db09cb72c4386e4f4c0ddaece2caf063fe85a3c74abdc3714d"
+    },
+    {
+      "role": "v1_1_supersession",
+      "path": "protocol/released_block_v1_1_supersession.json",
+      "size_bytes": 2491,
+      "sha256": "bb60f91ee5246399b50410dc27727f110d691540315fdee5917031a99bc65f40"
+    }
+  ]
+}

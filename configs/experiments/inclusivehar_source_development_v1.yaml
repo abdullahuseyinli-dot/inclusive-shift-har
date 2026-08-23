@@ -1,0 +1,39 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-source-development-v1"
+status: "predeclared_source_only_development"
+protocol: "configs/protocols/inclusivehar_released_block_v1_2.yaml"
+source_window_manifest: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+ontology_track: functional_core
+information_policy:
+  target_predictions_allowed: false
+  target_metrics_allowed: false
+  model_selection_participants: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+tuning:
+  equal_trials_per_model: 4
+  selection_seed: 11
+  candidates:
+    learning_rate: [0.0003, 0.001]
+    weight_decay: [0.0001, 0.001]
+  fixed:
+    optimizer: adamw
+    batch_size: 256
+    maximum_epochs: 80
+    early_stopping_patience: 12
+    minimum_epochs: 8
+    mixed_precision: float16
+    dataloader_workers: 0
+  selection_metric: mean_validation_participant_macro_f1
+  tie_breakers:
+    - worst_validation_participant_macro_f1
+    - lower_parameter_count
+    - lower_learning_rate
+final:
+  seeds: [11, 23, 47, 89, 131]
+  epoch_rule: "median source-fold best epoch, lower integer if non-integral, earliest epoch wins fold ties"
+  calibration: "single temperature fitted on pooled source out-of-fold logits"
+statistics:
+  participant_bootstrap_resamples: 10000
+  participant_bootstrap_seed: 1729
+  paired_permutation_samples: 100000
+  paired_permutation_seed: 2718
+  multiple_comparison_correction: holm_within_model_family

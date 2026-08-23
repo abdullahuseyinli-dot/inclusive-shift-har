@@ -1,0 +1,68 @@
+schema_version: "1.0.0"
+ontology_id: "inclusivehar-v4-ontology-v1.1"
+status: "locked_conditional_released_block_protocol"
+dataset_id: "inclusivehar_v4"
+source_label_column: "label"
+source_label_is_model_feature: false
+released_labels:
+  "Ramp ascent": "ramp_ascent"
+  "Ramp descent": "ramp_descent"
+  "Sitting": "sitting"
+  "Standing": "standing"
+  "Walking": "walking"
+  "jogging": "jogging"
+tracks:
+  inclusive_native:
+    status: "runnable_after_split_audit"
+    role: "secondary"
+    class_order:
+      - "jogging"
+      - "ramp_ascent"
+      - "ramp_descent"
+      - "sitting"
+      - "standing"
+      - "walking"
+    classes:
+      ramp_ascent: "ramp_ascent"
+      ramp_descent: "ramp_descent"
+      sitting: "sitting"
+      standing: "standing"
+      walking: "walking"
+      jogging: "jogging"
+    semantic_constraints:
+      - "Walking preserves the released label; for wheelchair users it denotes manual propulsion."
+      - "Ramp labels denote an 8 percent incline and are not stairs."
+  functional_core:
+    status: "primary_runnable_after_split_audit"
+    role: "primary_ability_shift"
+    class_order:
+      - "mobility"
+      - "sitting"
+      - "standing"
+    classes:
+      sitting: "sitting"
+      standing: "standing"
+      walking: "mobility"
+    semantic_constraints:
+      - "mobility is a functional, non-exact class spanning ordinary walking and manual wheelchair propulsion."
+      - "standing remains a released functional label; wheelchair-user realization is not documented and must be discussed as a limitation."
+  cross_source_core:
+    status: "blocked_not_classification_ready"
+    role: "future_cross_source"
+    exact_classes:
+      sitting: "sitting"
+    provisional_classes:
+      standing: "standing"
+    excluded_mappings:
+      walking: "Not exact for the all-participant cohort because wheelchair Walking means manual propulsion."
+      ramp_ascent: "Not UCI-HAR walking upstairs."
+      ramp_descent: "Not UCI-HAR walking downstairs."
+      jogging: "No UCI-HAR v1 counterpart."
+    unblock_condition: "Document standing realization and lock at least two exact classes before classification."
+  ambulatory_walking_sensitivity:
+    status: "blocked_pending_participant_eligibility_lock"
+    role: "exploratory_only"
+    classes:
+      walking: "walking"
+    constraint: "Must use a predeclared ambulatory eligibility rule and may not be reported as the all-participant primary result."
+class_count_policy: "Read only from this locked ontology; never infer from validation or target labels."

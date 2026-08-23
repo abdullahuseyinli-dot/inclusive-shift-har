@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "protocol_supersession",
+  "status": "superseded_without_target_access",
+  "recorded_date_utc": "2026-08-23",
+  "exact_record_time_status": "not_recorded",
+  "superseded": {
+    "protocol_id": "inclusivehar-released-block-v1",
+    "config_path": "configs/protocols/inclusivehar_released_block_v1.yaml",
+    "config_file_sha256": "14dd200e36117c43767d398639daca11fc4dc3668403ebe669c56dfbc590faf3",
+    "config_canonical_sha256": "e7ff814ab5da54ede292754e0fdf18b855ec79462a4b07956a554af1c765165c",
+    "split_path": "results/protocol/splits/inclusivehar_v4_released_block_v1.json",
+    "split_file_sha256": "d3e7913599572effb03c01e68f10e956ca0a8d7cb13de907251a6dc15fce02ab",
+    "split_manifest_sha256": "92e4f6a69e00928bebc97d55e6d8de30f1cebf4fdcdd2400407eb5ae6e73e907",
+    "audit_path": "results/protocol/split_audit_v1.json",
+    "audit_file_sha256": "82382a14e911611f8990e2711b54d9dc32c84f84047a93265bb651cd2cb03735"
+  },
+  "superseding": {
+    "protocol_id": "inclusivehar-released-block-v1.1",
+    "config_path": "configs/protocols/inclusivehar_released_block_v1_1.yaml",
+    "config_file_sha256": "993bda25d3303b23ec310e3dfce21b4019348f8c6781934660236e10e347cfdd",
+    "config_canonical_sha256": "1ecf23c84f043d9254b797b2d66533c57470b3a13deaee9fd0309f4c1bc11246",
+    "split_path": "results/protocol/splits/inclusivehar_v4_released_block_v1_1.json",
+    "split_file_sha256": "1833934fb848b041a25e5192bdb7a4d2294d4fa7edafe603f2b57e39d56569f7",
+    "split_manifest_sha256": "f586a3f051df23752461df04a4bc7f8b5fd0be78151f7122c76c52087f7bccd5",
+    "audit_path": "results/protocol/split_audit_v1_1.json",
+    "audit_file_sha256": "5558ad8381ed0be8a9dc12a30d31c06eb97cfcb93eeb22f2716964162bab3283"
+  },
+  "reason": "Version 1.1 adds explicit nested source cross-validation records; version 1 remains preserved and deterministically reconstructable.",
+  "target_predictions_or_performance_accessed": false,
+  "record_sha256": "b4086bf2405a1cba0e7d5608bce800d0c2cc8b277b6c69f8999fa9f65217a0bd"
+}

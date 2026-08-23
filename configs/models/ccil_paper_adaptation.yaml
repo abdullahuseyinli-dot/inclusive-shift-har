@@ -1,0 +1,40 @@
+schema_version: "1.0.0"
+model_id: "ccil-paper-loss-adaptation"
+enabled: false
+status: "implemented_loss_not_selected_or_evaluated"
+claim_status: "paper_derived_equations_2_to_6_not_official_code_or_faithful_reproduction"
+paper:
+  title: "Generalizable Sensor-Based Activity Recognition via Categorical Concept Invariant Learning"
+  doi: "10.1609/aaai.v39i1.32077"
+  primary_url: "https://ojs.aaai.org/index.php/AAAI/article/view/32077"
+official_software:
+  located_as_of: "2026-08-23"
+  repository: null
+  license: null
+implementation:
+  module: "inclusive_shift_har.training.ccil_paper.CCILPaperConceptMeanLoss"
+  scope: "concept-mean similarity loss only"
+  official_code: false
+  faithful_reproduction: false
+  classifier_weight_layout: [num_classes, feature_dim]
+  concept_matrix_layout: [batch, feature_dim, num_classes]
+explicit_ambiguity_resolutions:
+  first_class_observation: "initialize directly from its source-training batch mean"
+  update_timing: "include current source-training batch before evaluating its loss"
+  ema_reference_gradient: "detached"
+  reduction: "mean over examples of squared Frobenius distance"
+protocol_guards:
+  state_updates: "source training only"
+  validation_and_evaluation_state: "frozen"
+  disability_status_input: false
+  assistive_device_status_input: false
+  participant_identity_input: false
+  target_cohort_for_selection: false
+unselected_source_only_search_space:
+  alpha: [0.01, 0.1, 1.0]
+  ema_update_weight: [0.01, 0.05, 0.1]
+activation_gate:
+  - "select alpha and EMA only within predeclared grouped source validation"
+  - "validate end-to-end checkpoint reconstruction including class-mean buffers"
+  - "run under the same source folds, seeds, tuning budget, and metrics as comparators"
+  - "retain the paper-adaptation qualifier in every result artifact"

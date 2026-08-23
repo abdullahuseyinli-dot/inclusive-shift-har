@@ -1,0 +1,26 @@
+schema_version: "1.0.0"
+model_family: legacy_joint_dual_branch_logit_average
+status: architecture_reconstructed_not_trained
+backend_reference: pytorch_2.12.0_locked_profile
+implementation: inclusive_shift_har.models.legacy_models.LegacyJointLogitFusion
+source_notebook_sha256: c25d78ad1a21e485a7bd0d9dd5cc74bba4d3872465be300d7be56d8b829f636
+source_cells: ["10/11/4929a1ae", "12/13/cc39cfc2", "14/15/8fcda24e", "26/27/12004a09"]
+input_channels: 6
+class_count: 6
+training_semantics: joint_end_to_end_single_objective
+aggregation: arithmetic_mean_of_branch_logits
+independent_estimator_ensemble: false
+variants:
+  - id: legacy_joint_bilstm256_cnn128
+    bilstm_hidden: 256
+    bilstm_layers: 2
+    bilstm_temporal_max_pool: true
+    cnn_hidden: 128
+    parameter_count: 2694028
+  - id: legacy_joint_bilstm512_cnn256
+    bilstm_hidden: 512
+    bilstm_layers: 2
+    bilstm_temporal_max_pool: true
+    cnn_hidden: 256
+    parameter_count: 10696460
+evidence_status: architecture_reconstruction_no_model_result

@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "recorded_at_utc": "2026-08-23T21:28:10.3313443Z",
+  "status": "cuda_runtime_smoke_pass",
+  "environment_profile": "training-cuda",
+  "installation": {
+    "resolver": "uv 0.11.29",
+    "python": "3.11.9",
+    "torch": "2.12.0+cu132",
+    "torch_cuda_runtime": "13.2",
+    "wheel_index": "https://download.pytorch.org/whl/cu132",
+    "lockfile": "uv.lock"
+  },
+  "gpu": {
+    "cuda_available": true,
+    "device_count": 1,
+    "device_name": "NVIDIA RTX PRO 3000 Blackwell Generation Laptop GPU",
+    "compute_capability": [12, 0],
+    "driver_version": "596.72",
+    "total_memory_bytes": 12820480000,
+    "nvidia_smi_total_memory_mib": 12227,
+    "bf16_supported": true
+  },
+  "smoke_test": {
+    "operation": "CUDA Conv1d forward and backward under float16 autocast",
+    "input_shape": [256, 6, 128],
+    "output_shape": [256, 64, 128],
+    "loss_finite": true,
+    "gradient_finite": true,
+    "peak_memory_bytes": 47334912,
+    "seed": 1729
+  },
+  "privacy": {
+    "hostname_recorded": false,
+    "user_name_recorded": false
+  }
+}

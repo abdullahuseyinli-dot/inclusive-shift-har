@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "gate": "raw_data_read_access",
+  "dataset_id": "uci_har_v1",
+  "status": "approved",
+  "record_created_at_utc": "2026-08-23T21:36:53.5663168Z",
+  "authorization_source": "explicit_user_task_relayed_by_root_agent",
+  "authorization_scope": [
+    "official_archive_acquisition_and_integrity_verification",
+    "processed_inertial_signal_schema_audit",
+    "official_train_subject_grouped_source_protocol",
+    "legacy_consumed_test_integrity_audit_only"
+  ],
+  "forbidden_scope": [
+    "fresh_confirmatory_use_of_official_uci_test",
+    "inclusivehar_target_evaluation",
+    "raw_data_redistribution",
+    "test_based_model_selection_or_calibration"
+  ],
+  "mode": "read_only_after_create_only_acquisition",
+  "processed_archive_sha256": "2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0",
+  "record_sha256": "921ad4a7dcab55aa967ce7e36e25868470a3358ec72bebbf4e3a0e0127de15d3"
+}

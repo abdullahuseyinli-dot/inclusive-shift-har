@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0.0",
+  "audit_date": "2026-08-23",
+  "status": "source_provenance_only_no_training_or_target_evaluation",
+  "audit_clone_root": ".audit/baseline-source-audit-20260823",
+  "license_interpretation": "NOASSERTION means no repository software license grant was found at the audited commit; manuscript licenses are not treated as software licenses.",
+  "baselines": [
+    {
+      "id": "tinyhar",
+      "display_name": "TinyHAR",
+      "publication": {
+        "title": "TinyHAR: A Lightweight Deep Learning Model Designed for Human Activity Recognition",
+        "primary_url": "https://doi.org/10.1145/3544794.3558467",
+        "doi": "10.1145/3544794.3558467"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/teco-kit/ISWC22-HAR",
+        "official_or_paper_linked": true,
+        "audited_commit": "b84b89d09f6914fe93e82cde423e294042da2741",
+        "branch": "main",
+        "commit_timestamp": "2022-09-15T14:27:52+02:00",
+        "software_license_spdx": "NOASSERTION",
+        "license_files": []
+      },
+      "input_assumptions": {
+        "layout": "[batch,1,time,channels]",
+        "sampling": "dataset-specific",
+        "reference_interface": "HAPT: 50 Hz, 2.56 seconds, 128 samples",
+        "channels": "HAPT: 6; original repository has no UCI-HAR entry"
+      },
+      "protocol_findings": [
+        "outer subject-aware evaluation is available for most datasets",
+        "source training and validation randomly split 50%-overlap window indices, permitting raw-sample overlap"
+      ],
+      "local_reuse_decision": "blocked_no_software_license",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "tinierhar",
+      "display_name": "TinierHAR",
+      "publication": {
+        "title": "TinierHAR: Towards Ultra-Lightweight Deep Learning Models for Efficient Human Activity Recognition on Edge Devices",
+        "primary_url": "https://doi.org/10.1145/3715071.3750410",
+        "doi": "10.1145/3715071.3750410",
+        "arxiv": "2507.07949"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/zhaxidele/TinierHAR",
+        "official_or_paper_linked": true,
+        "audited_commit": "f2f1bbd7305689c374fb38cbb7ce853e7cefbb3f",
+        "branch": "main",
+        "commit_timestamp": "2025-10-12T09:33:19+02:00",
+        "software_license_spdx": "NOASSERTION",
+        "license_files": []
+      },
+      "input_assumptions": {
+        "layout": "[batch,1,time,channels]",
+        "paper_sampling": "all datasets use 4-second windows with 2-second overlap",
+        "paper_uci": "50 Hz, 9 channels, 200 samples implied by 4 seconds",
+        "repository_uci": "50 Hz, 9 channels, 2.56 seconds, 128 samples"
+      },
+      "reproducibility_conflicts": [
+        "paper and repository disagree on the UCI-HAR window duration",
+        "repository creates two initial pooled blocks plus nb_conv_blocks additional blocks",
+        "source training and validation randomly split overlapping window indices"
+      ],
+      "local_reuse_decision": "blocked_no_software_license",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "harmamba",
+      "display_name": "HARMamba",
+      "publication": {
+        "title": "HARMamba: Efficient and Lightweight Wearable Sensor Human Activity Recognition Based on Bidirectional Mamba",
+        "primary_url": "https://doi.org/10.1109/JIOT.2024.3463405",
+        "doi": "10.1109/JIOT.2024.3463405",
+        "arxiv": "2403.20183"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/dianoDouble/HARMamba",
+        "official_or_paper_linked": true,
+        "audited_commit": "3afb0dced3c66702d698af354d7ec7e753e772ad",
+        "branch": "main",
+        "commit_timestamp": "2025-03-10T22:31:54+08:00",
+        "software_license_spdx": "Apache-2.0",
+        "license_files": ["LICENSE"],
+        "root_license_sha256": "B208C52B00A2DF2C8F4C3298C34407BF2BFE409968213372251C91FCC737A1A5"
+      },
+      "input_assumptions": {
+        "paper_uci": "50 Hz, 9 channels, 128 samples, 50% overlap",
+        "repository_default": "9 channels, sequence length 512, patch size 16"
+      },
+      "protocol_and_runtime_findings": [
+        "paper uses a continuous 0.7/0.1/0.2 split rather than a documented subject-exclusive UCI split",
+        "paper table reports 20 UCI subjects, conflicting with the dataset's 30 participants",
+        "entry point constructs default HARMamba rather than resolving dataset-specific model dimensions",
+        "requirements reference hard-coded local Linux Mamba and causal-conv1d wheels",
+        "trainer evaluates its evaluation loader every epoch and selects best_checkpoint.pth on its accuracy"
+      ],
+      "local_reuse_decision": "blocked_pending_protocol_safe_adapter",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "ccil",
+      "display_name": "CCIL",
+      "publication": {
+        "title": "Generalizable Sensor-Based Activity Recognition via Categorical Concept Invariant Learning",
+        "primary_url": "https://doi.org/10.1609/aaai.v39i1.32077",
+        "doi": "10.1609/aaai.v39i1.32077",
+        "arxiv": "2412.13594"
+      },
+      "source_code": {
+        "repository_url": null,
+        "official_or_paper_linked": false,
+        "audited_commit": null,
+        "software_license_spdx": null,
+        "search_result": "no official implementation located as of audit date"
+      },
+      "input_assumptions": {
+        "cross_person_dsads": "45 channels, 125 samples",
+        "cross_person_pamap2": "27 channels, 200 samples",
+        "cross_person_uschad": "6 channels, 200 samples",
+        "cross_dataset": "6 channels, 50 samples",
+        "uci_cross_person": "not evaluated in the paper"
+      },
+      "local_component": {
+        "module": "inclusive_shift_har.training.ccil_paper.CCILPaperConceptMeanLoss",
+        "scope": "paper-derived equations 2-6 only",
+        "official_code": false,
+        "faithful_reproduction": false,
+        "explicit_choices": [
+          "initialize a class from its first source-training batch mean",
+          "update detached EMA before evaluating the current batch loss",
+          "freeze state outside source training"
+        ]
+      },
+      "local_reuse_decision": "paper_derived_loss_only_disabled_until_source_selection",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "bpd",
+      "display_name": "BPD",
+      "publication": {
+        "title": "Learning Disentangled Behaviour Patterns for Wearable-based Human Activity Recognition",
+        "primary_url": "https://doi.org/10.1145/3517252",
+        "doi": "10.1145/3517252",
+        "arxiv": "2202.07260"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/Jie-su/BPD",
+        "official_or_paper_linked": true,
+        "audited_commit": "8b2338927c118d1daa5c602d48b6ae5156dd5966",
+        "branch": "main",
+        "commit_timestamp": "2025-09-20T23:13:41+08:00",
+        "software_license_spdx": "Apache-2.0",
+        "license_files": ["LICENSE"],
+        "root_license_sha256": "C71D239DF91726FC519C6EB72D318EC65820627232B2F796219E87DCF35D0AB4"
+      },
+      "input_assumptions": {
+        "paper": "168 samples, 50% overlap, dataset-specific channels",
+        "paper_durations_seconds": {
+          "PAMAP2": 1.68,
+          "MHEALTH": 3.36,
+          "DSADS": 6.72,
+          "GOTOV": 2.02
+        },
+        "repository_effective_default": "168 samples, stride 32"
+      },
+      "protocol_findings": [
+        "participant streams are concatenated before generic window creation",
+        "paper stride 84 conflicts with repository default stride 32",
+        "CLI win_len is not passed through dataset_read",
+        "target is evaluated every epoch and target macro-F1 selects checkpoints"
+      ],
+      "local_reuse_decision": "blocked_pending_protocol_safe_adapter",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "cmd_har",
+      "display_name": "CMD-HAR",
+      "publication": {
+        "title": "CMD-HAR: Cross-Modal Disentanglement for Wearable Human Activity Recognition",
+        "primary_url": "https://arxiv.org/abs/2503.21843",
+        "arxiv": "2503.21843v4"
+      },
+      "source_code": {
+        "repository_url": null,
+        "official_or_paper_linked": false,
+        "audited_commit": null,
+        "software_license_spdx": null,
+        "search_result": "no official implementation located as of audit date"
+      },
+      "input_assumptions": {
+        "paper_uci": "50 Hz, 9 channels, 128 samples"
+      },
+      "local_reuse_decision": "blocked_no_official_code_related_work_only",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "benchhar",
+      "display_name": "BenchHAR",
+      "publication": {
+        "title": "BenchHAR: Benchmarking Self-Supervised Learning for Generalizable Sensor-based Activity Recognition",
+        "primary_url": "https://arxiv.org/abs/2605.08296",
+        "arxiv": "2605.08296v1"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/saiketa/HAR-Bench",
+        "official_or_paper_linked": true,
+        "audited_commit": "358a377929b1b9c0a2cefc417c67f56d15d4d11c",
+        "branch": "master",
+        "commit_timestamp": "2026-05-23T10:34:09+08:00",
+        "software_license_spdx": "NOASSERTION",
+        "license_files": []
+      },
+      "input_assumptions": {
+        "sampling": "20 Hz",
+        "window": "6 seconds, 120 samples, non-overlapping",
+        "channels": "3-axis accelerometer or 6-axis accelerometer/gyroscope",
+        "normalization": "per-window instance normalization"
+      },
+      "candidate_evidence": {
+        "broad_cross_dataset_average": "FOCAL",
+        "six_channel_cross_subject": "SimMTM",
+        "selection_warning": "candidate depends on predeclared endpoint and modality"
+      },
+      "local_reuse_decision": "blocked_no_software_license",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "simmtm",
+      "display_name": "SimMTM",
+      "publication": {
+        "title": "SimMTM: A Simple Pre-Training Framework for Masked Time-Series Modeling",
+        "primary_url": "https://arxiv.org/abs/2302.00861",
+        "arxiv": "2302.00861"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/thuml/SimMTM",
+        "official_or_paper_linked": true,
+        "audited_commit": "169513bef74fb676e48d98a0e30f8823793f691c",
+        "branch": "main",
+        "commit_timestamp": "2024-05-06T19:38:44+08:00",
+        "software_license_spdx": "NOASSERTION",
+        "license_files": []
+      },
+      "input_assumptions": {
+        "upstream": "generic multivariate time series; no official six-channel smartphone-HAR contract",
+        "benchhar_adapter": "20 Hz, 120 samples, 6 channels"
+      },
+      "local_reuse_decision": "blocked_no_software_license",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "focal",
+      "display_name": "FOCAL",
+      "publication": {
+        "title": "FOCAL: Contrastive Learning for Multimodal Time-Series Sensing Signals in Factorized Orthogonal Latent Space",
+        "primary_url": "https://arxiv.org/abs/2310.20071",
+        "arxiv": "2310.20071"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/tomoyoshki/focal",
+        "official_or_paper_linked": true,
+        "audited_commit": "f6a989eef42e7590aacc0c025e5aed875c6025c9",
+        "branch": "main",
+        "commit_timestamp": "2024-01-21T18:39:33-06:00",
+        "software_license_spdx": "MIT",
+        "license_files": ["LICENSE"],
+        "root_license_sha256": "5A8EA32BE1A3D9C5A914E8147BF7A4AE91CDB715927987E6CC14E1A48A591AE1"
+      },
+      "input_assumptions": {
+        "upstream_modalities": "paired acoustic and seismic signals",
+        "smartphone_imu_adapter": "not present upstream"
+      },
+      "local_reuse_decision": "eligible_for_future_clean_inertial_adapter",
+      "faithful_local_implementation": false
+    },
+    {
+      "id": "liteway",
+      "display_name": "LITEWAY",
+      "publication": {
+        "title": "LITEWAY: LIghtweight HAR via Temporal Efficient highWAY",
+        "primary_url": "https://arxiv.org/abs/2608.09421",
+        "arxiv": "2608.09421v1",
+        "submitted": "2026-08-10T10:49:17Z",
+        "venue_note": "accepted at UbiComp / ISWC 2026",
+        "manuscript_license": "CC-BY-NC-ND-4.0"
+      },
+      "source_code": {
+        "repository_url": "https://github.com/dominique-nshimyimana/liteway",
+        "official_or_paper_linked": true,
+        "audited_commit": "982100053db3a81b10a10d225711829473ac1f3d",
+        "branch": "main",
+        "commit_timestamp": "2026-08-11T13:03:46+02:00",
+        "software_license_spdx": "NOASSERTION",
+        "license_files": []
+      },
+      "input_assumptions": {
+        "layout": "[batch,1,time,channels]",
+        "paper_uci": "50 Hz, 9 channels, 2.56 seconds, 128 samples, 50% overlap",
+        "primary_project_difference": "primary benchmark has 6 user-acceleration/gyroscope channels"
+      },
+      "protocol_findings": [
+        "paper uses subject-independent outer evaluation",
+        "repository randomly splits overlapping source windows into training and validation"
+      ],
+      "overlap_with_project": [
+        "compact wearable HAR architecture",
+        "efficiency metrics and edge deployment evidence",
+        "direct comparison with TinyHAR and TinierHAR"
+      ],
+      "distinct_from_project": [
+        "does not study zero-shot non-disabled-to-disabled population shift",
+        "does not use content/realization factorization",
+        "uses a nine-channel UCI interface in the closest smartphone setting"
+      ],
+      "local_reuse_decision": "blocked_no_software_license_related_work_only",
+      "faithful_local_implementation": false
+    }
+  ]
+}

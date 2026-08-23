@@ -1,9 +1,19 @@
 schema_version: "1.0.0"
-dataset_id: uci_har
+dataset_id: uci_har_v1
 version: "1.0"
 status: source_only_legacy_test_consumed
 manifest: manifests/datasets/uci_har_v1.json
+manifest_sha256: a7d016ffde65917f0edd410f27e263d7f00e42f8bc498b7584cab91812d17c5c
 raw_root: data/raw/uci_har/v1
+official_download_wrapper:
+  path: data/raw/uci_har/v1/human+activity+recognition+using+smartphones.zip
+  size_bytes: 61005872
+  sha256: c00b803081a5c797cd5e4b83700a9810b38d53d9d84e01917e090e1fdbc81031
+processed_archive:
+  path: data/raw/uci_har/v1/UCI HAR Dataset.zip
+  derivation: create_only_materialization_of_verified_official_wrapper_member
+  size_bytes: 60999314
+  sha256: 2045e435c955214b38145fb5fa00776c72814f01b203fec405152dac7d5bfeb0
 sample_rate_hz: 50
 primary_channels:
   - body_acc_x
@@ -15,4 +25,14 @@ primary_channels:
 window_length_samples: 128
 source_stride_samples: 64
 official_test_status: legacy_exploratory_development_consumed
+source_development_scope: official_train_subjects_only
+instance_id_semantics: released_window_instance_not_recoverable_raw_sample
+uci_native_core:
+  1: walking
+  4: sitting
+  5: standing
+cross_source_eligibility:
+  sitting: exact
+  standing: provisional_blocked_pending_realization_documentation
+  walking: excluded_all_cohort_exact_ambulatory_sensitivity_only
 license_status: conflicting_notices

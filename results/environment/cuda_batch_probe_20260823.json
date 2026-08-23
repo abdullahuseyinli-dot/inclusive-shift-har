@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "status": "batch_probe_pass",
+  "recorded_date_utc": "2026-08-23",
+  "model": "MoReHAR default compact backbone",
+  "input_shape_without_batch": [128, 6],
+  "operation": "one AdamW training step with classification loss and float16 autocast",
+  "seed": 1729,
+  "environment_record": "results/environment/cuda_runtime_20260823.json",
+  "observations": [
+    {"batch_size": 128, "status": "pass", "peak_memory_bytes": 271383040, "elapsed_seconds": 3.950070, "loss_finite": true},
+    {"batch_size": 256, "status": "pass", "peak_memory_bytes": 472626176, "elapsed_seconds": 2.176686, "loss_finite": true},
+    {"batch_size": 512, "status": "pass", "peak_memory_bytes": 877210112, "elapsed_seconds": 1.655404, "loss_finite": true},
+    {"batch_size": 1024, "status": "pass", "peak_memory_bytes": 1686377984, "elapsed_seconds": 1.717519, "loss_finite": true},
+    {"batch_size": 2048, "status": "pass", "peak_memory_bytes": 3305238016, "elapsed_seconds": 1.817790, "loss_finite": true},
+    {"batch_size": 4096, "status": "pass", "peak_memory_bytes": 6542958080, "elapsed_seconds": 1.712034, "loss_finite": true}
+  ],
+  "selected_initial_batch_size": 256,
+  "selection_reason": "substantial headroom for paired clean/augmented passes, optimizer state, deterministic participant-aware batches, and concurrent operating-system use; this is not a claim that 256 is throughput-optimal",
+  "timing_note": "single-step timings include setup and are not latency benchmarks; the first observation includes CUDA warm-up"
+}

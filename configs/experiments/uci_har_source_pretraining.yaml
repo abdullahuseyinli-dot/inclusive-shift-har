@@ -1,0 +1,24 @@
+schema_version: "1.0.0"
+experiment_id: uci_har_v1_source_pretraining_v1
+status: configured_not_run
+evidence_status: source_pretraining_development_no_results
+dataset: configs/datasets/uci_har_v1.yaml
+protocol: configs/protocols/uci_har_source_grouped_v1.yaml
+allowed_training_data: official_uci_train_only
+forbidden_data:
+  - official_uci_test
+  - inclusivehar_target_participants
+tracks:
+  uci_native_six:
+    status: runnable_after_training_gate
+  cross_source_core:
+    sitting: exact
+    standing: provisional_blocked
+    walking: excluded_all_cohort_exact
+  ambulatory_walking_sensitivity:
+    status: blocked_pending_participant_eligibility_lock
+adaptation_policy:
+  preprocessing_frozen_before_any_target_evaluation: true
+  normalization_source: official_uci_train_only
+  target_labels_used_for_selection: false
+  target_group_metadata_as_model_input: false

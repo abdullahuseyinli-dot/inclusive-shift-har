@@ -1,0 +1,40 @@
+schema_version: "1.0.0"
+preprocessing_id: "inclusivehar-primary-six-128-v1"
+dataset_id: "inclusivehar_v4"
+channels:
+  - "motionUserAccelerationX"
+  - "motionUserAccelerationY"
+  - "motionUserAccelerationZ"
+  - "motionRotationRateX"
+  - "motionRotationRateY"
+  - "motionRotationRateZ"
+units:
+  motionUserAcceleration: "g"
+  motionRotationRate: "rad/s"
+window_length_samples: 128
+window_stride_samples: 128
+declared_sampling_rate_hz: 50
+window_duration_seconds_at_declared_rate: 2.56
+boundary_unit: "released_contiguous_subject_activity_block"
+remainder_policy: "drop_tail_shorter_than_128_per_released_block"
+normalization:
+  method: "per_channel_z_score"
+  fit_scope: "source_training_partition_only"
+  validation_in_fit: false
+  target_in_fit: false
+  epsilon: 1.0e-8
+cache_key_inputs:
+  - "source_artifact_sha256"
+  - "preprocessing_config_sha256"
+  - "split_manifest_sha256"
+  - "code_version"
+forbidden_model_inputs:
+  - "label"
+  - "Label"
+  - "UserID"
+  - "disabled"
+  - "gps_or_location"
+  - "global_row_index"
+  - "file_order"
+  - "released_block_position"
+  - "window_offset"
