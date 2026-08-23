@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:inclusive-shift-har:schema:source-calibrator:1.0.0",
+  "title": "InclusiveShift-HAR source-validation temperature calibrator",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_kind",
+    "status",
+    "evidence_status",
+    "method",
+    "fit_partition",
+    "checkpoint_sha256",
+    "training_configuration_sha256",
+    "split_manifest_sha256",
+    "validation_window_ids_sha256",
+    "class_names",
+    "class_schema_sha256",
+    "fit_input",
+    "temperature",
+    "nll_before",
+    "nll_after",
+    "target_subject_or_window_records_used",
+    "target_labels_or_performance_used",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "record_kind": {"const": "source_temperature_calibrator"},
+    "status": {"const": "frozen_source_validation"},
+    "evidence_status": {"const": "source_validation_calibration_target_sealed"},
+    "method": {"const": "scalar_temperature"},
+    "fit_partition": {"const": "source_validation"},
+    "checkpoint_sha256": {"$ref": "#/$defs/sha256"},
+    "training_configuration_sha256": {"$ref": "#/$defs/sha256"},
+    "split_manifest_sha256": {"$ref": "#/$defs/sha256"},
+    "validation_window_ids_sha256": {"$ref": "#/$defs/sha256"},
+    "class_names": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "class_schema_sha256": {"$ref": "#/$defs/sha256"},
+    "fit_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sample_count", "logits_sha256", "labels_sha256"],
+      "properties": {
+        "sample_count": {"type": "integer", "minimum": 1},
+        "logits_sha256": {"$ref": "#/$defs/sha256"},
+        "labels_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "temperature": {"type": "number", "exclusiveMinimum": 0},
+    "nll_before": {"type": "number", "minimum": 0},
+    "nll_after": {"type": "number", "minimum": 0},
+    "target_subject_or_window_records_used": {"const": false},
+    "target_labels_or_performance_used": {"const": false},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

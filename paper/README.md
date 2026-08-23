@@ -2,7 +2,7 @@
 
 The working title is provisional:
 
-> InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition
+> InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition
 
 The benchmark is the candidate primary contribution. MoRe-HAR is a secondary experimental hypothesis with high prior-work collision and may remain a negative result.
 
@@ -11,7 +11,8 @@ The paper outline will contain:
 1. research questions and preregistered hypotheses;
 2. related work and claim boundaries;
 3. dataset provenance, audit, ontology, and ethics;
-4. leakage-safe benchmark construction;
+4. participant-exclusive released-block benchmark construction and its
+   unrecoverable hidden-trial-boundary limitation;
 5. baselines and the optional MoRe-HAR hypothesis;
 6. locked experimental protocol and endpoints;
 7. participant-level results, uncertainty, calibration, and efficiency;

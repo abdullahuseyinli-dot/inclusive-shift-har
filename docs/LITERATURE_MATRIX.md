@@ -7,10 +7,10 @@
 
 ## Decision in one page
 
-The strict stop condition was not found in the searched record. No verified work was found that combines all of the following:
+The strict literature collision was not found in the searched record. No verified work was found that combines all of the following:
 
 1. InclusiveHAR version 4;
-2. participant- and trial-exclusive training, validation, and testing;
+2. participant-exclusive source/target separation under an explicitly audited released-block protocol;
 3. training and model selection using only non-disabled source participants;
 4. a prospectively locked, one-way evaluation on participants with disabilities;
 5. strong classical, deep, and domain-generalization baselines under equal information and tuning budgets; and
@@ -20,7 +20,17 @@ This is a **scoped search result, not proof of novelty**. It is sufficient to co
 
 The original broad framing is not defensible. Prior work already includes smartphone/wearable recognition involving people with stroke, lower-limb amputations, multiple sclerosis, and mobility aids; healthy/non-impaired-to-disabled transfer tests; disability/fairness analyses; user-independent mobility-aid recognition; broad OOD and SSL benchmarks; sensor-fault evaluation; and activity/style disentanglement. InclusiveHAR itself reports an author-described non-disabled-only training scenario. Therefore, the candidate contribution is narrowed to:
 
-> **A leakage-safe, subject- and trial-exclusive, one-way ability-associated population-shift benchmark on InclusiveHAR v4, with source-only model selection, an explicit activity-realization ontology, strong matched baselines, participant-level lower-tail and calibration evidence, and an auditable one-time target evaluation.**
+> **An auditable participant-exclusive, released-block, one-way
+> ability-associated population-shift benchmark on InclusiveHAR v4, with
+> source-only model selection, an explicit activity-realization ontology,
+> strong matched baselines, participant-level lower-tail and calibration
+> evidence, and a one-time target evaluation.**
+
+The v4 release does not expose timestamps or trial identifiers, and the audit
+could not recover trial boundaries. The candidate distinction therefore does
+not include “trial-safe,” “trial-exclusive,” “hidden-join-free,” or an
+unqualified “leakage-safe” claim. This data limitation is part of the
+benchmark result, not a condition assumed away.
 
 This wording describes a **candidate distinction**, not established novelty. The benchmark should remain the primary contribution. MoRe-HAR is an experimental hypothesis; its activity-content/realization factorization has substantial conceptual overlap with BPD, and class-conditioned invariance overlaps with CCIL. If it does not clearly improve both mean and lower-tail target-participant performance, or cannot be distinguished experimentally from those predecessors, it should be reported as a negative/exploratory result.
 
@@ -59,7 +69,7 @@ Search strings included the exact article title, `InclusiveHAR`, `10.1016/j.dib.
 
 | ID and primary source | Exact problem | Datasets, population, modality, and placement | Split/protocol |
 |---|---|---|---|
-| **IH** — [InclusiveHAR article](https://pmc.ncbi.nlm.nih.gov/articles/PMC12993405/); [dataset v4](https://data.mendeley.com/datasets/r78dn3f6nc/4) | Release a smartphone dataset spanning different physical abilities and show preliminary classification behavior. | **V:** 20 participants: 10 non-disabled and 10 with disabilities; six labels: walking, standing, sitting, jogging, ramp ascent, ramp descent. iPhone 14 Pro in a vertical waist pouch; Core Motion signals at 50 Hz. About three one-minute repetitions per activity. “Walking” for wheelchair users denotes manual propulsion; the route uses an 8% ramp. Raw release has 396,603 timestamped rows and 30 sensor columns. | **V:** baseline text says an 80/20 train/test division and compares training on non-disabled data with mixed data. **NR:** target cohort composition, participant/trial exclusivity, preprocessing, normalization, validation, model selection, and window construction are not sufficiently specified. Treat the first scenario as an **author-described source-only cross-group test**, not a verified leakage-safe zero-shot protocol. |
+| **IH** — [InclusiveHAR article](https://pmc.ncbi.nlm.nih.gov/articles/PMC12993405/); [dataset v4](https://data.mendeley.com/datasets/r78dn3f6nc/4) | Release a smartphone dataset spanning different physical abilities and show preliminary classification behavior. | **V:** 20 participants: 10 non-disabled and 10 with disabilities; six labels: walking, standing, sitting, jogging, ramp ascent, ramp descent. iPhone 14 Pro in a vertical waist pouch; Core Motion signals reported at 50 Hz. About three one-minute repetitions per activity. “Walking” for wheelchair users denotes manual propulsion; the route uses an 8% ramp. **Project read-only v4 audit:** 396,602 data rows plus one header and 33 columns; no timestamp or trial-identifier column is present. | **V:** baseline text says an 80/20 train/test division and compares training on non-disabled data with mixed data. **NR:** target cohort composition, participant/trial exclusivity, preprocessing, normalization, validation, model selection, and window construction are not sufficiently specified. Treat the first scenario as an **author-described source-only cross-group test**, not a verified locked zero-shot protocol. |
 | **UCI** — [UCI HAR official record](https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones), [DOI](https://doi.org/10.24432/C54S4K) | Recognize six scripted activities from waist-phone inertial data. | **V:** 30 volunteers aged 19–48; Samsung Galaxy S II at the waist; tri-axial acceleration and gyroscope at 50 Hz. Walking, upstairs, downstairs, sitting, standing, lying. 2.56 s/128-sample windows with 50% overlap; 561 engineered features plus inertial windows. No disability metadata. | **V:** official partition selects 70% of volunteers for training and 30% for test, so subjects are separated. **Project constraint:** the official test is legacy/development-consumed, not fresh confirmation. |
 | **FAIR-2024** — [Mennella et al., Computers in Biology and Medicine](https://doi.org/10.1016/j.compbiomed.2024.108826); [PubMed](https://pubmed.ncbi.nlm.nih.gov/38981215/) | Evaluate how demographic/disability composition affects fairness/performance of rehabilitation-exercise recognition. | **V:** IntelliRehabDS subset, 28 people: 14 patients and 14 healthy participants; five shoulder movements, each correct/incorrect (10 labels). Kinect One optical skeleton at 30 fps, 25 joints × 3 coordinates; 105-frame sequences. This is not smartphone inertial HAR. | **V:** eight curated population subsets; five-fold cross-validation with train/test subjects separated and a stratified train/validation division. It is heterogeneous training, not a locked one-way source-only target opening. |
 | **HAROOD** — [paper](https://arxiv.org/abs/2512.10807); [official code](https://github.com/AIFrontierLab/HAROOD) | Benchmark OOD generalization across person, sensor position, dataset, and time shifts. | **V:** DSADS, USC-HAD, UCI-HAR, PAMAP2, an EMG dataset, and WESAD; heterogeneous wearable modalities/populations. Sixteen OOD methods with CNN and Transformer backbones. No ability/disability target definition. | **V:** leave-one-domain-out experiments; source-domain validation and both practical source-selected and diagnostic oracle selection. Three repeats. **Important:** oracle target selection is explicitly diagnostic and unsuitable for deployment claims. Repository documentation later mentions a fifth, cross-device scenario; the inspected paper defines four. |
@@ -70,6 +80,7 @@ Search strings included the exact article title, `InclusiveHAR`, `10.1016/j.dib.
 | **STORM** — [Electronics article](https://www.mdpi.com/2079-9292/15/9/1924); [official code](https://github.com/AlessandroVaraldi/storm) | Co-design a tiny Transformer and RISC-V/CGRA execution path while testing sensor faults. | **V:** UCI-HAR, MotionSense, and PAMAP2 harmonized to six accelerometer/gyroscope channels at 50 Hz and eight labels; 1.28 s windows, stride 0.64 s. | **V:** source-stratified, participant-level 70/15/15 split; train-only normalization; fixed-seed corruption tests for modality/axis loss, intermittent dropout, Gaussian noise, stuck values, and scale drift. No ability cohort. |
 | **TRI** — [TRI-HAR paper](https://arxiv.org/abs/2608.15621); [official code](https://github.com/mbaek01/TRI-HAR) | Obtain exact rotation invariance for independently rotated IMUs at multiple body locations. | **V:** PAMAP2, DSADS, Opportunity, and REALDISP; accelerometer + gyroscope at multiple locations. Shared SO(3)-equivariant per-location encoder, invariant projection, then fusion. | **V:** leave-one-subject-out for PAMAP2, DSADS, Opportunity; five grouped REALDISP folds, with the fifth containing mutual displacement. Tests fixed, independent per-location rotations. No ability-defined split. |
 | **INERTIA** — [Inertia-1 paper](https://arxiv.org/abs/2607.06617); [project](https://yang-ai-lab.github.io/Inertia-1); [official code](https://github.com/yang-ai-lab/Inertia-1) | Systematically study large-scale wearable motion foundation models. | **V:** 18.2 million hours, more than 115,000 individuals, 15 datasets, and more than 1,000 model/evaluation runs. Pretraining centers on NHANES/UK Biobank wrist accelerometry; downstream tasks include 10 HAR, 3 freezing-of-gait, and disease-related tasks. | **V:** participant-level train/validation/test splits; linear probing and full fine-tuning. Default pretraining scale uses four H200 GPUs and is out of scope for this project. No ability-defined one-way target. |
+| **LITEWAY** — [paper](https://arxiv.org/abs/2608.09421); [paper-linked repository](https://github.com/dominique-nshimyimana/liteway) | Build a lightweight fully convolutional HAR architecture and compare accuracy and efficiency across many datasets. | **V:** 16 datasets and direct TinyHAR/TinierHAR comparisons; the closest UCI setup uses nine channels at 50 Hz, 128 samples, and 50% overlap. The model combines depthwise/residual downsampling, structured temporal convolution, convolution-attention pooling, and a linear classifier. It does not define an ability-associated cohort. | **V:** participant-independent outer evaluation, five seeds, macro-F1, parameters, MACs, and latency/energy evidence. **Repository audit:** overlapping source windows are randomly divided for train/validation. The paper-linked repository had no software licence at audited commit `982100053db3a81b10a10d225711829473ac1f3d`, so source reuse is blocked. |
 | **BPD** — [paper](https://arxiv.org/abs/2202.07260); [DOI](https://doi.org/10.1145/3517252); [official code](https://github.com/Jie-su/BPD) | Disentangle activity/behaviour patterns from personal style, environmental effects, and other nuisance variation. | **V:** PAMAP2, MHEALTH, DSADS, and GOTOV; multiple body-worn inertial placements, with GOTOV providing wrist acceleration from older adults. Encoder/disentanglers, activity and nuisance classifiers, adversarial optimization, reconstruction, and dependence reduction. | **V:** 168-sample windows with 50% overlap; leave-one-subject-out; an additional 28/7 participant GOTOV holdout ablation. Participant-level F1 is reported. |
 | **CMD** — [CMD-HAR paper](https://arxiv.org/abs/2503.21843) | Disentangle cross-modal spatiotemporal information and reduce multimodal/activity heterogeneity for deployment. | **V:** PAMAP2, WISDM, Opportunity, UCI-HAR, UniMiB-SHAR, USC-HAD; public wearable/phone datasets. Spatial/temporal attention decomposition, shared representation, modal alignment, cross-modal loss, and gradient modulation; Raspberry Pi 5 deployment simulation. | **V:** paper provides dataset-specific split ratios (mostly 7:2:1; UCI-HAR 8:1:1). **NR:** inspected text did not establish that every ratio split is subject-exclusive. |
 | **HAR-PMD** — [Scientific Data article](https://doi.org/10.1038/s41597-025-06527-y); [PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC12890990/); [Zenodo v2](https://doi.org/10.5281/zenodo.7939223); [official code](https://github.com/HanyangHCILab/HAR-handicaps) | Release and benchmark recognition of pedestrian/mobility-aid modes. | **V:** 120 participants; all collected smartphone data and 60 also smartwatch data; 14,400/7,200 minutes. Six categories: still, ordinary walking, crutches, walker, manual wheelchair, electric wheelchair; indoor/outdoor. Thirteen phone and five watch sensors, with baseline A/AG/AGM combinations. **V:** mobility-aid scenarios were simulated in a supervised university setting; the paper does not establish an independently recruited lived-experience disabled cohort. | **V:** random user-dependent five-fold CV and user-independent leave-one-group-out five-fold CV (96/24 phone; 48/12 phone+watch). Five-second non-overlapping windows at 60 Hz in the code documentation. The Zenodo prose fold table repeats participant 96 across two phone folds—an apparent documentation typo to resolve from code/manifests, not proof of actual leakage. |
@@ -109,12 +120,15 @@ The InclusiveHAR paper must be cited as prior evaluation of the broad idea. The 
 - **V:** the authors interpret the first scenario’s very low performance as difficulty recognizing activities performed by participants with disabilities.
 - **V:** reported scenario-one accuracy/F1 are 12.87%/12.15%, versus 42.54%/39.37% for mixed training.
 - **NR:** the exact test-set cohort, participant identities, trial boundaries, windowing, normalization fit, validation partition, and checkpoint/model-selection procedure are not documented sufficiently to independently verify a participant-exclusive zero-shot experiment.
-- **I:** it is fair to call this an **author-described source-only cross-group baseline**. It is not fair to call it a verified subject-exclusive, leakage-safe, locked confirmatory result.
+- **I:** it is fair to call this an **author-described source-only cross-group baseline**. It is not fair to call it a verified participant-exclusive, boundary-audited, locked confirmatory result.
 
 Consequences:
 
 1. Do not claim the first non-disabled-to-disabled InclusiveHAR evaluation.
-2. Position the benchmark contribution as making that question auditable, subject/trial-exclusive, strongly baselined, participant-level, and prospectively locked.
+2. Position the benchmark contribution as making that question auditable,
+   participant-exclusive at the source/target level, strongly baselined,
+   participant-level, and prospectively locked, while reporting unrecoverable
+   within-block trial-boundary risk.
 3. Treat the published 12.87%/12.15% result as prior developmental evidence, not as a comparator produced under the new protocol.
 4. Preserve the article’s wheelchair label semantics: “walking” is manual propulsion for wheelchair users. Do not rewrite it as ordinary gait.
 
@@ -131,7 +145,8 @@ Consequences:
 | Generic sensor-corruption benchmark or tiny Transformer | **Rejected/unsafe** | STORM explicitly covers realistic faults and edge co-design. |
 | Rotation robustness/invariance as novelty | **Rejected/unsafe** | SHIFT and TRI-HAR directly study orientation changes/invariance. |
 | A Transformer/Mamba backbone swap as novelty | **Rejected** | Architecture substitution alone does not distinguish the scientific question or method. |
-| Leakage-safe one-way InclusiveHAR-v4 ability-associated benchmark with participant-tail/calibration evidence | **Candidate distinction, not proven novelty** | No complete collision was verified in the scoped search. Retain only with transparent search date and refresh. |
+| A generic lightweight fully convolutional HAR architecture | **Rejected/unsafe** | LITEWAY already evaluates a closely related efficiency-oriented design across 16 datasets and directly compares TinyHAR/TinierHAR. |
+| Auditable participant-exclusive released-block InclusiveHAR-v4 ability-associated benchmark with participant-tail/calibration evidence | **Candidate distinction, not proven novelty** | No complete collision was verified in the scoped search. Retain only with transparent search date, the hidden-join limitation, and a pre-submission refresh. |
 | MoRe-HAR content/realization factorization | **High collision; hypothesis only** | BPD is especially close. Require direct BPD/CCIL comparison, descriptor-supervision ablations, parameter-matched controls, and primary-endpoint evidence. |
 
 ## Revised contribution and protocol implications
@@ -140,7 +155,13 @@ Consequences:
 
 Use wording no stronger than:
 
-> We construct and audit a subject- and trial-exclusive benchmark for one-way ability-associated population shift in InclusiveHAR v4. Model development and selection use only non-disabled source participants; the participant-with-disability cohort is evaluated under a documented lock. The benchmark emphasizes participant-level macro-F1, lower-tail performance, calibration, uncertainty, and reproducible lineage across matched classical, neural, and generalization baselines.
+> We construct and audit a participant-exclusive released-block benchmark for
+> one-way ability-associated population shift in InclusiveHAR v4. Model
+> development and selection use only non-disabled source participants; the
+> participant-with-disability cohort is evaluated under a documented lock. The
+> benchmark emphasizes participant-level macro-F1, lower-tail performance,
+> calibration, uncertainty, reproducible lineage, and explicit accounting for
+> unrecoverable within-block trial-boundary risk.
 
 Do not prefix this with “first,” “novel,” or “fair.” Refresh the literature search before submission and let reviewers evaluate distinctness.
 
@@ -173,7 +194,10 @@ MoRe-HAR should proceed only as a staged experimental hypothesis after the bench
 
 **Stage 1 literature/claim gate:** **passed for protocol development with revised claims.**  
 **Stage 1 model-novelty gate:** **not passed; evidence must come from implementation and direct predecessor comparison.**  
-**Trigger to stop/revise:** a newly indexed work showing the complete strict-gate combination, or evidence that InclusiveHAR’s published split was already fully participant/trial-exclusive with source-only development and a comparable strong/statistical suite.
+**Trigger to stop/revise:** a newly indexed work showing the complete narrowed
+combination, or authoritative new InclusiveHAR trial metadata that permits a
+stronger trial-exclusive protocol and changes the current released-block risk
+assessment.
 
 Remaining risks:
 

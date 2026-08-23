@@ -1,0 +1,575 @@
+{
+  "best_epoch": null,
+  "checkpoint": {
+    "configuration_sha256": "e3184e63de22cf2b7dea1d84fbb519e54bd57b019be0fd15bcabab994eee5e28",
+    "path": "results\\runs\\source-cv-v1\\xgboost-seed11-source_cv_02\\selected.pkl",
+    "sha256": "ed67531701a201c884007fbcd817e762da0b01adea68dbe54b7f305923723155"
+  },
+  "class_names": [
+    "mobility",
+    "sitting",
+    "standing"
+  ],
+  "code_commit": "2b441daadc134385fd72903c71695d36d081fd79",
+  "configuration": {
+    "model_name": "xgboost",
+    "num_classes": 3,
+    "seed": 11,
+    "xgboost_device": "cuda"
+  },
+  "configuration_sha256": "e3184e63de22cf2b7dea1d84fbb519e54bd57b019be0fd15bcabab994eee5e28",
+  "elapsed_seconds": 2.151298200013116,
+  "evidence_status": "source_development_not_confirmatory",
+  "model_device": "cuda",
+  "model_name": "xgboost",
+  "normalization": {
+    "channel_names": [
+      "motionUserAccelerationX",
+      "motionUserAccelerationY",
+      "motionUserAccelerationZ",
+      "motionRotationRateX",
+      "motionRotationRateY",
+      "motionRotationRateZ"
+    ],
+    "fit_scope": "training_partition_only",
+    "fitted_value_count_per_channel": 73728,
+    "mean": [
+      -0.006640844483575075,
+      0.0028810086755635036,
+      0.0030948223024363153,
+      0.00184467567546351,
+      -0.0009603263383991495,
+      0.001090878102560797
+    ],
+    "method": "per_channel_population_standardization",
+    "scale": [
+      0.20717170032111998,
+      0.16217994170550548,
+      0.16355879277276292,
+      0.54966450177185,
+      0.5890919988367507,
+      0.4579126648120194
+    ],
+    "schema_version": "1.0.0",
+    "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+    "training_participants": [
+      "1",
+      "10",
+      "2",
+      "3",
+      "4",
+      "5",
+      "8",
+      "9"
+    ]
+  },
+  "parameter_count": null,
+  "peak_vram_bytes": 0,
+  "prediction_artifact": {
+    "path": "results\\runs\\source-cv-v1\\xgboost-seed11-source_cv_02\\source_validation_predictions.npz",
+    "sha256": "2630e58b452b4baf33e212de121810783c86fd11705e9f1ac7c4433e0665b7e2"
+  },
+  "record_sha256": "12ddbf5bff48ccbe3bc33f7bc5206066511860da9a92cb80a7bee0e859c5da43",
+  "requested_device": "cuda",
+  "schema_version": "1.0.0",
+  "seed": 11,
+  "source_split_id": "source_cv_02",
+  "source_window_manifest_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522",
+  "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+  "status": "source_development_complete_target_sealed",
+  "target_performance_or_prediction_accessed": false,
+  "target_subject_or_window_records_loaded": false,
+  "train_participants": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "8",
+    "9",
+    "10"
+  ],
+  "train_window_count": 576,
+  "training_history": [],
+  "validation_participants": [
+    "6",
+    "7"
+  ],
+  "validation_report": {
+    "calibration": {
+      "ece": 0.29605399002164806,
+      "ece_bins": 15,
+      "ece_status": "secondary_diagnostic",
+      "multiclass_brier_score": 0.5845844016658229,
+      "negative_log_likelihood": 1.0995277539266202
+    },
+    "class_names": [
+      "mobility",
+      "sitting",
+      "standing"
+    ],
+    "cohorts": null,
+    "independence_note": "windows are not treated as independent statistical units",
+    "participant_count": 2,
+    "participants": [
+      {
+        "balanced_accuracy": 0.6296296296296297,
+        "cohort": null,
+        "macro_f1": 0.5333333333333333,
+        "participant_id": "6",
+        "window_count": 69
+      },
+      {
+        "balanced_accuracy": 0.6013227513227514,
+        "cohort": null,
+        "macro_f1": 0.5526506899055919,
+        "participant_id": "7",
+        "window_count": 80
+      }
+    ],
+    "primary": {
+      "lower_decile_participant_macro_f1": 0.5352650689905591,
+      "mean_participant_macro_f1": 0.5429920116194626,
+      "worst_participant_macro_f1": 0.5333333333333333
+    },
+    "sample_count": 149,
+    "schema_version": "1.0.0",
+    "selective_risk": {
+      "aurc": 0.19391153487392507,
+      "points": [
+        {
+          "coverage": 0.006711409395973154,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.013422818791946308,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.020134228187919462,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.03355704697986577,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.040268456375838924,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.053691275167785234,
+          "risk": 0.125
+        },
+        {
+          "coverage": 0.06040268456375839,
+          "risk": 0.1111111111111111
+        },
+        {
+          "coverage": 0.0738255033557047,
+          "risk": 0.09090909090909091
+        },
+        {
+          "coverage": 0.08053691275167785,
+          "risk": 0.08333333333333333
+        },
+        {
+          "coverage": 0.09395973154362416,
+          "risk": 0.07142857142857142
+        },
+        {
+          "coverage": 0.10067114093959731,
+          "risk": 0.06666666666666667
+        },
+        {
+          "coverage": 0.11409395973154363,
+          "risk": 0.058823529411764705
+        },
+        {
+          "coverage": 0.12080536912751678,
+          "risk": 0.05555555555555555
+        },
+        {
+          "coverage": 0.1342281879194631,
+          "risk": 0.1
+        },
+        {
+          "coverage": 0.14093959731543623,
+          "risk": 0.09523809523809523
+        },
+        {
+          "coverage": 0.15436241610738255,
+          "risk": 0.08695652173913043
+        },
+        {
+          "coverage": 0.1610738255033557,
+          "risk": 0.08333333333333333
+        },
+        {
+          "coverage": 0.174496644295302,
+          "risk": 0.07692307692307693
+        },
+        {
+          "coverage": 0.18120805369127516,
+          "risk": 0.07407407407407407
+        },
+        {
+          "coverage": 0.19463087248322147,
+          "risk": 0.06896551724137931
+        },
+        {
+          "coverage": 0.20134228187919462,
+          "risk": 0.06666666666666667
+        },
+        {
+          "coverage": 0.21476510067114093,
+          "risk": 0.09375
+        },
+        {
+          "coverage": 0.2214765100671141,
+          "risk": 0.09090909090909091
+        },
+        {
+          "coverage": 0.2348993288590604,
+          "risk": 0.11428571428571428
+        },
+        {
+          "coverage": 0.24161073825503357,
+          "risk": 0.1111111111111111
+        },
+        {
+          "coverage": 0.2550335570469799,
+          "risk": 0.10526315789473684
+        },
+        {
+          "coverage": 0.26174496644295303,
+          "risk": 0.1282051282051282
+        },
+        {
+          "coverage": 0.2684563758389262,
+          "risk": 0.125
+        },
+        {
+          "coverage": 0.28187919463087246,
+          "risk": 0.11904761904761904
+        },
+        {
+          "coverage": 0.28859060402684567,
+          "risk": 0.11627906976744186
+        },
+        {
+          "coverage": 0.30201342281879195,
+          "risk": 0.1111111111111111
+        },
+        {
+          "coverage": 0.3087248322147651,
+          "risk": 0.10869565217391304
+        },
+        {
+          "coverage": 0.3221476510067114,
+          "risk": 0.10416666666666667
+        },
+        {
+          "coverage": 0.3288590604026846,
+          "risk": 0.10204081632653061
+        },
+        {
+          "coverage": 0.3422818791946309,
+          "risk": 0.13725490196078433
+        },
+        {
+          "coverage": 0.348993288590604,
+          "risk": 0.1346153846153846
+        },
+        {
+          "coverage": 0.3624161073825503,
+          "risk": 0.14814814814814814
+        },
+        {
+          "coverage": 0.3691275167785235,
+          "risk": 0.14545454545454545
+        },
+        {
+          "coverage": 0.3825503355704698,
+          "risk": 0.14035087719298245
+        },
+        {
+          "coverage": 0.38926174496644295,
+          "risk": 0.13793103448275862
+        },
+        {
+          "coverage": 0.40268456375838924,
+          "risk": 0.13333333333333333
+        },
+        {
+          "coverage": 0.40939597315436244,
+          "risk": 0.13114754098360656
+        },
+        {
+          "coverage": 0.4228187919463087,
+          "risk": 0.14285714285714285
+        },
+        {
+          "coverage": 0.42953020134228187,
+          "risk": 0.140625
+        },
+        {
+          "coverage": 0.4429530201342282,
+          "risk": 0.15151515151515152
+        },
+        {
+          "coverage": 0.44966442953020136,
+          "risk": 0.14925373134328357
+        },
+        {
+          "coverage": 0.46308724832214765,
+          "risk": 0.14492753623188406
+        },
+        {
+          "coverage": 0.4697986577181208,
+          "risk": 0.15714285714285714
+        },
+        {
+          "coverage": 0.48322147651006714,
+          "risk": 0.18055555555555555
+        },
+        {
+          "coverage": 0.4899328859060403,
+          "risk": 0.1780821917808219
+        },
+        {
+          "coverage": 0.5033557046979866,
+          "risk": 0.18666666666666668
+        },
+        {
+          "coverage": 0.5100671140939598,
+          "risk": 0.18421052631578946
+        },
+        {
+          "coverage": 0.5167785234899329,
+          "risk": 0.19480519480519481
+        },
+        {
+          "coverage": 0.5302013422818792,
+          "risk": 0.21518987341772153
+        },
+        {
+          "coverage": 0.5369127516778524,
+          "risk": 0.225
+        },
+        {
+          "coverage": 0.5503355704697986,
+          "risk": 0.23170731707317074
+        },
+        {
+          "coverage": 0.5570469798657718,
+          "risk": 0.24096385542168675
+        },
+        {
+          "coverage": 0.5704697986577181,
+          "risk": 0.23529411764705882
+        },
+        {
+          "coverage": 0.5771812080536913,
+          "risk": 0.23255813953488372
+        },
+        {
+          "coverage": 0.5906040268456376,
+          "risk": 0.22727272727272727
+        },
+        {
+          "coverage": 0.5973154362416108,
+          "risk": 0.23595505617977527
+        },
+        {
+          "coverage": 0.610738255033557,
+          "risk": 0.24175824175824176
+        },
+        {
+          "coverage": 0.6174496644295302,
+          "risk": 0.25
+        },
+        {
+          "coverage": 0.6308724832214765,
+          "risk": 0.2553191489361702
+        },
+        {
+          "coverage": 0.6375838926174496,
+          "risk": 0.25263157894736843
+        },
+        {
+          "coverage": 0.6510067114093959,
+          "risk": 0.24742268041237114
+        },
+        {
+          "coverage": 0.6577181208053692,
+          "risk": 0.24489795918367346
+        },
+        {
+          "coverage": 0.6711409395973155,
+          "risk": 0.25
+        },
+        {
+          "coverage": 0.6778523489932886,
+          "risk": 0.25742574257425743
+        },
+        {
+          "coverage": 0.6912751677852349,
+          "risk": 0.2524271844660194
+        },
+        {
+          "coverage": 0.697986577181208,
+          "risk": 0.25
+        },
+        {
+          "coverage": 0.7114093959731543,
+          "risk": 0.25471698113207547
+        },
+        {
+          "coverage": 0.7181208053691275,
+          "risk": 0.2616822429906542
+        },
+        {
+          "coverage": 0.7315436241610739,
+          "risk": 0.27522935779816515
+        },
+        {
+          "coverage": 0.738255033557047,
+          "risk": 0.2818181818181818
+        },
+        {
+          "coverage": 0.7516778523489933,
+          "risk": 0.29464285714285715
+        },
+        {
+          "coverage": 0.7583892617449665,
+          "risk": 0.3008849557522124
+        },
+        {
+          "coverage": 0.7651006711409396,
+          "risk": 0.2982456140350877
+        },
+        {
+          "coverage": 0.7785234899328859,
+          "risk": 0.3103448275862069
+        },
+        {
+          "coverage": 0.785234899328859,
+          "risk": 0.3076923076923077
+        },
+        {
+          "coverage": 0.7986577181208053,
+          "risk": 0.31092436974789917
+        },
+        {
+          "coverage": 0.8053691275167785,
+          "risk": 0.30833333333333335
+        },
+        {
+          "coverage": 0.8187919463087249,
+          "risk": 0.30327868852459017
+        },
+        {
+          "coverage": 0.825503355704698,
+          "risk": 0.3089430894308943
+        },
+        {
+          "coverage": 0.8389261744966443,
+          "risk": 0.312
+        },
+        {
+          "coverage": 0.8456375838926175,
+          "risk": 0.30952380952380953
+        },
+        {
+          "coverage": 0.8590604026845637,
+          "risk": 0.3046875
+        },
+        {
+          "coverage": 0.8657718120805369,
+          "risk": 0.31007751937984496
+        },
+        {
+          "coverage": 0.8791946308724832,
+          "risk": 0.3053435114503817
+        },
+        {
+          "coverage": 0.8859060402684564,
+          "risk": 0.3106060606060606
+        },
+        {
+          "coverage": 0.8993288590604027,
+          "risk": 0.3208955223880597
+        },
+        {
+          "coverage": 0.9060402684563759,
+          "risk": 0.32592592592592595
+        },
+        {
+          "coverage": 0.9194630872483222,
+          "risk": 0.3357664233576642
+        },
+        {
+          "coverage": 0.9261744966442953,
+          "risk": 0.34057971014492755
+        },
+        {
+          "coverage": 0.9395973154362416,
+          "risk": 0.34285714285714286
+        },
+        {
+          "coverage": 0.9463087248322147,
+          "risk": 0.3475177304964539
+        },
+        {
+          "coverage": 0.959731543624161,
+          "risk": 0.35664335664335667
+        },
+        {
+          "coverage": 0.9664429530201343,
+          "risk": 0.3611111111111111
+        },
+        {
+          "coverage": 0.9798657718120806,
+          "risk": 0.363013698630137
+        },
+        {
+          "coverage": 0.9865771812080537,
+          "risk": 0.3673469387755102
+        },
+        {
+          "coverage": 1.0,
+          "risk": 0.37583892617449666
+        }
+      ]
+    },
+    "window_level_diagnostics": {
+      "accuracy": 0.6241610738255033,
+      "balanced_accuracy": 0.6158097854526426,
+      "confusion_matrix": [
+        [
+          46,
+          3,
+          0
+        ],
+        [
+          4,
+          44,
+          4
+        ],
+        [
+          0,
+          45,
+          3
+        ]
+      ],
+      "macro_f1": 0.5498316498316499,
+      "per_class_recall": {
+        "mobility": 0.9387755102040817,
+        "sitting": 0.8461538461538461,
+        "standing": 0.0625
+      }
+    }
+  },
+  "validation_window_count": 149
+}

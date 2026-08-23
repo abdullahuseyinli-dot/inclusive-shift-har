@@ -3,17 +3,18 @@ message: >-
   If you use repository-authored InclusiveShift-HAR software, cite this
   metadata and cite every third-party dataset separately under its own terms.
 title: >-
-  InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability
-  Generalization in Smartphone Activity Recognition
+  InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for
+  Physical-Ability Generalization in Smartphone Activity Recognition
 type: software
 version: 0.1.0a0
 authors:
   - family-names: Huseyinli
     given-names: Abdulla
 abstract: >-
-  Research software for leakage-safe, participant-exclusive evaluation of
-  ability-associated population shift in smartphone inertial human activity
-  recognition. The benchmark and proposed MoRe-HAR model are provisional;
+  Research software for auditable, participant-exclusive released-block
+  evaluation of ability-associated population shift in smartphone inertial
+  human activity recognition. InclusiveHAR v4 trial boundaries are
+  unrecoverable. The benchmark and proposed MoRe-HAR model are provisional;
   this metadata does not assert confirmatory results, fairness, clinical
   validity, state-of-the-art performance, or publication status.
 keywords:

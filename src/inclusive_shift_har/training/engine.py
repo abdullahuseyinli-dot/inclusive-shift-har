@@ -55,6 +55,7 @@ class TrainingConfig:
     mixed_precision: str = "float16"
     data_loader_workers: int = 0
     checkpoint_interval: int = 10
+    checkpoint_selection_rule: str = "source_validation_best"
     use_augmentation: bool = False
     use_content_objective: bool = False
     use_realization_factorization: bool = False
@@ -78,6 +79,13 @@ class TrainingConfig:
             raise ValueError("the locked initial protocol requires zero DataLoader workers")
         if self.checkpoint_interval < 1:
             raise ValueError("checkpoint_interval must be positive")
+        if self.checkpoint_selection_rule not in {
+            "fixed_last_epoch",
+            "source_validation_best",
+        }:
+            raise ValueError(
+                "checkpoint_selection_rule must be fixed_last_epoch or source_validation_best"
+            )
         if self.coral_weight < 0:
             raise ValueError("CORAL weight cannot be negative")
         if any(index < 0 or index >= 6 for index in self.zero_channel_indices):
@@ -422,7 +430,14 @@ def train_source_model(
     device: torch.device,
     resume_checkpoint: Path | None = None,
 ) -> dict[str, Any]:
-    """Train/tune on source participants only and preserve immutable resumable checkpoints."""
+    """Train on source participants only and preserve immutable resumable checkpoints.
+
+    ``fixed_last_epoch`` is the final-training rule: ``config.epochs`` is a
+    predeclared training budget, every epoch is run, and the last epoch is
+    selected regardless of validation performance.  Validation metrics remain
+    available for monitoring and source-only calibration, but cannot influence
+    checkpoint selection under that rule.
+    """
 
     if config.num_classes != len(lineage.label_schema):
         raise ValueError("training class count disagrees with locked checkpoint label schema")
@@ -475,6 +490,10 @@ def train_source_model(
     best_metric = float("-inf")
     best_worst_participant = float("-inf")
     best_state: dict[str, Tensor] | None = None
+    selected_epoch = 0
+    selected_metric = float("-inf")
+    selected_worst_participant = float("-inf")
+    selected_state: dict[str, Tensor] | None = None
 
     if resume_checkpoint is not None:
         checkpoint = torch.load(resume_checkpoint, map_location=device, weights_only=False)
@@ -497,6 +516,15 @@ def train_source_model(
         best_state = {
             key: value.detach().cpu().clone()
             for key, value in checkpoint["best_model_state"].items()
+        }
+        selected_epoch = int(checkpoint.get("selected_epoch", best_epoch))
+        selected_metric = float(checkpoint.get("selected_metric", best_metric))
+        selected_worst_participant = float(
+            checkpoint.get("selected_worst_participant", best_worst_participant)
+        )
+        selected_payload = checkpoint.get("selected_model_state", checkpoint["best_model_state"])
+        selected_state = {
+            key: value.detach().cpu().clone() for key, value in selected_payload.items()
         }
         if group_dro is not None and checkpoint["group_dro_weights"] is not None:
             group_dro.weights.copy_(checkpoint["group_dro_weights"].to(device))
@@ -528,14 +556,21 @@ def train_source_model(
         )
         metric = float(validation_report["primary"]["mean_participant_macro_f1"])
         worst = float(validation_report["primary"]["worst_participant_macro_f1"])
-        improved = metric > best_metric and not np.isclose(
+        fixed_last_epoch = config.checkpoint_selection_rule == "fixed_last_epoch"
+        monitoring_improved = metric > best_metric and not np.isclose(
             metric, best_metric, atol=1e-12, rtol=0.0
         )
-        if improved:
+        if monitoring_improved:
             best_epoch = epoch
             best_metric = metric
             best_worst_participant = worst
             best_state = _cpu_state_dict(model)
+        checkpoint_selected = fixed_last_epoch or monitoring_improved
+        if checkpoint_selected:
+            selected_epoch = epoch
+            selected_metric = metric
+            selected_worst_participant = worst
+            selected_state = _cpu_state_dict(model)
         history.append(
             {
                 "epoch": epoch,
@@ -544,6 +579,9 @@ def train_source_model(
                 "validation_mean_participant_macro_f1": metric,
                 "validation_worst_participant_macro_f1": worst,
                 "best_epoch_after_epoch": best_epoch,
+                "selected_epoch_after_epoch": selected_epoch,
+                "checkpoint_selected_after_epoch": checkpoint_selected,
+                "checkpoint_selection_rule": config.checkpoint_selection_rule,
             }
         )
         checkpoint_payload = {
@@ -552,6 +590,7 @@ def train_source_model(
             "model_name": config.model_name,
             "model_state": model.state_dict(),
             "best_model_state": best_state,
+            "selected_model_state": selected_state,
             "optimizer_state": optimizer.state_dict(),
             "scheduler_state": scheduler.state_dict(),
             "scaler_state": scaler.state_dict(),
@@ -560,10 +599,15 @@ def train_source_model(
             "lineage": asdict(lineage),
             "configuration": asdict(config),
             "configuration_sha256": configuration_sha256,
+            "checkpoint_selection_rule": config.checkpoint_selection_rule,
+            "target_information_used_for_selection": False,
             "epoch": epoch,
             "best_epoch": best_epoch,
             "best_metric": best_metric,
             "best_worst_participant": best_worst_participant,
+            "selected_epoch": selected_epoch,
+            "selected_metric": selected_metric,
+            "selected_worst_participant": selected_worst_participant,
             "history": history,
             "rng_states": {
                 **_rng_state(),
@@ -580,13 +624,17 @@ def train_source_model(
                 output_directory / f"epoch_{epoch:03d}.pt",
                 checkpoint_payload,
             )
-        if epoch >= config.minimum_epochs and epoch - best_epoch >= config.patience:
+        if (
+            not fixed_last_epoch
+            and epoch >= config.minimum_epochs
+            and epoch - best_epoch >= config.patience
+        ):
             stopped_early = True
             break
 
-    if best_state is None or last_checkpoint is None:
+    if best_state is None or selected_state is None or last_checkpoint is None:
         raise RuntimeError("training completed without a valid checkpoint")
-    model.load_state_dict(best_state)
+    model.load_state_dict(selected_state)
     validation_logits, validation_probabilities, validation_report = predict_model(
         model,
         validation_windows,
@@ -599,8 +647,13 @@ def train_source_model(
         zero_channel_indices=config.zero_channel_indices,
     )
     final_payload = copy.copy(last_checkpoint)
-    final_payload["model_state"] = best_state
-    final_payload["checkpoint_role"] = "source_validation_selected"
+    final_payload["model_state"] = selected_state
+    final_payload["checkpoint_role"] = (
+        "source_fixed_epoch_last"
+        if config.checkpoint_selection_rule == "fixed_last_epoch"
+        else "source_validation_selected"
+    )
+    final_payload["selected_epoch"] = selected_epoch
     final_payload["stopped_early"] = stopped_early
     final_checkpoint_path = output_directory / "selected.pt"
     final_checkpoint_sha256 = _write_checkpoint_create_only(final_checkpoint_path, final_payload)
@@ -609,6 +662,10 @@ def train_source_model(
         "status": "source_development_complete",
         "evidence_status": lineage.evidence_status,
         "configuration_sha256": configuration_sha256,
+        "checkpoint_selection_rule": config.checkpoint_selection_rule,
+        "selected_epoch": selected_epoch,
+        "selected_validation_mean_participant_macro_f1": selected_metric,
+        "selected_validation_worst_participant_macro_f1": selected_worst_participant,
         "best_epoch": best_epoch,
         "best_validation_mean_participant_macro_f1": best_metric,
         "best_validation_worst_participant_macro_f1": best_worst_participant,
@@ -621,6 +678,7 @@ def train_source_model(
         "checkpoint_path": str(final_checkpoint_path),
         "checkpoint_sha256": final_checkpoint_sha256,
         "parameter_count": trainable_parameter_count(model),
+        "target_information_used_for_selection": False,
     }
 
 

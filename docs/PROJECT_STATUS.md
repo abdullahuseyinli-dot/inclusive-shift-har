@@ -19,7 +19,10 @@ This file records workflow state. It is not a results page and does not authoriz
 - Stage 0 verification SHA-256: `F8838A2ED86E3E2B40D72B26D79D5522A40DDF8D9F257C43A15205C6802621D0`.
 - Current literature matrix SHA-256 at its recorded snapshot: `12C587D2C9D2A1CC1E7C339634FA153DBAA8DEDA2EA0583ACE3A371405295919`.
 - Current literature source registry SHA-256 at its recorded snapshot: `96EB2CA8664DC9F1F04D1B854CD9431FBD1D46496CD703ECABE60964B33913BC`.
-- Novelty-gate wording is narrowed to a candidate leakage-safe, **participant-exclusive released-block** ability-associated InclusiveHAR-v4 benchmark. It is not trial-safe and makes no “first,” fairness, clinical-validity, state-of-the-art, or publishability claim.
+- Novelty-gate wording is narrowed to a candidate **auditable,
+  participant-exclusive released-block** ability-associated InclusiveHAR-v4
+  benchmark. It is not trial-safe and makes no “first,” fairness,
+  clinical-validity, state-of-the-art, or publishability claim.
 - InclusiveHAR raw-read gate file SHA-256: `0CB9F5F3ADD587E688CB539E82257FE8A38723E6AE81CF4B13EB3028164357E3`.
 - InclusiveHAR Stage 3 audit embedded report SHA-256: `673917D3BFD4B3F283A1AE521AE4A7D548E3FACADD2AE89CE33B2E27153500E8`; audit JSON physical SHA-256: `B85E641DA9FDC3AC61B6C8440A78C2B6AEE625C160B095C8170C0B9D1A4A4204`.
 - Stage 3 conclusion remains visible: artifact/schema/coverage integrity passed, but timestamp/trial/session/sample identifiers are absent and hidden trial joins are unrecoverable.

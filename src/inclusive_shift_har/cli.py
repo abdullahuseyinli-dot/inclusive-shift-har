@@ -303,6 +303,53 @@ def _build_source_windows(args: argparse.Namespace) -> int:
     return EXIT_SUCCESS
 
 
+def _aggregate_source_cv(args: argparse.Namespace) -> int:
+    try:
+        from inclusive_shift_har.evaluation.source_cv import (
+            SourceCVAggregationError,
+            build_source_cv_aggregate,
+            write_source_cv_exports_new,
+        )
+
+        aggregate = build_source_cv_aggregate(
+            fold_record_dir=args.fold_record_dir,
+            source_development_dir=args.source_development_dir,
+            source_manifest_path=args.source_manifest,
+            bootstrap_resamples=args.bootstrap_resamples,
+            bootstrap_confidence=args.bootstrap_confidence,
+            bootstrap_seed=args.bootstrap_seed,
+        )
+        outputs = write_source_cv_exports_new(
+            aggregate,
+            output_dir=args.output_dir,
+            prefix=args.prefix,
+        )
+        published = load_json_strict(outputs["json"])
+        if not isinstance(published, Mapping):
+            raise SourceCVAggregationError("published aggregate root is not an object")
+    except (FileExistsError, OSError, SourceCVAggregationError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "SOURCE_CV_AGGREGATION_VALIDATION_ERROR",
+            "command": "aggregate-source-cv",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "aggregate_record_sha256": published["aggregate_record_sha256"],
+        "command": "aggregate-source-cv",
+        "configuration_count": published["configuration_count"],
+        "outputs": {key: value.as_posix() for key, value in outputs.items()},
+        "quarantined_configuration_count": published["quarantined_configuration_count"],
+        "status": published["status"],
+        "target_performance_or_prediction_accessed": False,
+        "target_subject_or_window_records_loaded": False,
+    }
+    _emit(payload, as_json=args.json)
+    return EXIT_SUCCESS
+
+
 def _gated(args: argparse.Namespace) -> int:
     payload = gated_command_payload(args.command)
     _emit(payload, as_json=args.json)
@@ -421,6 +468,26 @@ def build_parser() -> argparse.ArgumentParser:
     source_window_parser.add_argument("--allowed-root", default="results/protocol")
     source_window_parser.add_argument("--json", action="store_true")
     source_window_parser.set_defaults(handler=_build_source_windows)
+
+    source_cv_parser = subparsers.add_parser(
+        "aggregate-source-cv",
+        help="validate and aggregate complete source-only grouped CV evidence",
+    )
+    source_cv_parser.add_argument("--fold-record-dir", default="results/development/source_cv_v1")
+    source_cv_parser.add_argument(
+        "--source-development-dir", default="results/development/source_v1"
+    )
+    source_cv_parser.add_argument(
+        "--source-manifest",
+        default=("results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"),
+    )
+    source_cv_parser.add_argument("--output-dir", default="results/development/source_cv_v1")
+    source_cv_parser.add_argument("--prefix", default="source_cv_aggregate")
+    source_cv_parser.add_argument("--bootstrap-resamples", type=int, default=10_000)
+    source_cv_parser.add_argument("--bootstrap-confidence", type=float, default=0.95)
+    source_cv_parser.add_argument("--bootstrap-seed", type=int, default=1729)
+    source_cv_parser.add_argument("--json", action="store_true")
+    source_cv_parser.set_defaults(handler=_aggregate_source_cv)
 
     for command in _GATED_COMMANDS:
         gated_parser = subparsers.add_parser(command, help=_GATED_COMMANDS[command]["message"])

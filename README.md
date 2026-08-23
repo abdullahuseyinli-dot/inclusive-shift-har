@@ -1,6 +1,12 @@
 # InclusiveShift-HAR
 
-**Provisional title:** *InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition*
+**Evidence-corrected provisional title:** *InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition*
+
+The earlier working title used “leakage-safe.” The InclusiveHAR v4 audit found
+that timestamps and trial identifiers are absent and trial boundaries cannot be
+recovered, so that unqualified wording is no longer used. The authorized
+protocol is participant-exclusive and raw-row-disjoint, but only within
+released subject–activity blocks; hidden within-block joins remain possible.
 
 InclusiveShift-HAR is a research-software project for studying how reliably smartphone inertial human activity recognition (HAR) systems trained on conventional participant populations generalize to people whose activities may be physically realized differently, including some users of assistive devices.
 

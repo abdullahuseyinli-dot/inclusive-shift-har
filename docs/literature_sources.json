@@ -12,7 +12,7 @@
     "status": "pass_with_narrowed_contribution",
     "strict_collision_verified": false,
     "model_novelty_status": "open_high_collision",
-    "candidate_contribution": "A leakage-safe, subject- and trial-exclusive, one-way ability-associated population-shift benchmark on InclusiveHAR v4, with source-only model selection, explicit activity-realization ontology, matched strong baselines, participant-level lower-tail and calibration evidence, and an auditable one-time target evaluation.",
+    "candidate_contribution": "An auditable participant-exclusive, released-block, one-way ability-associated population-shift benchmark on InclusiveHAR v4, with source-only model selection, explicit activity-realization ontology, matched strong baselines, participant-level lower-tail and calibration evidence, explicit unrecoverable hidden-trial-boundary risk, and a one-time target evaluation.",
     "caveat": "This is a scoped search result and candidate distinction, not proof of novelty and not authorization to claim first, fairness, clinical validity, or publishability.",
     "refresh_required_before_submission": true
   },
@@ -217,6 +217,18 @@
       ],
       "source_status": "arxiv_preprint_project_and_mit_repository",
       "key_boundary": "Preempts a generic wearable foundation-model-scale study; its pretraining scale is out of scope and it has no ability-defined target."
+    },
+    {
+      "id": "liteway",
+      "title": "LITEWAY: LIghtweight HAR via Temporal Efficient highWAY",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2608.09421",
+      "primary_urls": [
+        "https://arxiv.org/abs/2608.09421",
+        "https://github.com/dominique-nshimyimana/liteway"
+      ],
+      "source_status": "arxiv_preprint_and_unlicensed_paper_linked_repository",
+      "key_boundary": "Preempts a generic lightweight fully convolutional HAR architecture claim; its closest UCI interface uses nine channels and overlapping windows, it does not study ability-associated shift, and audited source reuse is blocked by absent software licensing."
     },
     {
       "id": "bpd",

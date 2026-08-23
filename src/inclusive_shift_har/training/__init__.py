@@ -14,6 +14,7 @@ from inclusive_shift_har.training.engine import (
     train_source_model,
     training_config_from_dict,
 )
+from inclusive_shift_har.training.final_checkpoint import validate_fixed_epoch_checkpoint
 from inclusive_shift_har.training.objectives import (
     GroupDROState,
     MoReObjectiveWeights,
@@ -42,4 +43,5 @@ __all__ = [
     "symmetric_consistency_loss",
     "train_source_model",
     "training_config_from_dict",
+    "validate_fixed_epoch_checkpoint",
 ]

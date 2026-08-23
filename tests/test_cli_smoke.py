@@ -52,6 +52,7 @@ def test_cli_help_lists_every_stage_2_command(
         "audit-data",
         "build-splits",
         "audit-splits",
+        "aggregate-source-cv",
         "train",
         "evaluate",
         "validate-artifacts",

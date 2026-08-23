@@ -277,7 +277,8 @@ permission to copy repository code.
 Decision: add LITEWAY to related work and the future compact-baseline priority
 list, but do not integrate its source and do not relabel a generic local model as
 LITEWAY. A later author license could reopen the software gate; a future adaptation
-would still need six-channel, leakage-safe validation and parameter/MAC checks.
+would still need six-channel, participant-exclusive boundary-audited validation
+and parameter/MAC checks.
 
 ## Integration and claim rules
 
@@ -308,4 +309,3 @@ The following rules are binding for experiments built from this audit:
 | BPD | Boundary-safe per-participant/per-trial window adapter, stride/config reconciliation, target-blind training, and published-component validation |
 | CMD-HAR | Official licensed implementation or a predeclared clean-room paper adaptation with all missing choices exposed |
 | FOCAL HAR | Independently implemented inertial modality adapter, license notices, and source-only validation at the locked temporal interface |
-

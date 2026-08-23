@@ -43,6 +43,8 @@ def test_schema_documents_are_valid_json_with_only_local_references(
     assert {path.name for path in paths} == {
         "artifact_manifest.schema.json",
         "dataset_manifest.schema.json",
+        "final_freeze.schema.json",
+        "source_calibrator.schema.json",
     }
     for path in paths:
         schema = _load(path)

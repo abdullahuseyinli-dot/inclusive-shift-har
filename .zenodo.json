@@ -1,6 +1,6 @@
 {
-  "title": "InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition",
-  "description": "Provisional research software for leakage-safe, participant-exclusive evaluation of ability-associated population shift in smartphone inertial human activity recognition. This metadata does not assert confirmatory results, fairness, clinical validity, state-of-the-art performance, publication acceptance, or a minted DOI.",
+  "title": "InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition",
+  "description": "Provisional research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. InclusiveHAR v4 trial boundaries are unrecoverable, so this is not claimed to be trial-safe. This metadata does not assert confirmatory results, fairness, clinical validity, state-of-the-art performance, publication acceptance, or a minted DOI.",
   "upload_type": "software",
   "creators": [
     {
