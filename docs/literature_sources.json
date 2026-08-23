@@ -1,0 +1,304 @@
+{
+  "schema_version": "1.0.0",
+  "audit_date": "2026-08-23",
+  "scope": "Primary papers, official proceedings or publisher pages, official repositories, and versioned dataset records inspected for Stage 1 claim and novelty gating.",
+  "evidence_labels": {
+    "V": "verified in an inspected primary or official source",
+    "I": "bounded inference from verified facts",
+    "N": "scoped negative search, not proof of absence",
+    "NR": "not reported or not verified in the inspected source"
+  },
+  "novelty_gate": {
+    "status": "pass_with_narrowed_contribution",
+    "strict_collision_verified": false,
+    "model_novelty_status": "open_high_collision",
+    "candidate_contribution": "A leakage-safe, subject- and trial-exclusive, one-way ability-associated population-shift benchmark on InclusiveHAR v4, with source-only model selection, explicit activity-realization ontology, matched strong baselines, participant-level lower-tail and calibration evidence, and an auditable one-time target evaluation.",
+    "caveat": "This is a scoped search result and candidate distinction, not proof of novelty and not authorization to claim first, fairness, clinical validity, or publishability.",
+    "refresh_required_before_submission": true
+  },
+  "inclusivehar_citation_search": {
+    "target_article_doi": "10.1016/j.dib.2026.112620",
+    "target_dataset_doi": "10.17632/r78dn3f6nc.4",
+    "target_dataset_version": 4,
+    "result": "No post-release citing or using paper was verified in the searched sources as of the audit date.",
+    "result_label": "N",
+    "limitations": [
+      "Indexing lag and incomplete full-text indexing can produce false negatives.",
+      "Direct automated Google Scholar result access was not reliably available; a manual search is required before submission.",
+      "Counts and index records are volatile and must be refreshed."
+    ],
+    "queries": [
+      "InclusiveHAR",
+      "InclusiveHAR: A smartphone-based dataset for human activity recognition across diverse physical abilities",
+      "10.1016/j.dib.2026.112620",
+      "10.17632/r78dn3f6nc.4",
+      "r78dn3f6nc"
+    ],
+    "services": [
+      {
+        "service": "Crossref",
+        "url": "https://api.crossref.org/works/10.1016/j.dib.2026.112620",
+        "observed": "is-referenced-by-count=0"
+      },
+      {
+        "service": "Semantic Scholar Graph API",
+        "url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.dib.2026.112620?fields=title,year,citationCount,influentialCitationCount,citations.title,citations.year,citations.externalIds",
+        "observed": "citationCount=0; influentialCitationCount=0; citations=[]"
+      },
+      {
+        "service": "OpenAlex",
+        "url": "https://api.openalex.org/works/doi:10.1016/j.dib.2026.112620",
+        "observed": "work=W7132833671; cited_by_count=0; counts_by_year=[]; source record updated 2026-08-21"
+      },
+      {
+        "service": "Europe PMC",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1016/j.dib.2026.112620&format=json",
+        "observed": "one source record; citedByCount=0"
+      },
+      {
+        "service": "PubMed",
+        "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=InclusiveHAR&retmode=json",
+        "observed": "one result, PMID 41853668, the source article"
+      },
+      {
+        "service": "ScienceDirect",
+        "url": "https://www.sciencedirect.com/science/article/pii/S2352340926001733",
+        "observed": "Cited by (0) displayed when inspected"
+      },
+      {
+        "service": "arXiv API",
+        "url": "https://export.arxiv.org/api/query?search_query=all%3AInclusiveHAR&start=0&max_results=20",
+        "observed": "no downstream match"
+      },
+      {
+        "service": "IEEE Xplore, ACM Digital Library, and PMLR",
+        "url": null,
+        "observed": "no downstream paper verified by exact-title, DOI, dataset-ID, and site-restricted queries"
+      },
+      {
+        "service": "Google Scholar",
+        "url": "https://scholar.google.com/",
+        "observed": "direct automated results unavailable; no zero-citation conclusion drawn"
+      }
+    ]
+  },
+  "works": [
+    {
+      "id": "inclusivehar",
+      "title": "InclusiveHAR: A smartphone-based dataset for human activity recognition across diverse physical abilities",
+      "year": 2026,
+      "doi": "10.1016/j.dib.2026.112620",
+      "primary_urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12993405/",
+        "https://data.mendeley.com/datasets/r78dn3f6nc/4",
+        "https://doi.org/10.17632/r78dn3f6nc.4"
+      ],
+      "source_status": "peer_reviewed_article_and_versioned_dataset",
+      "key_boundary": "The paper already reports an author-described non-disabled-only training scenario, but split and target provenance are insufficient to verify a participant/trial-exclusive locked zero-shot protocol."
+    },
+    {
+      "id": "uci_har",
+      "title": "Human Activity Recognition Using Smartphones",
+      "year": 2012,
+      "doi": "10.24432/C54S4K",
+      "primary_urls": [
+        "https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones"
+      ],
+      "source_status": "official_versioned_dataset",
+      "key_boundary": "Conventional 30-participant population and subject-separated official split; no disability metadata, and stairs/body-acceleration semantics are not automatically compatible with InclusiveHAR. The current catalog's CC BY 4.0 label conflicts with the embedded Version 1.0 non-commercial notice; both must be preserved as unresolved and the data must not be redistributed or relicensed."
+    },
+    {
+      "id": "mennella_fairness_2024",
+      "title": "Promoting fairness in activity recognition algorithms for patient's monitoring and evaluation systems in healthcare",
+      "year": 2024,
+      "doi": "10.1016/j.compbiomed.2024.108826",
+      "primary_urls": [
+        "https://doi.org/10.1016/j.compbiomed.2024.108826",
+        "https://pubmed.ncbi.nlm.nih.gov/38981215/",
+        "https://zenodo.org/records/4610859",
+        "https://github.com/alina-miron/intellirehabds"
+      ],
+      "source_status": "peer_reviewed_article_and_public_data",
+      "key_boundary": "Direct disability/fairness prior using Kinect skeleton shoulder exercises; not smartphone inertial or a locked source-only population-shift benchmark."
+    },
+    {
+      "id": "harood",
+      "title": "HAROOD: A Benchmark for Out-of-distribution Generalization in Sensor-based Human Activity Recognition",
+      "year": 2026,
+      "doi": "10.1145/3770854.3785681",
+      "primary_urls": [
+        "https://arxiv.org/abs/2512.10807",
+        "https://github.com/AIFrontierLab/HAROOD"
+      ],
+      "source_status": "kdd_2026_accepted_paper_and_public_repository",
+      "key_boundary": "Preempts a generic HAR OOD benchmark claim; it has no ability-defined target, and oracle model selection is diagnostic."
+    },
+    {
+      "id": "benchar",
+      "title": "BenchHAR: Benchmarking Self-Supervised Learning for Generalizable Sensor-based Activity Recognition",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2605.08296",
+      "primary_urls": [
+        "https://arxiv.org/abs/2605.08296",
+        "https://github.com/saiketa/HAR-Bench"
+      ],
+      "source_status": "arxiv_preprint_and_public_repository",
+      "key_boundary": "Preempts a generic SSL-generalization benchmark; no ability-defined cohort or participant lower-tail/calibration endpoint."
+    },
+    {
+      "id": "whar_arena",
+      "title": "WHAR Arena: Benchmarking the State of the Art in Efficient Wearable Human Activity Recognition",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2606.13194",
+      "primary_urls": [
+        "https://arxiv.org/abs/2606.13194",
+        "https://teco-kit.github.io/whar-arena/",
+        "https://github.com/teco-kit/whar-datasets"
+      ],
+      "source_status": "arxiv_preprint_project_and_mit_dataset_parsers",
+      "key_boundary": "Preempts generic standardized accuracy-efficiency comparison; no ability-defined one-way target."
+    },
+    {
+      "id": "ccil",
+      "title": "Generalizable Sensor-Based Activity Recognition via Categorical Concept Invariant Learning",
+      "year": 2025,
+      "doi": "10.1609/aaai.v39i1.32077",
+      "primary_urls": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/32077"
+      ],
+      "source_status": "aaai_2025_peer_reviewed_proceedings",
+      "key_boundary": "Direct predecessor for category-conditioned invariant feature/logit learning; must be compared with MoRe-HAR."
+    },
+    {
+      "id": "in_shift_and_in_variance",
+      "title": "In Shift and In Variance: Assessing the Robustness of HAR Deep Learning Models Against Variability",
+      "year": 2025,
+      "doi": "10.3390/s25020430",
+      "primary_urls": [
+        "https://www.mdpi.com/1424-8220/25/2/430",
+        "https://pubmed.ncbi.nlm.nih.gov/39860799/"
+      ],
+      "source_status": "peer_reviewed_open_article",
+      "key_boundary": "Direct prior for person/device/position/orientation shift, but not ability-associated source-to-target generalization."
+    },
+    {
+      "id": "storm",
+      "title": "STORM: Hardware-Aware Tiny Transformer Co-Design for Low-Power Inertial Human Activity Recognition",
+      "year": 2026,
+      "doi": "10.3390/electronics15091924",
+      "primary_urls": [
+        "https://www.mdpi.com/2079-9292/15/9/1924",
+        "https://github.com/AlessandroVaraldi/storm"
+      ],
+      "source_status": "peer_reviewed_open_article_and_public_repository",
+      "key_boundary": "Preempts generic tiny-Transformer, sensor-fault, and edge-co-design claims; ability by reliability remains secondary."
+    },
+    {
+      "id": "tri_har",
+      "title": "Rotation-Invariant Multi-IMU Activity Recognition under Independent Per-Location Orientation Shifts",
+      "year": 2026,
+      "doi": "10.1145/3830727.3834824",
+      "primary_urls": [
+        "https://arxiv.org/abs/2608.15621",
+        "https://github.com/mbaek01/TRI-HAR"
+      ],
+      "source_status": "iswc_2026_paper_and_public_repository",
+      "key_boundary": "Preempts exact rotation-invariant multi-IMU novelty; not an ability-defined shift study."
+    },
+    {
+      "id": "inertia_1",
+      "title": "Inertia-1: An Open Exploration of Wearable Motion Foundation Models",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2607.06617",
+      "primary_urls": [
+        "https://arxiv.org/abs/2607.06617",
+        "https://yang-ai-lab.github.io/Inertia-1",
+        "https://github.com/yang-ai-lab/Inertia-1"
+      ],
+      "source_status": "arxiv_preprint_project_and_mit_repository",
+      "key_boundary": "Preempts a generic wearable foundation-model-scale study; its pretraining scale is out of scope and it has no ability-defined target."
+    },
+    {
+      "id": "bpd",
+      "title": "Learning Disentangled Behaviour Patterns for Wearable-based Human Activity Recognition",
+      "year": 2022,
+      "doi": "10.1145/3517252",
+      "primary_urls": [
+        "https://arxiv.org/abs/2202.07260",
+        "https://github.com/Jie-su/BPD"
+      ],
+      "source_status": "peer_reviewed_imwut_article_and_apache_2_repository",
+      "key_boundary": "High conceptual collision: BPD already separates activity behaviour from personal style/environmental nuisance and reports participant-level F1."
+    },
+    {
+      "id": "cmd_har",
+      "title": "CMD-HAR: Cross-Modal Disentanglement for Wearable Human Activity Recognition",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2503.21843",
+      "primary_urls": [
+        "https://arxiv.org/abs/2503.21843"
+      ],
+      "source_status": "arxiv_preprint_v4",
+      "key_boundary": "Further invalidates generic disentanglement novelty; ratio-only split documentation does not establish subject exclusivity for all datasets."
+    },
+    {
+      "id": "har_pmd",
+      "title": "Human Activity Recognition Dataset for Pedestrians with Mobility Disabilities",
+      "year": 2026,
+      "doi": "10.1038/s41597-025-06527-y",
+      "primary_urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12890990/",
+        "https://doi.org/10.5281/zenodo.7939223",
+        "https://github.com/HanyangHCILab/HAR-handicaps"
+      ],
+      "source_status": "peer_reviewed_data_descriptor_versioned_dataset_and_public_repository",
+      "uses_inclusivehar_verified": false,
+      "key_boundary": "Strong mobility-aid HAR benchmark with 120 participants and user-independent evaluation, but activities are simulated modes/aids rather than same-activity generalization to an independently recruited disabled cohort."
+    },
+    {
+      "id": "russo_ms_clinical",
+      "title": "Human Activity Recognition from Smartphone Sensor Data for Clinical Trials",
+      "year": 2025,
+      "doi": "10.48550/arXiv.2508.05175",
+      "primary_urls": [
+        "https://arxiv.org/abs/2508.05175"
+      ],
+      "source_status": "arxiv_preprint",
+      "key_boundary": "Includes healthy controls and people with MS, but GaitLab development mixes both cohorts and the full everyday-activity endpoint is evaluated only on healthy Roche participants."
+    },
+    {
+      "id": "obrien_stroke_2017",
+      "title": "Activity Recognition for Persons With Stroke Using Mobile Phone Technology",
+      "year": 2017,
+      "doi": "10.2196/jmir.7385",
+      "primary_urls": [
+        "https://www.jmir.org/2017/5/e184"
+      ],
+      "source_status": "peer_reviewed_open_article",
+      "key_boundary": "Direct smartphone healthy-to-stroke transfer precedent; rules out first healthy-to-disabled smartphone evaluation."
+    },
+    {
+      "id": "lonini_assistive_devices_2017",
+      "title": "Activity Recognition in Individuals Walking With Assistive Devices: Benefits of Device-Specific Models",
+      "year": 2017,
+      "doi": "10.2196/rehab.7317",
+      "primary_urls": [
+        "https://rehab.jmir.org/2017/2/e8/"
+      ],
+      "source_status": "peer_reviewed_open_article",
+      "key_boundary": "Direct healthy-global-to-assistive-device-user evaluation; rules out first assistive-device or healthy-to-disabled transfer claim."
+    },
+    {
+      "id": "jamieson_amputee_2021",
+      "title": "Human Activity Recognition of Individuals with Lower Limb Amputation in Free-Living Conditions: A Pilot Study",
+      "year": 2021,
+      "doi": "10.3390/s21248377",
+      "primary_urls": [
+        "https://www.mdpi.com/1424-8220/21/24/8377",
+        "https://doi.org/10.15129/ae451315-5258-4a07-8eb4-204e4d2e357f"
+      ],
+      "source_status": "peer_reviewed_open_article_and_versioned_data",
+      "key_boundary": "Direct non-impaired-to-lower-limb-amputee transfer failure; strongly narrows cross-ability novelty language."
+    }
+  ]
+}
