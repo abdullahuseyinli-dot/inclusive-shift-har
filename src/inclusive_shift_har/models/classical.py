@@ -88,7 +88,6 @@ def _build_estimator(config: ClassicalConfig) -> Any:
                         kernel="rbf",
                         gamma="scale",
                         class_weight="balanced",
-                        probability=False,
                         random_state=config.seed,
                     ),
                 ),

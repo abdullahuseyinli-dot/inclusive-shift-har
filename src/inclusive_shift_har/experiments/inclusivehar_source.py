@@ -74,9 +74,11 @@ def _materialize_source(manifest: dict[str, Any], raw_csv: Path) -> tuple[Any, t
     return batch, class_names
 
 
-def _normalize_final_source_split(
+def _normalize_source_split(
     batch: Any,
     manifest: dict[str, Any],
+    *,
+    fold_id: str,
 ) -> tuple[
     NDArray[np.float32],
     NDArray[np.int64],
@@ -88,12 +90,27 @@ def _normalize_final_source_split(
     tuple[str, ...],
     ChannelStandardizer,
 ]:
-    partitions = np.asarray(batch.partitions)
-    train_mask = partitions == "source_train"
-    validation_mask = partitions == "source_validation"
+    participant_array = np.asarray(batch.participant_ids)
+    if fold_id == "final_source_split":
+        partitions = np.asarray(batch.partitions)
+        train_mask = partitions == "source_train"
+        validation_mask = partitions == "source_validation"
+    else:
+        fold = next(
+            (
+                candidate
+                for candidate in manifest["source_cv_folds"]
+                if candidate["fold_id"] == fold_id
+            ),
+            None,
+        )
+        if fold is None:
+            choices = [candidate["fold_id"] for candidate in manifest["source_cv_folds"]]
+            raise ValueError(f"unknown source fold {fold_id!r}; choices: {choices}")
+        train_mask = np.isin(participant_array, fold["train_subjects"])
+        validation_mask = np.isin(participant_array, fold["validation_subjects"])
     if not train_mask.any() or not validation_mask.any() or np.any(train_mask & validation_mask):
         raise ValueError("locked final source split is incomplete or overlapping")
-    participant_array = np.asarray(batch.participant_ids)
     standardizer = ChannelStandardizer.fit(
         batch.signals[train_mask],
         participant_array[train_mask].tolist(),
@@ -160,6 +177,7 @@ def run_source_development(
     learning_rate: float,
     weight_decay: float,
     device_name: str,
+    fold_id: str = "final_source_split",
     use_augmentation: bool = False,
     use_content_objective: bool = False,
     use_realization_factorization: bool = False,
@@ -180,7 +198,7 @@ def run_source_development(
         validation_participants,
         validation_window_ids,
         standardizer,
-    ) = _normalize_final_source_split(batch, manifest)
+    ) = _normalize_source_split(batch, manifest, fold_id=fold_id)
     run_directory.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
     if device_name == "cuda" and not torch.cuda.is_available():
@@ -305,6 +323,7 @@ def run_source_development(
         "configuration_sha256": canonical_json_sha256(configuration),
         "source_window_manifest_sha256": manifest["source_window_manifest_sha256"],
         "split_manifest_sha256": manifest["source_split_manifest_sha256"],
+        "source_split_id": fold_id,
         "class_names": list(class_names),
         "normalization": standardizer.to_dict(),
         "train_window_count": int(train_labels.size),
@@ -347,6 +366,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    parser.add_argument("--fold-id", default="final_source_split")
     parser.add_argument("--augmentation", action="store_true")
     parser.add_argument("--content-objective", action="store_true")
     parser.add_argument("--realization-factorization", action="store_true")
@@ -370,6 +390,7 @@ def main(argv: list[str] | None = None) -> int:
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,
         device_name=args.device,
+        fold_id=args.fold_id,
         use_augmentation=args.augmentation,
         use_content_objective=args.content_objective,
         use_realization_factorization=args.realization_factorization,
