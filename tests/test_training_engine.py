@@ -116,3 +116,13 @@ def test_fixed_epoch_training_selects_last_epoch_without_early_stopping(tmp_path
     )
     assert record["selected_epoch"] == 3
     assert record["target_information_used_for_selection"] is False
+
+
+def test_training_config_records_explicit_cudnn_backend_choice() -> None:
+    config = TrainingConfig(
+        model_name="legacy_bilstm_h192",
+        num_classes=3,
+        seed=11,
+        disable_cudnn=True,
+    )
+    assert config.disable_cudnn is True

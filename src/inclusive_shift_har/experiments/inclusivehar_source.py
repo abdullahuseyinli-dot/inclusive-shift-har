@@ -183,6 +183,7 @@ def run_source_development(
     use_realization_factorization: bool = False,
     use_group_dro: bool = False,
     coral_weight: float = 0.0,
+    disable_cudnn: bool = False,
 ) -> dict[str, Any]:
     """Execute one immutable final-source-split development trial."""
 
@@ -261,6 +262,7 @@ def run_source_development(
             minimum_epochs=min(8, epochs),
             mixed_precision="float16" if device.type == "cuda" else "disabled",
             checkpoint_interval=max(epochs, 1),
+            disable_cudnn=disable_cudnn,
             use_augmentation=use_augmentation,
             use_content_objective=use_content_objective,
             use_realization_factorization=use_realization_factorization,
@@ -372,6 +374,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--realization-factorization", action="store_true")
     parser.add_argument("--group-dro", action="store_true")
     parser.add_argument("--coral-weight", type=float, default=0.0)
+    parser.add_argument(
+        "--disable-cudnn",
+        action="store_true",
+        help="keep CUDA tensors but use the non-cuDNN recurrent backend",
+    )
     return parser
 
 
@@ -396,6 +403,7 @@ def main(argv: list[str] | None = None) -> int:
         use_realization_factorization=args.realization_factorization,
         use_group_dro=args.group_dro,
         coral_weight=args.coral_weight,
+        disable_cudnn=args.disable_cudnn,
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0

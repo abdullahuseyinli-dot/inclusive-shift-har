@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "preserved_training_failure",
+  "status": "quarantined_native_process_failure",
+  "detected_at_local": "2026-08-23T23:48:04+01:00",
+  "code_commit": "7f873f300c6533f7e9b00408ef197ea6ed51e5c2",
+  "model_names": [
+    "legacy_bilstm_h192",
+    "legacy_joint_bilstm256_cnn128"
+  ],
+  "device": "cuda",
+  "python_exit_code_signed": -1073740791,
+  "python_exit_code_hex": "0xc0000409",
+  "windows_event": "BEX64 in ucrtbase.dll",
+  "attempt_count": 4,
+  "attempt_summaries": [
+    {
+      "path": "results/failures/cuda_lstm_exit_c0000409/legacy_bilstm_h192-seed11-lr3e4-wd1e3-exact7f873.json",
+      "file_sha256": "c4a8de8a421f108f02fe157835968935463e959290a2600d4135230f98ffa637"
+    },
+    {
+      "path": "results/failures/cuda_lstm_exit_c0000409/legacy_bilstm_h192-seed11-lr3e4-wd1e4-exact7f873.json",
+      "file_sha256": "d6a8d3d0a8c88f27dad4f4523276a5c5cfde701033e152f6be71bea7aa67b193"
+    },
+    {
+      "path": "results/failures/cuda_lstm_exit_c0000409/legacy_bilstm_h192-seed11-lr3e4-wd1e4-exact7f873-retry1.json",
+      "file_sha256": "3a5a758742635b3e3e4dbb0085a15f86930910e5f43813025b368fc224838a2d"
+    },
+    {
+      "path": "results/failures/cuda_lstm_exit_c0000409/legacy_joint_bilstm256_cnn128-seed11-lr1e3-wd1e4-source_cv_01.json",
+      "file_sha256": "1c57158e13025ec91dc39cd117abbe054ec79f94f7c2a2d2b9ad9c57cf8f8d0a"
+    }
+  ],
+  "windows_report_ids": [
+    "03ec83ca-1707-45ff-85b8-929ead104f7e",
+    "a20174c0-d048-49b3-b911-762b68402152",
+    "1f04629a-2947-4bbc-bd51-6b70e0a8ec8b"
+  ],
+  "selected_checkpoint_sha256_reproduced_twice": "fdc191ca994b234fb04f8f5e4c8628b8d1d210a087069fd462869ad365832878",
+  "disposition": "exclude_failed_attempts_and_use_explicit_non_cudnn_cuda_backend",
+  "target_subject_or_window_records_loaded": false,
+  "target_performance_or_prediction_accessed": false
+}

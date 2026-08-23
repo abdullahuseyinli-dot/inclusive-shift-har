@@ -56,6 +56,7 @@ class TrainingConfig:
     data_loader_workers: int = 0
     checkpoint_interval: int = 10
     checkpoint_selection_rule: str = "source_validation_best"
+    disable_cudnn: bool = False
     use_augmentation: bool = False
     use_content_objective: bool = False
     use_realization_factorization: bool = False
@@ -196,6 +197,8 @@ def _device_environment(device: torch.device) -> dict[str, Any]:
         "torch_cuda_runtime": torch.version.cuda,
         "device_type": device.type,
         "hostname_recorded": False,
+        "cudnn_enabled": torch.backends.cudnn.enabled,
+        "cudnn_version": cast(Any, torch.backends.cudnn).version(),
     }
     if device.type == "cuda":
         properties = torch.cuda.get_device_properties(device)
@@ -443,6 +446,7 @@ def train_source_model(
         raise ValueError("training class count disagrees with locked checkpoint label schema")
     if set(train_participant_ids) & set(validation_participant_ids):
         raise ValueError("source training and validation participants overlap")
+    torch.backends.cudnn.enabled = not config.disable_cudnn
     configure_determinism(config.seed)
     participant_domain_map = {
         participant: index for index, participant in enumerate(sorted(set(train_participant_ids)))
