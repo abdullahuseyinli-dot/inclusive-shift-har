@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:inclusive-shift-har:schema:artifact-manifest:1.0.0",
+  "title": "InclusiveShift-HAR result artifact manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "manifest_kind",
+    "artifact_id",
+    "artifact_type",
+    "status",
+    "evidence_status",
+    "created_at_utc",
+    "provenance",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "manifest_kind": {
+      "const": "artifact"
+    },
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": ["complete", "conditional", "failed", "quarantined"]
+    },
+    "evidence_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provenance": {
+      "$ref": "#/$defs/provenance"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/file"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": ["complete", "conditional"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "artifact_type": {
+            "const": "checkpoint"
+          },
+          "status": {
+            "enum": ["complete", "conditional"]
+          }
+        },
+        "required": ["artifact_type", "status"]
+      },
+      "then": {
+        "properties": {
+          "files": {
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "model_state"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "optimizer_state"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "preprocessing"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "normalization"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "label_schema"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "rng_states"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "environment_metadata"
+                    }
+                  },
+                  "required": ["role"]
+                }
+              }
+            ]
+          },
+          "provenance": {
+            "required": [
+              "code_commit",
+              "configuration_sha256",
+              "dataset_manifest_sha256",
+              "split_manifest_sha256"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code_commit",
+        "configuration_sha256",
+        "dataset_manifest_sha256"
+      ],
+      "properties": {
+        "code_commit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "configuration_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "dataset_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "split_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "size_bytes", "sha256"],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/$defs/safe_relative_path"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

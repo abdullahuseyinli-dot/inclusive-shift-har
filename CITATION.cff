@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+message: >-
+  If you use repository-authored InclusiveShift-HAR software, cite this
+  metadata and cite every third-party dataset separately under its own terms.
+title: >-
+  InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability
+  Generalization in Smartphone Activity Recognition
+type: software
+version: 0.1.0a0
+authors:
+  - family-names: Huseyinli
+    given-names: Abdulla
+abstract: >-
+  Research software for leakage-safe, participant-exclusive evaluation of
+  ability-associated population shift in smartphone inertial human activity
+  recognition. The benchmark and proposed MoRe-HAR model are provisional;
+  this metadata does not assert confirmatory results, fairness, clinical
+  validity, state-of-the-art performance, or publication status.
+keywords:
+  - human activity recognition
+  - wearable sensing
+  - inertial sensors
+  - domain generalization
+  - participant-exclusive evaluation
+  - reproducible research
+license: Apache-2.0
+notes: >-
+  Apache-2.0 applies only to repository-authored material that the copyright
+  holder has authority to license. Third-party datasets, legacy coursework
+  artifacts, checkpoints, papers, and figures retain their original terms.

@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "evidence_status": "observed_read_only",
+  "observed_at_utc": "2026-08-23T20:56:20.520Z",
+  "gpu": {
+    "count": 1,
+    "model": "NVIDIA RTX PRO 3000 Blackwell Generation Laptop GPU",
+    "memory_total_mib": 12227,
+    "memory_total_gib_approx": 11.94,
+    "driver_version": "596.72",
+    "driver_reported_cuda_compatibility": "13.2",
+    "driver_evidence_command": "nvidia-smi",
+    "nvcc_on_path": false,
+    "pytorch_cuda_runtime_status": "not_tested_pytorch_absent"
+  },
+  "cpu": {
+    "model": "Intel(R) Core(TM) Ultra 9 285H",
+    "physical_cores_reported": 16,
+    "logical_processors_reported": 16
+  },
+  "memory": {
+    "total_physical_bytes": 68137205760,
+    "total_physical_gib_approx": 63.458
+  },
+  "operating_system": {
+    "caption": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build_number": "26200",
+    "architecture": "64-bit"
+  },
+  "software": {
+    "python": {
+      "implementation": "CPython",
+      "version": "3.11.9",
+      "architecture": "AMD64",
+      "project_virtual_environment_active_for_query": true
+    },
+    "uv": {
+      "version": "0.11.29",
+      "build": "901092ee1 2026-07-15 x86_64-pc-windows-msvc"
+    },
+    "pytorch_installed_in_project_environment": false
+  },
+  "runtime_validation": {
+    "cuda_driver_detected": true,
+    "pytorch_import_tested": false,
+    "torch_cuda_is_available_tested": false,
+    "training_or_allocation_tested": false,
+    "conclusion": "CUDA runtime usability is not yet established because PyTorch is not installed in the project environment."
+  },
+  "privacy": {
+    "hostname_recorded": false,
+    "username_recorded": false,
+    "filesystem_paths_recorded": false,
+    "hardware_serial_identifiers_recorded": false
+  }
+}

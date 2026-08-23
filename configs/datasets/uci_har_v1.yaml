@@ -1,0 +1,18 @@
+schema_version: "1.0.0"
+dataset_id: uci_har
+version: "1.0"
+status: source_only_legacy_test_consumed
+manifest: manifests/datasets/uci_har_v1.json
+raw_root: data/raw/uci_har/v1
+sample_rate_hz: 50
+primary_channels:
+  - body_acc_x
+  - body_acc_y
+  - body_acc_z
+  - body_gyro_x
+  - body_gyro_y
+  - body_gyro_z
+window_length_samples: 128
+source_stride_samples: 64
+official_test_status: legacy_exploratory_development_consumed
+license_status: conflicting_notices

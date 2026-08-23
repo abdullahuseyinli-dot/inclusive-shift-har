@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "inclusive-shift-har"
+version = "0.1.0a0"
+description = "Leakage-safe research software for ability-associated population shift in smartphone inertial HAR"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Abdulla Huseyinli" },
+]
+keywords = [
+  "human-activity-recognition",
+  "inertial-sensors",
+  "domain-generalization",
+  "participant-exclusive-evaluation",
+  "reproducibility",
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=2.0,<3",
+  "pydantic>=2.9,<3",
+  "pyyaml>=6.0.2,<7",
+]
+
+[project.scripts]
+inclusive-shift-har = "inclusive_shift_har.cli:main"
+
+[dependency-groups]
+test = [
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<8",
+]
+lint = [
+  "ruff>=0.12,<1",
+]
+type = [
+  "mypy>=1.15,<2",
+  "types-pyyaml>=6.0.12.20250516,<7",
+]
+dev = [
+  { include-group = "test" },
+  { include-group = "lint" },
+  { include-group = "type" },
+]
+
+[tool.uv]
+default-groups = ["dev"]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inclusive_shift_har"]
+
+[tool.pytest.ini_options]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--showlocals",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["inclusive_shift_har"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 0
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "UP", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["inclusive_shift_har"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "tests"]
+show_error_codes = true
+warn_unreachable = true

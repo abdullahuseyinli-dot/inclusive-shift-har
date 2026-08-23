@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_kind": "dataset",
+  "dataset_id": "inclusivehar_v4",
+  "title": "InclusiveHAR: A Smartphone-Based Dataset for Human Activity Recognition Across Diverse Physical Abilities",
+  "record_status": "locked_starter",
+  "release": {
+    "version": "4",
+    "doi": "10.17632/r78dn3f6nc.4",
+    "published_date": "2026-02-18",
+    "landing_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4"
+  },
+  "provenance": {
+    "official_repository_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4",
+    "metadata_endpoint": "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=4",
+    "metadata_verified_date": "2026-08-23"
+  },
+  "license": {
+    "status": "clear",
+    "notices": [
+      {
+        "source": "Mendeley Data version 4 record",
+        "identifier": "CC-BY-4.0",
+        "name": "Creative Commons Attribution 4.0 International",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    ],
+    "redistribution_policy": "do_not_redistribute_raw"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "inclusivehar_v4_sensor_csv",
+      "role": "raw_sensor_table",
+      "provider_filename": "InclusiveHAR_dataset_v2 (1).csv",
+      "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/6be7ec3b-a21a-4288-8e09-18f1f238ddf2/file_downloaded",
+      "storage_path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv",
+      "media_type": "text/csv",
+      "expected_size_bytes": 148915541,
+      "expected_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+      "hash_provenance": "provider_sha256",
+      "git_policy": "exclude_raw_from_git"
+    },
+    {
+      "artifact_id": "inclusivehar_v4_disability_description_docx",
+      "role": "sensitive_participant_metadata",
+      "provider_filename": "Description of individuals with disabilities.docx",
+      "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/ee96cd50-8214-4ecd-83ff-0da10c862849/file_downloaded",
+      "storage_path": "inclusivehar/v4/Description of individuals with disabilities.docx",
+      "media_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "expected_size_bytes": 16997,
+      "expected_sha256": "b8c033dd630412103b8dd463c8a171aa4727fc7222ba6b7fdc1e2487315e0dfb",
+      "hash_provenance": "provider_sha256",
+      "git_policy": "exclude_raw_from_git"
+    }
+  ],
+  "expected_data": {
+    "claims_status": "data_integrity_pass_protocol_quarantine",
+    "manifest_lineage": {
+      "supersedes_manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+      "superseded_manifest_path": "manifests/history/inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json",
+      "authorized_audit_gate_manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+      "data_audit_result_path": "results/data_audit/inclusivehar_v4.audit.json",
+      "data_audit_report_sha256": "673917d3bfd4b3f283a1ae521ae4a7d548e3facadd2ae89ce33b2e27153500e8",
+      "reason": "read-only v4 audit observed lowercase label, 396602 data rows plus one header, and unrecoverable trial boundaries"
+    },
+    "source_record": {
+      "official_repository": "Mendeley Data",
+      "article_doi": "10.1016/j.dib.2026.112620",
+      "article_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12993405/",
+      "citation": "Kamel Tabbakh Farizani, S. R., Naeimi, I., Naghavi, K., Majidi Nasab, F., Ghaffarian, M., & Sharifi Moghaddam Kakhki, M. S. (2026). InclusiveHAR [Data set]. Mendeley Data. https://doi.org/10.17632/r78dn3f6nc.4"
+    },
+    "provider_file_identifiers": {
+      "inclusivehar_v4_sensor_csv": {
+        "file_id": "6be7ec3b-a21a-4288-8e09-18f1f238ddf2",
+        "content_id": "54b2c2c0-135d-4f1c-8d94-b45e35958b41"
+      },
+      "inclusivehar_v4_disability_description_docx": {
+        "file_id": "ee96cd50-8214-4ecd-83ff-0da10c862849",
+        "content_id": "4d8c371a-7a3c-4221-b76d-84ec0a35da08"
+      }
+    },
+    "acquisition_observations": {
+      "inclusivehar_v4_sensor_csv": {
+        "retrieval_date_utc": "2026-08-23",
+        "completed_at_utc": null,
+        "timestamp_status": "exact completion time not recorded because the downloader return failed during post-publication staging-link cleanup"
+      },
+      "inclusivehar_v4_disability_description_docx": {
+        "retrieval_date_utc": "2026-08-23",
+        "completed_at_utc": "2026-08-23T20:36:32.633474Z",
+        "timestamp_status": "recorded_by_successful_downloader_return"
+      }
+    },
+    "format": "single_csv_plus_participant_metadata_docx",
+    "provider_or_article_reported_records": 396603,
+    "observed_data_row_count_excluding_header": 396602,
+    "observed_physical_record_count_including_header": 396603,
+    "record_count_resolution": "reported 396603 equals observed physical records including the header; counting the header is a likely explanation, not author-confirmed",
+    "reported_participant_count": 20,
+    "reported_group_counts": {
+      "non_disabled": 10,
+      "people_with_disabilities": 10
+    },
+    "reported_sampling_rate_hz": 50,
+    "reported_activity_labels": [
+      "walking",
+      "standing",
+      "sitting",
+      "jogging",
+      "ramp ascent",
+      "ramp descent"
+    ],
+    "reported_recording_design": {
+      "seconds_per_activity": 60,
+      "repetitions_per_activity": 3,
+      "samples_trimmed_from_each_end": 50,
+      "consistency_status": "reported_design_arithmetic_does_not_match_reported_row_count"
+    },
+    "trial_identifier_status": "absent_and_unrecoverable_from_released_versions_1_through_4_protocol_quarantine",
+    "timestamp_schema_status": "absent_from_observed_33_column_v4_csv",
+    "raw_header_status": "observed_exact_order_33_columns_lowercase_label",
+    "semantic_notes": {
+      "wheelchair_walking": "The released walking label for wheelchair users means manual wheelchair propulsion.",
+      "incline": "Ramp ascent and descent were performed on an 8 percent ramp and are not stairs."
+    },
+    "primary_signal_units": {
+      "motionUserAcceleration": "G",
+      "motionRotationRate": "rad/s"
+    },
+    "model_tensor_shape": ["batch", 128, 6],
+    "raw_column_spelling_status": "published_names_locked_header_verification_pending",
+    "normalization_scope": "training_partition_only",
+    "disability_or_assistive_status_as_model_input": false
+  },
+  "feature_policy": {
+    "model_input_policy": "exact_allowlist_only",
+    "primary_six_channel_allowlist": [
+      "motionUserAccelerationX",
+      "motionUserAccelerationY",
+      "motionUserAccelerationZ",
+      "motionRotationRateX",
+      "motionRotationRateY",
+      "motionRotationRateZ"
+    ],
+    "sensitive_and_non_model_exclusions": {
+      "exact_names": [
+        "id",
+        "Label",
+        "label",
+        "disabled",
+        "UserID",
+        "gender",
+        "age",
+        "height",
+        "weight",
+        "disability",
+        "assistive_device"
+      ],
+      "casefold_prefixes": [
+        "gps",
+        "location"
+      ]
+    }
+  },
+  "gate_policy": {
+    "raw_data_read_requires": "raw_data_read_access_approved",
+    "split_build_requires": "data_audit_pass",
+    "training_requires": "split_audit_pass",
+    "confirmatory_evaluation_requires": "final_evaluation_unlock"
+  }
+}

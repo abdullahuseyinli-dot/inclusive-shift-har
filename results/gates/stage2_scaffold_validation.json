@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "stage": "stage_2_repository_and_data_provenance",
+  "validated_at_utc": "2026-08-23T20:32:53.2428519Z",
+  "status": "pass",
+  "scope": "repository scaffold, dependency lock, starter provenance manifests, fail-closed CLI, synthetic tests, lint, formatting, typing, and CI policy",
+  "does_not_authorize_raw_data_access": true,
+  "does_not_authorize_training": true,
+  "does_not_authorize_confirmatory_evaluation": true,
+  "checks": [
+    {
+      "command": "uv lock --check",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "command": "uv run --locked pytest -q",
+      "exit_code": 0,
+      "status": "pass",
+      "summary": "61 passed in 2.46s"
+    },
+    {
+      "command": "uv run --locked ruff check src tests",
+      "exit_code": 0,
+      "status": "pass"
+    },
+    {
+      "command": "uv run --locked ruff format --check src tests",
+      "exit_code": 0,
+      "status": "pass",
+      "summary": "19 files already formatted"
+    },
+    {
+      "command": "uv run --locked mypy src tests",
+      "exit_code": 0,
+      "status": "pass",
+      "summary": "no issues in 19 source files"
+    },
+    {
+      "command": "uv run --locked inclusive-shift-har --version",
+      "exit_code": 0,
+      "status": "pass",
+      "summary": "inclusive-shift-har 0.1.0a0"
+    },
+    {
+      "command": "uv run --locked inclusive-shift-har validate-manifests --json",
+      "exit_code": 0,
+      "status": "pass",
+      "summary": "2 starter manifests valid; UCI provider archive hash intentionally remains unpinned"
+    },
+    {
+      "command": "uv run --locked inclusive-shift-har build-splits --json",
+      "exit_code": 3,
+      "status": "expected_gate_closed",
+      "summary": "gated_not_implemented until data_audit_pass"
+    }
+  ],
+  "manifest_hashes": {
+    "inclusivehar_v4": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+    "uci_har_v1": "f7cca928de9a7ed2ba645f89922c600d6622c8226a51070b447c5320a61dbbaf"
+  },
+  "file_hashes": {
+    ".github/workflows/ci.yml": "94bcb0e8da69c831b761be9c73f99e18a246d4f14b108426df4245766a9eac18",
+    ".gitignore": "61c0c771badffc74cba5d5ffb4f664614e9933630b6e813642fbdcb7a45c3581",
+    "README.md": "d963ccfc157b54d0a4e566da15c68e29d19a02d8be596ba829f6bbcb4dcea997",
+    "configs/schema/artifact_manifest.schema.json": "5e83cbb914303bff6b0db145e5d826529e757e1b4375c6da2841efeeffbb6511",
+    "configs/schema/dataset_manifest.schema.json": "f2941528e9cd77967ef4ecd1496aa0a0ed3113e385b52f63a59331cc85bb2a32",
+    "pyproject.toml": "e1e374702491fd3b3076a9bebf3d543d5e8835a03d600fb0f5dce71c0a6fa163",
+    "src/inclusive_shift_har/cli.py": "73563809fd1ed28d3bd5718901855ed3370af5d45c5f132e039fc8624a020ae2",
+    "uv.lock": "60cb11c6d14b9eae5b6c27cbc11701deb7c56bc70e7cee2af76a9c9cffe0d456"
+  },
+  "open_warnings": [
+    "InclusiveHAR raw header, timestamp fields, trial boundaries, coverage, and anomalies have not yet been inspected.",
+    "UCI publishes no SHA-256 for the official archive; first authorized retrieval must compute and lock the locally observed hash.",
+    "UCI catalog and embedded Version 1.0 license notices conflict and remain unresolved.",
+    "build-splits, audit-splits, train, and evaluate remain explicit non-zero gates."
+  ]
+}

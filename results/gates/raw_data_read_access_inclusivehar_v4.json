@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "gate": "raw_data_read_access",
+  "status": "approved",
+  "dataset_id": "inclusivehar_v4",
+  "manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+  "approved_at_utc": "2026-08-23T20:33:53.0883301Z",
+  "approved_scope": [
+    "official version-pinned acquisition",
+    "provider size and SHA-256 verification",
+    "read-only schema and data-quality audit",
+    "participant/activity coverage audit",
+    "timestamp and trial-boundary recoverability audit",
+    "ontology feasibility assessment"
+  ],
+  "forbidden_scope": [
+    "model selection",
+    "split construction before data-audit acceptance",
+    "normalization fitting",
+    "training",
+    "calibration",
+    "confirmatory target evaluation"
+  ],
+  "lineage": {
+    "stage0_status": "pass_mechanics_only",
+    "stage0_verification_sha256": "f8838a2ed86e3e2b40d72b26d79d5522a40ddf8d9f257c43a15205c6802621d0",
+    "stage1_status": "pass_with_narrowed_contribution",
+    "stage2_status": "pass",
+    "stage2_validation_file_sha256": "40990ee128c67b140a0531e2d5debb219741910ddadb43e1870115a9d513c2eb"
+  },
+  "reason": "Stage 0, Stage 1, and Stage 2 acceptance evidence passed. The project brief explicitly authorizes an InclusiveHAR v4 read-only audit before ontology selection."
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "audit_profile": "inclusivehar-v4",
+  "audit_algorithm_version": "1.0.0",
+  "manifest_snapshot_path": "manifests/history/inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json",
+  "manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+  "gate_record_path": "results/gates/raw_data_read_access_inclusivehar_v4.json",
+  "data_root_policy": "external_raw_immutable_git_ignored",
+  "audit_completed_at_utc": "2026-08-23T20:49:00Z",
+  "privacy_policy": {
+    "export_gps_values": false,
+    "export_location_summaries": false,
+    "export_disability_descriptions": false,
+    "export_assistive_device_free_text": false
+  },
+  "output_status": "integrity_pass_protocol_quarantine"
+}

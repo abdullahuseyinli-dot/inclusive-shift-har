@@ -1,0 +1,75 @@
+# Local audit preservation (ignored by Git, never a cleanup target)
+/.audit/
+
+# Python bytecode and tool caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Build and packaging artifacts
+/build/
+/dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments (do not delete existing environments as cleanup)
+/.venv/
+/venv/
+/env/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Immutable/raw third-party data and caches
+/data/raw/
+/data/audio/raw/
+/data/processed/
+/data/cache/
+/data/downloads/
+/data/restricted/
+
+# Large or transient experiment outputs
+/outputs/
+/checkpoints/
+/results/runs/
+/results/**/checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Source archives must remain outside normal Git history
+/legacy/source_archives/
+/legacy/extracted/
+/legacy/checkpoints/
+
+# Secrets and machine-local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+secrets.yaml
+secrets.yml
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+~$*

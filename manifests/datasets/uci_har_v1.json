@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_kind": "dataset",
+  "dataset_id": "uci_har_v1",
+  "title": "Human Activity Recognition Using Smartphones",
+  "record_status": "locked_starter",
+  "release": {
+    "version": "1.0",
+    "doi": "10.24432/C54S4K",
+    "published_date": "2012-12-09",
+    "landing_url": "https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones"
+  },
+  "provenance": {
+    "official_repository_url": "https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones",
+    "metadata_endpoint": "https://archive.ics.uci.edu/api/dataset?id=240",
+    "metadata_verified_date": "2026-08-23"
+  },
+  "license": {
+    "status": "conflicting_notices",
+    "notices": [
+      {
+        "source": "current UCI catalog record",
+        "identifier": "CC-BY-4.0",
+        "name": "Creative Commons Attribution 4.0 International",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      {
+        "source": "official embedded UCI HAR Dataset Version 1.0 names/README notice",
+        "identifier": "NOASSERTION",
+        "name": "Citation required; embedded notice prohibits commercial use",
+        "url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.names",
+        "resolution_status": "unresolved_do_not_assume_catalog_notice_supersedes_embedded_notice"
+      }
+    ],
+    "redistribution_policy": "do_not_redistribute_raw"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "uci_har_v1_dataset_zip",
+      "role": "official_dataset_archive",
+      "provider_filename": "human+activity+recognition+using+smartphones.zip",
+      "download_url": "https://archive.ics.uci.edu/static/public/240/human+activity+recognition+using+smartphones.zip",
+      "storage_path": "uci_har/v1/human+activity+recognition+using+smartphones.zip",
+      "media_type": "application/zip",
+      "expected_size_bytes": null,
+      "expected_sha256": null,
+      "hash_provenance": "not_published",
+      "git_policy": "exclude_raw_from_git"
+    },
+    {
+      "artifact_id": "uci_har_v1_names",
+      "role": "official_embedded_metadata_and_license_notice",
+      "provider_filename": "UCI HAR Dataset.names",
+      "download_url": "https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.names",
+      "storage_path": "uci_har/v1/UCI HAR Dataset.names",
+      "media_type": "text/plain",
+      "expected_size_bytes": 6304,
+      "expected_sha256": "eaee53f45825f349681a1a1b92a997a0082648f9b5bf93ddb3290caeede4b3a8",
+      "hash_provenance": "locally_observed_official_https",
+      "git_policy": "exclude_raw_from_git"
+    }
+  ],
+  "expected_data": {
+    "claims_status": "provenance_verified_processed_schema_pending_local_hash",
+    "source_record": {
+      "official_repository": "UCI Machine Learning Repository",
+      "catalog_last_updated": "2024-03-10",
+      "catalog_donation_date": "2012-12-09",
+      "embedded_version_record_date": "2013-11",
+      "citation": "Reyes-Ortiz, J., Anguita, D., Ghio, A., Oneto, L., & Parra, X. (2013). Human Activity Recognition Using Smartphones [Data set]. UCI Machine Learning Repository. https://doi.org/10.24432/C54S4K"
+    },
+    "provider_reported_archive_size": "58.2 MB",
+    "format": "zip_of_preprocessed_text_matrices",
+    "reported_instance_count": 10299,
+    "reported_participant_count": 30,
+    "reported_sampling_rate_hz": 50,
+    "reported_activity_labels": [
+      "WALKING",
+      "WALKING_UPSTAIRS",
+      "WALKING_DOWNSTAIRS",
+      "SITTING",
+      "STANDING",
+      "LAYING"
+    ],
+    "window_length_samples": 128,
+    "window_duration_seconds": 2.56,
+    "released_window_stride_samples": 64,
+    "official_split": "subject_disjoint_70_30",
+    "official_test_status": "legacy_exploratory_development_consumed",
+    "trial_identifier_status": "absent_from_processed_v1_windows",
+    "raw_sample_index_status": "absent_from_processed_v1_windows",
+    "primary_signal_units": {
+      "body_acc": "G",
+      "body_gyro": "rad/s"
+    },
+    "body_acceleration_derivation": "gravity separated from total acceleration using a 0.3 Hz Butterworth low-pass assumption",
+    "updated_raw_dataset_note": "UCI dataset 341 is a separate DOI and must not be silently substituted for dataset 240.",
+    "model_tensor_shape": ["batch", 128, 6],
+    "source_representation": "released_inertial_signal_matrix_stems",
+    "normalization_scope": "training_partition_only",
+    "disability_or_assistive_status_as_model_input": false
+  },
+  "feature_policy": {
+    "model_input_policy": "exact_allowlist_only",
+    "primary_six_channel_allowlist": [
+      "body_acc_x",
+      "body_acc_y",
+      "body_acc_z",
+      "body_gyro_x",
+      "body_gyro_y",
+      "body_gyro_z"
+    ],
+    "sensitive_and_non_model_exclusions": {
+      "exact_names": [
+        "id",
+        "Label",
+        "disabled",
+        "UserID",
+        "disability",
+        "assistive_device",
+        "subject_train",
+        "subject_test",
+        "y_train",
+        "y_test",
+        "activity_label"
+      ],
+      "casefold_prefixes": [
+        "gps",
+        "location"
+      ]
+    }
+  },
+  "gate_policy": {
+    "raw_data_read_requires": "raw_data_read_access_approved",
+    "split_build_requires": "data_audit_pass",
+    "training_requires": "split_audit_pass",
+    "confirmatory_evaluation_requires": "final_evaluation_unlock"
+  }
+}

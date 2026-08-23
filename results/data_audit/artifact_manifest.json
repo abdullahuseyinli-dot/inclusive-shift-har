@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_kind": "artifact",
+  "artifact_id": "inclusivehar-v4-stage3-data-audit",
+  "artifact_type": "data_audit",
+  "status": "quarantined",
+  "evidence_status": "descriptive_read_only_integrity_pass_protocol_quarantine",
+  "created_at_utc": "2026-08-23T20:49:00Z",
+  "provenance": {
+    "code_commit": "uncommitted_stage3_workspace",
+    "configuration_sha256": "ae349c0e97517017689a40cc40d9053ed233d8b16296fe04fa8f3209b11a1063",
+    "dataset_manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb"
+  },
+  "files": [
+    {
+      "role": "data_audit_report",
+      "path": "data_audit/inclusivehar_v4.audit.json",
+      "size_bytes": 86749,
+      "sha256": "b85e641da9fdc3ac61b6c8440a78c2b6aee625c160b095c8170c0b9d1a4a4204"
+    },
+    {
+      "role": "audit_configuration",
+      "path": "data_audit/inclusivehar_v4.audit_config.json",
+      "size_bytes": 773,
+      "sha256": "eb60d837cc558785a8b3b203934e7f81d28e9a0a50477b44b07e745f51859414"
+    },
+    {
+      "role": "raw_data_read_gate",
+      "path": "gates/raw_data_read_access_inclusivehar_v4.json",
+      "size_bytes": 1305,
+      "sha256": "0cb9f5f3add587e688cb539e82257fe8a38723e6ae81cf4b13eb3028164357e3"
+    }
+  ]
+}

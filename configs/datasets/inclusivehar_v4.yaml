@@ -1,0 +1,26 @@
+schema_version: "1.0.0"
+dataset_id: inclusivehar
+version: "4"
+status: acquisition_locked_pending_stage_2_gate
+manifest: manifests/datasets/inclusivehar_v4.json
+raw_root: data/raw/inclusivehar/v4
+sample_rate_hz: 50
+primary_channels:
+  - motionUserAccelerationX
+  - motionUserAccelerationY
+  - motionUserAccelerationZ
+  - motionRotationRateX
+  - motionRotationRateY
+  - motionRotationRateZ
+forbidden_feature_families:
+  - identity
+  - disability
+  - assistive_device
+  - demographics
+  - labels
+  - timestamps
+  - gps_location
+  - row_ids
+window_length_samples: 128
+train_stride_samples: 64
+evaluation_stride_samples: 128

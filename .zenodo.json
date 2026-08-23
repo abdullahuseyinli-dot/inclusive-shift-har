@@ -1,0 +1,21 @@
+{
+  "title": "InclusiveShift-HAR: A Leakage-Safe Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition",
+  "description": "Provisional research software for leakage-safe, participant-exclusive evaluation of ability-associated population shift in smartphone inertial human activity recognition. This metadata does not assert confirmatory results, fairness, clinical validity, state-of-the-art performance, publication acceptance, or a minted DOI.",
+  "upload_type": "software",
+  "creators": [
+    {
+      "name": "Huseyinli, Abdulla"
+    }
+  ],
+  "version": "0.1.0a0",
+  "license": "Apache-2.0",
+  "keywords": [
+    "human activity recognition",
+    "wearable sensing",
+    "inertial sensors",
+    "domain generalization",
+    "participant-exclusive evaluation",
+    "reproducible research"
+  ],
+  "notes": "Apache-2.0 covers repository-authored material only. Third-party datasets, legacy coursework artifacts, checkpoints, papers, and figures retain their own licences and citations. This file prepares future release metadata and does not represent an existing public release or DOI."
+}

@@ -1,0 +1,2448 @@
+{
+  "acceptance_gate": {
+    "data_integrity_status": "pass",
+    "recommendation": "quarantine_split_and_window_construction_pending_authoritative_trial_boundaries_or_an_explicit_protocol_revision",
+    "split_and_window_readiness": "blocked"
+  },
+  "acquisition": {
+    "artifact_verification": {
+      "data_access": "read_bytes_integrity_only",
+      "dataset_id": "inclusivehar_v4",
+      "errors": [],
+      "manifest_path": "manifests\\history\\inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json",
+      "manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+      "mode": "read-only",
+      "observations": [
+        {
+          "artifact_id": "inclusivehar_v4_sensor_csv",
+          "errors": [],
+          "expected_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+          "expected_size_bytes": 148915541,
+          "observed_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+          "observed_size_bytes": 148915541,
+          "status": "pass",
+          "storage_path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+        },
+        {
+          "artifact_id": "inclusivehar_v4_disability_description_docx",
+          "errors": [],
+          "expected_sha256": "b8c033dd630412103b8dd463c8a171aa4727fc7222ba6b7fdc1e2487315e0dfb",
+          "expected_size_bytes": 16997,
+          "observed_sha256": "b8c033dd630412103b8dd463c8a171aa4727fc7222ba6b7fdc1e2487315e0dfb",
+          "observed_size_bytes": 16997,
+          "status": "pass",
+          "storage_path": "inclusivehar/v4/Description of individuals with disabilities.docx"
+        }
+      ],
+      "primary_six_channel_allowlist": [
+        "motionUserAccelerationX",
+        "motionUserAccelerationY",
+        "motionUserAccelerationZ",
+        "motionRotationRateX",
+        "motionRotationRateY",
+        "motionRotationRateZ"
+      ],
+      "report_sha256": "181bff7e76a4fb9d9df9f38f3a402dd19b1a67e97afed04cec596600b7732695",
+      "scope": "whole_file_integrity_only",
+      "sensitive_and_non_model_exclusions": {
+        "casefold_prefixes": [
+          "gps",
+          "location"
+        ],
+        "exact_names": [
+          "id",
+          "Label",
+          "disabled",
+          "UserID",
+          "gender",
+          "age",
+          "height",
+          "weight",
+          "disability",
+          "assistive_device"
+        ]
+      },
+      "valid": true,
+      "warnings": [
+        "row/schema/trial audit is not implemented in the Stage 2 integrity-only command"
+      ]
+    },
+    "failure_evidence": [
+      {
+        "artifact_id": "inclusivehar_v4_sensor_csv",
+        "canonical_storage_path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv",
+        "failure_stage": "post_verification_post_publication_staging_link_cleanup",
+        "physical_storage_accounting": "same_hard_linked_physical_file_not_a_second_provider_artifact",
+        "preserved_partial_path": "inclusivehar/v4/.InclusiveHAR_dataset_v2 (1).csv.partial.b9442c64851c4df59ffbc65f53a49753",
+        "same_physical_file_as_canonical": true,
+        "sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+        "size_bytes": 148915541,
+        "status": "preserved_failure_evidence",
+        "subsequent_fix": {
+          "code_change": "unlink staging name before applying read-only mode to the published hard link",
+          "regression_test": "tests/test_acquisition.py::test_read_only_publication_removes_staging_link_before_chmod"
+        }
+      }
+    ],
+    "physical_storage_accounting": {
+      "canonical_provider_artifact_count": 2,
+      "directory_entry_count_including_preserved_partials": 3,
+      "physical_file_groups": [
+        {
+          "entries": [
+            {
+              "artifact_id": "inclusivehar_v4_sensor_csv",
+              "path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv",
+              "role": "canonical_provider_artifact"
+            },
+            {
+              "artifact_id": "inclusivehar_v4_sensor_csv",
+              "path": "inclusivehar/v4/.InclusiveHAR_dataset_v2 (1).csv.partial.b9442c64851c4df59ffbc65f53a49753",
+              "role": "preserved_partial_evidence"
+            }
+          ],
+          "physical_file_group_id": "physical_file_01"
+        },
+        {
+          "entries": [
+            {
+              "artifact_id": "inclusivehar_v4_disability_description_docx",
+              "path": "inclusivehar/v4/Description of individuals with disabilities.docx",
+              "role": "canonical_provider_artifact"
+            }
+          ],
+          "physical_file_group_id": "physical_file_02"
+        }
+      ],
+      "preserved_partial_path_count": 1,
+      "unique_physical_file_count": 2
+    },
+    "status": "official_artifacts_verified_with_preserved_post_publication_cleanup_failure"
+  },
+  "audit_algorithm_version": "1.0.0",
+  "audit_completed_at_utc": "2026-08-23T20:49:00Z",
+  "audit_kind": "inclusivehar_v4_privacy_preserving_read_only_data_audit",
+  "blocking_and_quarantine_conditions": [
+    {
+      "code": "NO_TIMESTAMP_COLUMN",
+      "consequence": "sampling interval, monotonicity, gaps, resets, and within-label discontinuities cannot be audited"
+    },
+    {
+      "code": "NO_TRIAL_SESSION_OR_SAMPLE_IDENTIFIER",
+      "consequence": "the three reported repetitions cannot be recovered and windows cannot be proven not to cross hidden trial joins"
+    },
+    {
+      "code": "REPORTED_PROTOCOL_VOLUME_MISMATCH",
+      "consequence": "396602 data rows are far below both the 1080000 untrimmed and 1044000 stated-trim interpretation"
+    },
+    {
+      "code": "ABILITY_GROUP_ALIGNED_ACTIVITY_BLOCK_ORDER",
+      "consequence": "global row, subject, block-position, or deterministic file-order features would be perfect group proxies and are forbidden"
+    }
+  ],
+  "csv_audit": {
+    "anomalous_or_truncated_recording_candidates": {
+      "protocol_short_candidates": [
+        {
+          "activity_label": "Ramp descent",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 55.72,
+          "row_count": 2786,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 57.06,
+          "row_count": 2853,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Sitting",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 32.26,
+          "row_count": 1613,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Standing",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 55.92,
+          "row_count": 2796,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Standing",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 56.12,
+          "row_count": 2806,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Standing",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 54.14,
+          "row_count": 2707,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Walking",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 54.12,
+          "row_count": 2706,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "jogging",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 56.32,
+          "row_count": 2816,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "jogging",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 54.72,
+          "row_count": 2736,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 50.06,
+          "row_count": 2503,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "jogging",
+          "criterion": "fewer_than_2900_rows_reported_single_60s_repeat_after_100_sample_trim",
+          "estimated_duration_seconds_at_declared_rate": 56.4,
+          "row_count": 2820,
+          "subject_id": "20"
+        }
+      ],
+      "robust_within_activity_count_outliers": [
+        {
+          "activity_label": "Sitting",
+          "criterion": "absolute_modified_z_score_above_3.5_within_activity",
+          "modified_z_score": -4.155975,
+          "row_count": 1613,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "criterion": "absolute_modified_z_score_above_3.5_within_activity",
+          "modified_z_score": 3.854101,
+          "row_count": 4720,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "criterion": "absolute_modified_z_score_above_3.5_within_activity",
+          "modified_z_score": 3.55322,
+          "row_count": 4458,
+          "subject_id": "11"
+        }
+      ],
+      "status": "candidates_only_not_confirmed_truncation"
+    },
+    "column_profiles": [
+      {
+        "column": "locationLatitude",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "locationLongitude",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "locationAltitude",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "locationSpeed",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "locationCourse",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "locationVerticalAccuracy",
+        "finite_numeric_count": 396602,
+        "finite_summary": "suppressed_sensitive_location_values",
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_location"
+      },
+      {
+        "column": "accelerometerAccelerationX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 15.15988159,
+          "mean": 0.503397917050452,
+          "minimum": -9.614837646,
+          "sample_standard_deviation": 0.6463002151781079
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "accelerometerAccelerationY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 3.878723145,
+          "mean": 0.15114506813027564,
+          "minimum": -3.926635742,
+          "sample_standard_deviation": 0.5015767881187918
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "accelerometerAccelerationZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 8.262741089,
+          "mean": 0.04247680042676578,
+          "minimum": -5.654296875,
+          "sample_standard_deviation": 0.4798576705256114
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "gyroRotationX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 7.805520058,
+          "mean": -0.004600403645248848,
+          "minimum": -10.34813404,
+          "sample_standard_deviation": 0.7205919292301681
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "gyroRotationY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 14.28969383,
+          "mean": -0.0042767452512367295,
+          "minimum": -13.38332081,
+          "sample_standard_deviation": 0.8858004974543372
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "gyroRotationZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 14.82247925,
+          "mean": -0.008854058837666021,
+          "minimum": -17.80738068,
+          "sample_standard_deviation": 0.6128590121302475
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "magnetometerX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 560.5789185,
+          "mean": 459.08082829844864,
+          "minimum": 301.5005493,
+          "sample_standard_deviation": 31.055173519956924
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "magnetometerY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 22.29824829,
+          "mean": -104.54072401234875,
+          "minimum": -222.2721558,
+          "sample_standard_deviation": 34.83151267823321
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "magnetometerZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": -147.2483826,
+          "mean": -295.3312693289514,
+          "minimum": -369.5619202,
+          "sample_standard_deviation": 27.027308946839984
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionYaw",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 3.141582243,
+          "mean": -0.19492707527429404,
+          "minimum": -3.141566531,
+          "sample_standard_deviation": 1.8201492150733924
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionRoll",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 3.141492032,
+          "mean": 1.0423499546102377,
+          "minimum": -3.14152975,
+          "sample_standard_deviation": 1.3793537841373196
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionPitch",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 1.532755372,
+          "mean": -0.18339674254829053,
+          "minimum": -1.569378821,
+          "sample_standard_deviation": 0.6026038008312888
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionRotationRateX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 8.446718216,
+          "mean": -0.0019496131290815443,
+          "minimum": -10.94071102,
+          "sample_standard_deviation": 0.7203824892000811
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionRotationRateY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 12.75335598,
+          "mean": -0.0032292884093095215,
+          "minimum": -13.50641918,
+          "sample_standard_deviation": 0.8843377312015971
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionRotationRateZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 15.8586483,
+          "mean": -0.004827085619626631,
+          "minimum": -17.52365685,
+          "sample_standard_deviation": 0.6144154282615807
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionUserAccelerationX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 13.828125,
+          "mean": -0.00829806289785624,
+          "minimum": -9.099989891,
+          "sample_standard_deviation": 0.2857279242685828
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionUserAccelerationY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 3.590426922,
+          "mean": 0.005565636494884807,
+          "minimum": -2.906564713,
+          "sample_standard_deviation": 0.2042855650090278
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionUserAccelerationZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 7.664038181,
+          "mean": 0.00903874176750763,
+          "minimum": -4.774590969,
+          "sample_standard_deviation": 0.25490408630143563
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionGravityX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 1.000000119,
+          "mean": 0.5117145607607906,
+          "minimum": -0.999991119,
+          "sample_standard_deviation": 0.586724347078287
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionGravityY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 0.999998987,
+          "mean": 0.1455968882878513,
+          "minimum": -0.999276519,
+          "sample_standard_deviation": 0.45525986542458496
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionGravityZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 0.994306326,
+          "mean": 0.03345678307754907,
+          "minimum": -0.999776304,
+          "sample_standard_deviation": 0.4053705676691656
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionMagneticFieldX",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 107.9995117,
+          "mean": 16.38485355068069,
+          "minimum": -108.06073,
+          "sample_standard_deviation": 25.63060853090766
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionMagneticFieldY",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 171.5924683,
+          "mean": 6.18851176167926,
+          "minimum": -71.53138733,
+          "sample_standard_deviation": 24.057543420490067
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "motionMagneticFieldZ",
+        "finite_numeric_count": 396602,
+        "finite_summary": {
+          "maximum": 162.8428345,
+          "mean": 2.3046695239629527,
+          "minimum": -76.01599121,
+          "sample_standard_deviation": 21.563457451956573
+        },
+        "inferred_dtype": "float64_compatible",
+        "missing_count": 0,
+        "non_finite_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensor_signal"
+      },
+      {
+        "column": "label",
+        "inferred_dtype": "categorical_string",
+        "missing_count": 0,
+        "privacy_class": "target_label_non_model_feature"
+      },
+      {
+        "column": "UserID",
+        "inferred_dtype": "integer_identifier",
+        "missing_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "participant_identifier_non_model_feature"
+      },
+      {
+        "column": "disabled",
+        "inferred_dtype": "binary_integer",
+        "missing_count": 0,
+        "nonbinary_count": 0,
+        "parse_error_count": 0,
+        "privacy_class": "sensitive_group_metadata_non_model_feature"
+      }
+    ],
+    "coverage": {
+      "group_summaries": [
+        {
+          "activity_row_counts": {
+            "Ramp ascent": 30903,
+            "Ramp descent": 31380,
+            "Sitting": 30628,
+            "Standing": 30429,
+            "Walking": 33511,
+            "jogging": 31229
+          },
+          "participant_count": 10,
+          "released_disabled_indicator": 0,
+          "row_count": 188080,
+          "subject_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"
+          ]
+        },
+        {
+          "activity_row_counts": {
+            "Ramp ascent": 35833,
+            "Ramp descent": 36256,
+            "Sitting": 36507,
+            "Standing": 34028,
+            "Walking": 34970,
+            "jogging": 30928
+          },
+          "participant_count": 10,
+          "released_disabled_indicator": 1,
+          "row_count": 208522,
+          "subject_ids": [
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20"
+          ]
+        }
+      ],
+      "label_row_counts": {
+        "Ramp ascent": 66736,
+        "Ramp descent": 67636,
+        "Sitting": 67135,
+        "Standing": 64457,
+        "Walking": 68481,
+        "jogging": 62157
+      },
+      "participant_activity_cell_count": 120,
+      "participant_summaries": [
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3185,
+            "Ramp descent": 3036,
+            "Sitting": 3575,
+            "Standing": 3448,
+            "Walking": 3953,
+            "jogging": 3402
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 20599,
+          "subject_id": "1"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2989,
+            "Ramp descent": 2786,
+            "Sitting": 3023,
+            "Standing": 2906,
+            "Walking": 3301,
+            "jogging": 3152
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 18157,
+          "subject_id": "2"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2853,
+            "Ramp descent": 3216,
+            "Sitting": 1613,
+            "Standing": 3204,
+            "Walking": 3374,
+            "jogging": 3150
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 17410,
+          "subject_id": "3"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2949,
+            "Ramp descent": 3084,
+            "Sitting": 3131,
+            "Standing": 2796,
+            "Walking": 3074,
+            "jogging": 2926
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 17960,
+          "subject_id": "4"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3503,
+            "Ramp descent": 3835,
+            "Sitting": 3386,
+            "Standing": 2806,
+            "Walking": 3414,
+            "jogging": 3011
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 19955,
+          "subject_id": "5"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3222,
+            "Ramp descent": 3203,
+            "Sitting": 3485,
+            "Standing": 2707,
+            "Walking": 2706,
+            "jogging": 2965
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 18288,
+          "subject_id": "6"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3058,
+            "Ramp descent": 3103,
+            "Sitting": 3241,
+            "Standing": 3461,
+            "Walking": 3620,
+            "jogging": 3220
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 19703,
+          "subject_id": "7"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2944,
+            "Ramp descent": 2964,
+            "Sitting": 3051,
+            "Standing": 2995,
+            "Walking": 3332,
+            "jogging": 3189
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 18475,
+          "subject_id": "8"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3241,
+            "Ramp descent": 3032,
+            "Sitting": 3109,
+            "Standing": 3110,
+            "Walking": 3495,
+            "jogging": 3257
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 19244,
+          "subject_id": "9"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2959,
+            "Ramp descent": 3121,
+            "Sitting": 3014,
+            "Standing": 2996,
+            "Walking": 3242,
+            "jogging": 2957
+          },
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "row_count": 18289,
+          "subject_id": "10"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 4720,
+            "Ramp descent": 4458,
+            "Sitting": 4125,
+            "Standing": 4031,
+            "Walking": 3760,
+            "jogging": 3091
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 24185,
+          "subject_id": "11"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3510,
+            "Ramp descent": 3438,
+            "Sitting": 3871,
+            "Standing": 3501,
+            "Walking": 4028,
+            "jogging": 2816
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 21164,
+          "subject_id": "12"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3596,
+            "Ramp descent": 3896,
+            "Sitting": 3480,
+            "Standing": 3385,
+            "Walking": 3287,
+            "jogging": 3112
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 20756,
+          "subject_id": "13"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3018,
+            "Ramp descent": 3181,
+            "Sitting": 3452,
+            "Standing": 3445,
+            "Walking": 3580,
+            "jogging": 2736
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 19412,
+          "subject_id": "14"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3473,
+            "Ramp descent": 3775,
+            "Sitting": 3719,
+            "Standing": 3327,
+            "Walking": 2995,
+            "jogging": 3346
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 20635,
+          "subject_id": "15"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3292,
+            "Ramp descent": 3358,
+            "Sitting": 3397,
+            "Standing": 3156,
+            "Walking": 3034,
+            "jogging": 3164
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 19401,
+          "subject_id": "16"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3843,
+            "Ramp descent": 3803,
+            "Sitting": 3799,
+            "Standing": 3294,
+            "Walking": 4275,
+            "jogging": 3676
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 22690,
+          "subject_id": "17"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 2989,
+            "Ramp descent": 2503,
+            "Sitting": 3304,
+            "Standing": 3148,
+            "Walking": 3324,
+            "jogging": 3145
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 18413,
+          "subject_id": "18"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3911,
+            "Ramp descent": 3997,
+            "Sitting": 3574,
+            "Standing": 3183,
+            "Walking": 3466,
+            "jogging": 3022
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 21153,
+          "subject_id": "19"
+        },
+        {
+          "all_six_released_labels_present": true,
+          "label_row_counts": {
+            "Ramp ascent": 3481,
+            "Ramp descent": 3847,
+            "Sitting": 3786,
+            "Standing": 3558,
+            "Walking": 3221,
+            "jogging": 2820
+          },
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "row_count": 20713,
+          "subject_id": "20"
+        }
+      ]
+    },
+    "duplicates": {
+      "exact_full_row_duplicate_count": 0,
+      "full_row_method": "SHA-256 of deterministic JSON encoding of all 33 parsed fields",
+      "primary_six_channel_duplicate_count": 4,
+      "primary_six_method": "SHA-256 of deterministic JSON encoding of the six primary fields",
+      "unique_full_row_fingerprint_count": 396602,
+      "unique_primary_six_fingerprint_count": 396598
+    },
+    "identity_and_label_quality": {
+      "disabled_missing_count": 0,
+      "disabled_nonbinary_count": 0,
+      "disabled_parse_error_count": 0,
+      "label_missing_count": 0,
+      "subject_disabled_indicator_inconsistencies": {},
+      "subject_id_missing_count": 0,
+      "subject_id_parse_error_count": 0
+    },
+    "released_order_and_boundaries": {
+      "activity_block_order_patterns": [
+        {
+          "activity_sequence": [
+            "Ramp descent",
+            "jogging",
+            "Sitting",
+            "Standing",
+            "Ramp ascent",
+            "Walking"
+          ],
+          "pattern_id": "activity_order_pattern_1",
+          "released_disabled_indicator_values": [
+            0
+          ],
+          "subject_count": 10,
+          "subject_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10"
+          ]
+        },
+        {
+          "activity_sequence": [
+            "jogging",
+            "Walking",
+            "Sitting",
+            "Standing",
+            "Ramp ascent",
+            "Ramp descent"
+          ],
+          "pattern_id": "activity_order_pattern_2",
+          "released_disabled_indicator_values": [
+            1
+          ],
+          "subject_count": 10,
+          "subject_ids": [
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20"
+          ]
+        }
+      ],
+      "activity_order_is_perfectly_aligned_with_released_group_indicator": true,
+      "global_order_feature_policy": "forbid global row index, file order, subject order, block position, and deterministic batch order as model inputs or proxies",
+      "internal_trial_boundary_status": "unrecoverable_no_trial_session_or_timestamp_columns",
+      "one_contiguous_released_run_per_subject_activity": true,
+      "released_run_count": 120,
+      "released_run_semantics": "deterministic maximal contiguous rows sharing UserID and label; not validated trials",
+      "released_runs": [
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 3036,
+          "estimated_duration_seconds_at_declared_rate": 60.72,
+          "released_run_id": "released_run_001",
+          "row_count": 3036,
+          "start_data_row_inclusive": 1,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 6438,
+          "estimated_duration_seconds_at_declared_rate": 68.04,
+          "released_run_id": "released_run_002",
+          "row_count": 3402,
+          "start_data_row_inclusive": 3037,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 10013,
+          "estimated_duration_seconds_at_declared_rate": 71.5,
+          "released_run_id": "released_run_003",
+          "row_count": 3575,
+          "start_data_row_inclusive": 6439,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 13461,
+          "estimated_duration_seconds_at_declared_rate": 68.96,
+          "released_run_id": "released_run_004",
+          "row_count": 3448,
+          "start_data_row_inclusive": 10014,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 16646,
+          "estimated_duration_seconds_at_declared_rate": 63.7,
+          "released_run_id": "released_run_005",
+          "row_count": 3185,
+          "start_data_row_inclusive": 13462,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 20599,
+          "estimated_duration_seconds_at_declared_rate": 79.06,
+          "released_run_id": "released_run_006",
+          "row_count": 3953,
+          "start_data_row_inclusive": 16647,
+          "subject_id": "1"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 23385,
+          "estimated_duration_seconds_at_declared_rate": 55.72,
+          "released_run_id": "released_run_007",
+          "row_count": 2786,
+          "start_data_row_inclusive": 20600,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 26537,
+          "estimated_duration_seconds_at_declared_rate": 63.04,
+          "released_run_id": "released_run_008",
+          "row_count": 3152,
+          "start_data_row_inclusive": 23386,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 29560,
+          "estimated_duration_seconds_at_declared_rate": 60.46,
+          "released_run_id": "released_run_009",
+          "row_count": 3023,
+          "start_data_row_inclusive": 26538,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 32466,
+          "estimated_duration_seconds_at_declared_rate": 58.12,
+          "released_run_id": "released_run_010",
+          "row_count": 2906,
+          "start_data_row_inclusive": 29561,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 35455,
+          "estimated_duration_seconds_at_declared_rate": 59.78,
+          "released_run_id": "released_run_011",
+          "row_count": 2989,
+          "start_data_row_inclusive": 32467,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 38756,
+          "estimated_duration_seconds_at_declared_rate": 66.02,
+          "released_run_id": "released_run_012",
+          "row_count": 3301,
+          "start_data_row_inclusive": 35456,
+          "subject_id": "2"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 41972,
+          "estimated_duration_seconds_at_declared_rate": 64.32,
+          "released_run_id": "released_run_013",
+          "row_count": 3216,
+          "start_data_row_inclusive": 38757,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 45122,
+          "estimated_duration_seconds_at_declared_rate": 63.0,
+          "released_run_id": "released_run_014",
+          "row_count": 3150,
+          "start_data_row_inclusive": 41973,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 46735,
+          "estimated_duration_seconds_at_declared_rate": 32.26,
+          "released_run_id": "released_run_015",
+          "row_count": 1613,
+          "start_data_row_inclusive": 45123,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 49939,
+          "estimated_duration_seconds_at_declared_rate": 64.08,
+          "released_run_id": "released_run_016",
+          "row_count": 3204,
+          "start_data_row_inclusive": 46736,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 52792,
+          "estimated_duration_seconds_at_declared_rate": 57.06,
+          "released_run_id": "released_run_017",
+          "row_count": 2853,
+          "start_data_row_inclusive": 49940,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 56166,
+          "estimated_duration_seconds_at_declared_rate": 67.48,
+          "released_run_id": "released_run_018",
+          "row_count": 3374,
+          "start_data_row_inclusive": 52793,
+          "subject_id": "3"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 59250,
+          "estimated_duration_seconds_at_declared_rate": 61.68,
+          "released_run_id": "released_run_019",
+          "row_count": 3084,
+          "start_data_row_inclusive": 56167,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 62176,
+          "estimated_duration_seconds_at_declared_rate": 58.52,
+          "released_run_id": "released_run_020",
+          "row_count": 2926,
+          "start_data_row_inclusive": 59251,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 65307,
+          "estimated_duration_seconds_at_declared_rate": 62.62,
+          "released_run_id": "released_run_021",
+          "row_count": 3131,
+          "start_data_row_inclusive": 62177,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 68103,
+          "estimated_duration_seconds_at_declared_rate": 55.92,
+          "released_run_id": "released_run_022",
+          "row_count": 2796,
+          "start_data_row_inclusive": 65308,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 71052,
+          "estimated_duration_seconds_at_declared_rate": 58.98,
+          "released_run_id": "released_run_023",
+          "row_count": 2949,
+          "start_data_row_inclusive": 68104,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 74126,
+          "estimated_duration_seconds_at_declared_rate": 61.48,
+          "released_run_id": "released_run_024",
+          "row_count": 3074,
+          "start_data_row_inclusive": 71053,
+          "subject_id": "4"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 77961,
+          "estimated_duration_seconds_at_declared_rate": 76.7,
+          "released_run_id": "released_run_025",
+          "row_count": 3835,
+          "start_data_row_inclusive": 74127,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 80972,
+          "estimated_duration_seconds_at_declared_rate": 60.22,
+          "released_run_id": "released_run_026",
+          "row_count": 3011,
+          "start_data_row_inclusive": 77962,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 84358,
+          "estimated_duration_seconds_at_declared_rate": 67.72,
+          "released_run_id": "released_run_027",
+          "row_count": 3386,
+          "start_data_row_inclusive": 80973,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 87164,
+          "estimated_duration_seconds_at_declared_rate": 56.12,
+          "released_run_id": "released_run_028",
+          "row_count": 2806,
+          "start_data_row_inclusive": 84359,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 90667,
+          "estimated_duration_seconds_at_declared_rate": 70.06,
+          "released_run_id": "released_run_029",
+          "row_count": 3503,
+          "start_data_row_inclusive": 87165,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 94081,
+          "estimated_duration_seconds_at_declared_rate": 68.28,
+          "released_run_id": "released_run_030",
+          "row_count": 3414,
+          "start_data_row_inclusive": 90668,
+          "subject_id": "5"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 97284,
+          "estimated_duration_seconds_at_declared_rate": 64.06,
+          "released_run_id": "released_run_031",
+          "row_count": 3203,
+          "start_data_row_inclusive": 94082,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 100249,
+          "estimated_duration_seconds_at_declared_rate": 59.3,
+          "released_run_id": "released_run_032",
+          "row_count": 2965,
+          "start_data_row_inclusive": 97285,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 103734,
+          "estimated_duration_seconds_at_declared_rate": 69.7,
+          "released_run_id": "released_run_033",
+          "row_count": 3485,
+          "start_data_row_inclusive": 100250,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 106441,
+          "estimated_duration_seconds_at_declared_rate": 54.14,
+          "released_run_id": "released_run_034",
+          "row_count": 2707,
+          "start_data_row_inclusive": 103735,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 109663,
+          "estimated_duration_seconds_at_declared_rate": 64.44,
+          "released_run_id": "released_run_035",
+          "row_count": 3222,
+          "start_data_row_inclusive": 106442,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 112369,
+          "estimated_duration_seconds_at_declared_rate": 54.12,
+          "released_run_id": "released_run_036",
+          "row_count": 2706,
+          "start_data_row_inclusive": 109664,
+          "subject_id": "6"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 115472,
+          "estimated_duration_seconds_at_declared_rate": 62.06,
+          "released_run_id": "released_run_037",
+          "row_count": 3103,
+          "start_data_row_inclusive": 112370,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 118692,
+          "estimated_duration_seconds_at_declared_rate": 64.4,
+          "released_run_id": "released_run_038",
+          "row_count": 3220,
+          "start_data_row_inclusive": 115473,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 121933,
+          "estimated_duration_seconds_at_declared_rate": 64.82,
+          "released_run_id": "released_run_039",
+          "row_count": 3241,
+          "start_data_row_inclusive": 118693,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 125394,
+          "estimated_duration_seconds_at_declared_rate": 69.22,
+          "released_run_id": "released_run_040",
+          "row_count": 3461,
+          "start_data_row_inclusive": 121934,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 128452,
+          "estimated_duration_seconds_at_declared_rate": 61.16,
+          "released_run_id": "released_run_041",
+          "row_count": 3058,
+          "start_data_row_inclusive": 125395,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 132072,
+          "estimated_duration_seconds_at_declared_rate": 72.4,
+          "released_run_id": "released_run_042",
+          "row_count": 3620,
+          "start_data_row_inclusive": 128453,
+          "subject_id": "7"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 135036,
+          "estimated_duration_seconds_at_declared_rate": 59.28,
+          "released_run_id": "released_run_043",
+          "row_count": 2964,
+          "start_data_row_inclusive": 132073,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 138225,
+          "estimated_duration_seconds_at_declared_rate": 63.78,
+          "released_run_id": "released_run_044",
+          "row_count": 3189,
+          "start_data_row_inclusive": 135037,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 141276,
+          "estimated_duration_seconds_at_declared_rate": 61.02,
+          "released_run_id": "released_run_045",
+          "row_count": 3051,
+          "start_data_row_inclusive": 138226,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 144271,
+          "estimated_duration_seconds_at_declared_rate": 59.9,
+          "released_run_id": "released_run_046",
+          "row_count": 2995,
+          "start_data_row_inclusive": 141277,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 147215,
+          "estimated_duration_seconds_at_declared_rate": 58.88,
+          "released_run_id": "released_run_047",
+          "row_count": 2944,
+          "start_data_row_inclusive": 144272,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 150547,
+          "estimated_duration_seconds_at_declared_rate": 66.64,
+          "released_run_id": "released_run_048",
+          "row_count": 3332,
+          "start_data_row_inclusive": 147216,
+          "subject_id": "8"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 153579,
+          "estimated_duration_seconds_at_declared_rate": 60.64,
+          "released_run_id": "released_run_049",
+          "row_count": 3032,
+          "start_data_row_inclusive": 150548,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 156836,
+          "estimated_duration_seconds_at_declared_rate": 65.14,
+          "released_run_id": "released_run_050",
+          "row_count": 3257,
+          "start_data_row_inclusive": 153580,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 159945,
+          "estimated_duration_seconds_at_declared_rate": 62.18,
+          "released_run_id": "released_run_051",
+          "row_count": 3109,
+          "start_data_row_inclusive": 156837,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 163055,
+          "estimated_duration_seconds_at_declared_rate": 62.2,
+          "released_run_id": "released_run_052",
+          "row_count": 3110,
+          "start_data_row_inclusive": 159946,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 166296,
+          "estimated_duration_seconds_at_declared_rate": 64.82,
+          "released_run_id": "released_run_053",
+          "row_count": 3241,
+          "start_data_row_inclusive": 163056,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 169791,
+          "estimated_duration_seconds_at_declared_rate": 69.9,
+          "released_run_id": "released_run_054",
+          "row_count": 3495,
+          "start_data_row_inclusive": 166297,
+          "subject_id": "9"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 172912,
+          "estimated_duration_seconds_at_declared_rate": 62.42,
+          "released_run_id": "released_run_055",
+          "row_count": 3121,
+          "start_data_row_inclusive": 169792,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 175869,
+          "estimated_duration_seconds_at_declared_rate": 59.14,
+          "released_run_id": "released_run_056",
+          "row_count": 2957,
+          "start_data_row_inclusive": 172913,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 178883,
+          "estimated_duration_seconds_at_declared_rate": 60.28,
+          "released_run_id": "released_run_057",
+          "row_count": 3014,
+          "start_data_row_inclusive": 175870,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 181879,
+          "estimated_duration_seconds_at_declared_rate": 59.92,
+          "released_run_id": "released_run_058",
+          "row_count": 2996,
+          "start_data_row_inclusive": 178884,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 184838,
+          "estimated_duration_seconds_at_declared_rate": 59.18,
+          "released_run_id": "released_run_059",
+          "row_count": 2959,
+          "start_data_row_inclusive": 181880,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 188080,
+          "estimated_duration_seconds_at_declared_rate": 64.84,
+          "released_run_id": "released_run_060",
+          "row_count": 3242,
+          "start_data_row_inclusive": 184839,
+          "subject_id": "10"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 191171,
+          "estimated_duration_seconds_at_declared_rate": 61.82,
+          "released_run_id": "released_run_061",
+          "row_count": 3091,
+          "start_data_row_inclusive": 188081,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 194931,
+          "estimated_duration_seconds_at_declared_rate": 75.2,
+          "released_run_id": "released_run_062",
+          "row_count": 3760,
+          "start_data_row_inclusive": 191172,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 199056,
+          "estimated_duration_seconds_at_declared_rate": 82.5,
+          "released_run_id": "released_run_063",
+          "row_count": 4125,
+          "start_data_row_inclusive": 194932,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 203087,
+          "estimated_duration_seconds_at_declared_rate": 80.62,
+          "released_run_id": "released_run_064",
+          "row_count": 4031,
+          "start_data_row_inclusive": 199057,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 207807,
+          "estimated_duration_seconds_at_declared_rate": 94.4,
+          "released_run_id": "released_run_065",
+          "row_count": 4720,
+          "start_data_row_inclusive": 203088,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 212265,
+          "estimated_duration_seconds_at_declared_rate": 89.16,
+          "released_run_id": "released_run_066",
+          "row_count": 4458,
+          "start_data_row_inclusive": 207808,
+          "subject_id": "11"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 215081,
+          "estimated_duration_seconds_at_declared_rate": 56.32,
+          "released_run_id": "released_run_067",
+          "row_count": 2816,
+          "start_data_row_inclusive": 212266,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 219109,
+          "estimated_duration_seconds_at_declared_rate": 80.56,
+          "released_run_id": "released_run_068",
+          "row_count": 4028,
+          "start_data_row_inclusive": 215082,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 222980,
+          "estimated_duration_seconds_at_declared_rate": 77.42,
+          "released_run_id": "released_run_069",
+          "row_count": 3871,
+          "start_data_row_inclusive": 219110,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 226481,
+          "estimated_duration_seconds_at_declared_rate": 70.02,
+          "released_run_id": "released_run_070",
+          "row_count": 3501,
+          "start_data_row_inclusive": 222981,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 229991,
+          "estimated_duration_seconds_at_declared_rate": 70.2,
+          "released_run_id": "released_run_071",
+          "row_count": 3510,
+          "start_data_row_inclusive": 226482,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 233429,
+          "estimated_duration_seconds_at_declared_rate": 68.76,
+          "released_run_id": "released_run_072",
+          "row_count": 3438,
+          "start_data_row_inclusive": 229992,
+          "subject_id": "12"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 236541,
+          "estimated_duration_seconds_at_declared_rate": 62.24,
+          "released_run_id": "released_run_073",
+          "row_count": 3112,
+          "start_data_row_inclusive": 233430,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 239828,
+          "estimated_duration_seconds_at_declared_rate": 65.74,
+          "released_run_id": "released_run_074",
+          "row_count": 3287,
+          "start_data_row_inclusive": 236542,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 243308,
+          "estimated_duration_seconds_at_declared_rate": 69.6,
+          "released_run_id": "released_run_075",
+          "row_count": 3480,
+          "start_data_row_inclusive": 239829,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 246693,
+          "estimated_duration_seconds_at_declared_rate": 67.7,
+          "released_run_id": "released_run_076",
+          "row_count": 3385,
+          "start_data_row_inclusive": 243309,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 250289,
+          "estimated_duration_seconds_at_declared_rate": 71.92,
+          "released_run_id": "released_run_077",
+          "row_count": 3596,
+          "start_data_row_inclusive": 246694,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 254185,
+          "estimated_duration_seconds_at_declared_rate": 77.92,
+          "released_run_id": "released_run_078",
+          "row_count": 3896,
+          "start_data_row_inclusive": 250290,
+          "subject_id": "13"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 256921,
+          "estimated_duration_seconds_at_declared_rate": 54.72,
+          "released_run_id": "released_run_079",
+          "row_count": 2736,
+          "start_data_row_inclusive": 254186,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 260501,
+          "estimated_duration_seconds_at_declared_rate": 71.6,
+          "released_run_id": "released_run_080",
+          "row_count": 3580,
+          "start_data_row_inclusive": 256922,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 263953,
+          "estimated_duration_seconds_at_declared_rate": 69.04,
+          "released_run_id": "released_run_081",
+          "row_count": 3452,
+          "start_data_row_inclusive": 260502,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 267398,
+          "estimated_duration_seconds_at_declared_rate": 68.9,
+          "released_run_id": "released_run_082",
+          "row_count": 3445,
+          "start_data_row_inclusive": 263954,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 270416,
+          "estimated_duration_seconds_at_declared_rate": 60.36,
+          "released_run_id": "released_run_083",
+          "row_count": 3018,
+          "start_data_row_inclusive": 267399,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 273597,
+          "estimated_duration_seconds_at_declared_rate": 63.62,
+          "released_run_id": "released_run_084",
+          "row_count": 3181,
+          "start_data_row_inclusive": 270417,
+          "subject_id": "14"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 276943,
+          "estimated_duration_seconds_at_declared_rate": 66.92,
+          "released_run_id": "released_run_085",
+          "row_count": 3346,
+          "start_data_row_inclusive": 273598,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 279938,
+          "estimated_duration_seconds_at_declared_rate": 59.9,
+          "released_run_id": "released_run_086",
+          "row_count": 2995,
+          "start_data_row_inclusive": 276944,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 283657,
+          "estimated_duration_seconds_at_declared_rate": 74.38,
+          "released_run_id": "released_run_087",
+          "row_count": 3719,
+          "start_data_row_inclusive": 279939,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 286984,
+          "estimated_duration_seconds_at_declared_rate": 66.54,
+          "released_run_id": "released_run_088",
+          "row_count": 3327,
+          "start_data_row_inclusive": 283658,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 290457,
+          "estimated_duration_seconds_at_declared_rate": 69.46,
+          "released_run_id": "released_run_089",
+          "row_count": 3473,
+          "start_data_row_inclusive": 286985,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 294232,
+          "estimated_duration_seconds_at_declared_rate": 75.5,
+          "released_run_id": "released_run_090",
+          "row_count": 3775,
+          "start_data_row_inclusive": 290458,
+          "subject_id": "15"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 297396,
+          "estimated_duration_seconds_at_declared_rate": 63.28,
+          "released_run_id": "released_run_091",
+          "row_count": 3164,
+          "start_data_row_inclusive": 294233,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 300430,
+          "estimated_duration_seconds_at_declared_rate": 60.68,
+          "released_run_id": "released_run_092",
+          "row_count": 3034,
+          "start_data_row_inclusive": 297397,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 303827,
+          "estimated_duration_seconds_at_declared_rate": 67.94,
+          "released_run_id": "released_run_093",
+          "row_count": 3397,
+          "start_data_row_inclusive": 300431,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 306983,
+          "estimated_duration_seconds_at_declared_rate": 63.12,
+          "released_run_id": "released_run_094",
+          "row_count": 3156,
+          "start_data_row_inclusive": 303828,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 310275,
+          "estimated_duration_seconds_at_declared_rate": 65.84,
+          "released_run_id": "released_run_095",
+          "row_count": 3292,
+          "start_data_row_inclusive": 306984,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 313633,
+          "estimated_duration_seconds_at_declared_rate": 67.16,
+          "released_run_id": "released_run_096",
+          "row_count": 3358,
+          "start_data_row_inclusive": 310276,
+          "subject_id": "16"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 317309,
+          "estimated_duration_seconds_at_declared_rate": 73.52,
+          "released_run_id": "released_run_097",
+          "row_count": 3676,
+          "start_data_row_inclusive": 313634,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 321584,
+          "estimated_duration_seconds_at_declared_rate": 85.5,
+          "released_run_id": "released_run_098",
+          "row_count": 4275,
+          "start_data_row_inclusive": 317310,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 325383,
+          "estimated_duration_seconds_at_declared_rate": 75.98,
+          "released_run_id": "released_run_099",
+          "row_count": 3799,
+          "start_data_row_inclusive": 321585,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 328677,
+          "estimated_duration_seconds_at_declared_rate": 65.88,
+          "released_run_id": "released_run_100",
+          "row_count": 3294,
+          "start_data_row_inclusive": 325384,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 332520,
+          "estimated_duration_seconds_at_declared_rate": 76.86,
+          "released_run_id": "released_run_101",
+          "row_count": 3843,
+          "start_data_row_inclusive": 328678,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 336323,
+          "estimated_duration_seconds_at_declared_rate": 76.06,
+          "released_run_id": "released_run_102",
+          "row_count": 3803,
+          "start_data_row_inclusive": 332521,
+          "subject_id": "17"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 339468,
+          "estimated_duration_seconds_at_declared_rate": 62.9,
+          "released_run_id": "released_run_103",
+          "row_count": 3145,
+          "start_data_row_inclusive": 336324,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 342792,
+          "estimated_duration_seconds_at_declared_rate": 66.48,
+          "released_run_id": "released_run_104",
+          "row_count": 3324,
+          "start_data_row_inclusive": 339469,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 346096,
+          "estimated_duration_seconds_at_declared_rate": 66.08,
+          "released_run_id": "released_run_105",
+          "row_count": 3304,
+          "start_data_row_inclusive": 342793,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 349244,
+          "estimated_duration_seconds_at_declared_rate": 62.96,
+          "released_run_id": "released_run_106",
+          "row_count": 3148,
+          "start_data_row_inclusive": 346097,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 352233,
+          "estimated_duration_seconds_at_declared_rate": 59.78,
+          "released_run_id": "released_run_107",
+          "row_count": 2989,
+          "start_data_row_inclusive": 349245,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 354736,
+          "estimated_duration_seconds_at_declared_rate": 50.06,
+          "released_run_id": "released_run_108",
+          "row_count": 2503,
+          "start_data_row_inclusive": 352234,
+          "subject_id": "18"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 357758,
+          "estimated_duration_seconds_at_declared_rate": 60.44,
+          "released_run_id": "released_run_109",
+          "row_count": 3022,
+          "start_data_row_inclusive": 354737,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 361224,
+          "estimated_duration_seconds_at_declared_rate": 69.32,
+          "released_run_id": "released_run_110",
+          "row_count": 3466,
+          "start_data_row_inclusive": 357759,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 364798,
+          "estimated_duration_seconds_at_declared_rate": 71.48,
+          "released_run_id": "released_run_111",
+          "row_count": 3574,
+          "start_data_row_inclusive": 361225,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 367981,
+          "estimated_duration_seconds_at_declared_rate": 63.66,
+          "released_run_id": "released_run_112",
+          "row_count": 3183,
+          "start_data_row_inclusive": 364799,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 371892,
+          "estimated_duration_seconds_at_declared_rate": 78.22,
+          "released_run_id": "released_run_113",
+          "row_count": 3911,
+          "start_data_row_inclusive": 367982,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 375889,
+          "estimated_duration_seconds_at_declared_rate": 79.94,
+          "released_run_id": "released_run_114",
+          "row_count": 3997,
+          "start_data_row_inclusive": 371893,
+          "subject_id": "19"
+        },
+        {
+          "activity_label": "jogging",
+          "end_data_row_inclusive": 378709,
+          "estimated_duration_seconds_at_declared_rate": 56.4,
+          "released_run_id": "released_run_115",
+          "row_count": 2820,
+          "start_data_row_inclusive": 375890,
+          "subject_id": "20"
+        },
+        {
+          "activity_label": "Walking",
+          "end_data_row_inclusive": 381930,
+          "estimated_duration_seconds_at_declared_rate": 64.42,
+          "released_run_id": "released_run_116",
+          "row_count": 3221,
+          "start_data_row_inclusive": 378710,
+          "subject_id": "20"
+        },
+        {
+          "activity_label": "Sitting",
+          "end_data_row_inclusive": 385716,
+          "estimated_duration_seconds_at_declared_rate": 75.72,
+          "released_run_id": "released_run_117",
+          "row_count": 3786,
+          "start_data_row_inclusive": 381931,
+          "subject_id": "20"
+        },
+        {
+          "activity_label": "Standing",
+          "end_data_row_inclusive": 389274,
+          "estimated_duration_seconds_at_declared_rate": 71.16,
+          "released_run_id": "released_run_118",
+          "row_count": 3558,
+          "start_data_row_inclusive": 385717,
+          "subject_id": "20"
+        },
+        {
+          "activity_label": "Ramp ascent",
+          "end_data_row_inclusive": 392755,
+          "estimated_duration_seconds_at_declared_rate": 69.62,
+          "released_run_id": "released_run_119",
+          "row_count": 3481,
+          "start_data_row_inclusive": 389275,
+          "subject_id": "20"
+        },
+        {
+          "activity_label": "Ramp descent",
+          "end_data_row_inclusive": 396602,
+          "estimated_duration_seconds_at_declared_rate": 76.94,
+          "released_run_id": "released_run_120",
+          "row_count": 3847,
+          "start_data_row_inclusive": 392756,
+          "subject_id": "20"
+        }
+      ],
+      "timestamp_columns": [],
+      "timestamp_gap_reset_monotonicity_status": "not_auditable_no_timestamp_column"
+    },
+    "row_structure": {
+      "data_row_count": 396602,
+      "duplicate_headers": [],
+      "encoding": "UTF-8-compatible text read with utf-8-sig",
+      "exact_header_order_match": true,
+      "extra_headers": [],
+      "header_count": 33,
+      "headers": [
+        "locationLatitude",
+        "locationLongitude",
+        "locationAltitude",
+        "locationSpeed",
+        "locationCourse",
+        "locationVerticalAccuracy",
+        "accelerometerAccelerationX",
+        "accelerometerAccelerationY",
+        "accelerometerAccelerationZ",
+        "gyroRotationX",
+        "gyroRotationY",
+        "gyroRotationZ",
+        "magnetometerX",
+        "magnetometerY",
+        "magnetometerZ",
+        "motionYaw",
+        "motionRoll",
+        "motionPitch",
+        "motionRotationRateX",
+        "motionRotationRateY",
+        "motionRotationRateZ",
+        "motionUserAccelerationX",
+        "motionUserAccelerationY",
+        "motionUserAccelerationZ",
+        "motionGravityX",
+        "motionGravityY",
+        "motionGravityZ",
+        "motionMagneticFieldX",
+        "motionMagneticFieldY",
+        "motionMagneticFieldZ",
+        "label",
+        "UserID",
+        "disabled"
+      ],
+      "malformed_row_count": 0,
+      "malformed_row_numbers_first_100": [],
+      "missing_headers": []
+    }
+  },
+  "dataset_id": "inclusivehar_v4",
+  "evidence_status": "descriptive_data_audit_not_model_evaluation",
+  "gate_record": {
+    "approved_at_utc": "2026-08-23T20:33:53.0883301Z",
+    "gate": "raw_data_read_access",
+    "gate_record_path": "results/gates/raw_data_read_access_inclusivehar_v4.json",
+    "status": "approved"
+  },
+  "manifest": {
+    "manifest_path": "manifests/history/inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json",
+    "manifest_sha256": "e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb",
+    "release_doi": "10.17632/r78dn3f6nc.4",
+    "release_version": "4"
+  },
+  "ontology_feasibility": {
+    "ambulatory_only_documented_extension": [
+      "Walking may be compared with UCI-HAR walking only in an explicitly ambulatory-only sensitivity track."
+    ],
+    "cross_source_exact_candidates": [
+      "Sitting"
+    ],
+    "cross_source_provisional_candidates": [
+      {
+        "label": "Standing",
+        "qualification": "semantic realization for wheelchair users is not explicitly documented and requires clarification"
+      }
+    ],
+    "functional_core_candidates": [
+      "Walking",
+      "Sitting",
+      "Standing"
+    ],
+    "functional_core_walking_semantics": "all-participant mobility/locomotion track; functional and deliberately non-exact",
+    "inclusive_native_labels": [
+      "Ramp ascent",
+      "Ramp descent",
+      "Sitting",
+      "Standing",
+      "Walking",
+      "jogging"
+    ],
+    "label_coverage_status": "all_six_labels_present_for_all_20_participants",
+    "semantic_constraints": [
+      "Walking for wheelchair users denotes manual propulsion and must remain an activity realization distinction.",
+      "Ramp ascent/descent on an 8 percent incline must not be equated with UCI-HAR stairs.",
+      "Jogging must not be silently mapped to another locomotion class."
+    ]
+  },
+  "privacy": {
+    "disability_descriptions_exported": false,
+    "gps_coordinate_values_exported": false,
+    "location_column_value_summaries": "suppressed",
+    "raw_data_in_git_policy": "forbidden",
+    "sensitive_metadata_use": "audit_consistency_only_never_model_input"
+  },
+  "report_sha256": "c19d1d2db200e6482bd8175fe835ecdcc57c258c35fc62f7eb60d3af6292e094",
+  "reported_vs_observed": {
+    "observed_data_rows_excluding_header": 396602,
+    "observed_physical_records_including_header": 396603,
+    "provider_or_article_reported_records": 396603,
+    "record_count_resolution": "the reported 396603 corresponds to the physical header plus 396602 data rows",
+    "reported_sampling_rate_hz": 50.0,
+    "sampling_rate_verification": "publication_declared_not_empirically_verifiable_without_timestamps",
+    "stated_design_nominal_rows_after_50_samples_trimmed_from_each_end_of_each_repeat": 1044000,
+    "stated_design_nominal_rows_before_trim": 1080000
+  },
+  "required_primary_signals": {
+    "channels": [
+      "motionUserAccelerationX",
+      "motionUserAccelerationY",
+      "motionUserAccelerationZ",
+      "motionRotationRateX",
+      "motionRotationRateY",
+      "motionRotationRateZ"
+    ],
+    "coordinate_convention": "X/Y/Z names are encoded; handedness and a device-to-body coordinate transform are not encoded in the CSV",
+    "csv_unit_metadata_present": false,
+    "units_from_publication_and_manifest": {
+      "motionRotationRate": "rad/s",
+      "motionUserAcceleration": "G"
+    }
+  },
+  "sensitive_metadata_audit": {
+    "archive_crc_check": "pass",
+    "archive_member_count": 11,
+    "csv_disabled_subject_ids": [
+      "11",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16",
+      "17",
+      "18",
+      "19",
+      "20"
+    ],
+    "docx_subject_ids_recovered_from_explicit_user_or_subject_references": [],
+    "free_text_exported": false,
+    "nonempty_paragraph_count": 12,
+    "participant_reference_match": null,
+    "participant_reference_status": "not_auditable_no_explicit_user_or_subject_identifiers_in_docx",
+    "privacy_method": "only explicit numeric User/Subject references and document structure were retained; all descriptive text was discarded in memory",
+    "sensitive_record_paragraph_count": 0,
+    "table_count": 0,
+    "table_shapes": [],
+    "unredacted_disability_or_assistive_device_text_present_in_report": false
+  },
+  "status": "integrity_pass_protocol_quarantine",
+  "version_history_boundary_recovery": {
+    "conclusion": "failed_no_released_version_contains_timestamp_trial_session_or_sample_identifiers",
+    "metadata_endpoints": [
+      "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=1",
+      "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=2",
+      "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=3",
+      "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=4"
+    ],
+    "records": [
+      {
+        "content_id": "4e985d38-6139-47f9-a8b1-b1e39fb4e6a6",
+        "file_id": "d8656c19-61ec-4943-a161-217d937d9bca",
+        "filename": "DisabledHAR_dataset_v1.csv",
+        "header_audit": "same_33_columns_no_timestamp_trial_session_or_sample_identifier",
+        "sha256": "20109a3e580ea893712182cf8594ebeaf39cdcbae7dc642297a630a56b0f7cb7",
+        "size_bytes": 148856120,
+        "version": 1
+      },
+      {
+        "content_id": "54b2c2c0-135d-4f1c-8d94-b45e35958b41",
+        "file_id": "6be7ec3b-a21a-4288-8e09-18f1f238ddf2",
+        "filename": "DisabledHAR_dataset_v2 (1).csv",
+        "header_audit": "byte_identical_to_v4_sensor_csv",
+        "sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+        "size_bytes": 148915541,
+        "version": 2
+      },
+      {
+        "content_id": "54b2c2c0-135d-4f1c-8d94-b45e35958b41",
+        "file_id": "6be7ec3b-a21a-4288-8e09-18f1f238ddf2",
+        "filename": "DisabledHAR_dataset_v2 (1).csv",
+        "header_audit": "byte_identical_to_v4_sensor_csv",
+        "sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+        "size_bytes": 148915541,
+        "version": 3
+      },
+      {
+        "content_id": "54b2c2c0-135d-4f1c-8d94-b45e35958b41",
+        "file_id": "6be7ec3b-a21a-4288-8e09-18f1f238ddf2",
+        "filename": "InclusiveHAR_dataset_v2 (1).csv",
+        "header_audit": "direct_read_only_audit_this_report",
+        "sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+        "size_bytes": 148915541,
+        "version": 4
+      }
+    ],
+    "v4_docx_change": "version_4_adds_sensitive_participant_description_docx_but_no_boundary_metadata",
+    "verification_scope": "official API metadata for versions 1-4 plus authorized header-only audit; historical CSV bodies were not added to the v4 raw cache"
+  }
+}
+
