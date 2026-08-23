@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at_utc": "2026-08-23T19:57:30.708412+00:00",
+  "stage": "Stage 0 — preserve and audit legacy project",
+  "acceptance_gate": {
+    "status": "pass",
+    "scope": "archive integrity, inventory, saved-artifact reconstruction, and limitations documentation",
+    "does_not_authorize_scientific_reuse_as_confirmatory_evidence": true,
+    "checks": {
+      "archive_checksum": true,
+      "archive_entries": true,
+      "extracted_file_set": true,
+      "metric_reconstruction": true,
+      "reported_checkpoint_history": true,
+      "expected_run_artifacts": true,
+      "limitations_documented": true
+    }
+  },
+  "archive": {
+    "archive_checksum_matches": true,
+    "archive_entry_count": 180,
+    "duplicate_entry_paths": [],
+    "entry_content_mismatches": [],
+    "missing_extracted_files": [],
+    "unexpected_extracted_files": [],
+    "all_entry_sizes_and_hashes_match": true,
+    "extracted_file_set_matches": true,
+    "raw_manifest_sha256": "F21483255227E30543D18308B4CF16123BC13AADE185B492FFEBD45E628293D7",
+    "raw_manifest_generation_note": "The initial extraction/hash pass succeeded, but its PowerShell total-aggregation expression emitted errors and wrote zero aggregate byte totals. That raw artifact is preserved in the local audit directory. This public manifest recomputes totals from the 180 intact per-entry records and revalidates every extracted file."
+  },
+  "notebook": {
+    "notebook_sha256": "C25D78AD1A21E485A7BD0D9DD5CC74BBAF4D3872465BE300D7BE56D8B829F636",
+    "cell_count": 49,
+    "code_cell_count": 24,
+    "markdown_cell_count": 25,
+    "relevant_cell_ids": {
+      "3": "db8f4393",
+      "14": "8fcda24e",
+      "16": "c9c3142f",
+      "20": "d295352d",
+      "22": "9b4d3227",
+      "24": "40aeabcf",
+      "26": "12004a09",
+      "28": "2fb468a6",
+      "32": "b66f3efb",
+      "34": "5ec0b08b",
+      "36": "29f6ee3c",
+      "38": "616f3645",
+      "40": "9fa1ede6",
+      "42": "1761fd71",
+      "48": "f2534097"
+    }
+  },
+  "legacy_outputs": {
+    "run_count": 10,
+    "sample_count_per_run": [
+      2947
+    ],
+    "class_count_per_run": [
+      6
+    ],
+    "all_saved_prediction_probability_confusion_checks_pass": true,
+    "history_checks": [
+      {
+        "run": "00_bilstm__seed42/20251029-175423",
+        "row_count": 34,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 26,
+        "reported_best_val_loss": 0.09934343786343285,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 26,
+        "literal_minimum_val_loss": 0.09934343786343285,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "01_bilstm_th__seed42/20251029-175505",
+        "row_count": 37,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 29,
+        "reported_best_val_loss": 0.07763916513194209,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 29,
+        "literal_minimum_val_loss": 0.07763916513194209,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "02_bilstm_h256_th__seed42/20251029-175550",
+        "row_count": 36,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 28,
+        "reported_best_val_loss": 0.07496047117139983,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 28,
+        "literal_minimum_val_loss": 0.07496047117139983,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "03_bilstm_th_ls005_jit025_f003__seed42/20251029-175636",
+        "row_count": 37,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 29,
+        "reported_best_val_loss": 0.3155408605285313,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 29,
+        "literal_minimum_val_loss": 0.3155408605285313,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "04_bilstm_th_classw__seed42/20251029-175722",
+        "row_count": 37,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 29,
+        "reported_best_val_loss": 0.07282343280056248,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 29,
+        "literal_minimum_val_loss": 0.07282343280056248,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "05_cnn1d__seed42/20251029-175809",
+        "row_count": 40,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 40,
+        "reported_best_val_loss": 0.053428687803123306,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 40,
+        "literal_minimum_val_loss": 0.053428687803123306,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "06_ensemble_bilstm256_cnn128__seed42/20251029-175841",
+        "row_count": 40,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 36,
+        "reported_best_val_loss": 0.038660466509020844,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 36,
+        "literal_minimum_val_loss": 0.038660466509020844,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "06b_ensemble_bilstm512_cnn256__seed42/20251029-180001",
+        "row_count": 37,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 29,
+        "reported_best_val_loss": 0.026563500418611195,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 37,
+        "literal_minimum_val_loss": 0.02650601028100304,
+        "literal_minimum_is_reported_checkpoint": false,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "06b_ensemble_bilstm512_cnn256__seed42__seed1337/20251029-180202",
+        "row_count": 40,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 33,
+        "reported_best_val_loss": 0.023424265015384426,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 33,
+        "literal_minimum_val_loss": 0.023424265015384426,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      },
+      {
+        "run": "06b_ensemble_bilstm512_cnn256__seed42__seed2025/20251029-180413",
+        "row_count": 40,
+        "epochs_are_consecutive_from_one": true,
+        "reported_best_epoch": 36,
+        "reported_best_val_loss": 0.02321376019845838,
+        "reported_loss_matches_history": true,
+        "literal_minimum_epoch": 36,
+        "literal_minimum_val_loss": 0.02321376019845838,
+        "literal_minimum_is_reported_checkpoint": true,
+        "note": "Checkpoint rule requires improvement >1e-4, so a later literal minimum can be intentionally ignored by the legacy code.",
+        "missing_expected_run_files": []
+      }
+    ],
+    "all_reported_checkpoint_losses_match_history": true,
+    "all_expected_run_artifacts_present": true
+  },
+  "limitations_documentation": {
+    "path": "docs/LEGACY_AUDIT.md",
+    "required_markers": {
+      "random_window_validation": true,
+      "repeated_test_evaluation": true,
+      "incompatible_validation_losses": true,
+      "hard_coded_paths_and_provenance": true,
+      "joint_training_misnamed_ensemble": true,
+      "checkpoint_and_seed_metadata": true,
+      "missing_tests_package_cli_lock_ci": true,
+      "legacy_status": true
+    },
+    "all_required_limitations_present": true
+  },
+  "public_evidence_files": {
+    "legacy/archive_manifest.json": {
+      "size_bytes": 82985,
+      "sha256": "1CD163B92D6E3DFDBF5D5E6EDE3AB353E8BE03F7B53EB2DBFEA7880297B6A92D"
+    },
+    "legacy/legacy_metrics.locked.json": {
+      "size_bytes": 24458,
+      "sha256": "8F8487F0D8AE42968BEAEECFACFAFCF8CC0191A411D1504AF501C47EE3B52E59"
+    },
+    "legacy/metric_reconstruction.json": {
+      "size_bytes": 120280,
+      "sha256": "A73CE5200F191DFB57C41C120C2642D22145F85CFF0F9475C4D351760651CF0E"
+    },
+    "legacy/metric_reconstruction.csv": {
+      "size_bytes": 2411,
+      "sha256": "46EF1A980CB6651FA9E928F3EA81A56CE36C8B96DD78DCE47C2A741FF0327ECA"
+    },
+    "legacy/notebook_cell_index.json": {
+      "size_bytes": 6075,
+      "sha256": "F71CCACC0687B43A5F9341520B60B5A4BE683DD1BF9876D6AE8B1BE8C56680EC"
+    },
+    "docs/LEGACY_AUDIT.md": {
+      "size_bytes": 15762,
+      "sha256": "530D82D075FCBB0B96646A5C25FA748BD7E34D26E36374C0166FAC1F0207BD7A"
+    },
+    "legacy/README.md": {
+      "size_bytes": 2012,
+      "sha256": "298E8352F3F92E93895DB1DE6D35EB3BA3201843D23BCFE7844C9167D705938D"
+    }
+  },
+  "preservation": {
+    "original_zip_modified": false,
+    "robotics_workspace_modified": false,
+    "extraction_was_create_new_only": true,
+    "local_audit_root": "C:\\Users\\DELL\\Desktop\\Thesis\\inclusive-shift-har\\.audit\\stage0-20260823T194514Z-e93f7f22",
+    "raw_extraction_preserved_outside_normal_git_evidence": true
+  }
+}

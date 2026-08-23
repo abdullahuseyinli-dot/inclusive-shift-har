@@ -1,0 +1,164 @@
+{
+  "schema_version": "1.0.0",
+  "source_archive_sha256": "13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94",
+  "notebook_archive_path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\script\\assign2Task2_submission.ipynb",
+  "notebook_sha256": "C25D78AD1A21E485A7BD0D9DD5CC74BBAF4D3872465BE300D7BE56D8B829F636",
+  "nbformat": 4,
+  "nbformat_minor": 5,
+  "cell_count": 49,
+  "code_cell_count": 24,
+  "markdown_cell_count": 25,
+  "reference_convention": "Audit text gives zero-based JSON index, one-based human ordinal, and stable cell id.",
+  "audited_cell_references": [
+    {
+      "json_index_zero_based": 3,
+      "human_ordinal_one_based": 4,
+      "cell_id": "db8f4393",
+      "cell_type": "code",
+      "execution_count": 2,
+      "source_sha256": "8A11FA673BEC4C44BCD8632F0438132568675C7CBF5A7EF00F36C8F23EDFB558",
+      "first_source_line": "def set_seed(seed: int = 42, deterministic: bool = True):",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 14,
+      "human_ordinal_one_based": 15,
+      "cell_id": "8fcda24e",
+      "cell_type": "code",
+      "execution_count": 7,
+      "source_sha256": "F1A350127B484825ECA1B57692E8308028784E7E5B95C54382B74FD1243FE201",
+      "first_source_line": "class EnsembleAvg(nn.Module):",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 16,
+      "human_ordinal_one_based": 17,
+      "cell_id": "c9c3142f",
+      "cell_type": "code",
+      "execution_count": 8,
+      "source_sha256": "966DA84A42F6270F779007DD8D9DDA7006D42C15EC2890F27A115A3E3F2630F9",
+      "first_source_line": "@dataclass",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 20,
+      "human_ordinal_one_based": 21,
+      "cell_id": "d295352d",
+      "cell_type": "code",
+      "execution_count": 10,
+      "source_sha256": "1EC9347469B2CD90AE8CCC5DAB5794838F37AB713CB994B53E93701AE53EAADA",
+      "first_source_line": "SPLIT_FILES = {",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 22,
+      "human_ordinal_one_based": 23,
+      "cell_id": "9b4d3227",
+      "cell_type": "code",
+      "execution_count": 11,
+      "source_sha256": "D8ECF982847A60DC379C15A53F2B203E94B0C0C32B39ADBD2FDD24FA89458CE1",
+      "first_source_line": "def find_data_root(candidates=None) -> Optional[str]:",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 24,
+      "human_ordinal_one_based": 25,
+      "cell_id": "40aeabcf",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "9793CFAD50B1C45AF3B92E7D4AFDB996A40544FA2D47A377E32BA0D926595520",
+      "first_source_line": "import numpy as np",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 26,
+      "human_ordinal_one_based": 27,
+      "cell_id": "12004a09",
+      "cell_type": "code",
+      "execution_count": 13,
+      "source_sha256": "CED4C545C6C75D773A9A499214D81215D761AC664BD7ED1832D33628A58C02B8",
+      "first_source_line": "def build_model(cfg: Config, in_feats: int, num_classes: int) -> nn.Module:",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 28,
+      "human_ordinal_one_based": 29,
+      "cell_id": "2fb468a6",
+      "cell_type": "code",
+      "execution_count": 14,
+      "source_sha256": "66B1FBC06820229F54D12B7974C55F2BE52E20F05FB161398202D27298AD2A9F",
+      "first_source_line": "def evaluate(model: nn.Module, loader: DataLoader, criterion: nn.Module, device: torch.device):",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 32,
+      "human_ordinal_one_based": 33,
+      "cell_id": "b66f3efb",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "87B71CEE4B9B35D86C66286CC3B84207FB2C1505900FEE802EB762EE31557F60",
+      "first_source_line": "import time, math, json, csv, torch",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 34,
+      "human_ordinal_one_based": 35,
+      "cell_id": "5ec0b08b",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "25B95CD289288DB8574ABF14DD3C2F106E18B6AFF9C831D4E74B101228150039",
+      "first_source_line": "from pathlib import Path",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 36,
+      "human_ordinal_one_based": 37,
+      "cell_id": "29f6ee3c",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "DE3BBAE06C59CD5E0F94BDF4A29CDFA0F098279F056D6C6D673186CEB5C7F6A6",
+      "first_source_line": "EXPS = [",
+      "output_count": 0
+    },
+    {
+      "json_index_zero_based": 38,
+      "human_ordinal_one_based": 39,
+      "cell_id": "616f3645",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "FE5CB1A3147EBB4E7ACDFE25053698BC853E5DEB9DCA5FE6EEDFBDD6BCE1424C",
+      "first_source_line": "import json, os, math",
+      "output_count": 24
+    },
+    {
+      "json_index_zero_based": 40,
+      "human_ordinal_one_based": 41,
+      "cell_id": "9fa1ede6",
+      "cell_type": "code",
+      "execution_count": 20,
+      "source_sha256": "C0A289B6C1D2CB151A0FE8ECD70ABF35F0676AA3DC036A9F95064E2CF31EABD2",
+      "first_source_line": "import ipywidgets as w",
+      "output_count": 6
+    },
+    {
+      "json_index_zero_based": 42,
+      "human_ordinal_one_based": 43,
+      "cell_id": "1761fd71",
+      "cell_type": "code",
+      "execution_count": 21,
+      "source_sha256": "6BE4B884BA33FCF67DEBD1B4794F337C43416366B9FFAD10025AB8E15AC385BA",
+      "first_source_line": "import numpy as np",
+      "output_count": 2
+    },
+    {
+      "json_index_zero_based": 48,
+      "human_ordinal_one_based": 49,
+      "cell_id": "f2534097",
+      "cell_type": "code",
+      "execution_count": null,
+      "source_sha256": "76444D11DFCF257BB2ADB570F5A72FBF7185EF2FCDF2EDC662EE1B7C7BFBD79A",
+      "first_source_line": "import os, json, numpy as np, pandas as pd, matplotlib.pyplot as plt",
+      "output_count": 3
+    }
+  ]
+}

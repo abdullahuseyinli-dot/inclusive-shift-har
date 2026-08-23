@@ -1,0 +1,1832 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_status": "verified",
+  "generated_at_utc": "2026-08-23T19:57:30.564364+00:00",
+  "source_archive": {
+    "filename": "CS5062_Assessment2_20251031.zip",
+    "source_type": "user-provided legacy coursework archive",
+    "size_bytes": 163645730,
+    "expected_sha256": "13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94",
+    "observed_sha256": "13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94",
+    "checksum_matches": true,
+    "last_write_time_utc": "2026-08-23T19:08:50.829353+00:00",
+    "repository_policy": "Archive is not committed to normal Git history."
+  },
+  "inventory": {
+    "entry_count": 180,
+    "file_count": 168,
+    "directory_count": 12,
+    "uncompressed_bytes": 178250411,
+    "compressed_bytes": 163583206,
+    "duplicate_entry_paths": [],
+    "unsafe_entry_paths": []
+  },
+  "entry_fields": {
+    "path": "Exact central-directory entry path as represented by .NET ZipArchive.",
+    "timestamp": "ZIP entry last-write time including the represented UTC offset.",
+    "sha256": "SHA-256 of uncompressed file bytes; null for directory entries.",
+    "external_attributes": "ZIP external attributes as a signed integer."
+  },
+  "entries": [
+    {
+      "index": 0,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:10.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 1,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:10.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 2,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\CS5062_Assessment2_Huseyinli_Abdulla_52533844.pdf",
+      "type": "file",
+      "uncompressed_size": 2815335,
+      "compressed_size": 2433295,
+      "timestamp": "2025-10-31T07:11:24.0000000+00:00",
+      "sha256": "7BCDAF8BA7B6032DFE1D21AEC3C7299BF3A0510EFE0D5ED6AC0DBE0E362E0257",
+      "external_attributes": 0
+    },
+    {
+      "index": 3,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 4,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 5,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 6,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 7,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 8,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 9,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 10,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 11,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 12,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\",
+      "type": "directory",
+      "uncompressed_size": 0,
+      "compressed_size": 0,
+      "timestamp": "2025-10-31T07:38:12.0000000+00:00",
+      "sha256": null,
+      "external_attributes": 0
+    },
+    {
+      "index": 13,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\summary_metrics.csv",
+      "type": "file",
+      "uncompressed_size": 3075,
+      "compressed_size": 863,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "B632D04FD4C0C05F845DBCDF64BA175D3FA1252902C52414179E77BB2F4E101A",
+      "external_attributes": 0
+    },
+    {
+      "index": 14,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\best.pt",
+      "type": "file",
+      "uncompressed_size": 4796721,
+      "compressed_size": 4422756,
+      "timestamp": "2025-10-29T17:54:54.0000000+00:00",
+      "sha256": "A2FC10E0AF99B7A565B8E54DD594876D9BCDC262C207C3B7E31BA13FF2A7D992",
+      "external_attributes": 0
+    },
+    {
+      "index": 15,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1195,
+      "compressed_size": 371,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "4A180287F05CCB06BBEA539C295E9931DA65D8AF25C7136EF8A830E17C7DC6EE",
+      "external_attributes": 0
+    },
+    {
+      "index": 16,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 201,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "2C318A68F27431D2C6DF0E17F396336AA9D3459D1D82B4FF1298A405DC1031CC",
+      "external_attributes": 0
+    },
+    {
+      "index": 17,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 131,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "B7E671FC9F9A10D8E3F4E307AB4FB438CC46CD54F3F6609575021AB01EA162DA",
+      "external_attributes": 0
+    },
+    {
+      "index": 18,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 50291,
+      "compressed_size": 46847,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "5B04C6618E6D3E822271CE71FD631FB79EBD6CF3FC34616ECCBE4AD95978EB7C",
+      "external_attributes": 0
+    },
+    {
+      "index": 19,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 241,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "85E37C33EB8FFF8E057AC008BB0DF0CA56079B3FBA3DCBE0893B187ACFD4D5BA",
+      "external_attributes": 0
+    },
+    {
+      "index": 20,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\history.csv",
+      "type": "file",
+      "uncompressed_size": 2783,
+      "compressed_size": 1190,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "EDBAAD804F20912F020F76BC291E35A94ADD41F3E2B39E6B67987C3F8A92EFF5",
+      "external_attributes": 0
+    },
+    {
+      "index": 21,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1554,
+      "compressed_size": 686,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "6F1660E2864759BE48A05588E9A200D703826D777CD88374B4D1095CF9154F17",
+      "external_attributes": 0
+    },
+    {
+      "index": 22,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80259,
+      "compressed_size": 1029,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "8BDF43F795792CBA8F2EA2BE98E26C74DCC7C25449F4C2546919D0D2F3071E24",
+      "external_attributes": 0
+    },
+    {
+      "index": 23,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65717,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "DB2E8564D9E0AF25D50425EC5E0CC4A0E01BEC45AC0E19EE4D6A013309A1156B",
+      "external_attributes": 0
+    },
+    {
+      "index": 24,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 25490,
+      "compressed_size": 23902,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "43D78854B0CC9B335EAAD12BD5A9A18792426DBC3AF44459BA22B3FE78BFFA65",
+      "external_attributes": 0
+    },
+    {
+      "index": 25,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\00_bilstm__seed42\\20251029-175423\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 25897,
+      "compressed_size": 24302,
+      "timestamp": "2025-10-29T17:55:04.0000000+00:00",
+      "sha256": "5630507DDE8D42778EFE76D991CAA052B37ECB7FF3C2A43A91A0E050E1B9778F",
+      "external_attributes": 0
+    },
+    {
+      "index": 26,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\best.pt",
+      "type": "file",
+      "uncompressed_size": 4809009,
+      "compressed_size": 4434518,
+      "timestamp": "2025-10-29T17:55:40.0000000+00:00",
+      "sha256": "62A564C31508B53E4D99ED564EE207E873A9D9D64C96D0B8D374CA1CC8900A23",
+      "external_attributes": 0
+    },
+    {
+      "index": 27,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1211,
+      "compressed_size": 375,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "BB0773DBFEDDFEE7C1D14B154F9210ED4BB1B7272C6C30FCB1368619B0E8DC81",
+      "external_attributes": 0
+    },
+    {
+      "index": 28,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 203,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "E7752296F64ACF4D808CFA9B84C92EC9159B6A877EDAA3DEBD65BFDC357570A9",
+      "external_attributes": 0
+    },
+    {
+      "index": 29,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 125,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "498587F5C49F738B1743B54AB4E3D1FE36C1EA05B176F121C114666F840D3B03",
+      "external_attributes": 0
+    },
+    {
+      "index": 30,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 48379,
+      "compressed_size": 44781,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "BBF0E8A160BA7EFCE9B450975BDA1F9E13C117F1DB2A960C6DAD192F4A6390D4",
+      "external_attributes": 0
+    },
+    {
+      "index": 31,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 215,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "A09C4212556DA8F4B98D70F1BA37FD8BEDB8B8DA4E93DD1D33C08CF343FB71C4",
+      "external_attributes": 0
+    },
+    {
+      "index": 32,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3031,
+      "compressed_size": 1247,
+      "timestamp": "2025-10-29T17:55:48.0000000+00:00",
+      "sha256": "CD7E59A8F8CA0AB1681FB71E254205D707D57DB7378A8AD79F56502111EF5D86",
+      "external_attributes": 0
+    },
+    {
+      "index": 33,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1556,
+      "compressed_size": 694,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "5F201EECE4E4A90AB4EA6B849527CFC512A2DD833FD5692ACA42F3878C81A6B0",
+      "external_attributes": 0
+    },
+    {
+      "index": 34,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 79988,
+      "compressed_size": 945,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "D3582BF4951D2896CDB920B6CD47482C85B815210874FCA5BD781D6D2FAC99C6",
+      "external_attributes": 0
+    },
+    {
+      "index": 35,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 66009,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "2968A834133A4909039DFEE0BAA6597668E19BEE8DD5240F3D114772470E51A2",
+      "external_attributes": 0
+    },
+    {
+      "index": 36,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 20136,
+      "compressed_size": 18708,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "AD2CE442808A4CFF24D0F9A1328D9AAD077C834E6A2305AB3791C0819EAF5D6C",
+      "external_attributes": 0
+    },
+    {
+      "index": 37,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\01_bilstm_th__seed42\\20251029-175505\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21663,
+      "compressed_size": 20224,
+      "timestamp": "2025-10-29T17:55:50.0000000+00:00",
+      "sha256": "3CFAC09037F047FC767DDFC714CE942D6A2490AB348A46D5AAF94311B14F9D72",
+      "external_attributes": 0
+    },
+    {
+      "index": 38,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\best.pt",
+      "type": "file",
+      "uncompressed_size": 8507697,
+      "compressed_size": 7863411,
+      "timestamp": "2025-10-29T17:56:24.0000000+00:00",
+      "sha256": "25BC8AA831D11EBE18A5D1C8662DBBA16032949E3C6203B055C66EB73B2AD98B",
+      "external_attributes": 0
+    },
+    {
+      "index": 39,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1227,
+      "compressed_size": 375,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "7769CD1181F51B620603DB00EAED5F7BCB34D2B3E45AA4BECF086EA7DFD40991",
+      "external_attributes": 0
+    },
+    {
+      "index": 40,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 209,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "AFF7CB84EBB9587786D094C6304EF4EC4E8BE4940EF76C0947DA61F8DDA7BB17",
+      "external_attributes": 0
+    },
+    {
+      "index": 41,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 122,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "052568112745BB13C79C24515042A549562C366A107EBFF581F85BBEE8C0F4EF",
+      "external_attributes": 0
+    },
+    {
+      "index": 42,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 47573,
+      "compressed_size": 44054,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "E161B04F353B36402CA78DC80D7A431114AD9058FB6BEC2607922AD326D896F3",
+      "external_attributes": 0
+    },
+    {
+      "index": 43,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 212,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "0CACA75B63B927BEE140D8A0F8B1FC8F6FC96CA6877C328F33D9E100A0AD6AF3",
+      "external_attributes": 0
+    },
+    {
+      "index": 44,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\history.csv",
+      "type": "file",
+      "uncompressed_size": 2952,
+      "compressed_size": 1197,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "2A38B11D33D31DE7E45A0BAE40EB8429AC8CA4064E4261151259527C64C02256",
+      "external_attributes": 0
+    },
+    {
+      "index": 45,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1561,
+      "compressed_size": 696,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "5CA5D2F4EAAE713664D8452C05D916395BAF111D23EE68325C18E7F8A8A4B12C",
+      "external_attributes": 0
+    },
+    {
+      "index": 46,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80060,
+      "compressed_size": 925,
+      "timestamp": "2025-10-29T17:56:36.0000000+00:00",
+      "sha256": "36C5807E191F5D88A82A3C53462E9B574DC6ADBB635E908EDA67CBF571009E53",
+      "external_attributes": 0
+    },
+    {
+      "index": 47,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 66006,
+      "timestamp": "2025-10-29T17:56:36.0000000+00:00",
+      "sha256": "C0E2ACC78509B597A7DB39F66720946686DC5AAAE190C17C6223CA3D56EF2522",
+      "external_attributes": 0
+    },
+    {
+      "index": 48,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 20213,
+      "compressed_size": 18924,
+      "timestamp": "2025-10-29T17:56:36.0000000+00:00",
+      "sha256": "ED7FE7032AF3E0E051B639AF0D12C1F700B5FFA02926F9B308B9A9CEC0EBF93C",
+      "external_attributes": 0
+    },
+    {
+      "index": 49,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\02_bilstm_h256_th__seed42\\20251029-175550\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21002,
+      "compressed_size": 19513,
+      "timestamp": "2025-10-29T17:56:34.0000000+00:00",
+      "sha256": "F9DABEBB00EDC025B29A63DC2342143A92F07275D7B554AEB0563FFCB656C1CB",
+      "external_attributes": 0
+    },
+    {
+      "index": 50,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\best.pt",
+      "type": "file",
+      "uncompressed_size": 4809009,
+      "compressed_size": 4434231,
+      "timestamp": "2025-10-29T17:57:10.0000000+00:00",
+      "sha256": "F41BBC9129D8C182FF6A225D943FCCA17942CF1C729D99F4FB59BB4B23948636",
+      "external_attributes": 0
+    },
+    {
+      "index": 51,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1223,
+      "compressed_size": 382,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "C6A64E750AA016E624EB492631FE45EB58AFE0DC77F772C713F6BD9E4CE6444C",
+      "external_attributes": 0
+    },
+    {
+      "index": 52,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 200,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "434AB7D5ACE56F53DB9D9855A901B26C43A9FDCEAB799B831A0F5B282EFE2DD3",
+      "external_attributes": 0
+    },
+    {
+      "index": 53,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 125,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "661890D66C342F4DA6E1A17DB41CD69A694209986E286E45A0686B557B2C76CC",
+      "external_attributes": 0
+    },
+    {
+      "index": 54,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 46849,
+      "compressed_size": 43245,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "7F3AE2D94024170C48B5DB788144509DC9F1B20D9F0E54523B5C2E111B49645D",
+      "external_attributes": 0
+    },
+    {
+      "index": 55,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 211,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "E88B780CBB178D7DA0B9EF77F04D0383ED49642B9243D41212E5838B8DE5F66B",
+      "external_attributes": 0
+    },
+    {
+      "index": 56,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\history.csv",
+      "type": "file",
+      "uncompressed_size": 2995,
+      "compressed_size": 1226,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "367B1D155D98561589F450710ECE11E71926D7B93C6E228310D2EF15B3EA9EFA",
+      "external_attributes": 0
+    },
+    {
+      "index": 57,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1576,
+      "compressed_size": 710,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "D7F045E2D3AD208534B4DEF7237725DFED23AE98887B71B879C4AE392B7DD3D1",
+      "external_attributes": 0
+    },
+    {
+      "index": 58,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80022,
+      "compressed_size": 906,
+      "timestamp": "2025-10-29T17:57:22.0000000+00:00",
+      "sha256": "B1466F7BA30A40E7B327FD9B1AF24F014C3909A08864A09B07B87132976178B0",
+      "external_attributes": 0
+    },
+    {
+      "index": 59,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 64460,
+      "timestamp": "2025-10-29T17:57:22.0000000+00:00",
+      "sha256": "EA23C344F035E884C87DA285F31DF4D00598B5B134891BD05E4B86622C3C7948",
+      "external_attributes": 0
+    },
+    {
+      "index": 60,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 19861,
+      "compressed_size": 18534,
+      "timestamp": "2025-10-29T17:57:22.0000000+00:00",
+      "sha256": "3246F0F594974A68E347C0E3F552CCE028F5C7875E0FC008340A5BFF309A1B8F",
+      "external_attributes": 0
+    },
+    {
+      "index": 61,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\03_bilstm_th_ls005_jit025_f003__seed42\\20251029-175636\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21349,
+      "compressed_size": 20034,
+      "timestamp": "2025-10-29T17:57:20.0000000+00:00",
+      "sha256": "22C3F06A5129E207C30FEDF730E8E0931723641FBAE40D246BC95D332347465E",
+      "external_attributes": 0
+    },
+    {
+      "index": 62,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\best.pt",
+      "type": "file",
+      "uncompressed_size": 4809009,
+      "compressed_size": 4434613,
+      "timestamp": "2025-10-29T17:57:56.0000000+00:00",
+      "sha256": "41B0D8951451C8542282DD3C5CDEC3061F5E29D7FAB36393B33A9B16D98DA89C",
+      "external_attributes": 0
+    },
+    {
+      "index": 63,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1211,
+      "compressed_size": 378,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "D5DD2E9319BE925A43A50C4C89CCF3A666B82CC5E724A746EBEAD2CF12A8AADA",
+      "external_attributes": 0
+    },
+    {
+      "index": 64,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 207,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "18DC38D4CC3914060F566941576DB04536129CFB820C5E589649C9524011A1E6",
+      "external_attributes": 0
+    },
+    {
+      "index": 65,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 126,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "F922D6DE7F8FE749B1BE9BCCAA07E8F34CB571C73CD8A547DCD861ABA34D15DB",
+      "external_attributes": 0
+    },
+    {
+      "index": 66,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 48238,
+      "compressed_size": 44603,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "EA962292D23F2D80F3A96AE0367186A660042DA6F0B50DCB8EE464FBE1362535",
+      "external_attributes": 0
+    },
+    {
+      "index": 67,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 220,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "249525FB625C5C8CDE0A87953ECD90CEDC3D25FA78DEF09282093BD02F99610E",
+      "external_attributes": 0
+    },
+    {
+      "index": 68,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\history.csv",
+      "type": "file",
+      "uncompressed_size": 2978,
+      "compressed_size": 1213,
+      "timestamp": "2025-10-29T17:58:06.0000000+00:00",
+      "sha256": "2012617725B18A8831CC9C824F5699B6C8DB3F07799152A0D27069D6EF41B1EF",
+      "external_attributes": 0
+    },
+    {
+      "index": 69,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1562,
+      "compressed_size": 697,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "7F1FBE5A96B70676EC2D777767B85EE44A46F644830E5E2C19259DBC151C661C",
+      "external_attributes": 0
+    },
+    {
+      "index": 70,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 79996,
+      "compressed_size": 935,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "E63ADC05D97D392EC120FCE059EDA41633DECDDBE59BE91066679CB81AA94B25",
+      "external_attributes": 0
+    },
+    {
+      "index": 71,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65967,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "7E495BB9F1982DAF134C79FB75A34976E6B597A8027A363DCB4CE7BA68C89BAB",
+      "external_attributes": 0
+    },
+    {
+      "index": 72,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 19826,
+      "compressed_size": 18457,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "2E0D3A4F785A806FBBBAE4812B15757C7E74126E35901927063FE061A3827799",
+      "external_attributes": 0
+    },
+    {
+      "index": 73,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\04_bilstm_th_classw__seed42\\20251029-175722\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21595,
+      "compressed_size": 20132,
+      "timestamp": "2025-10-29T17:58:08.0000000+00:00",
+      "sha256": "D25007CEAD768EE1001F1144B06EDCAA17B20D1DE72E89A2945E7E09780002E4",
+      "external_attributes": 0
+    },
+    {
+      "index": 74,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\best.pt",
+      "type": "file",
+      "uncompressed_size": 2287232,
+      "compressed_size": 2111577,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "2A576307419E13B1EE34B60DDBF5635CCD9BE82056C5D65C7332B7807D8208D5",
+      "external_attributes": 0
+    },
+    {
+      "index": 75,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1211,
+      "compressed_size": 380,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "1C6905FD1E8C40AEE7A979658EF610C5C950078C20AEE84427203291E2C1B91E",
+      "external_attributes": 0
+    },
+    {
+      "index": 76,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 207,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "E5D14A7B9F5F071D81863EFC000EEEDADDECEC16EAA26972AEF34A968172DA7D",
+      "external_attributes": 0
+    },
+    {
+      "index": 77,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 117,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "033B06762966C095F0D69C045B930FE1F42BF8985AB5715452ABEE9E7E5F406E",
+      "external_attributes": 0
+    },
+    {
+      "index": 78,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 47757,
+      "compressed_size": 44035,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "798271357F34B12BD6418D5D3F49696DC42F50F946BFB376A6942FD4B08F9323",
+      "external_attributes": 0
+    },
+    {
+      "index": 79,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 193,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "E2E5A7EBB78773D2A5DE833D39C28FB989D7510F1D1E3FA517F5C15629C57563",
+      "external_attributes": 0
+    },
+    {
+      "index": 80,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3276,
+      "compressed_size": 1355,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "6F79E4C5D25544AF6CB2349D5E4FC2F384CD62EC82094AA6AFA2C8F8EC8C305B",
+      "external_attributes": 0
+    },
+    {
+      "index": 81,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1552,
+      "compressed_size": 685,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "474B0FC6E8CC1962E830E899DD9E2277047BA8E1DD1FB41B2290DAF42BDB943B",
+      "external_attributes": 0
+    },
+    {
+      "index": 82,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80418,
+      "compressed_size": 895,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "A0B001AF018EA60B0556B37C3FE7FA8793C16EB11D646CA13E0CB99E7FF850E5",
+      "external_attributes": 0
+    },
+    {
+      "index": 83,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65388,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "1D8D841465951CA54D3EB59CDCAF4B52FAE016FEB97DE21DD9AF2DE68A9D2EC0",
+      "external_attributes": 0
+    },
+    {
+      "index": 84,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 23532,
+      "compressed_size": 22048,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "88BDE3D625A89B38E0669C5228687E5A02E62009D2E823EFD66AE92FA8AD6D4A",
+      "external_attributes": 0
+    },
+    {
+      "index": 85,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\05_cnn1d__seed42\\20251029-175809\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21115,
+      "compressed_size": 19816,
+      "timestamp": "2025-10-29T17:58:40.0000000+00:00",
+      "sha256": "8EC7CEA742B2D37FCB6F4129136F4B066407B8B8AB97B9C33653EC2ACBBBCCAD",
+      "external_attributes": 0
+    },
+    {
+      "index": 86,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\best.pt",
+      "type": "file",
+      "uncompressed_size": 42810786,
+      "compressed_size": 39560491,
+      "timestamp": "2025-10-29T18:01:34.0000000+00:00",
+      "sha256": "E88F0E3BDF088EE8A1D480635A81A2E4819673D86471FBC47A2824B98EC63CA7",
+      "external_attributes": 0
+    },
+    {
+      "index": 87,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1212,
+      "compressed_size": 378,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "3697056EEF210A4CC93B923829DBB9953660DF38E93D5220DAA4D91DCB612F97",
+      "external_attributes": 0
+    },
+    {
+      "index": 88,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 204,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "42D0BB0BA4E1FF6E20B8C1C02B1AA019DDBF692C9E4E05E4C28C24453435595C",
+      "external_attributes": 0
+    },
+    {
+      "index": 89,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 120,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "B330143EA87DA8CE617E1E1833EF18FF6F8EAC71343955CF5D565A1EFF420948",
+      "external_attributes": 0
+    },
+    {
+      "index": 90,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 48150,
+      "compressed_size": 44533,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "8160905A6F106B5CA15D30F0D90F71E3A5A222A38E21E658EC8A7841F3B70388",
+      "external_attributes": 0
+    },
+    {
+      "index": 91,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 195,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "7207912FDF82E27E1C19B1D1D7AF473CAD50C46689EE9A2D48E85C0AD98E92E1",
+      "external_attributes": 0
+    },
+    {
+      "index": 92,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3073,
+      "compressed_size": 1258,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "68D4E241F6C3F522E53E4579BFF82E4FA5877801D89238A840FEF64F3ED01846",
+      "external_attributes": 0
+    },
+    {
+      "index": 93,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1573,
+      "compressed_size": 700,
+      "timestamp": "2025-10-29T18:02:00.0000000+00:00",
+      "sha256": "8D910EA4ADE9CF0DD9BEA2FDDCBA2102BCF491D39244985A3674D0C34C610DD9",
+      "external_attributes": 0
+    },
+    {
+      "index": 94,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\per_class_bars.png",
+      "type": "file",
+      "uncompressed_size": 50082,
+      "compressed_size": 44284,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "D465ABCB5C791D8D556C3021AE4B00A9A8A36E917B7A311B27FA3B6F2C544E41",
+      "external_attributes": 0
+    },
+    {
+      "index": 95,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80344,
+      "compressed_size": 916,
+      "timestamp": "2025-10-29T18:02:02.0000000+00:00",
+      "sha256": "57CEA55F310D8AF941FF632E87A97959D6EF783942E1A82C0E9C1E0E214D1D66",
+      "external_attributes": 0
+    },
+    {
+      "index": 96,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65698,
+      "timestamp": "2025-10-29T18:02:02.0000000+00:00",
+      "sha256": "347592C1C424285F142074253347D7694B629CA7739454E3ED7DAEEBA8EB033A",
+      "external_attributes": 0
+    },
+    {
+      "index": 97,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 28527,
+      "compressed_size": 26388,
+      "timestamp": "2025-10-29T18:02:02.0000000+00:00",
+      "sha256": "E9EB3D591CE15A7C10D4217216C953D62E2A3AAAAC41F1C7A034DFEA97A540BF",
+      "external_attributes": 0
+    },
+    {
+      "index": 98,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42\\20251029-180001\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 23591,
+      "compressed_size": 21773,
+      "timestamp": "2025-10-29T18:02:02.0000000+00:00",
+      "sha256": "5FCCE6B6FC1616D891E14648AD7D093A24A54B16721E1E4A6DCB9FBC040853DE",
+      "external_attributes": 0
+    },
+    {
+      "index": 99,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\best.pt",
+      "type": "file",
+      "uncompressed_size": 42810786,
+      "compressed_size": 39561295,
+      "timestamp": "2025-10-29T18:03:48.0000000+00:00",
+      "sha256": "D764A28BC2FC497531C965E8EFD450CCB1495ECC45E9E43C1FF3F22B5916360C",
+      "external_attributes": 0
+    },
+    {
+      "index": 100,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1199,
+      "compressed_size": 376,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "75F4A587F54295442A35B791FB650129357A3EE32304E4F5CB34FE13370358A5",
+      "external_attributes": 0
+    },
+    {
+      "index": 101,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 209,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "BA2CC75197FE9B24BDBEA48A7FBEFDD1B66D1BB0672A3DAD6B4BC22B258FB5B3",
+      "external_attributes": 0
+    },
+    {
+      "index": 102,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 116,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "5F942F392E62FB2C48FE7218F5790EB2A19BB5CABAFB45A09603EEE9D4CB8E40",
+      "external_attributes": 0
+    },
+    {
+      "index": 103,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 48205,
+      "compressed_size": 44436,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "F9F55FB28BE860D28246D8C88D6F5BE6E89398D5D1469D03BBA36BAB92D219FD",
+      "external_attributes": 0
+    },
+    {
+      "index": 104,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 196,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "C28B948E86380622A81681409DF2F3C246AE91E5C8740E2E6BF36658EE26CB06",
+      "external_attributes": 0
+    },
+    {
+      "index": 105,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3329,
+      "compressed_size": 1368,
+      "timestamp": "2025-10-29T18:04:10.0000000+00:00",
+      "sha256": "1F549DA043B916AA8155604548F8FCC809DE70F24C00211CCAACF2C1738A039A",
+      "external_attributes": 0
+    },
+    {
+      "index": 106,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1585,
+      "compressed_size": 703,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "0D8C48BA8A551BFD1018A01339D53633B6F2F1642D5FD1379F564CC1C1B240A2",
+      "external_attributes": 0
+    },
+    {
+      "index": 107,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80438,
+      "compressed_size": 917,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "7B7ECABF0C56776BCD063CFE75AD299D673B0EE2DA601262D229AF293E08C475",
+      "external_attributes": 0
+    },
+    {
+      "index": 108,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65595,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "BB94A4601F8D1139E781F52C5549B31F2AEA72EFA5F099C231B3D7B94299071E",
+      "external_attributes": 0
+    },
+    {
+      "index": 109,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 28020,
+      "compressed_size": 25683,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "DB3AFCB94C800D89132FAA64EFD6BBF3750F786DC9864451BD049F72B3F8CE06",
+      "external_attributes": 0
+    },
+    {
+      "index": 110,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed1337\\20251029-180202\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 23151,
+      "compressed_size": 21383,
+      "timestamp": "2025-10-29T18:04:12.0000000+00:00",
+      "sha256": "D14DDCC40684F94E446761D01202AAC4E3BD32D6580D662B49296D1840D91C79",
+      "external_attributes": 0
+    },
+    {
+      "index": 111,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\best.pt",
+      "type": "file",
+      "uncompressed_size": 42810786,
+      "compressed_size": 39561357,
+      "timestamp": "2025-10-29T18:06:08.0000000+00:00",
+      "sha256": "51EC1DC3C039EE04F1B262D2EAA2DC4151B90795C4E7131BF9EFF45986D3F228",
+      "external_attributes": 0
+    },
+    {
+      "index": 112,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1207,
+      "compressed_size": 379,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "E4629F52B5660FCEFED7DCC10656A315566BCC8D1D7C4957D75F96C25A3B88C6",
+      "external_attributes": 0
+    },
+    {
+      "index": 113,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 207,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "7677E3FB967674ABDDC50E36EACE7364020BBFA23243D557836A067A4F3731FD",
+      "external_attributes": 0
+    },
+    {
+      "index": 114,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 118,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "2851EBD67E21A9CD17141FAE7EF939C02EB185F2519B3BAE5FCCEB13EE8B8705",
+      "external_attributes": 0
+    },
+    {
+      "index": 115,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 48257,
+      "compressed_size": 44606,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "BBE4CF1C19C448439EAD0553641B72F2667621D33A0C2BAF89D7C199303E4BA2",
+      "external_attributes": 0
+    },
+    {
+      "index": 116,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 205,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "33050CF76D3DDAD9758106370E25373356AC1B877A811759D26A878CBD6E82D7",
+      "external_attributes": 0
+    },
+    {
+      "index": 117,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3302,
+      "compressed_size": 1381,
+      "timestamp": "2025-10-29T18:06:20.0000000+00:00",
+      "sha256": "3A9DF9DBC09A8002A279552C69B12705B12D2E99477736441547542D75AEA00C",
+      "external_attributes": 0
+    },
+    {
+      "index": 118,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1584,
+      "compressed_size": 703,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "E18EE1B64C65D4A58A0C070E48AECFEE8A4291B3FE0A98E029474C059CDDF168",
+      "external_attributes": 0
+    },
+    {
+      "index": 119,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80360,
+      "compressed_size": 916,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "1A940D0DE17B7527EB5CFB346AF2055CAEF13A47E6DEF4193BB6F2E5241726EE",
+      "external_attributes": 0
+    },
+    {
+      "index": 120,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65632,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "0D461F6569DF34F45735D2122FF770C8C4E1361CE1FDA59D59A4B0FA2D670EA3",
+      "external_attributes": 0
+    },
+    {
+      "index": 121,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 28463,
+      "compressed_size": 26083,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "1E5C412DEFECAB1A943E8C1DCCBEB3E74B35F4FE3DBE5B929B23E5FA32D4DF8C",
+      "external_attributes": 0
+    },
+    {
+      "index": 122,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06b_ensemble_bilstm512_cnn256__seed42__seed2025\\20251029-180413\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 23593,
+      "compressed_size": 21693,
+      "timestamp": "2025-10-29T18:06:22.0000000+00:00",
+      "sha256": "0B06C3EE0643352452A319738867343510DA2C6DB3270A4F0D3C2158008A03FE",
+      "external_attributes": 0
+    },
+    {
+      "index": 123,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\best.pt",
+      "type": "file",
+      "uncompressed_size": 10793826,
+      "compressed_size": 9973310,
+      "timestamp": "2025-10-29T17:59:52.0000000+00:00",
+      "sha256": "ED6A7BC96A1B7A3442D123B849E2F06ECCEC0004593C9A127DBD4CF60582E7D8",
+      "external_attributes": 0
+    },
+    {
+      "index": 124,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\class_report.json",
+      "type": "file",
+      "uncompressed_size": 1210,
+      "compressed_size": 370,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "D2203F49CBA2449F4FC1DF5B3EE251FEE7E713E03EDB92E5F4C2C1D032C5DC54",
+      "external_attributes": 0
+    },
+    {
+      "index": 125,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\class_report.txt",
+      "type": "file",
+      "uncompressed_size": 554,
+      "compressed_size": 200,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "9BD73EE6C9A0625F836CA5EDEF3FBEEB9DBED2A09BCD8A908A974315DB9063D3",
+      "external_attributes": 0
+    },
+    {
+      "index": 126,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\confusion_matrix.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 121,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "9410AC5E205A8226878517842C5A4921F1D5140ED478CAFA188D20914BBD65E1",
+      "external_attributes": 0
+    },
+    {
+      "index": 127,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\confusion_matrix.png",
+      "type": "file",
+      "uncompressed_size": 47063,
+      "compressed_size": 43439,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "2C9B713A96CA111BC393AAAE79A6BCC09207D628D7BB249085D9BFEB9274091D",
+      "external_attributes": 0
+    },
+    {
+      "index": 128,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\confusion_matrix_norm.npy",
+      "type": "file",
+      "uncompressed_size": 416,
+      "compressed_size": 182,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "5561BA0C2A81E6629B30D0CE7C23DBC33A1393C155C9BB481BF55F9EE84A10A3",
+      "external_attributes": 0
+    },
+    {
+      "index": 129,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\history.csv",
+      "type": "file",
+      "uncompressed_size": 3302,
+      "compressed_size": 1405,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "358269D8B446B7DDF99FE1CD6B5F58EF9E240383230746B021B763EECEAA22C3",
+      "external_attributes": 0
+    },
+    {
+      "index": 130,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\metrics.json",
+      "type": "file",
+      "uncompressed_size": 1572,
+      "compressed_size": 695,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "8227B4EF2D8DFE469B4C43EC466E942D8F403BEE18BD2B40D55141FA9E52AD57",
+      "external_attributes": 0
+    },
+    {
+      "index": 131,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\test_predictions.csv",
+      "type": "file",
+      "uncompressed_size": 80147,
+      "compressed_size": 903,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "00AA73A45BFB1B61885B9055CD8E55E13E1032CA6801DAD15C46359BF5E089AC",
+      "external_attributes": 0
+    },
+    {
+      "index": 132,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\test_probs.npy",
+      "type": "file",
+      "uncompressed_size": 70856,
+      "compressed_size": 65732,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "BCDF630CC1BD92B912125FDCC6DE3BCE019B6C0A4C06141FBC9247E015FF7D1F",
+      "external_attributes": 0
+    },
+    {
+      "index": 133,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\train_curves_acc.png",
+      "type": "file",
+      "uncompressed_size": 24844,
+      "compressed_size": 23003,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "B4544941D7506EED325E97877ABD2E7DA7D6AC1291248E1A9E7DA3C0829D2491",
+      "external_attributes": 0
+    },
+    {
+      "index": 134,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\outputs_runs_har_nb\\06_ensemble_bilstm256_cnn128__seed42\\20251029-175841\\train_curves_loss.png",
+      "type": "file",
+      "uncompressed_size": 21470,
+      "compressed_size": 20024,
+      "timestamp": "2025-10-29T18:00:00.0000000+00:00",
+      "sha256": "2ACE1DAFE695533273545F5899E7E48B93B7C8351A3A7C27F2F84868B54B8239",
+      "external_attributes": 0
+    },
+    {
+      "index": 135,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\script\\assign2Task2_submission.ipynb",
+      "type": "file",
+      "uncompressed_size": 598856,
+      "compressed_size": 390886,
+      "timestamp": "2025-10-31T00:37:12.0000000+00:00",
+      "sha256": "C25D78AD1A21E485A7BD0D9DD5CC74BBAF4D3872465BE300D7BE56D8B829F636",
+      "external_attributes": 0
+    },
+    {
+      "index": 136,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment 2_Task_2\\script\\assign2Task2_submission.pdf",
+      "type": "file",
+      "uncompressed_size": 668848,
+      "compressed_size": 598110,
+      "timestamp": "2025-10-30T23:35:08.0000000+00:00",
+      "sha256": "B71B5630FE8F3988ECB2863E1160ABEF192DA1E62437C333B5DC8DE695B048D5",
+      "external_attributes": 0
+    },
+    {
+      "index": 137,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\GB_best_cm.png",
+      "type": "file",
+      "uncompressed_size": 19350,
+      "compressed_size": 14938,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "B6A9DF06742711BD589FD990F71A5015720A5DFC971D48E2F9FAD295F6F3A2C8",
+      "external_attributes": 0
+    },
+    {
+      "index": 138,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\GB_best_metrics.json",
+      "type": "file",
+      "uncompressed_size": 693,
+      "compressed_size": 337,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "D8702996714E22784D1E8FA685F1BDCDF1C0E012150EC55934E21A4154A4F216",
+      "external_attributes": 0
+    },
+    {
+      "index": 139,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\GB_best_pr.png",
+      "type": "file",
+      "uncompressed_size": 41484,
+      "compressed_size": 37223,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "94AC528491D36E6457520446FC641622FF988B28E627950C2F0C47D258C68105",
+      "external_attributes": 0
+    },
+    {
+      "index": 140,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\GB_best_reliability.png",
+      "type": "file",
+      "uncompressed_size": 47480,
+      "compressed_size": 43459,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "617C5C6BC28DA18FE3394B1FBED4AD9CA222F0C51FB9B9EDD066354986724242",
+      "external_attributes": 0
+    },
+    {
+      "index": 141,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\GB_best_roc.png",
+      "type": "file",
+      "uncompressed_size": 45015,
+      "compressed_size": 40704,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "E2FD1C593877B095E526204D5A6CA386D157EABD93B21782A16DEBD428DE86EA",
+      "external_attributes": 0
+    },
+    {
+      "index": 142,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\KNN_cm.png",
+      "type": "file",
+      "uncompressed_size": 18751,
+      "compressed_size": 14374,
+      "timestamp": "2025-10-30T00:23:32.0000000+00:00",
+      "sha256": "E273DEA227900ADA70896EC439FF3613FE8DC5635644481B51E519464BBE97CC",
+      "external_attributes": 0
+    },
+    {
+      "index": 143,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\KNN_metrics.json",
+      "type": "file",
+      "uncompressed_size": 697,
+      "compressed_size": 347,
+      "timestamp": "2025-10-30T00:23:32.0000000+00:00",
+      "sha256": "7013E2A1C71070211CFB0752D643A43539597F8628DCECDFA6C61A69AAF7E49F",
+      "external_attributes": 0
+    },
+    {
+      "index": 144,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\KNN_pr.png",
+      "type": "file",
+      "uncompressed_size": 41211,
+      "compressed_size": 36934,
+      "timestamp": "2025-10-30T00:23:32.0000000+00:00",
+      "sha256": "EDEE34046FCBD1B48060D0EBF841DD11528CB8C04EE25D759ADDF92139A15A7C",
+      "external_attributes": 0
+    },
+    {
+      "index": 145,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\KNN_reliability.png",
+      "type": "file",
+      "uncompressed_size": 47315,
+      "compressed_size": 42757,
+      "timestamp": "2025-10-30T00:23:32.0000000+00:00",
+      "sha256": "0B3499729CB8005F66CD33CE6D11685C7F8100D292BF5ADA51019E9825E2BF56",
+      "external_attributes": 0
+    },
+    {
+      "index": 146,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\KNN_roc.png",
+      "type": "file",
+      "uncompressed_size": 43780,
+      "compressed_size": 39440,
+      "timestamp": "2025-10-30T00:23:32.0000000+00:00",
+      "sha256": "E92347B6E2CC8F4DEE0B9EEC0EE6F9405D0ECB53B117DFBFA9A81F93A0340951",
+      "external_attributes": 0
+    },
+    {
+      "index": 147,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\NB_cm.png",
+      "type": "file",
+      "uncompressed_size": 18481,
+      "compressed_size": 14098,
+      "timestamp": "2025-10-30T00:22:46.0000000+00:00",
+      "sha256": "966BA684E7E95066CB8F024190C8A444417B2C25DFFF3024CB6B7C773180E667",
+      "external_attributes": 0
+    },
+    {
+      "index": 148,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\NB_metrics.json",
+      "type": "file",
+      "uncompressed_size": 574,
+      "compressed_size": 289,
+      "timestamp": "2025-10-30T00:22:46.0000000+00:00",
+      "sha256": "0BAC875E2799E1AF19BBCCDE08005497F2CBBFE1AC494CDB8A4BB1DD71918878",
+      "external_attributes": 0
+    },
+    {
+      "index": 149,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\NB_pr.png",
+      "type": "file",
+      "uncompressed_size": 38862,
+      "compressed_size": 33996,
+      "timestamp": "2025-10-30T00:22:46.0000000+00:00",
+      "sha256": "61472754EB90370507D94F4850500030425AAE50396C08222303449293715678",
+      "external_attributes": 0
+    },
+    {
+      "index": 150,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\NB_reliability.png",
+      "type": "file",
+      "uncompressed_size": 43478,
+      "compressed_size": 39270,
+      "timestamp": "2025-10-30T00:22:46.0000000+00:00",
+      "sha256": "CC7D183C1F210471C3D091D6B3218D0ADFECE5DC2A6E697D6373D1EAC91DC11A",
+      "external_attributes": 0
+    },
+    {
+      "index": 151,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\NB_roc.png",
+      "type": "file",
+      "uncompressed_size": 46054,
+      "compressed_size": 42125,
+      "timestamp": "2025-10-30T00:22:46.0000000+00:00",
+      "sha256": "3D23B29FB226219BEFB0C604C6A73E6D1F921D6552021CAC90E2FD2CED5EDE9F",
+      "external_attributes": 0
+    },
+    {
+      "index": 152,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\results_table.csv",
+      "type": "file",
+      "uncompressed_size": 715,
+      "compressed_size": 394,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "20E09FADB40BB5D4C0C582CA0270BC980B97D61AE9DFCC48CDBC4EA7A98A43C2",
+      "external_attributes": 0
+    },
+    {
+      "index": 153,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\results_table.md",
+      "type": "file",
+      "uncompressed_size": 576,
+      "compressed_size": 237,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "6C882C4EF2932ABEB0DDE0E07F428C712E98767763C78046033CF7A62A931332",
+      "external_attributes": 0
+    },
+    {
+      "index": 154,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\results_table.xlsx",
+      "type": "file",
+      "uncompressed_size": 5516,
+      "compressed_size": 4961,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "1254B8224379C757D92191E9B69F1C7DE149A3696D3005119B4651DBD921C8E2",
+      "external_attributes": 0
+    },
+    {
+      "index": 155,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_cm.png",
+      "type": "file",
+      "uncompressed_size": 17941,
+      "compressed_size": 13562,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "99C3222764179F9317721E2EA236CF68177313D7C352CDA7654E84E331FE1D2C",
+      "external_attributes": 0
+    },
+    {
+      "index": 156,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_metrics.json",
+      "type": "file",
+      "uncompressed_size": 692,
+      "compressed_size": 341,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "7836BBC38C396C2BD97BD0F79AB859EB0DC46A48EAE18CF4160F7B6D97AAEEA0",
+      "external_attributes": 0
+    },
+    {
+      "index": 157,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_pr.png",
+      "type": "file",
+      "uncompressed_size": 42080,
+      "compressed_size": 38005,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "533D805961B96923C0E9C039931DE5EF1F700100CFCD160C4A94260F573A0947",
+      "external_attributes": 0
+    },
+    {
+      "index": 158,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_reliability.png",
+      "type": "file",
+      "uncompressed_size": 47382,
+      "compressed_size": 43128,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "6A299A4103892DB7A0D5D0CEF3893EC48E86A88C017CB1EFCEEB2E322D9A35A9",
+      "external_attributes": 0
+    },
+    {
+      "index": 159,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_roc.png",
+      "type": "file",
+      "uncompressed_size": 45184,
+      "compressed_size": 40962,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "69C4D046CBDCEC70464391F2809D6EBA5A20D553D5B538165A1ECC0C24C077F0",
+      "external_attributes": 0
+    },
+    {
+      "index": 160,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\RF_top_features.csv",
+      "type": "file",
+      "uncompressed_size": 1153,
+      "compressed_size": 530,
+      "timestamp": "2025-10-30T00:28:14.0000000+00:00",
+      "sha256": "FD443EF97C5C774898D43049E88002E6D19FF580CCE2CDE76E8258B27B568D00",
+      "external_attributes": 0
+    },
+    {
+      "index": 161,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_classifiers\\summary.txt",
+      "type": "file",
+      "uncompressed_size": 568,
+      "compressed_size": 309,
+      "timestamp": "2025-10-30T00:28:38.0000000+00:00",
+      "sha256": "BE2D3AEEE3DC46FFB442FF0A8C14186AA5E04E979BC014EF7DF6CBC3A02B71D7",
+      "external_attributes": 0
+    },
+    {
+      "index": 162,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\cgan_1200.png",
+      "type": "file",
+      "uncompressed_size": 128131,
+      "compressed_size": 124854,
+      "timestamp": "2025-10-29T21:05:40.0000000+00:00",
+      "sha256": "AB13E718DD224894C837D773C25CFB2D4BCD52CA728A82467076186A6AB21A54",
+      "external_attributes": 0
+    },
+    {
+      "index": 163,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\cgan_400.png",
+      "type": "file",
+      "uncompressed_size": 129066,
+      "compressed_size": 125962,
+      "timestamp": "2025-10-29T21:03:16.0000000+00:00",
+      "sha256": "20380340E8011D90570AD9A0F49A14D85820E4F1F066096FE0F7B6A072846828",
+      "external_attributes": 0
+    },
+    {
+      "index": 164,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\cgan_800.png",
+      "type": "file",
+      "uncompressed_size": 118616,
+      "compressed_size": 115315,
+      "timestamp": "2025-10-29T21:04:26.0000000+00:00",
+      "sha256": "C1D64B2D936785103A262052BCB64421784E698B7CC78E538BEC3BFCB6860F1D",
+      "external_attributes": 0
+    },
+    {
+      "index": 165,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\cgan_losses.png",
+      "type": "file",
+      "uncompressed_size": 43728,
+      "compressed_size": 38793,
+      "timestamp": "2025-10-29T21:06:42.0000000+00:00",
+      "sha256": "F07E4B320705369C652A1733785C8BFF0210110B4B6BDCD63DB5EA1042B4DB22",
+      "external_attributes": 0
+    },
+    {
+      "index": 166,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\cgan_samples.png",
+      "type": "file",
+      "uncompressed_size": 159443,
+      "compressed_size": 155970,
+      "timestamp": "2025-10-29T21:28:14.0000000+00:00",
+      "sha256": "7F319F9FCC2127C3612DB467CFBE68226F7F756AE14FD40ACD51E4CDC85B29F2",
+      "external_attributes": 0
+    },
+    {
+      "index": 167,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\gan_metrics.json",
+      "type": "file",
+      "uncompressed_size": 751,
+      "compressed_size": 340,
+      "timestamp": "2025-10-29T21:28:22.0000000+00:00",
+      "sha256": "78AB8DD945220420995482B6DCCDE5510F049BA51D698D9EFA2F5DE1D67696FB",
+      "external_attributes": 0
+    },
+    {
+      "index": 168,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\gan_metrics_table.csv",
+      "type": "file",
+      "uncompressed_size": 565,
+      "compressed_size": 223,
+      "timestamp": "2025-10-29T21:49:10.0000000+00:00",
+      "sha256": "F4C2CD6DB96550E4A22CE8EA959BCCCE1C5E360BBF3442337B73CC5FE6A2744E",
+      "external_attributes": 0
+    },
+    {
+      "index": 169,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\real_norm.png",
+      "type": "file",
+      "uncompressed_size": 205066,
+      "compressed_size": 202062,
+      "timestamp": "2025-10-29T21:02:04.0000000+00:00",
+      "sha256": "DFEF07A65E4D16C849EFA814B4625861400F7E9050C3B9B8B98ED597BDC934C1",
+      "external_attributes": 0
+    },
+    {
+      "index": 170,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\real_raw.png",
+      "type": "file",
+      "uncompressed_size": 214341,
+      "compressed_size": 210639,
+      "timestamp": "2025-10-29T21:02:04.0000000+00:00",
+      "sha256": "51FC41F0AC48811123A3C54124952BD2C0BCDBDF637A0A2E84A55F759626FCB7",
+      "external_attributes": 0
+    },
+    {
+      "index": 171,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_1200.png",
+      "type": "file",
+      "uncompressed_size": 87035,
+      "compressed_size": 82786,
+      "timestamp": "2025-10-29T21:19:32.0000000+00:00",
+      "sha256": "8B29B47AA9B998DDA78C29FDFB07AD6B3B8454214E607899A75DEE4C8BAABCBC",
+      "external_attributes": 0
+    },
+    {
+      "index": 172,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_1600.png",
+      "type": "file",
+      "uncompressed_size": 92517,
+      "compressed_size": 88199,
+      "timestamp": "2025-10-29T21:23:40.0000000+00:00",
+      "sha256": "306F641837D270918654D75088697D03ACA5C68338752583A41B83EC73EF61D9",
+      "external_attributes": 0
+    },
+    {
+      "index": 173,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_2000.png",
+      "type": "file",
+      "uncompressed_size": 96055,
+      "compressed_size": 91732,
+      "timestamp": "2025-10-29T21:28:12.0000000+00:00",
+      "sha256": "AE19F3AB4C2F60B8E967BF917E605C195D0D5DDC3356EC9C7BE10DE50F2E18E4",
+      "external_attributes": 0
+    },
+    {
+      "index": 174,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_400.png",
+      "type": "file",
+      "uncompressed_size": 233089,
+      "compressed_size": 229211,
+      "timestamp": "2025-10-29T21:11:10.0000000+00:00",
+      "sha256": "9093EEE4495CE13A277E3F25E264DAB0254873AB4F63BDB70CE1D11ACC822D6F",
+      "external_attributes": 0
+    },
+    {
+      "index": 175,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_800.png",
+      "type": "file",
+      "uncompressed_size": 29250,
+      "compressed_size": 23728,
+      "timestamp": "2025-10-29T21:15:14.0000000+00:00",
+      "sha256": "74404C628A36C5989D2D3D4875A57E2842B267DB70405C36F98A07BC2D38715E",
+      "external_attributes": 0
+    },
+    {
+      "index": 176,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_losses.png",
+      "type": "file",
+      "uncompressed_size": 71320,
+      "compressed_size": 68133,
+      "timestamp": "2025-10-29T21:28:14.0000000+00:00",
+      "sha256": "5BDFC7FFD8FF223313140E095131536863C0EDFBC1E0866E8D4BA5392C524D05",
+      "external_attributes": 0
+    },
+    {
+      "index": 177,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\outputs_task1_gan\\wgan_samples.png",
+      "type": "file",
+      "uncompressed_size": 80795,
+      "compressed_size": 76092,
+      "timestamp": "2025-10-29T21:28:14.0000000+00:00",
+      "sha256": "81E577F0EE18C83A1906BCB6293934245AA1C4DC3CC69F333D1E6C2A8C5A4589",
+      "external_attributes": 0
+    },
+    {
+      "index": 178,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\script_task1_classifiers\\task1_classifiers.py",
+      "type": "file",
+      "uncompressed_size": 19500,
+      "compressed_size": 6122,
+      "timestamp": "2025-10-23T02:51:10.0000000+01:00",
+      "sha256": "A5D037D9F3C832B75E4F88CCC7A74053756FB7F5DA98230CE61C0950C83267B6",
+      "external_attributes": 0
+    },
+    {
+      "index": 179,
+      "path": "CS5062_Assessment2_Huseyinli_Abdulla_52533844\\Assessment_2_Task_1\\script_task1_gan\\task1_gan.py",
+      "type": "file",
+      "uncompressed_size": 17700,
+      "compressed_size": 5723,
+      "timestamp": "2025-10-29T21:45:10.0000000+00:00",
+      "sha256": "3FCFC365017DA00AD9CF92723B3D122828ACC2C9C96EE44618EF43A09DFC0E84",
+      "external_attributes": 0
+    }
+  ]
+}
