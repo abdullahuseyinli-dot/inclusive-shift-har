@@ -343,8 +343,7 @@ def _load_source_reference(
         or len(set(windows)) != labels.size
         or set(participants) != set(SOURCE_VALIDATION_PARTICIPANTS)
         or not np.isfinite(logits).all()
-        or not np.isfinite(probabilities).all()
-        or not np.allclose(probabilities.sum(axis=1), 1.0, atol=1e-8, rtol=1e-8)
+        or not _valid_probability_matrix(probabilities)
     ):
         raise PaperAdaptationAggregationError("source comparator predictions are misaligned")
     reconstructed = classification_report(
@@ -603,8 +602,8 @@ def _load_target_reference(
         or not np.isfinite(logits).all()
         or not np.isfinite(uncalibrated).all()
         or not np.isfinite(calibrated).all()
-        or not np.allclose(uncalibrated.sum(axis=1), 1.0, atol=1e-8, rtol=1e-8)
-        or not np.allclose(calibrated.sum(axis=1), 1.0, atol=1e-8, rtol=1e-8)
+        or not _valid_probability_matrix(uncalibrated)
+        or not _valid_probability_matrix(calibrated)
         or not np.array_equal(predictions, calibrated.argmax(axis=1))
         or stored_status != ("locked_confirmatory_target_opening_1",)
     ):
