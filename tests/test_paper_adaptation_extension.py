@@ -3,11 +3,14 @@ from __future__ import annotations
 import json
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
+import numpy as np
 import pytest
 import torch
 
+import inclusive_shift_har.evaluation.paper_adaptation_reporting as reporting
 import inclusive_shift_har.experiments.ccil_bpd_postconfirmatory as runner
 from inclusive_shift_har.evaluation._strict_config import StrictConfigError
 from inclusive_shift_har.evaluation.paper_adaptation_reporting import (
@@ -16,6 +19,7 @@ from inclusive_shift_har.evaluation.paper_adaptation_reporting import (
     _average_seed_reports,
     _comparison,
     _resolve_file,
+    _target_alignment,
 )
 from inclusive_shift_har.experiments.ccil_bpd_postconfirmatory import (
     COMPARATOR_IDS,
@@ -54,6 +58,43 @@ def test_aggregator_accepts_cli_path_objects_on_windows(tmp_path: Path) -> None:
     )
 
     assert resolved == index.resolve()
+
+
+def test_target_alignment_uses_validated_clean_reference_path(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    count = 807
+    prediction = tmp_path / "opening-1.predictions.npz"
+    participants = np.asarray([str(11 + index % 10) for index in range(count)])
+    windows = np.asarray([f"window-{index:04d}" for index in range(count)])
+    labels = np.asarray([index % 3 for index in range(count)], dtype=np.int64)
+    with prediction.open("xb") as stream:
+        np.savez_compressed(
+            stream,
+            window_ids=windows,
+            participant_ids=participants,
+            true_labels=labels,
+        )
+    reference = SimpleNamespace(
+        prediction_path=prediction.resolve(),
+        prediction_sha256=sha256_file(prediction),
+    )
+    monkeypatch.setattr(reporting, "load_target_clean_reference", lambda *args, **kwargs: reference)
+    context: Any = SimpleNamespace(
+        result_entries={
+            ("compact-erm", SEED_ORDER[0]): {
+                "array_path": str(tmp_path / "deliberately-unused-missing.npz")
+            }
+        }
+    )
+
+    actual_windows, actual_participants, actual_labels = _target_alignment(
+        context, root=tmp_path.resolve()
+    )
+
+    assert actual_windows == tuple(windows.tolist())
+    assert actual_participants == tuple(participants.tolist())
+    assert np.array_equal(actual_labels, labels)
 
 
 def test_config_locks_source_only_adapters_comparators_and_four_test_family(

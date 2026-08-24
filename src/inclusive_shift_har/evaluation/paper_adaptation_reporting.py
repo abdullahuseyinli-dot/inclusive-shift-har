@@ -494,8 +494,13 @@ def _target_alignment(
     root: Path,
 ) -> tuple[tuple[str, ...], tuple[str, ...], NDArray[np.int64]]:
     reference = load_target_clean_reference(context, model_id="compact-erm", seed=SEED_ORDER[0])
-    entry = context.result_entries[("compact-erm", SEED_ORDER[0])]
-    path = _resolve_file(entry.get("array_path"), root=root, name="opening-1 target array")
+    path = reference.prediction_path
+    try:
+        path.relative_to(root)
+    except ValueError as exc:
+        raise PaperAdaptationAggregationError(
+            "opening-1 target array escapes repository_root"
+        ) from exc
     if sha256_file(path) != reference.prediction_sha256:
         raise PaperAdaptationAggregationError("opening-1 target alignment hash changed")
     with np.load(path, allow_pickle=False) as arrays:
