@@ -264,6 +264,41 @@ def test_read_only_progress_requires_exact_1200_cells(
     )
 
 
+def test_progress_ignores_only_reserved_statistics_attempt_namespaces(
+    tmp_path: Path, repository_root: Path
+) -> None:
+    _, manifest_path, _ = _materialize_v1_1_plan(tmp_path, repository_root)
+    results_root = tmp_path / "results" / "postconfirmatory" / "few_person_v1_1"
+    for name in ("statistics", "statistics_attempt_002", "statistics_attempt_999"):
+        directory = results_root / name
+        directory.mkdir(parents=True)
+        (directory / "failure.json").write_text("{}\n", encoding="utf-8")
+        (directory / "unfinished.partial.json").write_text("{}\n", encoding="utf-8")
+
+    progress = validate_few_person_progress(
+        manifest_path, results_root=results_root, artifact_root=tmp_path
+    )
+
+    assert progress["valid_so_far"] is True
+    assert progress["aggregation_ready"] is False
+    assert progress["observed"]["missing_cell_count"] == EXPECTED_CELL_COUNT
+    assert progress["observed"]["failure_attempt_count"] == 0
+    assert progress["incomplete_directories"] == []
+    assert progress["partial_files"] == []
+
+    near_miss = results_root / "statistics_attempt_latest"
+    near_miss.mkdir()
+    (near_miss / "failure.json").write_text("{}\n", encoding="utf-8")
+    invalid = validate_few_person_progress(
+        manifest_path, results_root=results_root, artifact_root=tmp_path
+    )
+    assert invalid["valid_so_far"] is False
+    assert invalid["aggregation_ready"] is False
+    assert invalid["invalid_artifacts"][0]["path"].endswith(
+        "statistics_attempt_latest/failure.json"
+    )
+
+
 def _write_valid_cell(
     tmp_path: Path,
     manifest_path: Path,

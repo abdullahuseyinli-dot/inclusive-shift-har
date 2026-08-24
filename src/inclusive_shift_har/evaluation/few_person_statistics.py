@@ -87,11 +87,24 @@ EXPECTED_CELL_COUNT = 16 * 5 * 5 * 3
 _RUN_DIRECTORY_PATTERN = re.compile(
     r".+--seed-(?:11|23|47|89|131)--target_outer_0[1-5]--k(?:1|2|4)(?:--attempt-\d+)?$"
 )
+_STATISTICS_DIRECTORY_PATTERN = re.compile(r"statistics(?:_attempt_\d{3})?")
 _GIT_COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
 
 class FewPersonStatisticsError(RuntimeError):
     """Raised when v1.1 evidence is incomplete, changed, or misaligned."""
+
+
+def _is_statistics_artifact_path(path: Path, *, results_root: Path) -> bool:
+    """Identify the direct-child namespace reserved for aggregation attempts."""
+
+    try:
+        parts = path.relative_to(results_root).parts
+    except ValueError:
+        return False
+    if not parts or _STATISTICS_DIRECTORY_PATTERN.fullmatch(parts[0]) is None:
+        return False
+    return not (results_root / parts[0]).is_symlink()
 
 
 @dataclass(frozen=True, order=True)
@@ -1353,6 +1366,8 @@ def _scan_progress(
     failures: dict[CellKey, list[dict[str, Any]]] = defaultdict(list)
     errors: list[dict[str, str]] = []
     for path in sorted(root.rglob("result.json")):
+        if _is_statistics_artifact_path(path, results_root=root):
+            continue
         try:
             item = _validate_completed_record(
                 path, plan=plan, artifact_root=artifacts, results_root=root
@@ -1363,6 +1378,8 @@ def _scan_progress(
         except (OSError, ValueError, RuntimeError) as exc:
             errors.append({"path": relative(path), "message": str(exc)})
     for path in sorted(root.rglob("failure.json")):
+        if _is_statistics_artifact_path(path, results_root=root):
+            continue
         try:
             key, record = _validate_failure(path, plan=plan)
             failures[key].append(
@@ -1425,7 +1442,11 @@ def _scan_progress(
             )
         elif not result_exists and not failure_exists:
             incomplete_directories.append(relative(path))
-    partial_files = sorted(relative(path) for path in root.rglob("*") if ".partial." in path.name)
+    partial_files = sorted(
+        relative(path)
+        for path in root.rglob("*")
+        if ".partial." in path.name and not _is_statistics_artifact_path(path, results_root=root)
+    )
     missing = sorted(plan.expected_cells - set(completed))
     failure_rows = [
         {**key.to_dict(), "attempts": values} for key, values in sorted(failures.items())
