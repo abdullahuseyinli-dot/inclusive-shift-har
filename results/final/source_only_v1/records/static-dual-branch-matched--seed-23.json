@@ -1,0 +1,907 @@
+{
+  "best_epoch": 14,
+  "checkpoint": {
+    "path": "C:\\Users\\DELL\\Desktop\\Thesis\\inclusive-shift-har\\results\\final\\source_only_v1\\runs\\static-dual-branch-matched\\seed-23\\selected.pt",
+    "sha256": "216d5c4321654442b61fbdc4729ecd15bf082266ec085fc5b75e3b5949ec9af7"
+  },
+  "class_names": [
+    "mobility",
+    "sitting",
+    "standing"
+  ],
+  "code_commit": "b4dc38fb9d5a0c17003221b61156ebc065395170",
+  "configuration": {
+    "batch_size": 256,
+    "checkpoint_interval": 18,
+    "checkpoint_selection_rule": "fixed_last_epoch",
+    "coral_weight": 0.0,
+    "dann_domain_loss_weight": 0.0,
+    "dann_grl_max_strength": 1.0,
+    "dann_grl_warmup_epochs": 10,
+    "data_loader_workers": 0,
+    "disable_cudnn": false,
+    "epochs": 18,
+    "gradient_clip_norm": 5.0,
+    "learning_rate": 0.0003,
+    "minimum_epochs": 8,
+    "mixed_precision": "float16",
+    "model_name": "static_dual_branch_matched",
+    "num_classes": 3,
+    "objective_weights": {
+      "consistency": 0.2,
+      "content": 0.1,
+      "factor": 0.01,
+      "realization": 0.1
+    },
+    "patience": 6,
+    "seed": 23,
+    "use_augmentation": false,
+    "use_content_objective": false,
+    "use_group_dro": false,
+    "use_realization_factorization": false,
+    "weight_decay": 0.0001,
+    "zero_channel_indices": []
+  },
+  "configuration_sha256": "f816a1fac920d998786a1a871c96db83f2e8429ee599f0de6f7350c5819b944e",
+  "elapsed_seconds": 1.6169222000025911,
+  "evidence_status": "source_development_not_confirmatory",
+  "model_device": "cuda",
+  "model_name": "static_dual_branch_matched",
+  "normalization": {
+    "channel_names": [
+      "motionUserAccelerationX",
+      "motionUserAccelerationY",
+      "motionUserAccelerationZ",
+      "motionRotationRateX",
+      "motionRotationRateY",
+      "motionRotationRateZ"
+    ],
+    "fit_scope": "training_partition_only",
+    "fitted_value_count_per_channel": 74496,
+    "mean": [
+      -0.00642144118058746,
+      0.004456799797090562,
+      0.004561163269163745,
+      -0.0012950135915616473,
+      -0.0039311363058991905,
+      -0.012006595313546137
+    ],
+    "method": "per_channel_population_standardization",
+    "scale": [
+      0.20835181478188058,
+      0.16051716851895695,
+      0.1704198730373161,
+      0.5641084160277883,
+      0.7187437191761052,
+      0.47195292467210326
+    ],
+    "schema_version": "1.0.0",
+    "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+    "training_participants": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "9"
+    ]
+  },
+  "parameter_count": 136923,
+  "peak_vram_bytes": 360395264,
+  "prediction_artifact": {
+    "path": "C:\\Users\\DELL\\Desktop\\Thesis\\inclusive-shift-har\\results\\final\\source_only_v1\\runs\\static-dual-branch-matched\\seed-23\\source_validation_predictions.npz",
+    "sha256": "570d6e268108729a186537450841bdf8bf6fb5da8fe8db8080ee36c75e72b131"
+  },
+  "record_sha256": "38306e4c6fec5b073dee2a3772bcfccd71f84d88cbab9cdac9c6f1dbf11ddc27",
+  "requested_device": "cuda",
+  "schema_version": "1.0.0",
+  "seed": 23,
+  "source_split_id": "final_source_split",
+  "source_window_manifest_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522",
+  "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+  "status": "source_development_complete_target_sealed",
+  "target_performance_or_prediction_accessed": false,
+  "target_subject_or_window_records_loaded": false,
+  "train_participants": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "9"
+  ],
+  "train_window_count": 582,
+  "training_history": [
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 1,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 1,
+      "learning_rate": 0.0002977211629518312,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 1,
+      "training_losses": {
+        "classification": 0.9679122880562064,
+        "total": 0.9679122880562064
+      },
+      "validation_mean_participant_macro_f1": 0.349010989010989,
+      "validation_worst_participant_macro_f1": 0.16849816849816848
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 2,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 2,
+      "learning_rate": 0.0002909538931178863,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 2,
+      "training_losses": {
+        "classification": 0.709353955136132,
+        "total": 0.709353955136132
+      },
+      "validation_mean_participant_macro_f1": 0.3513145539906103,
+      "validation_worst_participant_macro_f1": 0.16666666666666666
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 2,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 3,
+      "learning_rate": 0.00027990381056766585,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 3,
+      "training_losses": {
+        "classification": 0.6416132579144743,
+        "total": 0.6416132579144743
+      },
+      "validation_mean_participant_macro_f1": 0.33936089251594936,
+      "validation_worst_participant_macro_f1": 0.1631205673758865
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 2,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 4,
+      "learning_rate": 0.0002649066664678467,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 4,
+      "training_losses": {
+        "classification": 0.6024078286390534,
+        "total": 0.6024078286390534
+      },
+      "validation_mean_participant_macro_f1": 0.33427097057531835,
+      "validation_worst_participant_macro_f1": 0.17424242424242423
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 2,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 5,
+      "learning_rate": 0.0002464181414529809,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 5,
+      "training_losses": {
+        "classification": 0.5796076063437969,
+        "total": 0.5796076063437969
+      },
+      "validation_mean_participant_macro_f1": 0.34937198067632846,
+      "validation_worst_participant_macro_f1": 0.20444444444444443
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 6,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 6,
+      "learning_rate": 0.00022499999999999997,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 6,
+      "training_losses": {
+        "classification": 0.5672783464500585,
+        "total": 0.5672783464500585
+      },
+      "validation_mean_participant_macro_f1": 0.3628234398782344,
+      "validation_worst_participant_macro_f1": 0.2100456621004566
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 6,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 7,
+      "learning_rate": 0.00020130302149885031,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 7,
+      "training_losses": {
+        "classification": 0.5482282142868566,
+        "total": 0.5482282142868566
+      },
+      "validation_mean_participant_macro_f1": 0.3536339421613394,
+      "validation_worst_participant_macro_f1": 0.19166666666666665
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 6,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 8,
+      "learning_rate": 0.00017604722665003956,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 8,
+      "training_losses": {
+        "classification": 0.5395578963240397,
+        "total": 0.5395578963240397
+      },
+      "validation_mean_participant_macro_f1": 0.35609120711860437,
+      "validation_worst_participant_macro_f1": 0.19658119658119658
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 6,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 9,
+      "learning_rate": 0.00015,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 9,
+      "training_losses": {
+        "classification": 0.5316366448844831,
+        "total": 0.5316366448844831
+      },
+      "validation_mean_participant_macro_f1": 0.352450814589323,
+      "validation_worst_participant_macro_f1": 0.18930041152263374
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 10,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 10,
+      "learning_rate": 0.00012395277334996044,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 10,
+      "training_losses": {
+        "classification": 0.5261363476207576,
+        "total": 0.5261363476207576
+      },
+      "validation_mean_participant_macro_f1": 0.41040257788567136,
+      "validation_worst_participant_macro_f1": 0.3052039381153305
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 11,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 11,
+      "learning_rate": 9.869697850114973e-05,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 11,
+      "training_losses": {
+        "classification": 0.5246544920701751,
+        "total": 0.5246544920701751
+      },
+      "validation_mean_participant_macro_f1": 0.4456030025127527,
+      "validation_worst_participant_macro_f1": 0.3756047873694932
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 12,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 12,
+      "learning_rate": 7.500000000000003e-05,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 12,
+      "training_losses": {
+        "classification": 0.5184639383017812,
+        "total": 0.5184639383017812
+      },
+      "validation_mean_participant_macro_f1": 0.5028875324863584,
+      "validation_worst_participant_macro_f1": 0.4798869319417265
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 13,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 13,
+      "learning_rate": 5.3581858547019096e-05,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 13,
+      "training_losses": {
+        "classification": 0.5155775219304455,
+        "total": 0.5155775219304455
+      },
+      "validation_mean_participant_macro_f1": 0.5269536559670984,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 14,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 14,
+      "learning_rate": 3.5093333532153316e-05,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 14,
+      "training_losses": {
+        "classification": 0.518848049476794,
+        "total": 0.518848049476794
+      },
+      "validation_mean_participant_macro_f1": 0.5357331821617537,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 14,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 15,
+      "learning_rate": 2.0096189432334228e-05,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 15,
+      "training_losses": {
+        "classification": 0.5132406734928643,
+        "total": 0.5132406734928643
+      },
+      "validation_mean_participant_macro_f1": 0.5340551776266063,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 14,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 16,
+      "learning_rate": 9.046106882113753e-06,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 16,
+      "training_losses": {
+        "classification": 0.513567610909439,
+        "total": 0.513567610909439
+      },
+      "validation_mean_participant_macro_f1": 0.5276499488684363,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 14,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 17,
+      "learning_rate": 2.2788370481687974e-06,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 17,
+      "training_losses": {
+        "classification": 0.5111237312715078,
+        "total": 0.5111237312715078
+      },
+      "validation_mean_participant_macro_f1": 0.5276499488684363,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    },
+    {
+      "amp_skipped_step_count": 0,
+      "best_epoch_after_epoch": 14,
+      "checkpoint_selected_after_epoch": true,
+      "checkpoint_selection_rule": "fixed_last_epoch",
+      "epoch": 18,
+      "learning_rate": 0.0,
+      "optimizer_update_count": 3,
+      "scheduler_advanced": true,
+      "selected_epoch_after_epoch": 18,
+      "training_losses": {
+        "classification": 0.5174663466276582,
+        "total": 0.5174663466276582
+      },
+      "validation_mean_participant_macro_f1": 0.5276499488684363,
+      "validation_worst_participant_macro_f1": 0.5258881330309902
+    }
+  ],
+  "validation_participants": [
+    "8",
+    "10"
+  ],
+  "validation_report": {
+    "calibration": {
+      "ece": 0.06068258143805122,
+      "ece_bins": 15,
+      "ece_status": "secondary_diagnostic",
+      "multiclass_brier_score": 0.3675548815242735,
+      "negative_log_likelihood": 0.5739412358217016
+    },
+    "class_names": [
+      "mobility",
+      "sitting",
+      "standing"
+    ],
+    "cohorts": null,
+    "independence_note": "windows are not treated as independent statistical units",
+    "participant_count": 2,
+    "participants": [
+      {
+        "balanced_accuracy": 0.638840579710145,
+        "cohort": null,
+        "macro_f1": 0.5294117647058824,
+        "participant_id": "10",
+        "window_count": 71
+      },
+      {
+        "balanced_accuracy": 0.6282051282051282,
+        "cohort": null,
+        "macro_f1": 0.5258881330309902,
+        "participant_id": "8",
+        "window_count": 72
+      }
+    ],
+    "primary": {
+      "lower_decile_participant_macro_f1": 0.5262404961984795,
+      "mean_participant_macro_f1": 0.5276499488684363,
+      "worst_participant_macro_f1": 0.5258881330309902
+    },
+    "sample_count": 143,
+    "schema_version": "1.0.0",
+    "selective_risk": {
+      "aurc": 0.12730981472919792,
+      "points": [
+        {
+          "coverage": 0.006993006993006993,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.013986013986013986,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.02097902097902098,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.03496503496503497,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.04195804195804196,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.055944055944055944,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.06293706293706294,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.06993006993006994,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.08391608391608392,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.09090909090909091,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.1048951048951049,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.11188811188811189,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.1258741258741259,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.13286713286713286,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.13986013986013987,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.15384615384615385,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.16083916083916083,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.17482517482517482,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.18181818181818182,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.1888111888111888,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.20279720279720279,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.2097902097902098,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.22377622377622378,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.23076923076923078,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.24475524475524477,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.2517482517482518,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.25874125874125875,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.2727272727272727,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.27972027972027974,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.2937062937062937,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.3006993006993007,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.3146853146853147,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.32167832167832167,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.32867132867132864,
+          "risk": 0.0
+        },
+        {
+          "coverage": 0.34265734265734266,
+          "risk": 0.02040816326530612
+        },
+        {
+          "coverage": 0.34965034965034963,
+          "risk": 0.02
+        },
+        {
+          "coverage": 0.36363636363636365,
+          "risk": 0.057692307692307696
+        },
+        {
+          "coverage": 0.3706293706293706,
+          "risk": 0.07547169811320754
+        },
+        {
+          "coverage": 0.3776223776223776,
+          "risk": 0.09259259259259259
+        },
+        {
+          "coverage": 0.3916083916083916,
+          "risk": 0.08928571428571429
+        },
+        {
+          "coverage": 0.3986013986013986,
+          "risk": 0.10526315789473684
+        },
+        {
+          "coverage": 0.4125874125874126,
+          "risk": 0.11864406779661017
+        },
+        {
+          "coverage": 0.4195804195804196,
+          "risk": 0.11666666666666667
+        },
+        {
+          "coverage": 0.43356643356643354,
+          "risk": 0.11290322580645161
+        },
+        {
+          "coverage": 0.4405594405594406,
+          "risk": 0.1111111111111111
+        },
+        {
+          "coverage": 0.44755244755244755,
+          "risk": 0.109375
+        },
+        {
+          "coverage": 0.46153846153846156,
+          "risk": 0.10606060606060606
+        },
+        {
+          "coverage": 0.46853146853146854,
+          "risk": 0.1044776119402985
+        },
+        {
+          "coverage": 0.4825174825174825,
+          "risk": 0.10144927536231885
+        },
+        {
+          "coverage": 0.48951048951048953,
+          "risk": 0.1
+        },
+        {
+          "coverage": 0.5034965034965035,
+          "risk": 0.09722222222222222
+        },
+        {
+          "coverage": 0.5104895104895105,
+          "risk": 0.0958904109589041
+        },
+        {
+          "coverage": 0.5174825174825175,
+          "risk": 0.0945945945945946
+        },
+        {
+          "coverage": 0.5314685314685315,
+          "risk": 0.09210526315789473
+        },
+        {
+          "coverage": 0.5384615384615384,
+          "risk": 0.09090909090909091
+        },
+        {
+          "coverage": 0.5524475524475524,
+          "risk": 0.10126582278481013
+        },
+        {
+          "coverage": 0.5594405594405595,
+          "risk": 0.1125
+        },
+        {
+          "coverage": 0.5664335664335665,
+          "risk": 0.12345679012345678
+        },
+        {
+          "coverage": 0.5804195804195804,
+          "risk": 0.13253012048192772
+        },
+        {
+          "coverage": 0.5874125874125874,
+          "risk": 0.14285714285714285
+        },
+        {
+          "coverage": 0.6013986013986014,
+          "risk": 0.1511627906976744
+        },
+        {
+          "coverage": 0.6083916083916084,
+          "risk": 0.16091954022988506
+        },
+        {
+          "coverage": 0.6223776223776224,
+          "risk": 0.1797752808988764
+        },
+        {
+          "coverage": 0.6293706293706294,
+          "risk": 0.17777777777777778
+        },
+        {
+          "coverage": 0.6363636363636364,
+          "risk": 0.17582417582417584
+        },
+        {
+          "coverage": 0.6503496503496503,
+          "risk": 0.1935483870967742
+        },
+        {
+          "coverage": 0.6573426573426573,
+          "risk": 0.19148936170212766
+        },
+        {
+          "coverage": 0.6713286713286714,
+          "risk": 0.19791666666666666
+        },
+        {
+          "coverage": 0.6783216783216783,
+          "risk": 0.20618556701030927
+        },
+        {
+          "coverage": 0.6853146853146853,
+          "risk": 0.21428571428571427
+        },
+        {
+          "coverage": 0.6993006993006993,
+          "risk": 0.21
+        },
+        {
+          "coverage": 0.7062937062937062,
+          "risk": 0.2079207920792079
+        },
+        {
+          "coverage": 0.7202797202797203,
+          "risk": 0.20388349514563106
+        },
+        {
+          "coverage": 0.7272727272727273,
+          "risk": 0.20192307692307693
+        },
+        {
+          "coverage": 0.7412587412587412,
+          "risk": 0.19811320754716982
+        },
+        {
+          "coverage": 0.7482517482517482,
+          "risk": 0.205607476635514
+        },
+        {
+          "coverage": 0.7552447552447552,
+          "risk": 0.21296296296296297
+        },
+        {
+          "coverage": 0.7692307692307693,
+          "risk": 0.22727272727272727
+        },
+        {
+          "coverage": 0.7762237762237763,
+          "risk": 0.23423423423423423
+        },
+        {
+          "coverage": 0.7902097902097902,
+          "risk": 0.24778761061946902
+        },
+        {
+          "coverage": 0.7972027972027972,
+          "risk": 0.2543859649122807
+        },
+        {
+          "coverage": 0.8111888111888111,
+          "risk": 0.25
+        },
+        {
+          "coverage": 0.8181818181818182,
+          "risk": 0.2564102564102564
+        },
+        {
+          "coverage": 0.8251748251748252,
+          "risk": 0.2627118644067797
+        },
+        {
+          "coverage": 0.8391608391608392,
+          "risk": 0.275
+        },
+        {
+          "coverage": 0.8461538461538461,
+          "risk": 0.2809917355371901
+        },
+        {
+          "coverage": 0.8601398601398601,
+          "risk": 0.2926829268292683
+        },
+        {
+          "coverage": 0.8671328671328671,
+          "risk": 0.29838709677419356
+        },
+        {
+          "coverage": 0.8741258741258742,
+          "risk": 0.296
+        },
+        {
+          "coverage": 0.8881118881118881,
+          "risk": 0.30708661417322836
+        },
+        {
+          "coverage": 0.8951048951048951,
+          "risk": 0.3046875
+        },
+        {
+          "coverage": 0.9090909090909091,
+          "risk": 0.3
+        },
+        {
+          "coverage": 0.916083916083916,
+          "risk": 0.3053435114503817
+        },
+        {
+          "coverage": 0.9300699300699301,
+          "risk": 0.3157894736842105
+        },
+        {
+          "coverage": 0.9370629370629371,
+          "risk": 0.3208955223880597
+        },
+        {
+          "coverage": 0.9440559440559441,
+          "risk": 0.32592592592592595
+        },
+        {
+          "coverage": 0.958041958041958,
+          "risk": 0.3284671532846715
+        },
+        {
+          "coverage": 0.965034965034965,
+          "risk": 0.3333333333333333
+        },
+        {
+          "coverage": 0.9790209790209791,
+          "risk": 0.34285714285714286
+        },
+        {
+          "coverage": 0.986013986013986,
+          "risk": 0.3475177304964539
+        },
+        {
+          "coverage": 1.0,
+          "risk": 0.35664335664335667
+        }
+      ]
+    },
+    "window_level_diagnostics": {
+      "accuracy": 0.6433566433566433,
+      "balanced_accuracy": 0.6332764990053993,
+      "confusion_matrix": [
+        [
+          47,
+          4,
+          0
+        ],
+        [
+          1,
+          45,
+          0
+        ],
+        [
+          1,
+          45,
+          0
+        ]
+      ],
+      "macro_f1": 0.5276190476190475,
+      "per_class_recall": {
+        "mobility": 0.9215686274509803,
+        "sitting": 0.9782608695652174,
+        "standing": 0.0
+      }
+    }
+  },
+  "validation_window_count": 143
+}

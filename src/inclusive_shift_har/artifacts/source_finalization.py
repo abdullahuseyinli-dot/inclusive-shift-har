@@ -282,12 +282,41 @@ def _validate_one_run(
         if summary.get("requested_device") != "cuda" or summary.get("model_device") != "cuda":
             raise SourceFinalizationError(f"{model_id} final neural run was not executed on CUDA")
         epochs = configuration.get("epochs")
+        monitoring_best_epoch = summary.get("best_epoch")
+        history = summary.get("training_history")
         if (
             isinstance(epochs, bool)
             or not isinstance(epochs, int)
-            or summary.get("best_epoch") != epochs
+            or isinstance(monitoring_best_epoch, bool)
+            or not isinstance(monitoring_best_epoch, int)
+            or not 1 <= monitoring_best_epoch <= epochs
+            or not isinstance(history, list)
+            or len(history) != epochs
+            or not isinstance(history[-1], Mapping)
+            or history[-1].get("epoch") != epochs
         ):
-            raise SourceFinalizationError(f"{model_id} is not the fixed predeclared final epoch")
+            raise SourceFinalizationError(
+                f"{model_id} does not contain a complete fixed-epoch training history"
+            )
+        for expected_epoch, row_value in enumerate(history, start=1):
+            if not isinstance(row_value, Mapping):
+                raise SourceFinalizationError(f"{model_id} training history row is invalid")
+            updates = row_value.get("optimizer_update_count")
+            skipped = row_value.get("amp_skipped_step_count")
+            scheduler_advanced = row_value.get("scheduler_advanced")
+            if (
+                row_value.get("epoch") != expected_epoch
+                or isinstance(updates, bool)
+                or not isinstance(updates, int)
+                or updates < 0
+                or isinstance(skipped, bool)
+                or not isinstance(skipped, int)
+                or skipped < 0
+                or scheduler_advanced is not (updates > 0)
+            ):
+                raise SourceFinalizationError(
+                    f"{model_id} epoch {expected_epoch} violates the AMP/scheduler invariant"
+                )
         selected_epoch = epochs
         validated = validate_fixed_epoch_checkpoint(
             checkpoint_path,

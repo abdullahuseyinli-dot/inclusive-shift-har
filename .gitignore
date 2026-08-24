@@ -51,6 +51,7 @@ Thumbs.db
 *.pt
 *.pth
 *.ckpt
+*.pkl
 *.onnx
 
 # Source archives must remain outside normal Git history
