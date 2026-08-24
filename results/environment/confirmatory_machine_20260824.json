@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "confirmatory_machine_environment",
+  "status": "observed_read_only_cuda_validated",
+  "observed_at_utc": "2026-08-24T01:15:50.0142531Z",
+  "evaluation_tooling_code_commit": "0f4c7bd58e55674416fdc221bc4c259a366decc5",
+  "frozen_training_code_commit": "b4dc38fb9d5a0c17003221b61156ebc065395170",
+  "gpu": {
+    "count": 1,
+    "model": "NVIDIA RTX PRO 3000 Blackwell Generation Laptop GPU",
+    "memory_total_mib": 12227,
+    "driver_version": "596.72",
+    "driver_reported_cuda_compatibility": "13.2",
+    "compute_capability": [12, 0]
+  },
+  "framework": {
+    "python": "3.11.9",
+    "pytorch": "2.12.0+cu132",
+    "pytorch_cuda_runtime": "13.2",
+    "cudnn_version": 92000,
+    "torch_cuda_is_available": true,
+    "cuda_tensor_allocation_and_reduction_passed": true,
+    "allocation_probe_result": 6144.0,
+    "dependency_lock_sha256": "15a994785a766bd2c01681684da71874ffc628b42773e257dd3c336896b9d987"
+  },
+  "system": {
+    "operating_system": "Microsoft Windows 11 Pro",
+    "version": "10.0.26200",
+    "build": "26200",
+    "cpu": "Intel(R) Core(TM) Ultra 9 285H",
+    "logical_processors": 16,
+    "physical_memory_bytes": 68137205760
+  },
+  "runtime_policy": {
+    "neural_training_device": "cuda",
+    "neural_confirmatory_inference_device": "cuda",
+    "recurrent_backend_deviation": "CUDA tensors with cuDNN disabled for recurrent models after preserved Windows backend crashes",
+    "parallel_final_neural_runs": false
+  },
+  "privacy": {
+    "hostname_recorded": false,
+    "username_recorded": false,
+    "filesystem_paths_recorded": false,
+    "hardware_serial_identifiers_recorded": false
+  },
+  "record_sha256": "8b73d8dfa5db995a218dd3a1a7174d833496cb5b11434f5ebfdfb02c0c05ea7e"
+}
