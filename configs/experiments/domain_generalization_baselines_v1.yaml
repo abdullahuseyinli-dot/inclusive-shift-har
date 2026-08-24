@@ -1,0 +1,44 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-source-domain-generalization-v1"
+status: "predeclared_source_only_before_target_unlock"
+protocol: "configs/protocols/inclusivehar_released_block_v1_2.yaml"
+source_window_manifest: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+ontology_track: functional_core
+backbone: compact_residual_96
+information_policy:
+  source_participant_ids_used_as_training_domains: true
+  participant_identity_used_at_inference: false
+  disability_or_assistive_device_input: false
+  target_subjects_signals_labels_predictions_or_metrics_allowed: false
+shared:
+  selection_seed: 11
+  batch_size: 256
+  maximum_epochs: 80
+  early_stopping_patience: 12
+  minimum_epochs: 8
+  weight_decay: 0.0001
+  mixed_precision: float16
+  device: cuda
+  selection_metric: mean_validation_participant_macro_f1
+  tie_breakers:
+    - worst_validation_participant_macro_f1
+    - lower_regularization_weight
+    - lower_learning_rate
+baselines:
+  erm:
+    registry_model: compact_residual_96
+    selected_source_configuration_sha256: "2c62b52d708a01f8eaf92f88833256edf0cf0f76858ce945195a7e450c788b8e"
+  coral:
+    registry_model: compact_residual_96
+    source_only_trials:
+      - {learning_rate: 0.0003, coral_weight: 0.01}
+      - {learning_rate: 0.0003, coral_weight: 0.1}
+      - {learning_rate: 0.001, coral_weight: 0.01}
+      - {learning_rate: 0.001, coral_weight: 0.1}
+  dann:
+    status: "implementation_gate_open_source_only_not_yet_run"
+    requirement: "gradient-reversal participant-domain head must be checkpointed and absent from inference inputs"
+claim_policy:
+  - "CORAL and DANN are established baselines, not contributions."
+  - "Participant IDs define source training domains only and are never inference features."
+  - "All target information remains sealed during tuning and grouped source evaluation."
