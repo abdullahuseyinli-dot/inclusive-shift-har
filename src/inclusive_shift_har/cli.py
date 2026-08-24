@@ -363,18 +363,12 @@ def _run_uci_source_fold(args: argparse.Namespace) -> int:
             fold_id=args.fold_id,
             seed=args.seed,
             code_commit=args.code_commit,
+            repository_root=Path(args.repository_root),
+            experiment_config_path=Path(args.experiment_config),
+            expected_experiment_config_file_sha256=(args.expected_experiment_config_file_sha256),
             run_directory=Path(args.run_directory),
             summary_path=Path(args.summary),
             allowed_output_root=Path(args.allowed_output_root),
-            epochs=args.epochs,
-            batch_size=args.batch_size,
-            learning_rate=args.learning_rate,
-            weight_decay=args.weight_decay,
-            patience=args.patience,
-            minimum_epochs=args.minimum_epochs,
-            checkpoint_selection_rule=args.checkpoint_selection_rule,
-            mixed_precision=args.mixed_precision,
-            disable_cudnn=args.disable_cudnn,
         )
     except (FileExistsError, OSError, PermissionError, RuntimeError, ValueError) as exc:
         payload: MappingLike = {
@@ -410,6 +404,8 @@ def _aggregate_uci_source(args: argparse.Namespace) -> int:
         report = build_uci_reproduction_report(
             record_directory=args.record_directory,
             protocol_path=args.protocol,
+            experiment_config_path=args.experiment_config,
+            expected_experiment_config_file_sha256=(args.expected_experiment_config_file_sha256),
             bootstrap_resamples=args.bootstrap_resamples,
             bootstrap_seed=args.bootstrap_seed,
         )
@@ -799,30 +795,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     uci_source_parser.add_argument("--seed", type=int, required=True)
     uci_source_parser.add_argument("--code-commit", required=True)
+    uci_source_parser.add_argument("--repository-root", default=".")
+    uci_source_parser.add_argument(
+        "--experiment-config",
+        default="configs/experiments/uci_har_corrected_reproduction_v1_1.yaml",
+    )
+    uci_source_parser.add_argument(
+        "--expected-experiment-config-file-sha256",
+        required=True,
+    )
     uci_source_parser.add_argument("--run-directory", required=True)
     uci_source_parser.add_argument("--summary", required=True)
     uci_source_parser.add_argument("--allowed-output-root", default="results")
-    uci_source_parser.add_argument("--epochs", type=int, default=40)
-    uci_source_parser.add_argument("--batch-size", type=int, default=128)
-    uci_source_parser.add_argument("--learning-rate", type=float, default=3e-4)
-    uci_source_parser.add_argument("--weight-decay", type=float, default=1e-4)
-    uci_source_parser.add_argument("--patience", type=int, default=8)
-    uci_source_parser.add_argument("--minimum-epochs", type=int, default=8)
-    uci_source_parser.add_argument(
-        "--checkpoint-selection-rule",
-        choices=("source_validation_best", "fixed_last_epoch"),
-        default="source_validation_best",
-    )
-    uci_source_parser.add_argument(
-        "--mixed-precision",
-        choices=("float16", "bfloat16", "disabled"),
-        default="float16",
-    )
-    uci_source_parser.add_argument(
-        "--disable-cudnn",
-        action="store_true",
-        help="retain CUDA tensors while bypassing the cuDNN recurrent backend",
-    )
     uci_source_parser.add_argument("--json", action="store_true")
     uci_source_parser.set_defaults(handler=_run_uci_source_fold)
 
@@ -836,6 +820,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     uci_aggregate_parser.add_argument(
         "--protocol", default="results/protocol/uci_har_source_grouped_v1.json"
+    )
+    uci_aggregate_parser.add_argument(
+        "--experiment-config",
+        default="configs/experiments/uci_har_corrected_reproduction_v1_1.yaml",
+    )
+    uci_aggregate_parser.add_argument(
+        "--expected-experiment-config-file-sha256",
+        required=True,
     )
     uci_aggregate_parser.add_argument(
         "--output-directory",

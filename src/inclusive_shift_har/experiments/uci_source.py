@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
 import time
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, cast
@@ -16,6 +18,12 @@ from inclusive_shift_har.data.uci_har import (
     UCI_HAR_CHANNELS,
     UCIHARWindows,
     load_uci_har_split,
+)
+from inclusive_shift_har.evaluation._strict_config import (
+    StrictConfigError,
+    load_strict_yaml_mapping,
+    require_exact_keys,
+    require_mapping,
 )
 from inclusive_shift_har.manifests.canonical import (
     atomic_write_json_new,
@@ -43,10 +51,209 @@ UCI_CORRECTED_MODEL_IDS: tuple[str, ...] = (
 UCI_CLASS_NAMES: tuple[str, ...] = tuple(
     UCI_HAR_ACTIVITY_NAMES[index] for index in sorted(UCI_HAR_ACTIVITY_NAMES)
 )
+UCI_CORRECTED_FOLD_IDS: tuple[str, ...] = tuple(
+    f"uci_source_cv_{index:02d}" for index in range(1, 6)
+)
+UCI_CORRECTED_SEEDS: tuple[int, ...] = (42, 1337, 2025, 31415, 271828)
 
 
 class UCISourceRunError(RuntimeError):
     """Raised when a corrected source-only run fails closed."""
+
+
+@dataclass(frozen=True)
+class UCIReproductionConfig:
+    """Strict, hash-pinned corrected-reproduction matrix contract."""
+
+    path: Path
+    file_sha256: str
+    canonical_sha256: str
+    experiment_id: str
+    dataset_manifest: str
+    protocol_manifest: str
+    models: tuple[str, ...]
+    disable_cudnn_by_model: Mapping[str, bool]
+    fold_order: tuple[str, ...]
+    seed_order: tuple[int, ...]
+    training: Mapping[str, Any]
+    outputs: Mapping[str, Any]
+
+
+def _require_config_value(actual: Any, expected: Any, *, location: str) -> None:
+    if actual != expected:
+        raise StrictConfigError(f"{location} is {actual!r}; required {expected!r}")
+
+
+def load_uci_reproduction_config(
+    path: str | Path,
+    *,
+    expected_file_sha256: str,
+) -> UCIReproductionConfig:
+    """Load the exact v1.1 matrix and reject any unrecorded protocol drift."""
+
+    config_path = Path(path).resolve(strict=True)
+    observed_file_sha256 = sha256_file(config_path)
+    expected_digest = expected_file_sha256.casefold()
+    if (
+        len(expected_digest) != 64
+        or any(character not in "0123456789abcdef" for character in expected_digest)
+        or observed_file_sha256 != expected_digest
+    ):
+        raise StrictConfigError("UCI reproduction config file SHA-256 mismatch")
+    raw = load_strict_yaml_mapping(config_path)
+    require_exact_keys(
+        raw,
+        {
+            "schema_version",
+            "experiment_id",
+            "status",
+            "evidence_status",
+            "supersedes",
+            "supersession_reason",
+            "dataset_manifest",
+            "protocol_manifest",
+            "allowed_released_split",
+            "official_test_member_opening_allowed",
+            "input_shape",
+            "label_track",
+            "models",
+            "fold_order",
+            "seed_order",
+            "training",
+            "execution",
+            "outputs",
+        },
+        location="$",
+    )
+    constants = {
+        "schema_version": "1.0.0",
+        "experiment_id": "uci_har_corrected_legacy_reproduction_v1.1",
+        "status": "configured_not_run_superseding_v1_model_scope",
+        "evidence_status": "corrected_source_development_no_results",
+        "supersedes": "configs/experiments/uci_har_legacy_reproduction.yaml",
+        "supersession_reason": (
+            "v1 listed a temporal BiLSTM variant outside the implemented exact three-model "
+            "reproduction matrix"
+        ),
+        "dataset_manifest": "manifests/datasets/uci_har_v1.json",
+        "protocol_manifest": "results/protocol/uci_har_source_grouped_v1.json",
+        "allowed_released_split": "train",
+        "official_test_member_opening_allowed": False,
+        "input_shape": [128, 6],
+        "label_track": "uci_native_six",
+    }
+    for key, expected in constants.items():
+        _require_config_value(raw.get(key), expected, location=key)
+
+    models_value = raw["models"]
+    if not isinstance(models_value, list) or len(models_value) != len(UCI_CORRECTED_MODEL_IDS):
+        raise StrictConfigError("models must contain exactly the three corrected legacy models")
+    model_ids: list[str] = []
+    disable_cudnn: dict[str, bool] = {}
+    expected_disable = (False, True, True)
+    for index, (value, expected_model, expected_disabled) in enumerate(
+        zip(models_value, UCI_CORRECTED_MODEL_IDS, expected_disable, strict=True)
+    ):
+        model = require_mapping(value, location=f"models[{index}]")
+        require_exact_keys(model, {"model_id", "disable_cudnn"}, location=f"models[{index}]")
+        _require_config_value(
+            model.get("model_id"), expected_model, location=f"models[{index}].model_id"
+        )
+        _require_config_value(
+            model.get("disable_cudnn"),
+            expected_disabled,
+            location=f"models[{index}].disable_cudnn",
+        )
+        model_ids.append(expected_model)
+        disable_cudnn[expected_model] = expected_disabled
+
+    _require_config_value(raw["fold_order"], list(UCI_CORRECTED_FOLD_IDS), location="fold_order")
+    _require_config_value(raw["seed_order"], list(UCI_CORRECTED_SEEDS), location="seed_order")
+
+    training = require_mapping(raw["training"], location="training")
+    expected_training = {
+        "device": "cuda",
+        "cpu_fallback": False,
+        "epochs_max": 40,
+        "batch_size": 128,
+        "optimizer": "adamw",
+        "learning_rate": 0.0003,
+        "weight_decay": 0.0001,
+        "early_stopping_patience": 8,
+        "minimum_epochs": 8,
+        "checkpoint_selection_rule": "source_validation_best",
+        "selection_metric": "validation_participant_macro_f1",
+        "normalization": "fold_training_windows_only",
+        "mixed_precision": "float16",
+    }
+    require_exact_keys(training, set(expected_training), location="training")
+    _require_config_value(training, expected_training, location="training")
+
+    execution = require_mapping(raw["execution"], location="execution")
+    expected_execution = {
+        "expected_run_count": 75,
+        "one_run_per_process": True,
+        "sequential_runs": True,
+        "create_only": True,
+        "preserve_failures": True,
+        "official_test_evaluation": "forbidden_consumed_legacy_evidence",
+    }
+    require_exact_keys(execution, set(expected_execution), location="execution")
+    _require_config_value(execution, expected_execution, location="execution")
+
+    outputs = require_mapping(raw["outputs"], location="outputs")
+    expected_outputs = {
+        "root": "results/legacy_reproduction/uci_har_source_grouped_v1",
+        "participant_level_metrics": True,
+        "no_inclusivehar_target_evaluation": True,
+    }
+    require_exact_keys(outputs, set(expected_outputs), location="outputs")
+    _require_config_value(outputs, expected_outputs, location="outputs")
+    return UCIReproductionConfig(
+        path=config_path,
+        file_sha256=observed_file_sha256,
+        canonical_sha256=canonical_json_sha256(raw),
+        experiment_id=str(raw["experiment_id"]),
+        dataset_manifest=str(raw["dataset_manifest"]),
+        protocol_manifest=str(raw["protocol_manifest"]),
+        models=tuple(model_ids),
+        disable_cudnn_by_model=disable_cudnn,
+        fold_order=UCI_CORRECTED_FOLD_IDS,
+        seed_order=UCI_CORRECTED_SEEDS,
+        training=training,
+        outputs=outputs,
+    )
+
+
+def build_uci_training_config(
+    config: UCIReproductionConfig,
+    *,
+    model_name: str,
+    seed: int,
+) -> TrainingConfig:
+    """Materialize exactly one immutable cell's shared-engine configuration."""
+
+    if model_name not in config.models:
+        raise UCISourceRunError(f"model is outside the locked matrix: {model_name}")
+    if seed not in config.seed_order:
+        raise UCISourceRunError(f"seed is outside the locked matrix: {seed}")
+    training = config.training
+    epochs = int(training["epochs_max"])
+    return TrainingConfig(
+        model_name=model_name,
+        num_classes=len(UCI_CLASS_NAMES),
+        seed=seed,
+        epochs=epochs,
+        batch_size=int(training["batch_size"]),
+        learning_rate=float(training["learning_rate"]),
+        weight_decay=float(training["weight_decay"]),
+        patience=int(training["early_stopping_patience"]),
+        minimum_epochs=int(training["minimum_epochs"]),
+        mixed_precision=str(training["mixed_precision"]),
+        checkpoint_interval=epochs,
+        checkpoint_selection_rule=str(training["checkpoint_selection_rule"]),
+        disable_cudnn=config.disable_cudnn_by_model[model_name],
+    )
 
 
 @dataclass(frozen=True)
@@ -240,6 +447,75 @@ def _code_commit(value: str) -> str:
     return normalized
 
 
+def _validate_repository_head(repository_root: Path, *, expected_commit: str) -> str:
+    root = repository_root.resolve(strict=True)
+    if not root.is_dir():
+        raise UCISourceRunError("repository root must be a directory")
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "--verify", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise UCISourceRunError("cannot verify the executing Git HEAD") from exc
+    observed = _code_commit(completed.stdout.strip())
+    if observed != expected_commit:
+        raise UCISourceRunError(
+            f"supplied code commit {expected_commit} does not match executing HEAD {observed}"
+        )
+    return observed
+
+
+def _validate_matrix_paths(
+    *,
+    repository_root: Path,
+    experiment_config: UCIReproductionConfig,
+    archive_path: Path,
+    dataset_manifest_path: Path,
+    protocol_path: Path,
+    model_name: str,
+    fold_id: str,
+    seed: int,
+    run_directory: Path,
+    summary_path: Path,
+    allowed_output_root: Path,
+) -> None:
+    root = repository_root.resolve(strict=True)
+    expected_config_path = (
+        root / "configs/experiments/uci_har_corrected_reproduction_v1_1.yaml"
+    ).resolve(strict=True)
+    expected_dataset_path = (root / experiment_config.dataset_manifest).resolve(strict=True)
+    expected_protocol_path = (root / experiment_config.protocol_manifest).resolve(strict=True)
+    expected_output_root = (root / str(experiment_config.outputs["root"])).resolve(strict=False)
+    expected_allowed_root = (root / "results").resolve(strict=True)
+    stem = f"{model_name}--seed-{seed}--{fold_id}"
+    comparisons = (
+        (experiment_config.path, expected_config_path, "experiment config"),
+        (dataset_manifest_path.resolve(strict=True), expected_dataset_path, "dataset manifest"),
+        (protocol_path.resolve(strict=True), expected_protocol_path, "source protocol"),
+        (allowed_output_root.resolve(strict=True), expected_allowed_root, "allowed output root"),
+        (
+            run_directory.resolve(strict=False),
+            expected_output_root / "runs" / stem,
+            "run directory",
+        ),
+        (
+            summary_path.resolve(strict=False),
+            expected_output_root / "records" / f"{stem}.json",
+            "summary path",
+        ),
+    )
+    for observed, expected, role in comparisons:
+        if observed != expected:
+            raise UCISourceRunError(f"{role} differs from the locked matrix path")
+    expected_archive = (root / "data/raw/uci_har/v1/UCI HAR Dataset.zip").resolve(strict=False)
+    if archive_path.resolve(strict=True) != expected_archive:
+        raise UCISourceRunError("archive path differs from the locked UCI inner archive path")
+
+
 def run_uci_source_fold(
     *,
     archive_path: Path,
@@ -249,18 +525,12 @@ def run_uci_source_fold(
     fold_id: str,
     seed: int,
     code_commit: str,
+    repository_root: Path,
+    experiment_config_path: Path,
+    expected_experiment_config_file_sha256: str,
     run_directory: Path,
     summary_path: Path,
     allowed_output_root: Path,
-    epochs: int,
-    batch_size: int,
-    learning_rate: float,
-    weight_decay: float,
-    patience: int,
-    minimum_epochs: int,
-    checkpoint_selection_rule: str,
-    mixed_precision: str = "float16",
-    disable_cudnn: bool = False,
 ) -> dict[str, Any]:
     """Run one immutable grouped source fold on CUDA; official test stays unopened."""
 
@@ -269,6 +539,31 @@ def run_uci_source_fold(
     commit = _code_commit(code_commit)
     if not torch.cuda.is_available():
         raise UCISourceRunError("CUDA is required for corrected UCI source training")
+    _validate_repository_head(repository_root, expected_commit=commit)
+    experiment_config = load_uci_reproduction_config(
+        experiment_config_path,
+        expected_file_sha256=expected_experiment_config_file_sha256,
+    )
+    if fold_id not in experiment_config.fold_order:
+        raise UCISourceRunError(f"fold is outside the locked matrix: {fold_id}")
+    _validate_matrix_paths(
+        repository_root=repository_root,
+        experiment_config=experiment_config,
+        archive_path=archive_path,
+        dataset_manifest_path=dataset_manifest_path,
+        protocol_path=protocol_path,
+        model_name=model_name,
+        fold_id=fold_id,
+        seed=seed,
+        run_directory=run_directory,
+        summary_path=summary_path,
+        allowed_output_root=allowed_output_root,
+    )
+    configuration = build_uci_training_config(
+        experiment_config,
+        model_name=model_name,
+        seed=seed,
+    )
     run_path = _confined_output(
         run_directory, allowed_root=allowed_output_root, kind="run directory"
     )
@@ -283,21 +578,6 @@ def run_uci_source_fold(
         dataset_manifest_path=dataset_manifest_path,
         protocol_path=protocol_path,
         fold_id=fold_id,
-    )
-    configuration = TrainingConfig(
-        model_name=model_name,
-        num_classes=len(UCI_CLASS_NAMES),
-        seed=seed,
-        epochs=epochs,
-        batch_size=batch_size,
-        learning_rate=learning_rate,
-        weight_decay=weight_decay,
-        patience=patience,
-        minimum_epochs=minimum_epochs,
-        mixed_precision=mixed_precision,
-        checkpoint_interval=max(1, epochs),
-        checkpoint_selection_rule=checkpoint_selection_rule,
-        disable_cudnn=disable_cudnn,
     )
     preprocessing_sha256 = canonical_json_sha256(
         {
@@ -367,6 +647,11 @@ def run_uci_source_fold(
             "model_name": model_name,
             "seed": seed,
             "code_commit": commit,
+            "experiment_config": {
+                "experiment_id": experiment_config.experiment_id,
+                "file_sha256": experiment_config.file_sha256,
+                "canonical_sha256": experiment_config.canonical_sha256,
+            },
             "fold": {
                 "fold_id": prepared.fold.fold_id,
                 "train_subject_ids": list(prepared.fold.train_subject_ids),
@@ -401,7 +686,7 @@ def run_uci_source_fold(
                 "cuda_runtime": torch.version.cuda,
                 "cudnn_enabled": torch.backends.cudnn.enabled,
                 "cudnn_version": cast(Any, torch.backends.cudnn).version(),
-                "mixed_precision": mixed_precision,
+                "mixed_precision": configuration.mixed_precision,
                 "peak_vram_bytes": int(torch.cuda.max_memory_allocated(device)),
             },
             "elapsed_seconds": time.perf_counter() - started,
@@ -420,6 +705,11 @@ def run_uci_source_fold(
             "model_name": model_name,
             "seed": seed,
             "code_commit": commit,
+            "experiment_config": {
+                "experiment_id": experiment_config.experiment_id,
+                "file_sha256": experiment_config.file_sha256,
+                "canonical_sha256": experiment_config.canonical_sha256,
+            },
             "exception_type": type(exc).__name__,
             "message": str(exc),
             "official_test_member_opened": False,

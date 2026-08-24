@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -10,12 +11,22 @@ from inclusive_shift_har.data.uci_har import load_uci_har_split
 from inclusive_shift_har.experiments.uci_source import (
     UCISourceRunError,
     _portable_output_reference,
+    _validate_repository_head,
+    load_uci_reproduction_config,
     prepare_uci_source_fold,
     run_uci_source_fold,
 )
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 from inclusive_shift_har.protocols.uci_source import build_uci_source_protocol_manifest
 from tests._uci_synthetic import materialize_synthetic_uci_archive
+
+EXPERIMENT_CONFIG_PATH = (
+    Path(__file__).parents[1]
+    / "configs"
+    / "experiments"
+    / "uci_har_corrected_reproduction_v1_1.yaml"
+)
+EXPERIMENT_CONFIG_FILE_SHA256 = sha256_file(EXPERIMENT_CONFIG_PATH)
 
 
 def _inputs(tmp_path: Path) -> tuple[Path, Path, Path]:
@@ -97,16 +108,12 @@ def test_runner_refuses_to_fall_back_to_cpu(
             fold_id="uci_source_cv_01",
             seed=42,
             code_commit="a" * 40,
+            repository_root=tmp_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             run_directory=tmp_path / "outputs" / "run",
             summary_path=tmp_path / "outputs" / "summary.json",
             allowed_output_root=tmp_path,
-            epochs=1,
-            batch_size=2,
-            learning_rate=3e-4,
-            weight_decay=1e-4,
-            patience=1,
-            minimum_epochs=1,
-            checkpoint_selection_rule="fixed_last_epoch",
         )
     assert not (tmp_path / "outputs").exists()
 
@@ -125,3 +132,38 @@ def test_prediction_reference_is_output_root_relative_and_confined(tmp_path: Pat
     outside.write_bytes(b"synthetic")
     with pytest.raises(UCISourceRunError, match="escapes"):
         _portable_output_reference(outside, allowed_root=output_root, kind="prediction artifact")
+
+
+def test_experiment_config_is_hash_pinned_and_locks_recurrent_cudnn_policy() -> None:
+    config = load_uci_reproduction_config(
+        EXPERIMENT_CONFIG_PATH,
+        expected_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
+    )
+
+    assert config.models == (
+        "legacy_cnn1d_h128",
+        "legacy_bilstm_h192",
+        "legacy_joint_bilstm256_cnn128",
+    )
+    assert config.disable_cudnn_by_model == {
+        "legacy_cnn1d_h128": False,
+        "legacy_bilstm_h192": True,
+        "legacy_joint_bilstm256_cnn128": True,
+    }
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        load_uci_reproduction_config(
+            EXPERIMENT_CONFIG_PATH,
+            expected_file_sha256="0" * 64,
+        )
+
+
+def test_repository_head_binding_rejects_supplied_commit_drift(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "inclusive_shift_har.experiments.uci_source.subprocess.run",
+        lambda *args, **kwargs: SimpleNamespace(stdout=f"{'b' * 40}\n"),
+    )
+
+    with pytest.raises(UCISourceRunError, match="does not match executing HEAD"):
+        _validate_repository_head(tmp_path, expected_commit="a" * 40)

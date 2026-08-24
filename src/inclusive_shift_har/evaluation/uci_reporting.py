@@ -14,6 +14,7 @@ import math
 import os
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from dataclasses import asdict
 from itertools import combinations
 from pathlib import Path
 from typing import Any, cast
@@ -32,6 +33,9 @@ from inclusive_shift_har.evaluation.statistics import (
 from inclusive_shift_har.experiments.uci_source import (
     UCI_CLASS_NAMES,
     UCI_CORRECTED_MODEL_IDS,
+    UCIReproductionConfig,
+    build_uci_training_config,
+    load_uci_reproduction_config,
 )
 from inclusive_shift_har.manifests.canonical import (
     atomic_write_json_new,
@@ -255,6 +259,7 @@ def _load_run(
     expected_models: set[str],
     expected_seeds: set[int],
     allowed_artifact_root: Path,
+    experiment_config: UCIReproductionConfig,
 ) -> dict[str, Any]:
     if path.is_symlink() or not path.is_file():
         raise UCIReportingError(f"run summary must be a regular, non-symlink file: {path}")
@@ -339,6 +344,18 @@ def _load_run(
         or configuration.get("num_classes") != len(UCI_CLASS_NAMES)
     ):
         raise UCIReportingError(f"configuration identity mismatch for {path}")
+    expected_configuration = asdict(
+        build_uci_training_config(experiment_config, model_name=model, seed=seed_raw)
+    )
+    if canonical_json_sha256(expected_configuration) != configuration_sha256:
+        raise UCIReportingError(f"configuration differs from the locked experiment for {path}")
+    experiment_lineage = _mapping(record.get("experiment_config"), name=f"{path}.experiment_config")
+    if dict(experiment_lineage) != {
+        "experiment_id": experiment_config.experiment_id,
+        "file_sha256": experiment_config.file_sha256,
+        "canonical_sha256": experiment_config.canonical_sha256,
+    }:
+        raise UCIReportingError(f"experiment configuration lineage mismatch for {path}")
     normalization = _mapping(record.get("normalization"), name=f"{path}.normalization")
     if (
         normalization.get("method") != "per_channel_population_standardization"
@@ -465,6 +482,8 @@ def build_uci_reproduction_report(
     *,
     record_directory: str | os.PathLike[str],
     protocol_path: str | os.PathLike[str],
+    experiment_config_path: str | os.PathLike[str],
+    expected_experiment_config_file_sha256: str,
     models: Sequence[str] = UCI_CORRECTED_MODEL_IDS,
     seeds: Sequence[int] = DEFAULT_UCI_REPRODUCTION_SEEDS,
     bootstrap_resamples: int = 10_000,
@@ -472,11 +491,20 @@ def build_uci_reproduction_report(
 ) -> dict[str, Any]:
     """Validate a complete CUDA matrix and aggregate official-train OOF predictions."""
 
-    if tuple(models) != UCI_CORRECTED_MODEL_IDS:
+    try:
+        experiment_config = load_uci_reproduction_config(
+            Path(experiment_config_path),
+            expected_file_sha256=expected_experiment_config_file_sha256,
+        )
+    except (OSError, ValueError) as exc:
+        raise UCIReportingError(f"invalid UCI reproduction experiment config: {exc}") from exc
+    if tuple(models) != experiment_config.models or tuple(models) != UCI_CORRECTED_MODEL_IDS:
         raise UCIReportingError(
             "complete reporting requires all corrected legacy models in predeclared order"
         )
-    if tuple(seeds) != DEFAULT_UCI_REPRODUCTION_SEEDS:
+    if tuple(seeds) != experiment_config.seed_order or tuple(seeds) != (
+        DEFAULT_UCI_REPRODUCTION_SEEDS
+    ):
         raise UCIReportingError("complete reporting requires the five predeclared seeds in order")
     if bootstrap_resamples < 100:
         raise UCIReportingError("bootstrap_resamples must be at least 100")
@@ -486,6 +514,8 @@ def build_uci_reproduction_report(
     root = root.resolve(strict=True)
     artifact_root = root.parent
     protocol = _protocol_contract(Path(protocol_path))
+    if tuple(cast(Mapping[str, Any], protocol["folds"])) != experiment_config.fold_order:
+        raise UCIReportingError("protocol fold order differs from the locked experiment config")
     paths = sorted(root.glob("*.json"))
     expected_count = len(models) * len(seeds) * len(cast(Mapping[str, Any], protocol["folds"]))
     if len(paths) != expected_count:
@@ -497,6 +527,7 @@ def build_uci_reproduction_report(
             expected_models=set(models),
             expected_seeds=set(seeds),
             allowed_artifact_root=artifact_root,
+            experiment_config=experiment_config,
         )
         for path in paths
     ]
@@ -687,6 +718,11 @@ def build_uci_reproduction_report(
         "code_commit": commits.pop(),
         "dataset_manifest_sha256": protocol["dataset_manifest_sha256"],
         "processed_archive_sha256": protocol["processed_archive_sha256"],
+        "experiment_config": {
+            "experiment_id": experiment_config.experiment_id,
+            "file_sha256": experiment_config.file_sha256,
+            "canonical_sha256": experiment_config.canonical_sha256,
+        },
         "models": model_rows,
         "highest_observed_mean_model": model_rows[0]["model_name"],
         "all_pairwise_comparisons": comparisons,

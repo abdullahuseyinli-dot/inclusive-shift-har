@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -18,8 +19,18 @@ from inclusive_shift_har.evaluation.uci_reporting import (
 from inclusive_shift_har.experiments.uci_source import (
     UCI_CLASS_NAMES,
     UCI_CORRECTED_MODEL_IDS,
+    build_uci_training_config,
+    load_uci_reproduction_config,
 )
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
+
+EXPERIMENT_CONFIG_PATH = (
+    Path(__file__).parents[1]
+    / "configs"
+    / "experiments"
+    / "uci_har_corrected_reproduction_v1_1.yaml"
+)
+EXPERIMENT_CONFIG_FILE_SHA256 = sha256_file(EXPERIMENT_CONFIG_PATH)
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
@@ -31,26 +42,36 @@ def _window_hash(values: list[str]) -> str:
 
 
 def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
+    experiment_config = load_uci_reproduction_config(
+        EXPERIMENT_CONFIG_PATH,
+        expected_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
+    )
     record_root = tmp_path / "records"
     artifact_root = tmp_path / "runs"
     record_root.mkdir()
     artifact_root.mkdir()
     folds: list[dict[str, Any]] = []
     all_window_ids: list[str] = []
-    for index, participant in enumerate(("1", "2"), start=1):
+    synthetic_participants = ("1", "2", "3", "4", "5")
+    for index, participant in enumerate(synthetic_participants, start=1):
         fold_id = f"uci_source_cv_{index:02d}"
         validation_ids = [f"uci_har:train:{participant}:{offset:06d}" for offset in range(6)]
         all_window_ids.extend(validation_ids)
-        other = "2" if participant == "1" else "1"
+        training_participants = [
+            candidate for candidate in synthetic_participants if candidate != participant
+        ]
+        training_window_ids = [
+            f"uci_har:train:{candidate}:{offset:06d}"
+            for candidate in training_participants
+            for offset in range(6)
+        ]
         folds.append(
             {
                 "fold_id": fold_id,
-                "normalization_fit_subjects": [other],
-                "train_subject_ids": [other],
-                "train_window_count": 6,
-                "train_window_ids_sha256": _window_hash(
-                    [f"uci_har:train:{other}:{offset:06d}" for offset in range(6)]
-                ),
+                "normalization_fit_subjects": training_participants,
+                "train_subject_ids": training_participants,
+                "train_window_count": len(training_window_ids),
+                "train_window_ids_sha256": _window_hash(training_window_ids),
                 "validation_subject_ids": [participant],
                 "validation_window_count": 6,
                 "validation_window_ids_sha256": _window_hash(validation_ids),
@@ -62,7 +83,7 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
         "input": {
             "archive_sha256": "c" * 64,
             "released_split": "train",
-            "window_count": 12,
+            "window_count": 30,
             "window_ids_sha256": _window_hash(all_window_ids),
         },
         "leakage_controls": {"official_test_status": "legacy_exploratory_development_consumed"},
@@ -107,11 +128,13 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                     participants.tolist(),
                     class_names=UCI_CLASS_NAMES,
                 )
-                configuration = {
-                    "model_name": model,
-                    "num_classes": len(UCI_CLASS_NAMES),
-                    "seed": seed,
-                }
+                configuration = asdict(
+                    build_uci_training_config(
+                        experiment_config,
+                        model_name=model,
+                        seed=seed,
+                    )
+                )
                 record: dict[str, Any] = {
                     "schema_version": "1.0.0",
                     "status": "corrected_uci_source_fold_complete_official_test_unopened",
@@ -127,6 +150,11 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                     "model_name": model,
                     "seed": seed,
                     "code_commit": "a" * 40,
+                    "experiment_config": {
+                        "experiment_id": experiment_config.experiment_id,
+                        "file_sha256": experiment_config.file_sha256,
+                        "canonical_sha256": experiment_config.canonical_sha256,
+                    },
                     "fold": fold,
                     "class_names": list(UCI_CLASS_NAMES),
                     "configuration": configuration,
@@ -169,13 +197,15 @@ def test_complete_uci_matrix_is_reconstructed_and_exported_create_only(tmp_path:
     report = build_uci_reproduction_report(
         record_directory=record_root,
         protocol_path=protocol_path,
+        experiment_config_path=EXPERIMENT_CONFIG_PATH,
+        expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
         bootstrap_resamples=100,
     )
 
     assert report["status"] == "corrected_uci_source_grouped_reproduction_complete"
     assert report["official_test_member_opened"] is False
     assert len(report["models"]) == 3
-    assert all(row["participant_count"] == 2 for row in report["models"])
+    assert all(row["participant_count"] == 5 for row in report["models"])
     assert len(report["all_pairwise_comparisons"]) == 3
     outputs = write_uci_reproduction_exports_new(report, output_directory=tmp_path / "exports")
     assert set(outputs) == {"json", "csv", "markdown"}
@@ -191,6 +221,8 @@ def test_missing_run_fails_closed(tmp_path: Path) -> None:
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -205,6 +237,8 @@ def test_prediction_hash_tampering_fails_closed(tmp_path: Path) -> None:
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -230,6 +264,8 @@ def test_prediction_reference_must_be_relative_and_confined(
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -256,6 +292,30 @@ def test_run_dataset_lineage_must_match_protocol_pins(
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
+            bootstrap_resamples=100,
+        )
+
+
+def test_locked_experiment_rejects_recurrent_backend_or_hyperparameter_drift(
+    tmp_path: Path,
+) -> None:
+    record_root, protocol_path = _materialize_complete_matrix(tmp_path)
+    record_path = next(record_root.glob("legacy_bilstm_h192*.json"))
+    record = json.loads(record_path.read_text(encoding="utf-8"))
+    record["configuration"]["disable_cudnn"] = False
+    record["configuration_sha256"] = canonical_json_sha256(record["configuration"])
+    record.pop("record_sha256")
+    record["record_sha256"] = canonical_json_sha256(record)
+    _write_json(record_path, record)
+
+    with pytest.raises(UCIReportingError, match="differs from the locked experiment"):
+        build_uci_reproduction_report(
+            record_directory=record_root,
+            protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -280,6 +340,8 @@ def test_misaligned_prediction_vectors_fail_closed(tmp_path: Path) -> None:
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -312,6 +374,8 @@ def test_window_label_identity_must_match_across_runs(tmp_path: Path) -> None:
         build_uci_reproduction_report(
             record_directory=record_root,
             protocol_path=protocol_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
             bootstrap_resamples=100,
         )
 
@@ -321,6 +385,8 @@ def test_export_collision_is_preflighted_before_any_bundle_member(tmp_path: Path
     report = build_uci_reproduction_report(
         record_directory=record_root,
         protocol_path=protocol_path,
+        experiment_config_path=EXPERIMENT_CONFIG_PATH,
+        expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
         bootstrap_resamples=100,
     )
     output = tmp_path / "exports"
