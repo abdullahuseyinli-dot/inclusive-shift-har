@@ -1,6 +1,8 @@
 # SI acceleration-unit sensitivity runbook
 
-Status: **implemented but not executed**. This post-confirmatory preprocessing audit tests the numerical consequence of expressing InclusiveHAR user acceleration in `m/s^2` instead of `g` when the per-channel z-score is fit on the same `source_train` cache. It is not a model run, an accuracy result, a new target opening, or evidence of improved generalization.
+Status: **executed and numerically equivalent under the training-only z-score**. The source and target normalized tensors were exactly equal in the stored float32 calculation (maximum and mean absolute differences `0.0`; predeclared tolerance `1e-6`). The underlying moment-scaling residuals were below `8.5e-15`. No model training, accuracy calculation, raw-file access, unlock call, or new target opening occurred. The create-only record SHA-256 is `ca42d11b9b846307afc1cd2dfeda9e113c81fbdcc8bd60f1499eb22f1fb7bcaa`.
+
+This post-confirmatory preprocessing audit tests the numerical consequence of expressing InclusiveHAR user acceleration in `m/s^2` instead of `g` when the per-channel z-score is fit on the same `source_train` cache. It is not a model run, an accuracy result, or evidence of improved generalization.
 
 The command accepts only the existing hash-pinned primary-channel cache index, the consumed opening-1 receipt/index, and the predeclared SI configuration. It exposes no raw-CSV, unlock, target-opening, model, or training argument. It reads `source_train` and `target_sealed` materialized caches, validates their hashes and ordered identities, fits both normalizers on `source_train` only, and writes one self-hashed JSON record as its final action. Target labels are loaded only because the shared cache validator checks exact opening-1 alignment; they are not used in the numerical calculation or model selection.
 
@@ -19,7 +21,7 @@ Fixed input pins:
 
 ## Exact command
 
-Run from the repository root after replacing the two cache placeholders with the create-only cache-index path and its externally recorded file hash:
+The executed invocation used the create-only cache record `results/postconfirmatory/cache/primary_channels_opening1_v1.json` with externally pinned file SHA-256 `02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba`. For a fresh versioned reproduction, use a new empty output directory and the following template:
 
 ```powershell
 $primaryCacheRecord = "<PRIMARY_CACHE_RECORD_PATH>"
