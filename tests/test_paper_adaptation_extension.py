@@ -20,6 +20,7 @@ from inclusive_shift_har.evaluation.paper_adaptation_reporting import (
     _comparison,
     _resolve_file,
     _target_alignment,
+    _valid_probability_matrix,
 )
 from inclusive_shift_har.experiments.ccil_bpd_postconfirmatory import (
     COMPARATOR_IDS,
@@ -95,6 +96,18 @@ def test_target_alignment_uses_validated_clean_reference_path(
     assert actual_windows == tuple(windows.tolist())
     assert actual_participants == tuple(participants.tolist())
     assert np.array_equal(actual_labels, labels)
+
+
+def test_probability_validation_accepts_float32_rounding_but_rejects_bad_simplex() -> None:
+    rounded = np.asarray(
+        [[0.33333334, 0.33333334, 0.33333334], [0.99999994, 0.0, 0.0]],
+        dtype=np.float32,
+    ).astype(np.float64)
+    invalid = rounded.copy()
+    invalid[0, 0] = 0.34
+
+    assert _valid_probability_matrix(rounded)
+    assert not _valid_probability_matrix(invalid)
 
 
 def test_config_locks_source_only_adapters_comparators_and_four_test_family(

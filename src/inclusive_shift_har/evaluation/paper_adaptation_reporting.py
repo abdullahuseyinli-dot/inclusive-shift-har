@@ -53,6 +53,9 @@ class PaperAdaptationAggregationError(ValueError):
     """Raised when an adapter artifact is incomplete, changed, or misaligned."""
 
 
+_PROBABILITY_TOLERANCE = 1.0e-6
+
+
 def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise PaperAdaptationAggregationError(f"{name} must be an object")
@@ -115,6 +118,22 @@ def _finite(value: Any, *, name: str) -> float:
     if not np.isfinite(result):
         raise PaperAdaptationAggregationError(f"{name} must be finite")
     return result
+
+
+def _valid_probability_matrix(values: NDArray[np.float64]) -> bool:
+    """Accept a probability simplex within stored float32 rounding precision."""
+
+    return bool(
+        np.isfinite(values).all()
+        and np.all(values >= -_PROBABILITY_TOLERANCE)
+        and np.all(values <= 1.0 + _PROBABILITY_TOLERANCE)
+        and np.allclose(
+            values.sum(axis=1),
+            1.0,
+            atol=_PROBABILITY_TOLERANCE,
+            rtol=_PROBABILITY_TOLERANCE,
+        )
+    )
 
 
 def _participant_values(
@@ -226,8 +245,8 @@ def _load_extension_entry(
         or len(windows) != count
         or len(set(windows)) != count
         or not np.isfinite(logits).all()
-        or not np.allclose(uncalibrated.sum(axis=1), 1.0, atol=1e-8, rtol=1e-8)
-        or not np.allclose(calibrated.sum(axis=1), 1.0, atol=1e-8, rtol=1e-8)
+        or not _valid_probability_matrix(uncalibrated)
+        or not _valid_probability_matrix(calibrated)
         or not np.array_equal(predicted, calibrated.argmax(axis=1))
         or stored_method != (method_id,)
         or stored_seed.tolist() != [seed]
