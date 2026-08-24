@@ -1625,14 +1625,7 @@ def _validate_target_identity_against_opening(
         raise RawTotalSensitivityError("opening-1 index lacks the alignment reference")
     entry = context.result_entries[key]
     clean = load_target_clean_reference(context, model_id=key[0], seed=key[1])
-    record = _mapping(load_json_strict(clean.record_path), name="alignment result record")
-    prediction = _mapping(record.get("prediction_array"), name="alignment prediction")
-    prediction_path = _confined_path(
-        _string(prediction.get("path"), location="alignment prediction path"),
-        root=context.artifact_root,
-        role="alignment prediction",
-        must_exist=True,
-    )
+    prediction_path = clean.prediction_path
     if sha256_file(prediction_path) != entry.get("array_sha256"):
         raise RawTotalSensitivityError("opening-1 alignment prediction hash changed")
     with np.load(prediction_path, allow_pickle=False) as arrays:

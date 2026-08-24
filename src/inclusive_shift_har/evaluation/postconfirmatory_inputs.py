@@ -75,6 +75,7 @@ class MaterializedCacheEvidence:
 class TargetCleanReference:
     model_id: str
     seed: int
+    prediction_path: Path
     prediction_sha256: str
     record_sha256: str
     record_file_sha256: str
@@ -264,6 +265,7 @@ def load_target_clean_reference(
     return TargetCleanReference(
         model_id=model_id,
         seed=seed,
+        prediction_path=array_path,
         prediction_sha256=prediction_hash,
         record_sha256=record_hash,
         record_file_sha256=record_file_hash,

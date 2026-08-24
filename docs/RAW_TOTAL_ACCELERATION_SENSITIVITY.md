@@ -1,6 +1,6 @@
 # Raw/total-acceleration sensitivity runbook
 
-Status: implemented but **not executed**. This is a post-confirmatory exploratory signal-definition sensitivity. It is not a new confirmatory opening, an exact UCI body-acceleration match, trial-safe evidence, or a causal disability analysis.
+Status: **v1 failed and was preserved; v1.1 is the implementation-corrected rerun specification**. The v1 source stage completed all ten CUDA retrains, but target materialization failed because an opening-1 prediction path stored relative to the `results` artifact namespace was incorrectly resolved relative to the repository root. No target inference result was produced. The v1.1 runner uses the already hash-validated prediction path from the immutable opening index; every scientific setting is unchanged. This remains a post-confirmatory exploratory signal-definition sensitivity, not a new confirmatory opening, an exact UCI body-acceleration match, trial-safe evidence, or a causal disability analysis.
 
 The track retrains only the compact ERM backbone and full MoRe-HAR. These architectures were selected independently of observed performance ranking. Each uses the five locked seeds and its unchanged fixed-epoch source budget. Per-channel normalization is fit only on `source_train`; scalar temperature calibration is fit only on `source_validation`. The source stage must complete and publish `source_stage_lock.json` before the consumed opening-1 target context is loaded. No target tuning, calibration, threshold selection, or refit is permitted.
 
@@ -23,24 +23,24 @@ $executionCommit = git rev-parse HEAD
 $executionTimestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
 
 .venv\Scripts\python.exe -m inclusive_shift_har.experiments.raw_total_acceleration `
-  --config configs/experiments/raw_total_acceleration_sensitivity_v1.yaml `
+  --config configs/experiments/raw_total_acceleration_sensitivity_v1_1.yaml `
   --repository-root . `
   --raw-csv "data/raw/inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv" `
   --code-commit $executionCommit `
   --created-at-utc $executionTimestamp
 ```
 
-Only if `results/postconfirmatory/raw_total_acceleration_v1/raw_total_acceleration_index.json` has `status: complete_create_only`, aggregate it once:
+Only if `results/postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_index.json` has `status: complete_create_only`, aggregate it once:
 
 ```powershell
 $aggregationTimestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
 
 .venv\Scripts\python.exe -m inclusive_shift_har.evaluation.raw_total_reporting `
-  --index results/postconfirmatory/raw_total_acceleration_v1/raw_total_acceleration_index.json `
+  --index results/postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_index.json `
   --artifact-root . `
-  --destination results/postconfirmatory/raw_total_acceleration_v1/raw_total_acceleration_aggregate.json `
-  --csv-destination results/postconfirmatory/raw_total_acceleration_v1/raw_total_acceleration_summary.csv `
-  --markdown-destination results/postconfirmatory/raw_total_acceleration_v1/raw_total_acceleration_summary.md `
+  --destination results/postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_aggregate.json `
+  --csv-destination results/postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_summary.csv `
+  --markdown-destination results/postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_summary.md `
   --created-at-utc $aggregationTimestamp
 ```
 

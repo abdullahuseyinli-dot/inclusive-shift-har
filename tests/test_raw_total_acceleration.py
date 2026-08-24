@@ -35,6 +35,7 @@ from inclusive_shift_har.manifests.canonical import (
 )
 
 CONFIG_PATH = Path("configs/experiments/raw_total_acceleration_sensitivity_v1.yaml")
+RECOVERY_CONFIG_PATH = Path("configs/experiments/raw_total_acceleration_sensitivity_v1_1.yaml")
 
 
 def _write_hashed(path: Path, payload: dict[str, Any]) -> None:
@@ -73,12 +74,19 @@ def _raw_csv(path: Path, *, row_label: str = "Walking") -> None:
 
 def test_strict_raw_total_config_locks_two_architectures_and_five_seeds(tmp_path: Path) -> None:
     config = load_raw_total_sensitivity_config(CONFIG_PATH)
+    recovery = load_raw_total_sensitivity_config(RECOVERY_CONFIG_PATH)
 
     assert tuple(model.model_id for model in config.models) == MODEL_IDS
     assert tuple(config.execution["required_seed_order"]) == SEED_ORDER
     assert config.signal_interface["uci_body_acceleration_equivalent"] is False
     assert config.signal_interface["trial_safe"] is False
     assert config.opening_context["unlock_or_new_opening_invocation_allowed"] is False
+    assert recovery.models == config.models
+    assert recovery.dataset == config.dataset
+    assert recovery.opening_context == config.opening_context
+    assert recovery.outputs["output_directory"] == (
+        "results/postconfirmatory/raw_total_acceleration_v1_1"
+    )
 
     duplicate = tmp_path / "duplicate.yaml"
     duplicate.write_text(

@@ -194,6 +194,10 @@ def test_consumed_target_cache_matches_opening_one_without_unlock(tmp_path: Path
         "target-window-2",
     )
     reference = load_target_clean_reference(context, model_id="compact", seed=11)
+    assert (
+        reference.prediction_path
+        == (tmp_path / "confirmatory/compact--seed-11.predictions.npz").resolve()
+    )
     assert reference.prediction_sha256 == sha256_file(
         tmp_path / "confirmatory/compact--seed-11.predictions.npz"
     )
