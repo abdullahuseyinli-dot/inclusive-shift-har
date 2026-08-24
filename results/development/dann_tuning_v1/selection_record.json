@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "source_only_dann_selection",
+  "status": "complete_source_development_target_sealed",
+  "predeclared_grid": "configs/experiments/domain_generalization_baselines_v1.yaml",
+  "selection_metric": "mean_validation_participant_macro_f1",
+  "tie_breakers": [
+    "worst_validation_participant_macro_f1",
+    "lower_dann_domain_loss_weight",
+    "lower_learning_rate"
+  ],
+  "selection_seed": 11,
+  "source_split_id": "final_source_split",
+  "trials": [
+    {
+      "path": "results/development/dann_tuning_v1/lr0003-w001.json",
+      "file_sha256": "db9dcfca56d86dfa4393d231b6bf406d179e4fdc6c82058ff445106bef9ce9cb",
+      "record_sha256": "e3a7413bf47a175527a628f39a562b72286c3c346e4b37ac794507acb4a20539",
+      "configuration_sha256": "1f0db901e555ebc0f9dee5408bb6cd61eee1d0d9b60184b891f9072dde521042",
+      "learning_rate": 0.0003,
+      "dann_domain_loss_weight": 0.01,
+      "mean_participant_macro_f1": 0.6668021746390951,
+      "worst_participant_macro_f1": 0.5921900161030597,
+      "lower_decile_participant_macro_f1": 0.6071124478102667,
+      "best_epoch": 32
+    },
+    {
+      "path": "results/development/dann_tuning_v1/lr0003-w01.json",
+      "file_sha256": "3298a1df0d2cde34c8db0f7a7a9caff32b3feb0a9f3bb428d16658f57ff5c6ae",
+      "record_sha256": "6acbfe19e764629f32c0ed585804b7b5076aee9615e62b91c58cd901bbf274ba",
+      "configuration_sha256": "b41a1901e7615be1ec651668b32e015e47c4c63a8c45578aade0595a63225727",
+      "learning_rate": 0.0003,
+      "dann_domain_loss_weight": 0.1,
+      "mean_participant_macro_f1": 0.6744389450712962,
+      "worst_participant_macro_f1": 0.5921900161030597,
+      "lower_decile_participant_macro_f1": 0.608639801896707,
+      "best_epoch": 32
+    },
+    {
+      "path": "results/development/dann_tuning_v1/lr001-w001.json",
+      "file_sha256": "c4aa1eb9127b55bbaca63f572b419796fb85f1cf201d0bbbf99dcaf0014b56ed",
+      "record_sha256": "45c3a4d8c5f3013b0e706624b07b6f69080ff36784b543cb37cb0d0e96ae4986",
+      "configuration_sha256": "8271e625507bb7e26989a181dbe7bd64d172a2d80f17da330403e9869c89a351",
+      "learning_rate": 0.001,
+      "dann_domain_loss_weight": 0.01,
+      "mean_participant_macro_f1": 0.7538815677406538,
+      "worst_participant_macro_f1": 0.5630412751059518,
+      "lower_decile_participant_macro_f1": 0.6012093336328922,
+      "best_epoch": 23
+    },
+    {
+      "path": "results/development/dann_tuning_v1/lr001-w01.json",
+      "file_sha256": "c62a6dd4a19a8b4a4b7489185792d29447a77b18677fb6077e7ba8444a775e4f",
+      "record_sha256": "bd71df2f6b46699700fd3672f14ded0f1dfe1d7b100e00d9f3c42a6ed81ff8ba",
+      "configuration_sha256": "71935e1919971cb5e8ba5a58f2ff132debb74d3d579d5d3acb8ea632162af56d",
+      "learning_rate": 0.001,
+      "dann_domain_loss_weight": 0.1,
+      "mean_participant_macro_f1": 0.7578994854490477,
+      "worst_participant_macro_f1": 0.5710771105227396,
+      "lower_decile_participant_macro_f1": 0.6084415855080012,
+      "best_epoch": 23
+    }
+  ],
+  "selected_configuration_sha256": "71935e1919971cb5e8ba5a58f2ff132debb74d3d579d5d3acb8ea632162af56d",
+  "selected_learning_rate": 0.001,
+  "selected_dann_domain_loss_weight": 0.1,
+  "selected_fixed_epoch_from_grouped_cv": 23,
+  "grouped_cv": {
+    "aggregate_path": "results/development/source_cv_v1/source_cv_aggregate_v6.json",
+    "aggregate_file_sha256": "0bc323d2ba04dda54776999c3b77d3a338fdfb6c804edadad1248d649907e875",
+    "aggregate_record_sha256": "fb23b81e417cbaec43eef587638a762b7109f0fa21a8409b22793d0c914bf56f",
+    "mean_participant_macro_f1": 0.8004225679388528,
+    "worst_participant_macro_f1": 0.5710771105227396,
+    "lower_decile_participant_macro_f1": 0.6069128660931913
+  },
+  "cuda_required_and_used": true,
+  "target_subject_or_window_records_loaded": false,
+  "target_predictions_or_performance_accessed": false,
+  "record_sha256": "fa30dd70ff767ed1486e677ef7899966ef0e622d77cfafbc302b6c97274e73a5"
+}
