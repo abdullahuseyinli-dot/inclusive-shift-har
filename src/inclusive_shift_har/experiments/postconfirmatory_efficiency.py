@@ -61,6 +61,20 @@ def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
     return value
 
 
+def _configuration_matches_frozen(
+    reconstructed: Mapping[str, Any],
+    frozen: Mapping[str, Any],
+    *,
+    expected_sha256: str,
+) -> bool:
+    """Compare serialized configuration semantics across JSON and checkpoint types."""
+
+    return (
+        canonical_json_sha256(reconstructed) == expected_sha256
+        and canonical_json_sha256(frozen) == expected_sha256
+    )
+
+
 def _sha256(value: Any, *, name: str) -> str:
     if (
         not isinstance(value, str)
@@ -891,9 +905,10 @@ def run_frozen_efficiency_profiles(
                 payload_configuration = _mapping(
                     payload.get("configuration"), name="reconstructed configuration"
                 )
-                if (
-                    canonical_json_sha256(payload_configuration) != configuration_hash
-                    or payload_configuration != configuration
+                if not _configuration_matches_frozen(
+                    payload_configuration,
+                    configuration,
+                    expected_sha256=configuration_hash,
                 ):
                     raise PostconfirmatoryEfficiencyError(
                         f"{model_id} reconstructed configuration differs from inventory"

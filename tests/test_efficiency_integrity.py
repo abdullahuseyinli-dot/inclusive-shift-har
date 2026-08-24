@@ -569,6 +569,19 @@ def test_repository_freeze_has_exact_runner_inventory(repository_root: Path) -> 
     }
 
 
+def test_checkpoint_tuple_and_inventory_list_configurations_match_canonically() -> None:
+    frozen = {"seed": 11, "zero_channel_indices": []}
+    reconstructed = {"seed": 11, "zero_channel_indices": ()}
+    expected = canonical_json_sha256(frozen)
+
+    assert runner._configuration_matches_frozen(reconstructed, frozen, expected_sha256=expected)
+    assert not runner._configuration_matches_frozen(
+        {"seed": 11, "zero_channel_indices": (0,)},
+        frozen,
+        expected_sha256=expected,
+    )
+
+
 def test_failure_and_failed_index_are_create_only_and_preserve_partial_counts(
     tmp_path: Path,
 ) -> None:

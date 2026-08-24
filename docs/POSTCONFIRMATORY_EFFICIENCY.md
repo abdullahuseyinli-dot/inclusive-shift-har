@@ -33,7 +33,12 @@ machine-readable timing-validity classification. This is a sampled process gate,
 not continuous utilization or thermal monitoring, and that limitation must remain
 attached to reported timing.
 
-From the repository root, supply a real UTC timestamp and run once:
+The first create-only attempt is preserved at
+`results/efficiency/postconfirmatory-v1`. It stopped before timing because a
+checkpoint tuple and its semantically identical JSON list were compared using
+raw Python container equality after their canonical hash had already matched.
+The tested fix compares the canonical serialized configurations. From the
+repository root, supply a real UTC timestamp and run the new attempt once:
 
 ```powershell
 $profilerCommit = (git rev-parse --verify HEAD).Trim()
@@ -51,7 +56,7 @@ if ($observedProfileConfigFileSha -ne $profileConfigFileSha) {
   --opening-receipt results/protocol/confirmatory_target_opening_1.json `
   --locked-target-index results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json `
   --artifact-root . `
-  --output-directory results/efficiency/postconfirmatory-v1 `
+  --output-directory results/efficiency/postconfirmatory-v1-attempt-002 `
   --output-root . `
   --created-at-utc $createdAtUtc `
   --profiler-code-commit $profilerCommit
@@ -69,9 +74,9 @@ profiler commit, and a complete passing contention attestation:
 $aggregationCommit = (git rev-parse --verify HEAD).Trim()
 $aggregationCreatedAtUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.ffffffZ")
 .venv\Scripts\python.exe -m inclusive_shift_har.evaluation.secondary_aggregation efficiency `
-  --index results/efficiency/postconfirmatory-v1/neural_efficiency_profile_index.json `
+  --index results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_profile_index.json `
   --artifact-root . `
-  --destination results/efficiency/postconfirmatory-v1/neural_efficiency_aggregate.json `
+  --destination results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate.json `
   --created-at-utc $aggregationCreatedAtUtc `
   --aggregation-code-commit $aggregationCommit
 ```
