@@ -350,6 +350,54 @@ def _aggregate_source_cv(args: argparse.Namespace) -> int:
     return EXIT_SUCCESS
 
 
+def _run_uci_source_fold(args: argparse.Namespace) -> int:
+    try:
+        from inclusive_shift_har.experiments.uci_source import run_uci_source_fold
+
+        summary = run_uci_source_fold(
+            archive_path=Path(args.archive),
+            dataset_manifest_path=Path(args.dataset_manifest),
+            protocol_path=Path(args.protocol),
+            model_name=args.model,
+            fold_id=args.fold_id,
+            seed=args.seed,
+            code_commit=args.code_commit,
+            run_directory=Path(args.run_directory),
+            summary_path=Path(args.summary),
+            allowed_output_root=Path(args.allowed_output_root),
+            epochs=args.epochs,
+            batch_size=args.batch_size,
+            learning_rate=args.learning_rate,
+            weight_decay=args.weight_decay,
+            patience=args.patience,
+            minimum_epochs=args.minimum_epochs,
+            checkpoint_selection_rule=args.checkpoint_selection_rule,
+            mixed_precision=args.mixed_precision,
+            disable_cudnn=args.disable_cudnn,
+        )
+    except (FileExistsError, OSError, PermissionError, RuntimeError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "UCI_SOURCE_RUN_VALIDATION_OR_EXECUTION_ERROR",
+            "command": "run-uci-source-fold",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "command": "run-uci-source-fold",
+        "fold_id": summary["fold"]["fold_id"],
+        "model_name": summary["model_name"],
+        "record_sha256": summary["record_sha256"],
+        "status": summary["status"],
+        "summary": Path(args.summary).as_posix(),
+        "official_test_performance_or_prediction_accessed": False,
+        "inclusivehar_data_or_target_accessed": False,
+    }
+    _emit(payload, as_json=args.json)
+    return EXIT_SUCCESS
+
+
 def _gated(args: argparse.Namespace) -> int:
     payload = gated_command_payload(args.command)
     _emit(payload, as_json=args.json)
@@ -359,7 +407,10 @@ def _gated(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="inclusive-shift-har",
-        description="Leakage-safe, evidence-gated InclusiveShift-HAR research commands.",
+        description=(
+            "Participant-exclusive, evidence-gated InclusiveShift-HAR research commands; "
+            "InclusiveHAR released-block windows are not trial-safe."
+        ),
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -488,6 +539,60 @@ def build_parser() -> argparse.ArgumentParser:
     source_cv_parser.add_argument("--bootstrap-seed", type=int, default=1729)
     source_cv_parser.add_argument("--json", action="store_true")
     source_cv_parser.set_defaults(handler=_aggregate_source_cv)
+
+    uci_source_parser = subparsers.add_parser(
+        "run-uci-source-fold",
+        help="run one corrected official-train-only UCI-HAR grouped fold on CUDA",
+    )
+    uci_source_parser.add_argument("--archive", required=True)
+    uci_source_parser.add_argument(
+        "--dataset-manifest", default="manifests/datasets/uci_har_v1.json"
+    )
+    uci_source_parser.add_argument(
+        "--protocol", default="results/protocol/uci_har_source_grouped_v1.json"
+    )
+    uci_source_parser.add_argument(
+        "--model",
+        required=True,
+        choices=(
+            "legacy_cnn1d_h128",
+            "legacy_bilstm_h192",
+            "legacy_joint_bilstm256_cnn128",
+        ),
+    )
+    uci_source_parser.add_argument(
+        "--fold-id",
+        required=True,
+        choices=tuple(f"uci_source_cv_{index:02d}" for index in range(1, 6)),
+    )
+    uci_source_parser.add_argument("--seed", type=int, required=True)
+    uci_source_parser.add_argument("--code-commit", required=True)
+    uci_source_parser.add_argument("--run-directory", required=True)
+    uci_source_parser.add_argument("--summary", required=True)
+    uci_source_parser.add_argument("--allowed-output-root", default="results")
+    uci_source_parser.add_argument("--epochs", type=int, default=40)
+    uci_source_parser.add_argument("--batch-size", type=int, default=128)
+    uci_source_parser.add_argument("--learning-rate", type=float, default=3e-4)
+    uci_source_parser.add_argument("--weight-decay", type=float, default=1e-4)
+    uci_source_parser.add_argument("--patience", type=int, default=8)
+    uci_source_parser.add_argument("--minimum-epochs", type=int, default=8)
+    uci_source_parser.add_argument(
+        "--checkpoint-selection-rule",
+        choices=("source_validation_best", "fixed_last_epoch"),
+        default="source_validation_best",
+    )
+    uci_source_parser.add_argument(
+        "--mixed-precision",
+        choices=("float16", "bfloat16", "disabled"),
+        default="float16",
+    )
+    uci_source_parser.add_argument(
+        "--disable-cudnn",
+        action="store_true",
+        help="retain CUDA tensors while bypassing the cuDNN recurrent backend",
+    )
+    uci_source_parser.add_argument("--json", action="store_true")
+    uci_source_parser.set_defaults(handler=_run_uci_source_fold)
 
     for command in _GATED_COMMANDS:
         gated_parser = subparsers.add_parser(command, help=_GATED_COMMANDS[command]["message"])

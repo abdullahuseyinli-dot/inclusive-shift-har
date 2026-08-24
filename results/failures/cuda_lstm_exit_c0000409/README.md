@@ -16,12 +16,20 @@ A subsequent CUDA fold attempt for the original jointly trained
 `legacy_joint_bilstm256_cnn128` reproduced the same native exit code and is
 quarantined here as a fourth failed attempt.
 
+An exact `deepconvlstm` CUDA development attempt under commit
+`fb99510c3606498b90d8126293a7ef1f4871e07d` also completed its Python-level
+artifact writes and then exited with the same `0xc0000409` native failure. Its
+summary is preserved here as the fifth failed attempt. The successful
+DeepConvLSTM development and grouped-CV records use CUDA with cuDNN disabled
+explicitly in the hashed configuration.
+
 Windows Application Error/WER event IDs 1000/1001 recorded report IDs
 `03ec83ca-1707-45ff-85b8-929ead104f7e`,
 `a20174c0-d048-49b3-b911-762b68402152`, and
 `1f04629a-2947-4bbc-bd51-6b70e0a8ec8b`. The failure occurred with PyTorch
-2.12.0+cu132 on the RTX PRO 3000 Blackwell Laptop GPU under commit
-`7f873f300c6533f7e9b00408ef197ea6ed51e5c2` while another independent local
+2.12.0+cu132 on the RTX PRO 3000 Blackwell Laptop GPU under commits
+`7f873f300c6533f7e9b00408ef197ea6ed51e5c2` and
+`fb99510c3606498b90d8126293a7ef1f4871e07d` while another independent local
 GPU process was visible. The benchmark does not attribute causality to that
 contention.
 

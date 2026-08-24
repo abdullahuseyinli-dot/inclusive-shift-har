@@ -184,6 +184,8 @@ def run_source_development(
     use_group_dro: bool = False,
     coral_weight: float = 0.0,
     disable_cudnn: bool = False,
+    checkpoint_selection_rule: str = "source_validation_best",
+    zero_channel_indices: tuple[int, ...] = (),
 ) -> dict[str, Any]:
     """Execute one immutable final-source-split development trial."""
 
@@ -262,12 +264,14 @@ def run_source_development(
             minimum_epochs=min(8, epochs),
             mixed_precision="float16" if device.type == "cuda" else "disabled",
             checkpoint_interval=max(epochs, 1),
+            checkpoint_selection_rule=checkpoint_selection_rule,
             disable_cudnn=disable_cudnn,
             use_augmentation=use_augmentation,
             use_content_objective=use_content_objective,
             use_realization_factorization=use_realization_factorization,
             use_group_dro=use_group_dro,
             coral_weight=coral_weight,
+            zero_channel_indices=zero_channel_indices,
         )
         lineage = TrainingLineage(
             dataset_manifest_sha256=sha256_file(dataset_manifest_path),
@@ -379,6 +383,19 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="keep CUDA tensors but use the non-cuDNN recurrent backend",
     )
+    parser.add_argument(
+        "--checkpoint-selection-rule",
+        choices=("source_validation_best", "fixed_last_epoch"),
+        default="source_validation_best",
+        help="use source-validation early stopping for development or a frozen final epoch",
+    )
+    parser.add_argument(
+        "--zero-channel-indices",
+        type=int,
+        nargs="*",
+        default=(),
+        help="zero selected input channels after training-only normalization (indices 0-5)",
+    )
     return parser
 
 
@@ -404,6 +421,8 @@ def main(argv: list[str] | None = None) -> int:
         use_group_dro=args.group_dro,
         coral_weight=args.coral_weight,
         disable_cudnn=args.disable_cudnn,
+        checkpoint_selection_rule=args.checkpoint_selection_rule,
+        zero_channel_indices=tuple(args.zero_channel_indices),
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0

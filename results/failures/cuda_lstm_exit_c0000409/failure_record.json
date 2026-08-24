@@ -3,16 +3,20 @@
   "record_kind": "preserved_training_failure",
   "status": "quarantined_native_process_failure",
   "detected_at_local": "2026-08-23T23:48:04+01:00",
-  "code_commit": "7f873f300c6533f7e9b00408ef197ea6ed51e5c2",
+  "code_commits": [
+    "7f873f300c6533f7e9b00408ef197ea6ed51e5c2",
+    "fb99510c3606498b90d8126293a7ef1f4871e07d"
+  ],
   "model_names": [
     "legacy_bilstm_h192",
-    "legacy_joint_bilstm256_cnn128"
+    "legacy_joint_bilstm256_cnn128",
+    "deepconvlstm"
   ],
   "device": "cuda",
   "python_exit_code_signed": -1073740791,
   "python_exit_code_hex": "0xc0000409",
   "windows_event": "BEX64 in ucrtbase.dll",
-  "attempt_count": 4,
+  "attempt_count": 5,
   "attempt_summaries": [
     {
       "path": "results/failures/cuda_lstm_exit_c0000409/legacy_bilstm_h192-seed11-lr3e4-wd1e3-exact7f873.json",
@@ -29,6 +33,10 @@
     {
       "path": "results/failures/cuda_lstm_exit_c0000409/legacy_joint_bilstm256_cnn128-seed11-lr1e3-wd1e4-source_cv_01.json",
       "file_sha256": "1c57158e13025ec91dc39cd117abbe054ec79f94f7c2a2d2b9ad9c57cf8f8d0a"
+    },
+    {
+      "path": "results/failures/cuda_lstm_exit_c0000409/deepconvlstm-seed11-lr3e4-wd1e4-exactfb995-cuda.json",
+      "file_sha256": "8938138aea2a3202df5b7a8c851c8712b7589decc5ccda4acc3d86a935adee4f"
     }
   ],
   "windows_report_ids": [
