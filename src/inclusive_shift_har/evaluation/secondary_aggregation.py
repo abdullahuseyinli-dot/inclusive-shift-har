@@ -109,6 +109,13 @@ def _sha256(value: Any, *, name: str) -> str:
     return result
 
 
+def _git_commit(value: Any, *, name: str) -> str:
+    result = _string(value, name=name).casefold()
+    if len(result) != 40 or any(character not in "0123456789abcdef" for character in result):
+        raise SecondaryAggregationError(f"{name} must be a full lowercase Git commit")
+    return result
+
+
 def _boolean(value: Any, *, name: str) -> bool:
     if not isinstance(value, bool):
         raise SecondaryAggregationError(f"{name} must be boolean")
@@ -150,6 +157,199 @@ def _participant_metrics(report_value: Any) -> dict[str, dict[str, float]]:
             ),
         }
     return result
+
+
+def _validate_gpu_contention_attestation(
+    reference_value: Any,
+    *,
+    root: Path,
+    profile_config_sha256: str,
+    profiler_code_commit: str,
+) -> tuple[Mapping[str, Any], dict[tuple[tuple[str, int, int, str], str], str]]:
+    """Validate complete sampled process-gate coverage for every timed profile."""
+
+    reference = _mapping(reference_value, name="GPU contention attestation reference")
+    path = _resolve_file(reference.get("path"), root=root, name="GPU contention attestation")
+    if sha256_file(path) != _sha256(
+        reference.get("file_sha256"), name="contention attestation file hash"
+    ):
+        raise SecondaryAggregationError("GPU contention attestation file hash changed")
+    attestation = _mapping(load_json_strict(path), name="GPU contention attestation")
+    record_hash = _self_hash(attestation, field="record_sha256", name="GPU contention attestation")
+    if record_hash != reference.get("record_sha256"):
+        raise SecondaryAggregationError("GPU contention attestation differs from index")
+    timing_validities = {
+        "valid_exclusive_compute_process_samples",
+        "valid_with_declared_allowlisted_ambient_system_processes",
+    }
+    expected_snapshot_count = 1 + 2 * len(FROZEN_NEURAL_MODEL_IDS) * len(FROZEN_NEURAL_SEEDS) * len(
+        EFFICIENCY_BATCH_SIZES
+    ) * len(EFFICIENCY_PRECISIONS)
+    required = {
+        "schema_version": "1.0.0",
+        "record_kind": "gpu_contention_attestation",
+        "status": "pass_no_unapproved_compute_processes_sampled",
+        "profiler_code_commit": profiler_code_commit,
+        "profile_config_sha256": profile_config_sha256,
+        "monitor": "nvidia_smi_selected_device_compute_apps",
+        "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
+        "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
+        "allowed_ambient_process_names": ["dwm.exe"],
+        "expected_snapshot_count": expected_snapshot_count,
+        "observed_snapshot_count": expected_snapshot_count,
+        "unapproved_competing_process_count": 0,
+    }
+    mismatches = [key for key, expected in required.items() if attestation.get(key) != expected]
+    if mismatches:
+        raise SecondaryAggregationError(
+            f"GPU contention attestation contract mismatch: {mismatches}"
+        )
+    try:
+        require_utc_timestamp(
+            _string(attestation.get("created_at_utc"), name="contention created_at_utc"),
+            location="contention created_at_utc",
+        )
+    except ValueError as exc:
+        raise SecondaryAggregationError("GPU contention timestamp is invalid") from exc
+    timing_validity = _string(attestation.get("timing_validity"), name="timing validity")
+    if (
+        timing_validity not in timing_validities
+        or reference.get("status") != attestation["status"]
+        or reference.get("timing_validity") != timing_validity
+    ):
+        raise SecondaryAggregationError("GPU contention timing validity is invalid")
+
+    snapshots = _sequence(attestation.get("snapshots"), name="GPU contention snapshots")
+    if len(snapshots) != expected_snapshot_count:
+        raise SecondaryAggregationError("GPU contention snapshot matrix is incomplete")
+    expected_profiles = {
+        (model_id, seed, batch_size, precision)
+        for model_id in FROZEN_NEURAL_MODEL_IDS
+        for seed in FROZEN_NEURAL_SEEDS
+        for batch_size in EFFICIENCY_BATCH_SIZES
+        for precision in EFFICIENCY_PRECISIONS
+    }
+    snapshot_hashes: dict[tuple[tuple[str, int, int, str], str], str] = {}
+    initial_count = 0
+    observed_ambient_names: set[str] = set()
+    for value in snapshots:
+        snapshot = _mapping(value, name="GPU contention snapshot")
+        snapshot_hash = _self_hash(snapshot, field="record_sha256", name="GPU contention snapshot")
+        snapshot_required = {
+            "schema_version": "1.0.0",
+            "record_kind": "gpu_contention_snapshot",
+            "profiler_code_commit": profiler_code_commit,
+            "monitor": "nvidia_smi_selected_device_compute_apps",
+            "monitor_return_code": 0,
+            "monitor_error": None,
+            "allowed_ambient_process_names": ["dwm.exe"],
+            "unapproved_competing_process_count": 0,
+            "status": "pass_no_unapproved_compute_processes",
+        }
+        snapshot_mismatches = [
+            key for key, expected in snapshot_required.items() if snapshot.get(key) != expected
+        ]
+        if snapshot_mismatches:
+            raise SecondaryAggregationError(
+                f"GPU contention snapshot contract mismatch: {snapshot_mismatches}"
+            )
+        try:
+            require_utc_timestamp(
+                _string(snapshot.get("captured_at_utc"), name="snapshot captured_at_utc"),
+                location="snapshot captured_at_utc",
+            )
+        except ValueError as exc:
+            raise SecondaryAggregationError("GPU contention snapshot timestamp is invalid") from exc
+        device_index = snapshot.get("device_index")
+        if isinstance(device_index, bool) or not isinstance(device_index, int) or device_index < 0:
+            raise SecondaryAggregationError("GPU contention device index is invalid")
+        phase = snapshot.get("phase")
+        identity_value = snapshot.get("profile_identity")
+        if phase == "before_run" and identity_value is None:
+            initial_count += 1
+        elif phase in {"before_profile", "after_profile"}:
+            identity = _mapping(identity_value, name="contention profile identity")
+            if set(identity) != {"model_id", "seed", "batch_size", "precision"}:
+                raise SecondaryAggregationError("contention profile identity fields are invalid")
+            profile_identity = (
+                _string(identity.get("model_id"), name="contention model_id"),
+                _integer(identity.get("seed"), name="contention seed"),
+                _integer(identity.get("batch_size"), name="contention batch size"),
+                _string(identity.get("precision"), name="contention precision"),
+            )
+            phase_key = "before" if phase == "before_profile" else "after"
+            key = (profile_identity, phase_key)
+            if profile_identity not in expected_profiles or key in snapshot_hashes:
+                raise SecondaryAggregationError(
+                    "GPU contention profile sample is unexpected or duplicated"
+                )
+            snapshot_hashes[key] = snapshot_hash
+        else:
+            raise SecondaryAggregationError("GPU contention snapshot phase is invalid")
+
+        processes = _sequence(
+            snapshot.get("observed_compute_processes"), name="observed compute processes"
+        )
+        for process_value in processes:
+            process = _mapping(process_value, name="observed compute process")
+            pid = process.get("pid")
+            if isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+                raise SecondaryAggregationError("observed compute process PID is invalid")
+            reported = _string(
+                process.get("nvidia_smi_reported_process_name"),
+                name="nvidia-smi reported process name",
+            )
+            basename_value = process.get("process_name_basename")
+            if basename_value is not None and not isinstance(basename_value, str):
+                raise SecondaryAggregationError("resolved process basename is invalid")
+            basename = None if basename_value is None else basename_value.casefold()
+            classification = process.get("classification")
+            resolution = process.get("process_name_resolution")
+            resolution_error = process.get("process_name_resolution_error")
+            if classification == "allowlisted_ambient_process":
+                if basename != "dwm.exe":
+                    raise SecondaryAggregationError("an ambient process is not allowlisted")
+                observed_ambient_names.add(basename)
+            elif classification != "current_profiler_process":
+                raise SecondaryAggregationError("contention attestation contains a competitor")
+            if reported.casefold() == "[insufficient permissions]":
+                if classification == "current_profiler_process":
+                    continue
+                if (
+                    resolution != "windows_get_process_exact_pid"
+                    or resolution_error is not None
+                    or basename != "dwm.exe"
+                ):
+                    raise SecondaryAggregationError(
+                        "protected Windows process was not resolved by its exact PID"
+                    )
+            else:
+                reported_basename = reported.replace("\\", "/").rsplit("/", 1)[-1].casefold()
+                if (
+                    resolution != "nvidia_smi_reported_process_name"
+                    or resolution_error is not None
+                    or basename != reported_basename
+                ):
+                    raise SecondaryAggregationError(
+                        "nvidia-smi process-name resolution metadata is invalid"
+                    )
+
+    expected_sample_keys = {
+        (identity, phase) for identity in expected_profiles for phase in ("before", "after")
+    }
+    if initial_count != 1 or set(snapshot_hashes) != expected_sample_keys:
+        raise SecondaryAggregationError("GPU contention snapshot matrix is incomplete")
+    declared_ambient = attestation.get("observed_allowlisted_ambient_process_names")
+    if declared_ambient != sorted(observed_ambient_names):
+        raise SecondaryAggregationError("declared ambient GPU processes differ from snapshots")
+    expected_validity = (
+        "valid_with_declared_allowlisted_ambient_system_processes"
+        if observed_ambient_names
+        else "valid_exclusive_compute_process_samples"
+    )
+    if timing_validity != expected_validity:
+        raise SecondaryAggregationError("GPU contention timing validity differs from snapshots")
+    return reference, snapshot_hashes
 
 
 def _mean(values: Sequence[float]) -> float:
@@ -211,6 +411,15 @@ def aggregate_efficiency_profiles(
     )
     lineage = {field: _sha256(index.get(field), name=field) for field in lineage_fields}
     frozen_code_commit = _string(index.get("frozen_code_commit"), name="frozen code commit")
+    profiler_code_commit = _git_commit(
+        index.get("profiler_code_commit"), name="profiler code commit"
+    )
+    contention_reference, contention_samples = _validate_gpu_contention_attestation(
+        index.get("gpu_contention_attestation"),
+        root=root,
+        profile_config_sha256=lineage["profile_config_sha256"],
+        profiler_code_commit=profiler_code_commit,
+    )
 
     validation_values = _sequence(
         index.get("checkpoint_validations"), name="checkpoint validations"
@@ -355,11 +564,23 @@ def aggregate_efficiency_profiles(
         expected_profile_lineage = {
             **lineage,
             "frozen_code_commit": frozen_code_commit,
+            "profiler_code_commit": profiler_code_commit,
             "training_configuration_sha256": validation_entry["training_configuration_sha256"],
             "checkpoint_path": validation_entry["checkpoint_path"],
         }
         if any(profile.get(key) != expected for key, expected in expected_profile_lineage.items()):
             raise SecondaryAggregationError("efficiency profile lineage differs from index")
+        sample_links = _mapping(
+            profile.get("gpu_contention_samples"), name="profile GPU contention samples"
+        )
+        expected_sample_links = {
+            "before_record_sha256": contention_samples[(profile_identity, "before")],
+            "after_record_sha256": contention_samples[(profile_identity, "after")],
+        }
+        if sample_links != expected_sample_links:
+            raise SecondaryAggregationError(
+                "efficiency profile GPU contention samples differ from attestation"
+            )
         if (
             checkpoint_link
             != {
@@ -483,6 +704,9 @@ def aggregate_efficiency_profiles(
         "efficiency_index_record_sha256": index["record_sha256"],
         **lineage,
         "frozen_code_commit": frozen_code_commit,
+        "profiler_code_commit": profiler_code_commit,
+        "gpu_contention_attestation": dict(contention_reference),
+        "gpu_timing_validity": contention_reference["timing_validity"],
         "validated_checkpoint_count": len(validations),
         "validated_profile_count": len(seen),
         "validated_combinatorics": "16_models_x_5_seeds_x_2_batches_x_2_precisions",

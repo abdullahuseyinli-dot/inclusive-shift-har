@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 profile_id: "neural-efficiency-cuda-v1"
-config_sha256: "f1c9499e5c79f44acce31cced5b173cd431399ee190e497458052cdad819c853"
+config_sha256: "06fefd3568b7c0b19ab485c7492d46292bea304496d44c8b821dbefdc5573d77"
 status: "configured_not_run"
 required_device: "cuda"
 input:
@@ -30,6 +30,14 @@ complexity:
     - "pooling"
     - "softmax"
     - "attention or custom functional kernels not exposed as counted modules"
+contention_policy:
+  monitor_command: "nvidia-smi"
+  query_scope: "selected_device_compute_apps"
+  sample_before_run: true
+  sample_before_and_after_each_profile: true
+  allow_current_process: true
+  allowed_ambient_process_names: ["dwm.exe"]
+  fail_on_unapproved_process: true
 output_policy:
   create_only: true
   checkpoint_sha256_required: true

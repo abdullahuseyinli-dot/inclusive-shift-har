@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+import inclusive_shift_har.experiments.few_person as few_person_module
 from inclusive_shift_har.experiments.few_person import (
     FewPersonRunError,
     run_few_person_scenario,
@@ -40,6 +41,7 @@ def test_neural_runner_refuses_cpu_before_raw_or_checkpoint_access(
             model_id="compact-erm",
             seed=11,
             code_commit="a" * 40,
+            created_at_utc="2099-01-01T00:00:00Z",
             output_directory=output,
             output_root=tmp_path,
         )
@@ -78,6 +80,16 @@ def test_unplanned_k_or_participant_assignment_is_rejected(
             model_id="compact-erm",
             seed=11,
             code_commit="a" * 40,
+            created_at_utc="2099-01-01T00:00:00Z",
             output_directory=tmp_path / "outputs" / "run",
             output_root=tmp_path,
         )
+
+
+def test_supplied_commit_must_equal_repository_head(
+    repository_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(few_person_module, "_repository_head", lambda _: "b" * 40)
+    with pytest.raises(FewPersonRunError, match="differs from repository HEAD"):
+        few_person_module._require_repository_head(repository_root, "a" * 40)
+    assert few_person_module._require_repository_head(repository_root, "b" * 40) == "b" * 40

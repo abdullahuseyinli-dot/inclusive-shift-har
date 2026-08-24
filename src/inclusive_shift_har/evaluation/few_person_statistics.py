@@ -21,6 +21,7 @@ import torch
 from numpy.typing import NDArray
 
 from inclusive_shift_har.calibration import TemperatureCalibrator
+from inclusive_shift_har.evaluation._strict_config import require_utc_timestamp
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.evaluation.source_calibration import (
     load_source_temperature_calibrator_file,
@@ -132,6 +133,8 @@ class _Completed:
     checkpoint_sha256: str
     prediction_path: Path
     prediction_sha256: str
+    code_commit: str
+    environment_sha256: str
     window_ids: tuple[str, ...]
     participant_ids: tuple[str, ...]
     labels: NDArray[np.int64]
@@ -186,6 +189,56 @@ def _finite_probability(value: Any, *, name: str) -> float:
     ):
         raise FewPersonStatisticsError(f"{name} must lie in [0,1]")
     return float(value)
+
+
+def _validate_execution_metadata(record: Mapping[str, Any], *, name: str) -> tuple[str, str, str]:
+    timestamp = record.get("created_at_utc")
+    if not isinstance(timestamp, str):
+        raise FewPersonStatisticsError(f"{name} created_at_utc is missing")
+    try:
+        timestamp = require_utc_timestamp(timestamp, location=f"{name}.created_at_utc")
+    except ValueError as exc:
+        raise FewPersonStatisticsError(str(exc)) from exc
+    commit = record.get("code_commit")
+    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        raise FewPersonStatisticsError(f"{name} code commit is invalid")
+    environment = _mapping(record.get("environment"), name=f"{name} environment")
+    string_fields = (
+        "python",
+        "platform",
+        "numpy",
+        "torch",
+        "torch_cuda_runtime",
+        "device_type",
+        "device_name",
+    )
+    capability = environment.get("compute_capability")
+    if (
+        any(
+            not isinstance(environment.get(field), str) or not environment[field]
+            for field in string_fields
+        )
+        or environment.get("device_type") != "cuda"
+        or isinstance(environment.get("device_index"), bool)
+        or not isinstance(environment.get("device_index"), int)
+        or int(environment["device_index"]) < 0
+        or isinstance(environment.get("device_total_memory_bytes"), bool)
+        or not isinstance(environment.get("device_total_memory_bytes"), int)
+        or int(environment["device_total_memory_bytes"]) <= 0
+        or not isinstance(capability, list)
+        or len(capability) != 2
+        or any(isinstance(value, bool) or not isinstance(value, int) for value in capability)
+        or not isinstance(environment.get("cudnn_enabled_during_run"), bool)
+        or isinstance(environment.get("cudnn_version"), bool)
+        or not isinstance(environment.get("cudnn_version"), int)
+        or int(environment["cudnn_version"]) <= 0
+        or environment.get("hostname_recorded") is not False
+        or environment.get("process_id_recorded") is not False
+    ):
+        raise FewPersonStatisticsError(f"{name} environment metadata is invalid")
+    execution_machine = dict(environment)
+    execution_machine.pop("cudnn_enabled_during_run")
+    return timestamp, commit, canonical_json_sha256(execution_machine)
 
 
 def _digest(value: Any, *, name: str) -> str:
@@ -568,6 +621,13 @@ def _validate_checkpoint(
         raise FewPersonStatisticsError(
             f"{key.cell_id} adaptation seed/commit differs from checkpoint"
         )
+    if record.get("created_at_utc") != checkpoint.get("created_at_utc") or record.get(
+        "environment"
+    ) != checkpoint.get("environment"):
+        raise FewPersonStatisticsError(
+            f"{key.cell_id} timestamp/environment differs from checkpoint"
+        )
+    _validate_execution_metadata(checkpoint, name=f"{key.cell_id} checkpoint")
     rng_states = checkpoint.get("rng_states")
     if (
         not isinstance(checkpoint.get("parameter_count"), int)
@@ -1031,9 +1091,11 @@ def _validate_completed_record(
     mismatches = [field for field, expected in required.items() if record.get(field) != expected]
     if mismatches:
         raise FewPersonStatisticsError(f"{key.cell_id} result mismatch: {mismatches}")
+    _, commit, environment_sha256 = _validate_execution_metadata(
+        record, name=f"{key.cell_id} result"
+    )
     device = _mapping(record.get("device"), name="few-person result device")
     elapsed = record.get("elapsed_seconds")
-    commit = record.get("code_commit")
     if (
         device.get("type") != "cuda"
         or not isinstance(device.get("peak_vram_bytes"), int)
@@ -1042,8 +1104,6 @@ def _validate_completed_record(
         or not isinstance(elapsed, (int, float))
         or not np.isfinite(elapsed)
         or float(elapsed) < 0.0
-        or not isinstance(commit, str)
-        or re.fullmatch(r"[0-9a-f]{40}", commit) is None
     ):
         raise FewPersonStatisticsError(f"{key.cell_id} execution metadata is invalid")
     checkpoint_ref = _mapping(record.get("adapted_checkpoint"), name="adapted checkpoint ref")
@@ -1110,6 +1170,8 @@ def _validate_completed_record(
         checkpoint_sha256=checkpoint_sha256,
         prediction_path=prediction_path,
         prediction_sha256=prediction_sha256,
+        code_commit=commit,
+        environment_sha256=environment_sha256,
         window_ids=window_ids,
         participant_ids=participants,
         labels=labels,
@@ -1145,6 +1207,17 @@ def _validate_failure(path: Path, *, plan: _Plan) -> tuple[CellKey, Mapping[str,
     mismatches = [field for field, expected in required.items() if record.get(field) != expected]
     if mismatches:
         raise FewPersonStatisticsError(f"{key.cell_id} failure mismatch: {mismatches}")
+    _validate_execution_metadata(record, name=f"{key.cell_id} failure")
+    elapsed = record.get("elapsed_seconds")
+    if (
+        isinstance(elapsed, bool)
+        or not isinstance(elapsed, (int, float))
+        or not np.isfinite(elapsed)
+        or float(elapsed) < 0.0
+        or not isinstance(record.get("exception_type"), str)
+        or not isinstance(record.get("message"), str)
+    ):
+        raise FewPersonStatisticsError(f"{key.cell_id} failure execution metadata is invalid")
     return key, record
 
 
@@ -1211,6 +1284,22 @@ def _scan_progress(
                     ),
                 }
             )
+    completed_commits = sorted({item.code_commit for item in completed.values()})
+    completed_environments = sorted({item.environment_sha256 for item in completed.values()})
+    if len(completed_commits) > 1:
+        errors.append(
+            {
+                "path": relative(root),
+                "message": "completed cells combine multiple executing Git commits",
+            }
+        )
+    if len(completed_environments) > 1:
+        errors.append(
+            {
+                "path": relative(root),
+                "message": "completed cells combine multiple execution environments",
+            }
+        )
     incomplete_directories: list[str] = []
     for path in sorted(item for item in root.rglob("*") if item.is_dir()):
         if not _RUN_DIRECTORY_PATTERN.fullmatch(path.name):
@@ -1283,6 +1372,13 @@ def _scan_progress(
             "invalid_artifact_count": len(errors),
             "incomplete_directory_count": len(incomplete_directories),
             "partial_file_count": len(partial_files),
+        },
+        "execution_lineage": {
+            "code_commits": completed_commits,
+            "environment_sha256": completed_environments,
+            "environment_hash_scope": (
+                "machine_and_software_environment_excluding_model_specific_cudnn_policy"
+            ),
         },
         "missing_cells": [key.to_dict() for key in missing],
         "validated_completed_cells": completed_rows,
@@ -1642,7 +1738,6 @@ def _markdown_bytes(rows: Sequence[Mapping[str, Any]]) -> bytes:
 
 
 def _write_bytes_new(path: Path, payload: bytes) -> str:
-    path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("xb") as stream:
         stream.write(payload)
         stream.flush()
@@ -1651,14 +1746,36 @@ def _write_bytes_new(path: Path, payload: bytes) -> str:
 
 
 def _preflight_statistics_destinations(
-    output_directory: str | Path, prefix: str
+    output_directory: str | Path, prefix: str, *, allowed_root: str | Path
 ) -> tuple[Path, Path, Path, Path]:
     if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", prefix) is None:
         raise FewPersonStatisticsError("statistics prefix must be one portable filename stem")
+    root_candidate = Path(allowed_root)
+    if root_candidate.is_symlink():
+        raise FewPersonStatisticsError("statistics allowed root must not be a symlink")
+    root = root_candidate.resolve(strict=True)
     requested_output = Path(output_directory)
-    if requested_output.is_symlink():
+    candidate = requested_output if requested_output.is_absolute() else root / requested_output
+    if os.path.lexists(candidate) and candidate.is_symlink():
         raise FewPersonStatisticsError("statistics output directory must not be a symlink")
-    output = requested_output.resolve(strict=True)
+    if not os.path.lexists(candidate):
+        if candidate.parent.is_symlink():
+            raise FewPersonStatisticsError("statistics output parent is unsafe")
+        parent = candidate.parent.resolve(strict=True)
+        try:
+            parent.relative_to(root)
+        except ValueError as exc:
+            raise FewPersonStatisticsError(
+                "statistics output directory escapes allowed root"
+            ) from exc
+        if not parent.is_dir():
+            raise FewPersonStatisticsError("statistics output parent is unsafe")
+        candidate.mkdir(exist_ok=False)
+    output = candidate.resolve(strict=True)
+    try:
+        output.relative_to(root)
+    except ValueError as exc:
+        raise FewPersonStatisticsError("statistics output directory escapes allowed root") from exc
     if not output.is_dir():
         raise FewPersonStatisticsError("statistics output directory must be a regular directory")
     json_path = output / f"{prefix}.json"
@@ -1681,12 +1798,14 @@ def aggregate_few_person_statistics(
     bootstrap_resamples: int = 10_000,
     bootstrap_confidence: float = 0.95,
     bootstrap_seed: int = 1729,
+    created_at_utc: str,
 ) -> dict[str, Any]:
     """Aggregate exact complete coverage after reconstructing every stored metric."""
 
     output, json_path, csv_path, markdown_path = _preflight_statistics_destinations(
-        output_directory, prefix
+        output_directory, prefix, allowed_root=artifact_root
     )
+    timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
     scan = _scan_progress(manifest_path, results_root=results_root, artifact_root=artifact_root)
     if scan.progress["valid_so_far"] is not True or scan.progress["aggregation_ready"] is not True:
         raise FewPersonStatisticsError(
@@ -1723,11 +1842,13 @@ def aggregate_few_person_statistics(
     payload: dict[str, Any] = {
         "schema_version": FEW_PERSON_STATISTICS_SCHEMA_VERSION,
         "record_kind": "few_person_v1_1_participant_statistics",
+        "created_at_utc": timestamp,
         "status": "complete_create_only_postconfirmatory_secondary",
         "evidence_status": FEW_PERSON_V1_1_EVIDENCE_STATUS,
         "protocol_id": FEW_PERSON_V1_1_PROTOCOL_ID,
         "few_person_manifest_sha256": scan.plan.manifest_sha256,
         "validated_scenario_result_count": len(scan.completed),
+        "execution_lineage": scan.progress["execution_lineage"],
         "exact_coverage": {
             "model_ids": list(EXPECTED_MODEL_IDS),
             "seeds": list(EXPECTED_SEEDS),
@@ -1818,6 +1939,7 @@ def build_parser() -> argparse.ArgumentParser:
     aggregate.add_argument("--bootstrap-resamples", type=int, default=10_000)
     aggregate.add_argument("--bootstrap-confidence", type=float, default=0.95)
     aggregate.add_argument("--bootstrap-seed", type=int, default=1729)
+    aggregate.add_argument("--created-at-utc", required=True)
     return parser
 
 
@@ -1857,6 +1979,7 @@ def main(argv: list[str] | None = None) -> int:
                 bootstrap_resamples=args.bootstrap_resamples,
                 bootstrap_confidence=args.bootstrap_confidence,
                 bootstrap_seed=args.bootstrap_seed,
+                created_at_utc=args.created_at_utc,
             )
             payload = {
                 "status": record["status"],

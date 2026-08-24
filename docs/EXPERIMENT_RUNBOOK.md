@@ -42,37 +42,37 @@ seeds = 75 CUDA runs. It never opens the official UCI test or InclusiveHAR
 target. Use the inner verified archive described in
 `docs/DATA_ACQUISITION_RUNBOOK.md`.
 
+The runner consumes and byte-pins the v1.1 YAML. Model scope, folds, seeds,
+hyperparameters, mixed precision, and the model-specific recurrent cuDNN policy
+are derived from that file; the CLI has no independent hyperparameter override.
+It also rejects a supplied code commit that differs from the executing Git HEAD.
+
 ```powershell
 $archive = "data/raw/uci_har/v1/UCI HAR Dataset.zip"
 $root = "results/legacy_reproduction/uci_har_source_grouped_v1"
+$experimentConfig = "configs/experiments/uci_har_corrected_reproduction_v1_1.yaml"
+$experimentConfigSha = (Get-FileHash -Algorithm SHA256 -LiteralPath $experimentConfig).Hash.ToLowerInvariant()
 $folds = 1..5 | ForEach-Object { "uci_source_cv_{0:d2}" -f $_ }
 $seeds = @(42, 1337, 2025, 31415, 271828)
-$models = @(
-  @{ id = "legacy_cnn1d_h128"; disableCudnn = $false },
-  @{ id = "legacy_bilstm_h192"; disableCudnn = $true },
-  @{ id = "legacy_joint_bilstm256_cnn128"; disableCudnn = $true }
-)
+$models = @("legacy_cnn1d_h128", "legacy_bilstm_h192", "legacy_joint_bilstm256_cnn128")
 foreach ($model in $models) {
   foreach ($seed in $seeds) {
     foreach ($fold in $folds) {
-      $stem = "$($model.id)--seed-$seed--$fold"
+      $stem = "$model--seed-$seed--$fold"
       $arguments = @(
         "run", "inclusive-shift-har", "train", "uci-source-fold",
         "--archive", $archive,
         "--dataset-manifest", "manifests/datasets/uci_har_v1.json",
         "--protocol", "results/protocol/uci_har_source_grouped_v1.json",
-        "--model", $model.id, "--fold-id", $fold, "--seed", "$seed",
+        "--model", $model, "--fold-id", $fold, "--seed", "$seed",
         "--code-commit", $executionCommit,
+        "--repository-root", ".",
+        "--experiment-config", $experimentConfig,
+        "--expected-experiment-config-file-sha256", $experimentConfigSha,
         "--run-directory", "$root/runs/$stem",
         "--summary", "$root/records/$stem.json",
-        "--allowed-output-root", "results",
-        "--epochs", "40", "--batch-size", "128",
-        "--learning-rate", "0.0003", "--weight-decay", "0.0001",
-        "--patience", "8", "--minimum-epochs", "8",
-        "--checkpoint-selection-rule", "source_validation_best",
-        "--mixed-precision", "float16"
+        "--allowed-output-root", "results"
       )
-      if ($model.disableCudnn) { $arguments += "--disable-cudnn" }
       & uv @arguments
       if ($LASTEXITCODE -ne 0) { throw "UCI run failed: $stem" }
     }
@@ -86,6 +86,8 @@ Only after all 75 records and their linked arrays/checkpoints validate:
 uv run inclusive-shift-har evaluate uci-source `
   --record-directory results/legacy_reproduction/uci_har_source_grouped_v1/records `
   --protocol results/protocol/uci_har_source_grouped_v1.json `
+  --experiment-config $experimentConfig `
+  --expected-experiment-config-file-sha256 $experimentConfigSha `
   --output-directory results/legacy_reproduction/uci_har_source_grouped_v1 `
   --bootstrap-resamples 10000 `
   --bootstrap-seed 1729 `
@@ -146,9 +148,11 @@ $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
 $cacheRecordFileHash = "<EXTERNALLY_RECORDED_PRIMARY_CACHE_RECORD_FILE_SHA256>"
 $outputRoot = "results/postconfirmatory/few_person_v1_1"
+$executionCommit = (git rev-parse HEAD).Trim()
 foreach ($scenario in $manifest.scenarios) {
   foreach ($model in $manifest.models) {
     $output = "$outputRoot/$($scenario.scenario_id)/$($model.model_id)/seed-$($model.seed)"
+    $createdAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
     uv run inclusive-shift-har train few-person run-scenario `
       --manifest $manifestPath `
       --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json `
@@ -161,6 +165,7 @@ foreach ($scenario in $manifest.scenarios) {
       --fold-id $scenario.fold_id --k $scenario.k `
       --model-id $model.model_id --seed $model.seed `
       --code-commit $executionCommit `
+      --created-at-utc $createdAt `
       --output-directory $output --output-root .
     if ($LASTEXITCODE -ne 0) { throw "Few-person run failed: $output" }
   }
@@ -170,6 +175,8 @@ foreach ($scenario in $manifest.scenarios) {
 Validate progress at any time. Aggregate only when `aggregation_ready` is true:
 
 ```powershell
+$statisticsCreatedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
+
 uv run inclusive-shift-har evaluate few-person-statistics validate-progress `
   --manifest results/protocol/few_person_inclusion_curve_v1_1.json `
   --results-root results/postconfirmatory/few_person_v1_1 `
@@ -180,8 +187,13 @@ uv run inclusive-shift-har evaluate few-person-statistics aggregate `
   --results-root results/postconfirmatory/few_person_v1_1 `
   --artifact-root . `
   --output-directory results/postconfirmatory/few_person_v1_1/statistics `
-  --zero-shot-index results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json
+  --zero-shot-index results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json `
+  --created-at-utc $statisticsCreatedAt
 ```
+
+Each run rejects a supplied commit that is not the checkout's actual `HEAD`.
+Aggregation safely creates only the final `statistics` directory beneath the
+artifact root; its parent must already exist, and all exports remain create-only.
 
 ## Disabled-cohort within-group cross-subject description
 

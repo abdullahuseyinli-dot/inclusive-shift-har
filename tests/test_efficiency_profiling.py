@@ -34,6 +34,11 @@ def test_efficiency_config_is_self_hashed_and_cuda_only(repository_root: Path) -
     assert config.warmup_iterations == 20
     assert config.measured_iterations == 100
     assert config.flop_per_mac == 2
+    assert config.contention_monitor_command == "nvidia-smi"
+    assert config.contention_sample_before_run is True
+    assert config.contention_sample_before_and_after_each_profile is True
+    assert config.contention_allowed_ambient_process_names == ("dwm.exe",)
+    assert config.contention_fail_on_unapproved_process is True
 
 
 def test_supported_operator_mac_formulas_are_exact() -> None:
@@ -111,6 +116,11 @@ def test_efficiency_record_writer_is_self_hashed_and_create_only(tmp_path: Path)
         "required_device": "cuda",
         "execution_device_type": "cuda",
         "model_selection_use": False,
+        "profiler_code_commit": "9" * 40,
+        "gpu_contention_samples": {
+            "before_record_sha256": "a" * 64,
+            "after_record_sha256": "b" * 64,
+        },
         "parameters": {"total": 15},
     }
     record["record_sha256"] = canonical_json_sha256(record)

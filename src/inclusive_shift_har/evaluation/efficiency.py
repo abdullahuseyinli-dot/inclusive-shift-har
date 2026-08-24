@@ -76,6 +76,12 @@ class EfficiencyProfileConfig:
     latency_percentiles: tuple[float, ...]
     synchronize_each_iteration: bool
     flop_per_mac: int
+    contention_monitor_command: str
+    contention_sample_before_run: bool
+    contention_sample_before_and_after_each_profile: bool
+    contention_allow_current_process: bool
+    contention_allowed_ambient_process_names: tuple[str, ...]
+    contention_fail_on_unapproved_process: bool
 
 
 _TOP_LEVEL_KEYS = {
@@ -88,6 +94,7 @@ _TOP_LEVEL_KEYS = {
     "precision_modes",
     "latency",
     "complexity",
+    "contention_policy",
     "output_policy",
 }
 
@@ -148,6 +155,7 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
     input_config = _mapping(parsed["input"], location="input")
     latency = _mapping(parsed["latency"], location="latency")
     complexity = _mapping(parsed["complexity"], location="complexity")
+    contention = _mapping(parsed["contention_policy"], location="contention_policy")
     output_policy = _mapping(parsed["output_policy"], location="output_policy")
     try:
         require_exact_keys(
@@ -169,6 +177,19 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
             complexity,
             {"mac_definition", "flop_per_mac", "counted_modules", "excluded_operations"},
             location="complexity",
+        )
+        require_exact_keys(
+            contention,
+            {
+                "monitor_command",
+                "query_scope",
+                "sample_before_run",
+                "sample_before_and_after_each_profile",
+                "allow_current_process",
+                "allowed_ambient_process_names",
+                "fail_on_unapproved_process",
+            },
+            location="contention_policy",
         )
         require_exact_keys(
             output_policy,
@@ -198,6 +219,22 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
     flop_per_mac = _integer(complexity["flop_per_mac"], location="flop_per_mac")
     if flop_per_mac != 2:
         raise EfficiencyProfileError("flop_per_mac must remain 2")
+    ambient_names = contention["allowed_ambient_process_names"]
+    if (
+        contention["monitor_command"] != "nvidia-smi"
+        or contention["query_scope"] != "selected_device_compute_apps"
+        or contention["sample_before_run"] is not True
+        or contention["sample_before_and_after_each_profile"] is not True
+        or contention["allow_current_process"] is not True
+        or contention["fail_on_unapproved_process"] is not True
+        or not isinstance(ambient_names, list)
+        or any(
+            not isinstance(value, str) or not value or "/" in value or "\\" in value
+            for value in ambient_names
+        )
+        or len({value.casefold() for value in ambient_names}) != len(ambient_names)
+    ):
+        raise EfficiencyProfileError("GPU contention policy contract was changed")
 
     raw_batches = input_config["batch_sizes"]
     if not isinstance(raw_batches, list) or not raw_batches:
@@ -253,6 +290,12 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         latency_percentiles=percentiles,
         synchronize_each_iteration=True,
         flop_per_mac=flop_per_mac,
+        contention_monitor_command="nvidia-smi",
+        contention_sample_before_run=True,
+        contention_sample_before_and_after_each_profile=True,
+        contention_allow_current_process=True,
+        contention_allowed_ambient_process_names=tuple(ambient_names),
+        contention_fail_on_unapproved_process=True,
     )
 
 
@@ -575,6 +618,31 @@ def write_efficiency_profile_new(
         raise EfficiencyProfileError("efficiency profile does not prove CUDA execution")
     if value.get("model_selection_use") is not False:
         raise EfficiencyProfileError("efficiency record cannot be model-selection evidence")
+    profiler_commit = value.get("profiler_code_commit")
+    if (
+        not isinstance(profiler_commit, str)
+        or len(profiler_commit) != 40
+        or any(character not in "0123456789abcdef" for character in profiler_commit)
+    ):
+        raise EfficiencyProfileError(
+            "efficiency record must bind the full profiler implementation Git commit"
+        )
+    contention_samples = value.get("gpu_contention_samples")
+    if not isinstance(contention_samples, Mapping) or set(contention_samples) != {
+        "before_record_sha256",
+        "after_record_sha256",
+    }:
+        raise EfficiencyProfileError(
+            "efficiency record must bind before/after GPU contention samples"
+        )
+    for field in ("before_record_sha256", "after_record_sha256"):
+        sample_hash = contention_samples[field]
+        if (
+            not isinstance(sample_hash, str)
+            or len(sample_hash) != 64
+            or any(character not in "0123456789abcdef" for character in sample_hash)
+        ):
+            raise EfficiencyProfileError(f"{field} must be a full lowercase SHA-256")
     root = allowed_root.resolve(strict=True)
     target = destination.resolve(strict=False)
     try:

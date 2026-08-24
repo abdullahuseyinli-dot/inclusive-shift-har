@@ -304,6 +304,23 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
     adaptation_seed = _expected_adaptation_seed(key.seed, key.fold_id, key.k)
     configuration = model["training_configuration"]
     commit = "a" * 40
+    created_at_utc = "2099-01-01T00:00:00Z"
+    environment = {
+        "python": "3.11.0",
+        "platform": "synthetic",
+        "numpy": "2.0.0",
+        "torch": "2.12.0",
+        "torch_cuda_runtime": "13.2",
+        "device_type": "cuda",
+        "device_index": 0,
+        "device_name": "synthetic",
+        "device_total_memory_bytes": 1024,
+        "compute_capability": [12, 0],
+        "cudnn_enabled_during_run": not configuration["disable_cudnn"],
+        "cudnn_version": 9000,
+        "hostname_recorded": False,
+        "process_id_recorded": False,
+    }
     split_path = tmp_path / "split.json"
     raw_path = tmp_path / "data" / "raw" / "synthetic-inclusivehar.csv"
     input_base = {
@@ -327,6 +344,7 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
     checkpoint = {
         "schema_version": "1.0.0",
         "record_kind": "few_person_adapted_neural_checkpoint",
+        "created_at_utc": created_at_utc,
         "evidence_status": FEW_PERSON_V1_1_EVIDENCE_STATUS,
         "protocol_id": FEW_PERSON_V1_1_PROTOCOL_ID,
         "model_id": key.model_id,
@@ -354,6 +372,7 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
         "few_person_manifest_sha256": plan.manifest_sha256,
         "split_manifest_sha256": plan.record["split_manifest_sha256"],
         "code_commit": commit,
+        "environment": environment,
         "checkpoint_selection_rule": "fixed_last_epoch_no_validation",
         "training_history": [
             {
@@ -402,6 +421,7 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
     result: dict[str, Any] = {
         "schema_version": "1.0.0",
         "record_kind": "few_person_outer_fold_result",
+        "created_at_utc": created_at_utc,
         "status": "complete_create_only_postconfirmatory_secondary",
         "evidence_status": FEW_PERSON_V1_1_EVIDENCE_STATUS,
         "protocol_id": FEW_PERSON_V1_1_PROTOCOL_ID,
@@ -451,6 +471,7 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
         },
         "device": {"type": "cuda", "name": "synthetic", "peak_vram_bytes": 0},
         "code_commit": commit,
+        "environment": environment,
         "elapsed_seconds": 1.0,
     }
     result["record_sha256"] = canonical_json_sha256(result)
@@ -667,10 +688,32 @@ def test_statistics_preflights_every_destination_before_scanning(
             artifact_root=tmp_path,
             output_directory=output,
             prefix="blocked",
+            created_at_utc="2099-01-01T00:00:00Z",
         )
     assert scan_called is False
     assert not (output / "blocked.json").exists()
     assert not (output / "blocked.md").exists()
+
+
+def test_statistics_output_directory_is_created_once_inside_allowed_root(tmp_path: Path) -> None:
+    parent = tmp_path / "few-person"
+    parent.mkdir()
+    output = parent / "statistics"
+    resolved, json_path, csv_path, markdown_path = (
+        statistics_module._preflight_statistics_destinations(output, "safe", allowed_root=tmp_path)
+    )
+    assert resolved == output.resolve(strict=True)
+    assert (json_path.name, csv_path.name, markdown_path.name) == (
+        "safe.json",
+        "safe.csv",
+        "safe.md",
+    )
+    escaped = tmp_path.parent / f"{tmp_path.name}-escaped-statistics"
+    with pytest.raises(FewPersonStatisticsError, match="escapes allowed root"):
+        statistics_module._preflight_statistics_destinations(
+            escaped, "blocked", allowed_root=tmp_path
+        )
+    assert not escaped.exists()
 
 
 def test_statistics_json_completion_marker_is_written_last(
@@ -692,6 +735,13 @@ def test_statistics_json_completion_marker_is_written_last(
             "valid_so_far": True,
             "aggregation_ready": True,
             "failed_cells": [],
+            "execution_lineage": {
+                "code_commits": ["a" * 40],
+                "environment_sha256": ["e" * 64],
+                "environment_hash_scope": (
+                    "machine_and_software_environment_excluding_model_specific_cudnn_policy"
+                ),
+            },
         },
     )
     monkeypatch.setattr(statistics_module, "_scan_progress", lambda *args, **kwargs: fake_scan)
@@ -712,6 +762,7 @@ def test_statistics_json_completion_marker_is_written_last(
         output_directory=output,
         prefix="ordered",
         bootstrap_resamples=100,
+        created_at_utc="2099-01-01T00:00:00Z",
     )
     assert (output / "ordered.json").is_file()
 
@@ -773,6 +824,8 @@ def test_seed_averaging_precedes_participant_inference_and_holm() -> None:
                         checkpoint_sha256="c" * 64,
                         prediction_path=dummy,
                         prediction_sha256="d" * 64,
+                        code_commit="a" * 40,
+                        environment_sha256="e" * 64,
                         window_ids=(),
                         participant_ids=(),
                         labels=np.asarray([], dtype=np.int64),

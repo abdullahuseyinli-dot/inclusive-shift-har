@@ -7,10 +7,14 @@ lineage only. It never reads materialized signals or target metrics.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
+import re
+import subprocess
 import sys
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -64,6 +68,246 @@ def _sha256(value: Any, *, name: str) -> str:
     ):
         raise PostconfirmatoryEfficiencyError(f"{name} must be a lowercase SHA-256")
     return value
+
+
+def _full_commit(value: Any, *, name: str) -> str:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{40}", value.casefold()) is None:
+        raise PostconfirmatoryEfficiencyError(f"{name} must be a full Git commit")
+    return value.casefold()
+
+
+def _repository_head(repository_root: Path) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD^{commit}"],
+            cwd=repository_root,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise PostconfirmatoryEfficiencyError(
+            "artifact root is not a readable Git checkout"
+        ) from exc
+    return _full_commit(completed.stdout.strip(), name="repository HEAD")
+
+
+def _require_profiler_head(repository_root: Path, supplied_commit: str) -> str:
+    commit = _full_commit(supplied_commit, name="profiler code commit")
+    observed = _repository_head(repository_root)
+    if observed != commit:
+        raise PostconfirmatoryEfficiencyError(
+            f"profiler code commit {commit} differs from repository HEAD {observed}"
+        )
+    return commit
+
+
+def _now_utc() -> str:
+    return datetime.now(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
+
+
+def _process_basename(value: str) -> str:
+    return re.split(r"[\\/]", value.strip())[-1].casefold()
+
+
+def _resolve_windows_process_basename(pid: int) -> tuple[str | None, str | None]:
+    """Resolve one protected Windows PID without trusting an unknown process name."""
+
+    if os.name != "nt":
+        return None, "protected process-name resolution is available only on Windows"
+    command = [
+        "powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-Command",
+        f"(Get-Process -Id {pid} -ErrorAction Stop).ProcessName",
+    ]
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=15,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return None, f"{type(exc).__name__}: {exc}"
+    if completed.returncode != 0:
+        error = completed.stderr.strip()[:500] or f"Get-Process exited {completed.returncode}"
+        return None, error
+    lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+    if len(lines) != 1:
+        return None, "Get-Process did not return exactly one process name"
+    basename = _process_basename(lines[0])
+    if not basename:
+        return None, "Get-Process returned an empty process name"
+    if "." not in basename:
+        basename = f"{basename}.exe"
+    return basename, None
+
+
+def _capture_gpu_contention_snapshot(
+    *,
+    config: EfficiencyProfileConfig,
+    device: torch.device,
+    profiler_code_commit: str,
+    phase: str,
+    profile_identity: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Capture one self-hashed, selected-device compute-process gate sample."""
+
+    device_index = torch.cuda.current_device() if device.index is None else device.index
+    command = [
+        config.contention_monitor_command,
+        "--id",
+        str(device_index),
+        "--query-compute-apps=pid,process_name",
+        "--format=csv,noheader,nounits",
+    ]
+    return_code: int | None = None
+    stdout = ""
+    error: str | None = None
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=15,
+        )
+        return_code = completed.returncode
+        stdout = completed.stdout
+        if return_code != 0:
+            error = completed.stderr.strip()[:500] or f"nvidia-smi exited {return_code}"
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        error = f"{type(exc).__name__}: {exc}"
+
+    allowed = {value.casefold() for value in config.contention_allowed_ambient_process_names}
+    observed: list[dict[str, Any]] = []
+    if error is None:
+        try:
+            for row in csv.reader(stdout.splitlines()):
+                if not row or not any(value.strip() for value in row):
+                    continue
+                if len(row) != 2:
+                    raise ValueError("unexpected nvidia-smi compute-process column count")
+                pid = int(row[0].strip())
+                reported_process_name = row[1].strip()
+                basename: str | None = _process_basename(reported_process_name)
+                resolution = "nvidia_smi_reported_process_name"
+                resolution_error: str | None = None
+                if (
+                    pid != os.getpid()
+                    and reported_process_name.casefold() == "[insufficient permissions]"
+                ):
+                    basename, resolution_error = _resolve_windows_process_basename(pid)
+                    resolution = (
+                        "windows_get_process_exact_pid"
+                        if basename is not None
+                        else "unresolved_protected_process"
+                    )
+                if pid == os.getpid() and config.contention_allow_current_process:
+                    classification = "current_profiler_process"
+                elif basename is not None and basename in allowed:
+                    classification = "allowlisted_ambient_process"
+                else:
+                    classification = "unapproved_competing_process"
+                observed.append(
+                    {
+                        "pid": pid,
+                        "nvidia_smi_reported_process_name": reported_process_name,
+                        "process_name_basename": basename,
+                        "process_name_resolution": resolution,
+                        "process_name_resolution_error": resolution_error,
+                        "classification": classification,
+                    }
+                )
+        except (TypeError, ValueError) as exc:
+            error = f"{type(exc).__name__}: {exc}"
+            observed = []
+    unapproved = [
+        value for value in observed if value["classification"] == "unapproved_competing_process"
+    ]
+    snapshot: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "gpu_contention_snapshot",
+        "captured_at_utc": _now_utc(),
+        "phase": phase,
+        "profile_identity": None if profile_identity is None else dict(profile_identity),
+        "profiler_code_commit": profiler_code_commit,
+        "device_index": device_index,
+        "monitor": "nvidia_smi_selected_device_compute_apps",
+        "monitor_return_code": return_code,
+        "monitor_error": error,
+        "allowed_ambient_process_names": list(config.contention_allowed_ambient_process_names),
+        "observed_compute_processes": observed,
+        "unapproved_competing_process_count": len(unapproved),
+        "status": (
+            "pass_no_unapproved_compute_processes"
+            if error is None and not unapproved
+            else "fail_contention_gate"
+        ),
+    }
+    snapshot["record_sha256"] = canonical_json_sha256(snapshot)
+    return snapshot
+
+
+def _require_contention_pass(snapshot: Mapping[str, Any]) -> None:
+    if snapshot.get("status") != "pass_no_unapproved_compute_processes":
+        raise PostconfirmatoryEfficiencyError(
+            "GPU contention gate failed; timing cannot be treated as valid"
+        )
+
+
+def _contention_attestation(
+    *,
+    timestamp: str,
+    config: EfficiencyProfileConfig,
+    profiler_code_commit: str,
+    snapshots: list[dict[str, Any]],
+) -> dict[str, Any]:
+    expected = 1 + 2 * len(FROZEN_NEURAL_MODEL_IDS) * len(FROZEN_NEURAL_SEEDS) * len(
+        EFFICIENCY_BATCH_SIZES
+    ) * len(EFFICIENCY_PRECISIONS)
+    if len(snapshots) != expected or any(
+        value.get("status") != "pass_no_unapproved_compute_processes" for value in snapshots
+    ):
+        raise PostconfirmatoryEfficiencyError("GPU contention attestation coverage is incomplete")
+    ambient = sorted(
+        {
+            str(process["process_name_basename"])
+            for snapshot in snapshots
+            for process in snapshot["observed_compute_processes"]
+            if process["classification"] == "allowlisted_ambient_process"
+        }
+    )
+    attestation: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "gpu_contention_attestation",
+        "status": "pass_no_unapproved_compute_processes_sampled",
+        "created_at_utc": timestamp,
+        "profiler_code_commit": profiler_code_commit,
+        "profile_config_sha256": config.config_sha256,
+        "monitor": "nvidia_smi_selected_device_compute_apps",
+        "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
+        "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
+        "allowed_ambient_process_names": list(config.contention_allowed_ambient_process_names),
+        "observed_allowlisted_ambient_process_names": ambient,
+        "timing_validity": (
+            "valid_exclusive_compute_process_samples"
+            if not ambient
+            else "valid_with_declared_allowlisted_ambient_system_processes"
+        ),
+        "expected_snapshot_count": expected,
+        "observed_snapshot_count": len(snapshots),
+        "unapproved_competing_process_count": 0,
+        "snapshots": snapshots,
+    }
+    attestation["record_sha256"] = canonical_json_sha256(attestation)
+    return attestation
 
 
 def _resolve_frozen_file(record: Mapping[str, Any], *, artifact_root: Path, name: str) -> Path:
@@ -297,6 +541,8 @@ def _index_contract(
     context: ConsumedTargetContext | None,
     profile_entries: list[dict[str, Any]],
     validation_entries: list[dict[str, Any]],
+    profiler_code_commit: str,
+    contention_attestation: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     return {
         "schema_version": "1.0.0",
@@ -316,6 +562,10 @@ def _index_contract(
         if inventory is None
         else inventory.get("split_manifest_sha256"),
         "frozen_code_commit": None if inventory is None else inventory.get("code_commit"),
+        "profiler_code_commit": profiler_code_commit,
+        "gpu_contention_attestation": None
+        if contention_attestation is None
+        else dict(contention_attestation),
         "locked_target_index_record_sha256": None
         if context is None
         else context.index.get("record_sha256"),
@@ -352,6 +602,8 @@ def _publish_failure_artifacts(
     context: ConsumedTargetContext | None,
     profile_entries: list[dict[str, Any]],
     validation_entries: list[dict[str, Any]],
+    profiler_code_commit: str,
+    contention_snapshots: list[dict[str, Any]],
     error: Exception,
 ) -> None:
     failure_path = output / "failure.json"
@@ -368,6 +620,11 @@ def _publish_failure_artifacts(
         "error": {"type": type(error).__name__, "message": str(error)},
         "completed_checkpoint_validation_count": len(validation_entries),
         "completed_profile_count": len(profile_entries),
+        "profiler_code_commit": profiler_code_commit,
+        "gpu_contention": {
+            "snapshot_count": len(contention_snapshots),
+            "snapshots": contention_snapshots,
+        },
         "partial_outputs_preserved": True,
         "target_signals_or_metrics_accessed": False,
         "model_selection_use": False,
@@ -395,6 +652,8 @@ def _publish_failure_artifacts(
         context=context,
         profile_entries=profile_entries,
         validation_entries=validation_entries,
+        profiler_code_commit=profiler_code_commit,
+        contention_attestation=None,
     )
     index.update(
         {
@@ -421,6 +680,7 @@ def run_frozen_efficiency_profiles(
     output_directory: str | Path,
     output_root: str | Path,
     created_at_utc: str,
+    profiler_code_commit: str,
     device: torch.device,
 ) -> dict[str, Any]:
     """Profile all 80 frozen neural entries and publish exactly 320 profiles."""
@@ -437,6 +697,7 @@ def run_frozen_efficiency_profiles(
     if root_candidate.is_symlink():
         raise PostconfirmatoryEfficiencyError("artifact_root may not be a symlink")
     root = root_candidate.resolve(strict=True)
+    profiler_commit = _require_profiler_head(root, profiler_code_commit)
     outputs_root = Path(output_root)
     output = _output_directory(Path(output_directory), output_root=outputs_root)
     outputs_root = outputs_root.resolve(strict=True)
@@ -445,7 +706,17 @@ def run_frozen_efficiency_profiles(
     inventory: Mapping[str, Any] | None = None
     profile_entries: list[dict[str, Any]] = []
     validation_entries: list[dict[str, Any]] = []
+    contention_snapshots: list[dict[str, Any]] = []
     try:
+        initial_contention = _capture_gpu_contention_snapshot(
+            config=config,
+            device=device,
+            profiler_code_commit=profiler_commit,
+            phase="before_run",
+            profile_identity=None,
+        )
+        contention_snapshots.append(initial_contention)
+        _require_contention_pass(initial_contention)
         context = load_consumed_target_context(
             opening_receipt_path=opening_receipt_path,
             locked_target_index_path=locked_target_index_path,
@@ -497,7 +768,8 @@ def run_frozen_efficiency_profiles(
                         )
         index_path = output / "neural_efficiency_profile_index.json"
         failure_path = output / "failure.json"
-        for path in [*planned, index_path, failure_path]:
+        contention_path = output / "gpu_contention_attestation.json"
+        for path in [*planned, contention_path, index_path, failure_path]:
             if os.path.lexists(path):
                 raise FileExistsError(f"refusing to overwrite efficiency evidence: {path}")
 
@@ -576,6 +848,21 @@ def run_frozen_efficiency_profiles(
                         device=device,
                     )
                     for precision in EFFICIENCY_PRECISIONS:
+                        profile_identity = {
+                            "model_id": model_id,
+                            "seed": seed,
+                            "batch_size": batch_size,
+                            "precision": precision,
+                        }
+                        contention_before = _capture_gpu_contention_snapshot(
+                            config=config,
+                            device=device,
+                            profiler_code_commit=profiler_commit,
+                            phase="before_profile",
+                            profile_identity=profile_identity,
+                        )
+                        contention_snapshots.append(contention_before)
+                        _require_contention_pass(contention_before)
                         profile, cudnn_policy = _profile_with_cudnn_policy(
                             model,
                             example,
@@ -588,6 +875,15 @@ def run_frozen_efficiency_profiles(
                             checkpoint_validation_record_sha256=str(validation["record_sha256"]),
                             disable_cudnn=disable_cudnn,
                         )
+                        contention_after = _capture_gpu_contention_snapshot(
+                            config=config,
+                            device=device,
+                            profiler_code_commit=profiler_commit,
+                            phase="after_profile",
+                            profile_identity=profile_identity,
+                        )
+                        contention_snapshots.append(contention_after)
+                        _require_contention_pass(contention_after)
                         profile_body = dict(profile)
                         profile_body.pop("record_sha256")
                         profile_body.update(
@@ -596,6 +892,7 @@ def run_frozen_efficiency_profiles(
                                 "training_configuration_sha256": configuration_hash,
                                 "split_manifest_sha256": split_hash,
                                 "frozen_code_commit": code_commit,
+                                "profiler_code_commit": profiler_commit,
                                 "final_freeze_inventory_sha256": inventory_hash,
                                 "frozen_artifact_set_sha256": frozen_set_hash,
                                 "locked_target_index_record_sha256": context.index["record_sha256"],
@@ -608,6 +905,10 @@ def run_frozen_efficiency_profiles(
                                 },
                                 "cudnn_policy": cudnn_policy,
                                 "cuda_available_at_profile": True,
+                                "gpu_contention_samples": {
+                                    "before_record_sha256": contention_before["record_sha256"],
+                                    "after_record_sha256": contention_after["record_sha256"],
+                                },
                             }
                         )
                         profile_body["record_sha256"] = canonical_json_sha256(profile_body)
@@ -643,6 +944,20 @@ def run_frozen_efficiency_profiles(
                 torch.cuda.synchronize(device)
                 torch.cuda.empty_cache()
 
+        contention = _contention_attestation(
+            timestamp=timestamp,
+            config=config,
+            profiler_code_commit=profiler_commit,
+            snapshots=contention_snapshots,
+        )
+        atomic_write_json_new(contention, contention_path, allowed_root=outputs_root)
+        contention_reference = {
+            "path": contention_path.relative_to(outputs_root).as_posix(),
+            "file_sha256": sha256_file(contention_path),
+            "record_sha256": contention["record_sha256"],
+            "status": contention["status"],
+            "timing_validity": contention["timing_validity"],
+        }
         index = _index_contract(
             timestamp=timestamp,
             profile_config_sha256=config.config_sha256,
@@ -650,6 +965,8 @@ def run_frozen_efficiency_profiles(
             context=context,
             profile_entries=profile_entries,
             validation_entries=validation_entries,
+            profiler_code_commit=profiler_commit,
+            contention_attestation=contention_reference,
         )
         if (
             index["checkpoint_validation_count"] != index["neural_model_seed_count"]
@@ -675,6 +992,8 @@ def run_frozen_efficiency_profiles(
             context=context,
             profile_entries=profile_entries,
             validation_entries=validation_entries,
+            profiler_code_commit=profiler_commit,
+            contention_snapshots=contention_snapshots,
             error=exc,
         )
         raise
@@ -690,6 +1009,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--created-at-utc", required=True)
+    parser.add_argument("--profiler-code-commit", required=True)
     return parser
 
 
@@ -705,6 +1025,7 @@ def main(argv: list[str] | None = None) -> int:
             output_directory=args.output_directory,
             output_root=args.output_root,
             created_at_utc=args.created_at_utc,
+            profiler_code_commit=args.profiler_code_commit,
             device=torch.device("cuda"),
         )
     except Exception as exc:

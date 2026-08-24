@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -35,9 +36,31 @@ def _rewrite_index(path: Path, value: dict[str, Any]) -> None:
     _write(path, value)
 
 
+def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) -> dict[str, Any]:
+    snapshot: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "gpu_contention_snapshot",
+        "captured_at_utc": "2099-01-01T00:00:00Z",
+        "phase": phase,
+        "profile_identity": profile_identity,
+        "profiler_code_commit": "9" * 40,
+        "device_index": 0,
+        "monitor": "nvidia_smi_selected_device_compute_apps",
+        "monitor_return_code": 0,
+        "monitor_error": None,
+        "allowed_ambient_process_names": ["dwm.exe"],
+        "observed_compute_processes": [],
+        "unapproved_competing_process_count": 0,
+        "status": "pass_no_unapproved_compute_processes",
+    }
+    snapshot["record_sha256"] = canonical_json_sha256(snapshot)
+    return snapshot
+
+
 def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
     validations: list[dict[str, Any]] = []
     profiles: list[dict[str, Any]] = []
+    contention_snapshots = [_contention_snapshot("before_run", None)]
     for model_index, model_id in enumerate(FROZEN_NEURAL_MODEL_IDS):
         for seed in FROZEN_NEURAL_SEEDS:
             disabled = model_id in RECURRENT_CUDNN_DISABLED_MODEL_IDS
@@ -75,6 +98,15 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
             validations.append(validation_entry)
             for batch_size in EFFICIENCY_BATCH_SIZES:
                 for precision in EFFICIENCY_PRECISIONS:
+                    identity = {
+                        "model_id": model_id,
+                        "seed": seed,
+                        "batch_size": batch_size,
+                        "precision": precision,
+                    }
+                    contention_before = _contention_snapshot("before_profile", identity)
+                    contention_after = _contention_snapshot("after_profile", identity)
+                    contention_snapshots.extend((contention_before, contention_after))
                     profile_path = (
                         root / "profiles" / f"{model_id}--{seed}--{batch_size}--{precision}.json"
                     )
@@ -95,6 +127,7 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                         "training_configuration_sha256": configuration_hash,
                         "split_manifest_sha256": "d" * 64,
                         "frozen_code_commit": "frozen-commit",
+                        "profiler_code_commit": "9" * 40,
                         "final_freeze_inventory_sha256": "a" * 64,
                         "frozen_artifact_set_sha256": "c" * 64,
                         "locked_target_index_record_sha256": "e" * 64,
@@ -113,6 +146,10 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                             "original_backend_state_restored": True,
                         },
                         "environment": {"device_type": "cuda", "device": "cuda:0"},
+                        "gpu_contention_samples": {
+                            "before_record_sha256": contention_before["record_sha256"],
+                            "after_record_sha256": contention_after["record_sha256"],
+                        },
                         "parameters": {
                             "total": 100 + model_index,
                             "trainable": 90 + model_index,
@@ -161,6 +198,26 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                             "record_sha256": profile["record_sha256"],
                         }
                     )
+    contention_path = root / "gpu-contention-attestation.json"
+    contention: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "gpu_contention_attestation",
+        "status": "pass_no_unapproved_compute_processes_sampled",
+        "created_at_utc": "2099-01-01T00:00:00Z",
+        "profiler_code_commit": "9" * 40,
+        "profile_config_sha256": "b" * 64,
+        "monitor": "nvidia_smi_selected_device_compute_apps",
+        "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
+        "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
+        "allowed_ambient_process_names": ["dwm.exe"],
+        "observed_allowlisted_ambient_process_names": [],
+        "timing_validity": "valid_exclusive_compute_process_samples",
+        "expected_snapshot_count": 641,
+        "observed_snapshot_count": 641,
+        "unapproved_competing_process_count": 0,
+        "snapshots": contention_snapshots,
+    }
+    _write(contention_path, contention)
     index: dict[str, Any] = {
         "schema_version": "1.0.0",
         "record_kind": "frozen_neural_efficiency_profile_index",
@@ -173,6 +230,14 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
         "frozen_artifact_set_sha256": "c" * 64,
         "split_manifest_sha256": "d" * 64,
         "frozen_code_commit": "frozen-commit",
+        "profiler_code_commit": "9" * 40,
+        "gpu_contention_attestation": {
+            "path": contention_path.relative_to(root).as_posix(),
+            "file_sha256": sha256_file(contention_path),
+            "record_sha256": contention["record_sha256"],
+            "status": contention["status"],
+            "timing_validity": contention["timing_validity"],
+        },
         "locked_target_index_record_sha256": "e" * 64,
         "opening_receipt_record_sha256": "f" * 64,
         "expected_model_ids": list(FROZEN_NEURAL_MODEL_IDS),
@@ -209,6 +274,8 @@ def test_exact_320_cell_efficiency_matrix_aggregates(tmp_path: Path) -> None:
     result = _aggregate(index_path, tmp_path)
     assert result["validated_checkpoint_count"] == 80
     assert result["validated_profile_count"] == 320
+    assert result["profiler_code_commit"] == "9" * 40
+    assert result["gpu_timing_validity"] == "valid_exclusive_compute_process_samples"
     assert len(result["tables"]["model_batch_precision_aggregates"]) == 64
 
 
@@ -244,6 +311,29 @@ def test_efficiency_profile_escape_path_is_rejected(tmp_path: Path) -> None:
     index["profiles"][0]["path"] = "../escaped.json"
     _rewrite_index(index_path, index)
     with pytest.raises(SecondaryAggregationError, match="escapes artifact_root"):
+        _aggregate(index_path, tmp_path)
+
+
+def test_profiler_commit_lineage_change_is_rejected(tmp_path: Path) -> None:
+    index_path, index = _exact_fixture(tmp_path)
+    index["profiler_code_commit"] = "8" * 40
+    _rewrite_index(index_path, index)
+    with pytest.raises(SecondaryAggregationError, match="contention attestation contract"):
+        _aggregate(index_path, tmp_path)
+
+
+def test_profile_contention_link_change_is_rejected(tmp_path: Path) -> None:
+    index_path, index = _exact_fixture(tmp_path)
+    entry = index["profiles"][0]
+    profile_path = tmp_path / entry["path"]
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile.pop("record_sha256")
+    profile["gpu_contention_samples"]["before_record_sha256"] = "0" * 64
+    _write(profile_path, profile)
+    entry["file_sha256"] = sha256_file(profile_path)
+    entry["record_sha256"] = profile["record_sha256"]
+    _rewrite_index(index_path, index)
+    with pytest.raises(SecondaryAggregationError, match="contention samples"):
         _aggregate(index_path, tmp_path)
 
 
@@ -294,6 +384,72 @@ def test_runner_applies_and_restores_cudnn_without_cuda_execution(
     assert policy["original_backend_state_restored"] is True
 
 
+def test_profiler_commit_must_equal_repository_head(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    monkeypatch.setattr(runner, "_repository_head", lambda _: "1" * 40)
+    with pytest.raises(runner.PostconfirmatoryEfficiencyError, match="differs"):
+        runner._require_profiler_head(tmp_path, "2" * 40)
+    assert runner._require_profiler_head(tmp_path, "1" * 40) == "1" * 40
+
+
+def test_protected_windows_dwm_is_resolved_by_exact_pid(
+    repository_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = load_efficiency_profile_config(
+        repository_root / "configs/experiments/neural_efficiency_profile_v1.yaml"
+    )
+    completed = subprocess.CompletedProcess(
+        args=["nvidia-smi"],
+        returncode=0,
+        stdout="2268, [Insufficient Permissions]\n",
+        stderr="",
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.experiments.postconfirmatory_efficiency.subprocess.run",
+        lambda *_, **__: completed,
+    )
+    monkeypatch.setattr(runner, "_resolve_windows_process_basename", lambda pid: ("dwm.exe", None))
+    snapshot = runner._capture_gpu_contention_snapshot(
+        config=config,
+        device=torch.device("cuda:0"),
+        profiler_code_commit="9" * 40,
+        phase="before_run",
+        profile_identity=None,
+    )
+    assert snapshot["status"] == "pass_no_unapproved_compute_processes"
+    process = snapshot["observed_compute_processes"][0]
+    assert process["pid"] == 2268
+    assert process["process_name_basename"] == "dwm.exe"
+    assert process["process_name_resolution"] == "windows_get_process_exact_pid"
+    assert process["classification"] == "allowlisted_ambient_process"
+
+
+def test_unapproved_gpu_process_fails_contention_gate(
+    repository_root: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = load_efficiency_profile_config(
+        repository_root / "configs/experiments/neural_efficiency_profile_v1.yaml"
+    )
+    completed = subprocess.CompletedProcess(
+        args=["nvidia-smi"], returncode=0, stdout="9999, python.exe\n", stderr=""
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.experiments.postconfirmatory_efficiency.subprocess.run",
+        lambda *_, **__: completed,
+    )
+    snapshot = runner._capture_gpu_contention_snapshot(
+        config=config,
+        device=torch.device("cuda:0"),
+        profiler_code_commit="9" * 40,
+        phase="before_run",
+        profile_identity=None,
+    )
+    assert snapshot["status"] == "fail_contention_gate"
+    with pytest.raises(runner.PostconfirmatoryEfficiencyError, match="contention gate"):
+        runner._require_contention_pass(snapshot)
+
+
 def test_repository_freeze_has_exact_runner_inventory(repository_root: Path) -> None:
     inventory = json.loads(
         (repository_root / "results/protocol/final_source_artifact_freeze_v1.json").read_text(
@@ -321,6 +477,8 @@ def test_failure_and_failed_index_are_create_only_and_preserve_partial_counts(
         context=None,
         profile_entries=[{"model_id": "partial"}],
         validation_entries=[{"model_id": "partial"}],
+        profiler_code_commit="9" * 40,
+        contention_snapshots=[],
         error=RuntimeError("synthetic failure"),
     )
     failure = json.loads((output / "failure.json").read_text(encoding="utf-8"))
@@ -358,6 +516,8 @@ def test_efficiency_main_returns_nonzero_on_failure(
             ".",
             "--created-at-utc",
             "2099-01-01T00:00:00Z",
+            "--profiler-code-commit",
+            "9" * 40,
         ]
     )
     assert exit_code == 1

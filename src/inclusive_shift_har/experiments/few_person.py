@@ -7,7 +7,9 @@ import csv
 import hashlib
 import json
 import os
+import platform
 import random
+import subprocess
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -25,6 +27,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from inclusive_shift_har.data.inclusivehar import INCLUSIVEHAR_PRIMARY_CHANNELS
 from inclusive_shift_har.data.materialize import MaterializedWindows
 from inclusive_shift_har.data.windowing import WindowRecord
+from inclusive_shift_har.evaluation._strict_config import require_utc_timestamp
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.evaluation.source_calibration import (
     load_source_temperature_calibrator_file,
@@ -102,6 +105,53 @@ def _full_commit(value: str) -> str:
     ):
         raise FewPersonRunError("code commit must be a full 40-character Git object ID")
     return normalized
+
+
+def _repository_head(repository_root: Path) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD^{commit}"],
+            cwd=repository_root,
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise FewPersonRunError("artifact root is not a readable Git checkout") from exc
+    return _full_commit(completed.stdout.strip())
+
+
+def _require_repository_head(repository_root: Path, supplied_commit: str) -> str:
+    commit = _full_commit(supplied_commit)
+    observed = _repository_head(repository_root)
+    if observed != commit:
+        raise FewPersonRunError(
+            f"supplied code commit {commit} differs from repository HEAD {observed}"
+        )
+    return commit
+
+
+def _execution_environment(
+    device: torch.device, *, cudnn_enabled_during_run: bool
+) -> dict[str, Any]:
+    properties = torch.cuda.get_device_properties(device)
+    return {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "numpy": np.__version__,
+        "torch": str(torch.__version__),
+        "torch_cuda_runtime": torch.version.cuda,
+        "device_type": device.type,
+        "device_index": torch.cuda.current_device() if device.index is None else device.index,
+        "device_name": properties.name,
+        "device_total_memory_bytes": int(properties.total_memory),
+        "compute_capability": list(torch.cuda.get_device_capability(device)),
+        "cudnn_enabled_during_run": cudnn_enabled_during_run,
+        "cudnn_version": torch.backends.cudnn.version(),  # type: ignore[no-untyped-call]
+        "hostname_recorded": False,
+        "process_id_recorded": False,
+    }
 
 
 def _confined(path: Path, *, root: Path, name: str, must_exist: bool) -> Path:
@@ -834,6 +884,7 @@ def run_few_person_scenario(
     model_id: str,
     seed: int,
     code_commit: str,
+    created_at_utc: str,
     output_directory: Path,
     output_root: Path,
 ) -> dict[str, Any]:
@@ -881,13 +932,14 @@ def run_few_person_scenario(
     except FewPersonProtocolError as exc:
         raise FewPersonRunError(str(exc)) from exc
     scenario, model_entry = _selected(plan, fold_id=fold_id, k=k, model_id=model_id, seed=seed)
-    commit = _full_commit(code_commit)
+    timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
     if not torch.cuda.is_available():
         raise FewPersonRunError(
             "few-person neural execution requires CUDA; CPU fallback is forbidden"
         )
 
     root = artifact_root.resolve(strict=True)
+    commit = _require_repository_head(root, code_commit)
     resolved_output_root = output_root.resolve(strict=True)
     try:
         resolved_output_root.relative_to(root)
@@ -942,6 +994,7 @@ def run_few_person_scenario(
     )
     if calibrator_payload.get("target_subject_or_window_records_used") is not False:
         raise FewPersonRunError("calibrator is not source-only")
+    environment = _execution_environment(device, cudnn_enabled_during_run=not config.disable_cudnn)
 
     inclusion = set(cast(list[str], scenario["target_inclusion_subjects"]))
     evaluation = set(cast(list[str], scenario["evaluation_subjects"]))
@@ -1070,6 +1123,7 @@ def run_few_person_scenario(
         checkpoint_payload = {
             "schema_version": "1.0.0",
             "record_kind": "few_person_adapted_neural_checkpoint",
+            "created_at_utc": timestamp,
             "evidence_status": evidence_status,
             "protocol_id": protocol_id,
             "model_id": model_id,
@@ -1097,6 +1151,7 @@ def run_few_person_scenario(
             "few_person_manifest_sha256": plan_sha256,
             "split_manifest_sha256": split_sha256,
             "code_commit": commit,
+            "environment": environment,
             "checkpoint_selection_rule": "fixed_last_epoch_no_validation",
             "training_history": history,
             "rng_states": {
@@ -1182,6 +1237,7 @@ def run_few_person_scenario(
         result: dict[str, Any] = {
             "schema_version": "1.0.0",
             "record_kind": "few_person_outer_fold_result",
+            "created_at_utc": timestamp,
             "status": "complete_create_only_postconfirmatory_secondary",
             "evidence_status": evidence_status,
             "protocol_id": protocol_id,
@@ -1234,6 +1290,7 @@ def run_few_person_scenario(
                 "cudnn_enabled": torch.backends.cudnn.enabled,
             },
             "code_commit": commit,
+            "environment": environment,
             "elapsed_seconds": time.perf_counter() - started,
         }
         result["record_sha256"] = canonical_json_sha256(result)
@@ -1243,6 +1300,7 @@ def run_few_person_scenario(
         failure: dict[str, Any] = {
             "schema_version": "1.0.0",
             "record_kind": "few_person_failed_run",
+            "created_at_utc": timestamp,
             "status": "failed_preserved_postconfirmatory_secondary",
             "evidence_status": "failed_run_not_result",
             "protocol_id": protocol_id,
@@ -1251,6 +1309,8 @@ def run_few_person_scenario(
             "model_id": model_id,
             "seed": seed,
             "few_person_manifest_sha256": plan_sha256,
+            "code_commit": commit,
+            "environment": environment,
             "exception_type": type(exc).__name__,
             "message": str(exc),
             "input_materialization": checkpoint_input_lineage,
@@ -1295,6 +1355,7 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--model-id", required=True)
     run.add_argument("--seed", type=int, required=True)
     run.add_argument("--code-commit", required=True)
+    run.add_argument("--created-at-utc", required=True)
     run.add_argument("--output-directory", type=Path, required=True)
     run.add_argument("--output-root", type=Path, required=True)
     return parser
@@ -1338,6 +1399,7 @@ def main(argv: list[str] | None = None) -> int:
                 model_id=args.model_id,
                 seed=args.seed,
                 code_commit=args.code_commit,
+                created_at_utc=args.created_at_utc,
                 output_directory=args.output_directory,
                 output_root=args.output_root,
             )
