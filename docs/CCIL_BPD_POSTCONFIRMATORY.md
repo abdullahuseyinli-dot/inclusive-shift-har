@@ -1,9 +1,11 @@
 # CCIL/BPD post-confirmatory extension runbook
 
-Status: implemented and synthetic-tested; no CCIL/BPD real-data or CUDA run has
-been performed by this change. This extension was designed after target opening
-1 had been consumed. Every target result is therefore descriptive
-post-confirmatory evidence and is ineligible for the locked primary claim.
+Status: complete. The create-only CUDA run and reconstruction-based aggregation
+finished on 2026-08-24 with eight source-selection fits and ten final fits, no
+failed cells, and no new target opening or unlock. This extension was designed
+after target opening 1 had been consumed. Every target result is therefore
+descriptive post-confirmatory evidence and is ineligible for the locked primary
+claim.
 
 ## Scientific identity
 
@@ -149,6 +151,29 @@ The JSON report records exact input/config hashes, participant-clustered
 bootstrap intervals, paired sign-flip and Wilcoxon tests, effect sizes, lower-tail
 metrics, calibration, and Holm-adjusted p-values for the complete four-comparison
 target family. Statistical tests do not restore confirmatory status.
+
+## Completed results
+
+The aggregate is
+`results/postconfirmatory/ccil_bpd_v1/ccil_bpd_postconfirmatory_aggregate.json`.
+Its canonical `record_sha256` is
+`c7b27e2a6d5ddf94efcd2c2064cb84aecfc70dfe3d4f38539660c3479128c180`.
+The corresponding CSV and Markdown exports are in the same directory.
+
+Across the ten held-out target participants, the qualified CCIL adaptation
+obtained mean participant macro-F1 0.6896 (participant-clustered 95% bootstrap
+interval [0.5413, 0.8254]), worst-participant 0.2724, and lower-decile 0.3459.
+Compact ERM obtained 0.6777, 0.2725, and 0.3541, respectively. Thus CCIL's mean
+difference was +0.0119, but its worst and lower-decile results were slightly
+lower. The family-adjusted paired permutation and Wilcoxon p-values were both
+0.2109. CCIL therefore does not satisfy the predeclared requirement to improve
+both mean and lower-tail performance.
+
+The boundary-safe BPD adaptation obtained mean participant macro-F1 0.5710,
+worst-participant 0.2471, and lower-decile 0.2751. It underperformed compact ERM
+by 0.1067 mean macro-F1 and MoRe-HAR full by 0.0644. These qualified adaptations
+do not change the locked primary conclusion and do not establish an advantage
+for MoRe-HAR.
 
 ## Interpretation limits
 
