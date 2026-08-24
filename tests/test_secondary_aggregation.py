@@ -8,6 +8,7 @@ import pytest
 
 from inclusive_shift_har.evaluation.secondary_aggregation import (
     SecondaryAggregationError,
+    _resolve_file,
     aggregate_efficiency_profiles,
     aggregate_sensor_stress,
     build_parser,
@@ -19,6 +20,14 @@ def _write(path: Path, value: dict[str, Any], *, hash_field: str = "record_sha25
     value[hash_field] = canonical_json_sha256(value)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, sort_keys=True) + "\n", encoding="utf-8")
+
+
+@pytest.fixture(autouse=True)
+def _repository_head_gate(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "inclusive_shift_har.evaluation.secondary_aggregation._require_repository_head",
+        lambda _root, *, expected_commit: expected_commit,
+    )
 
 
 def test_efficiency_aggregation_preserves_seed_rows_and_operator_scope(tmp_path: Path) -> None:
@@ -85,6 +94,7 @@ def test_efficiency_aggregation_preserves_seed_rows_and_operator_scope(tmp_path:
             artifact_root=tmp_path,
             destination=tmp_path / "aggregate.json",
             created_at_utc="2099-01-01T00:00:00Z",
+            aggregation_code_commit="a" * 40,
         )
 
 
@@ -196,6 +206,7 @@ def test_sensor_stress_aggregation_builds_participant_and_cohort_delta_tables(
         artifact_root=tmp_path,
         destination=tmp_path / "stress-aggregate.json",
         created_at_utc="2099-01-01T00:00:00Z",
+        aggregation_code_commit="a" * 40,
     )
     assert len(result["tables"]["participant_seed_deltas"]) == 12
     assert result["implementation_code_commit"] == "7" * 40
@@ -229,6 +240,8 @@ def test_aggregate_module_parser_has_both_operations() -> None:
                 "aggregate.json",
                 "--created-at-utc",
                 "2099-01-01T00:00:00Z",
+                "--aggregation-code-commit",
+                "a" * 40,
             ]
         )
         assert parsed.operation == operation
@@ -281,4 +294,12 @@ def test_sensor_stress_index_rejects_absolute_result_record_references(tmp_path:
             artifact_root=tmp_path,
             destination=tmp_path / "aggregate.json",
             created_at_utc="2099-01-01T00:00:00Z",
+            aggregation_code_commit="a" * 40,
         )
+
+
+def test_relative_path_objects_are_portable_on_windows(tmp_path: Path) -> None:
+    path = tmp_path / "index.json"
+    path.write_text("{}", encoding="utf-8")
+
+    assert _resolve_file(Path("index.json"), root=tmp_path, name="index") == path

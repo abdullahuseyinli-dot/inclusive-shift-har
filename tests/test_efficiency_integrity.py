@@ -25,6 +25,14 @@ from inclusive_shift_har.evaluation.secondary_aggregation import (
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 
 
+@pytest.fixture(autouse=True)
+def _repository_head_gate(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "inclusive_shift_har.evaluation.secondary_aggregation._require_repository_head",
+        lambda _root, *, expected_commit: expected_commit,
+    )
+
+
 def _write(path: Path, value: dict[str, Any]) -> None:
     value["record_sha256"] = canonical_json_sha256(value)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -266,6 +274,7 @@ def _aggregate(index_path: Path, root: Path) -> dict[str, Any]:
         artifact_root=root,
         destination=root / "aggregate.json",
         created_at_utc="2099-01-01T00:00:00Z",
+        aggregation_code_commit="a" * 40,
     )
 
 

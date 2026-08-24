@@ -56,7 +56,8 @@ profiler commit, and a complete passing contention attestation:
   --index results/efficiency/postconfirmatory-v1/neural_efficiency_profile_index.json `
   --artifact-root . `
   --destination results/efficiency/postconfirmatory-v1/neural_efficiency_aggregate.json `
-  --created-at-utc 2026-08-24T00:00:00Z
+  --created-at-utc 2026-08-24T00:00:00Z `
+  --aggregation-code-commit $profilerCommit
 ```
 
 Reported analytical MACs/FLOPs cover only the declared `Conv1d`, `Linear`, and

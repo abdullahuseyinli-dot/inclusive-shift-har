@@ -285,7 +285,8 @@ uv run inclusive-shift-har evaluate sensor-stress `
   --index results/postconfirmatory/sensor_stress_v1/sensor_reliability_stress_index.json `
   --artifact-root . `
   --destination results/postconfirmatory/sensor_stress_v1/sensor_stress_aggregate.json `
-  --created-at-utc $timestamp
+  --created-at-utc $timestamp `
+  --aggregation-code-commit $executionCommit
 ```
 
 Aggregate only a complete create-only index. Preserve a failed index and all

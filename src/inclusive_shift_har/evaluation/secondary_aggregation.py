@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -59,7 +60,7 @@ def _resolve_file(value: Any, *, root: Path, name: str, allow_absolute: bool = F
     raw = Path(value)
     if raw.is_absolute() and not allow_absolute:
         raise SecondaryAggregationError(f"{name} path must be artifact-root-relative")
-    if not raw.is_absolute() and ("\\" in str(value) or ".." in raw.parts):
+    if not raw.is_absolute() and ".." in raw.parts:
         raise SecondaryAggregationError(f"{name} escapes artifact_root")
     candidate = raw if raw.is_absolute() else root / raw
     if candidate.is_symlink():
@@ -114,6 +115,27 @@ def _git_commit(value: Any, *, name: str) -> str:
     if len(result) != 40 or any(character not in "0123456789abcdef" for character in result):
         raise SecondaryAggregationError(f"{name} must be a full lowercase Git commit")
     return result
+
+
+def _require_repository_head(root: Path, *, expected_commit: str) -> str:
+    """Bind an aggregation to the actual repository implementation commit."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise SecondaryAggregationError("could not resolve repository Git HEAD") from exc
+    observed = completed.stdout.strip().casefold()
+    if len(observed) != 40 or any(character not in "0123456789abcdef" for character in observed):
+        raise SecondaryAggregationError("repository Git HEAD is not a full object ID")
+    if observed != expected_commit:
+        raise SecondaryAggregationError("aggregation code commit differs from repository Git HEAD")
+    return observed
 
 
 def _boolean(value: Any, *, name: str) -> bool:
@@ -362,6 +384,7 @@ def aggregate_efficiency_profiles(
     artifact_root: str | Path,
     destination: str | Path,
     created_at_utc: str,
+    aggregation_code_commit: str,
 ) -> dict[str, Any]:
     """Aggregate only the complete, lineage-validated 320-cell CUDA matrix."""
 
@@ -369,6 +392,8 @@ def aggregate_efficiency_profiles(
     if root_candidate.is_symlink():
         raise SecondaryAggregationError("artifact_root may not be a symlink")
     root = root_candidate.resolve(strict=True)
+    aggregation_commit = _git_commit(aggregation_code_commit, name="aggregation code commit")
+    _require_repository_head(root, expected_commit=aggregation_commit)
     target = _confined_new_destination(destination, root=root)
     timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
     _, index = _load_index(index_path, root=root, kind="frozen neural efficiency profile index")
@@ -701,6 +726,7 @@ def aggregate_efficiency_profiles(
         "record_kind": "frozen_neural_efficiency_aggregate",
         "status": "complete_create_only",
         "created_at_utc": timestamp,
+        "aggregation_code_commit": aggregation_commit,
         "efficiency_index_record_sha256": index["record_sha256"],
         **lineage,
         "frozen_code_commit": frozen_code_commit,
@@ -745,10 +771,13 @@ def aggregate_sensor_stress(
     artifact_root: str | Path,
     destination: str | Path,
     created_at_utc: str,
+    aggregation_code_commit: str,
 ) -> dict[str, Any]:
     """Create participant-seed and seed-averaged clean-to-stress delta tables."""
 
     root = Path(artifact_root).resolve(strict=True)
+    aggregation_commit = _git_commit(aggregation_code_commit, name="aggregation code commit")
+    _require_repository_head(root, expected_commit=aggregation_commit)
     timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
     _, index = _load_index(index_path, root=root, kind="sensor reliability stress index")
     required = {
@@ -967,6 +996,7 @@ def aggregate_sensor_stress(
         "record_kind": "secondary_sensor_reliability_participant_aggregate",
         "status": "complete_create_only",
         "created_at_utc": timestamp,
+        "aggregation_code_commit": aggregation_commit,
         "track_role": "secondary_post_confirmatory",
         "primary_claim_eligible": False,
         "used_for_model_selection": False,
@@ -1002,6 +1032,7 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--artifact-root", type=Path, required=True)
         subparser.add_argument("--destination", type=Path, required=True)
         subparser.add_argument("--created-at-utc", required=True)
+        subparser.add_argument("--aggregation-code-commit", required=True)
     return parser
 
 
@@ -1012,6 +1043,7 @@ def main(argv: list[str] | None = None) -> int:
         "artifact_root": args.artifact_root,
         "destination": args.destination,
         "created_at_utc": args.created_at_utc,
+        "aggregation_code_commit": args.aggregation_code_commit,
     }
     if args.operation == "efficiency":
         result = aggregate_efficiency_profiles(**kwargs)
