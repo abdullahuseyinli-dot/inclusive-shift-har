@@ -183,6 +183,9 @@ def run_source_development(
     use_realization_factorization: bool = False,
     use_group_dro: bool = False,
     coral_weight: float = 0.0,
+    dann_domain_loss_weight: float = 0.0,
+    dann_grl_max_strength: float = 1.0,
+    dann_grl_warmup_epochs: int = 10,
     disable_cudnn: bool = False,
     checkpoint_selection_rule: str = "source_validation_best",
     zero_channel_indices: tuple[int, ...] = (),
@@ -225,9 +228,13 @@ def run_source_development(
             config=classical_config,
             channel_names=PRIMARY_CHANNELS,
             lineage={
+                "dataset_manifest_sha256": sha256_file(dataset_manifest_path),
                 "source_window_manifest_sha256": manifest["source_window_manifest_sha256"],
                 "split_manifest_sha256": manifest["source_split_manifest_sha256"],
+                "preprocessing_config_sha256": manifest["preprocessing"]["config_sha256"],
+                "ontology_sha256": manifest["ontology"]["config_sha256"],
                 "normalization": standardizer.to_dict(),
+                "label_schema": list(class_names),
                 "code_commit": code_commit,
                 "evidence_status": "source_development_only_target_sealed",
             },
@@ -271,6 +278,9 @@ def run_source_development(
             use_realization_factorization=use_realization_factorization,
             use_group_dro=use_group_dro,
             coral_weight=coral_weight,
+            dann_domain_loss_weight=dann_domain_loss_weight,
+            dann_grl_max_strength=dann_grl_max_strength,
+            dann_grl_warmup_epochs=dann_grl_warmup_epochs,
             zero_channel_indices=zero_channel_indices,
         )
         lineage = TrainingLineage(
@@ -379,6 +389,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--group-dro", action="store_true")
     parser.add_argument("--coral-weight", type=float, default=0.0)
     parser.add_argument(
+        "--dann-domain-loss-weight",
+        type=float,
+        default=0.0,
+        help="source-participant domain loss weight for the established DANN baseline",
+    )
+    parser.add_argument("--dann-grl-max-strength", type=float, default=1.0)
+    parser.add_argument("--dann-grl-warmup-epochs", type=int, default=10)
+    parser.add_argument(
         "--disable-cudnn",
         action="store_true",
         help="keep CUDA tensors but use the non-cuDNN recurrent backend",
@@ -420,6 +438,9 @@ def main(argv: list[str] | None = None) -> int:
         use_realization_factorization=args.realization_factorization,
         use_group_dro=args.group_dro,
         coral_weight=args.coral_weight,
+        dann_domain_loss_weight=args.dann_domain_loss_weight,
+        dann_grl_max_strength=args.dann_grl_max_strength,
+        dann_grl_warmup_epochs=args.dann_grl_warmup_epochs,
         disable_cudnn=args.disable_cudnn,
         checkpoint_selection_rule=args.checkpoint_selection_rule,
         zero_channel_indices=tuple(args.zero_channel_indices),

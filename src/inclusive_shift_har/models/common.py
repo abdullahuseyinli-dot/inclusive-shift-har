@@ -17,6 +17,7 @@ class HAROutput:
     content: Tensor | None = None
     realization: Tensor | None = None
     descriptor_prediction: Tensor | None = None
+    domain_logits: Tensor | None = None
 
 
 def require_window_tensor(x: Tensor, *, channels: int = 6) -> None:

@@ -10,6 +10,10 @@ from inclusive_shift_har.models.baselines import (
     build_baseline,
 )
 from inclusive_shift_har.models.common import HAROutput, trainable_parameter_count
+from inclusive_shift_har.models.domain_adversarial import (
+    DANNCompactResidualHAR,
+    gradient_reverse,
+)
 from inclusive_shift_har.models.legacy_models import build_exact_legacy_model
 from inclusive_shift_har.models.more_har import MoReHAR
 
@@ -17,6 +21,7 @@ __all__ = [
     "CNN1D",
     "BiLSTM",
     "CompactResidualHAR",
+    "DANNCompactResidualHAR",
     "DeepConvLSTM",
     "HAROutput",
     "JointCNNBiLSTM",
@@ -24,5 +29,6 @@ __all__ = [
     "StaticDualBranchHAR",
     "build_baseline",
     "build_exact_legacy_model",
+    "gradient_reverse",
     "trainable_parameter_count",
 ]

@@ -20,6 +20,7 @@ from torch.utils.data import DataLoader, Dataset
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 from inclusive_shift_har.models import (
+    DANNCompactResidualHAR,
     MoReHAR,
     build_baseline,
     build_exact_legacy_model,
@@ -62,6 +63,9 @@ class TrainingConfig:
     use_realization_factorization: bool = False
     use_group_dro: bool = False
     coral_weight: float = 0.0
+    dann_domain_loss_weight: float = 0.0
+    dann_grl_max_strength: float = 1.0
+    dann_grl_warmup_epochs: int = 10
     objective_weights: MoReObjectiveWeights = field(default_factory=MoReObjectiveWeights)
     zero_channel_indices: tuple[int, ...] = ()
 
@@ -89,6 +93,17 @@ class TrainingConfig:
             )
         if self.coral_weight < 0:
             raise ValueError("CORAL weight cannot be negative")
+        is_dann = self.model_name == "dann_compact_residual_96"
+        if is_dann and self.dann_domain_loss_weight <= 0:
+            raise ValueError("DANN requires a positive domain-loss weight")
+        if not is_dann and self.dann_domain_loss_weight != 0:
+            raise ValueError("DANN domain loss requires model_name='dann_compact_residual_96'")
+        if not 0 < self.dann_grl_max_strength <= 1:
+            raise ValueError("DANN maximum GRL strength must lie in (0, 1]")
+        if self.dann_grl_warmup_epochs < 1:
+            raise ValueError("DANN GRL warmup epochs must be positive")
+        if is_dann and (self.coral_weight > 0 or self.use_group_dro):
+            raise ValueError("the established DANN baseline cannot be combined with CORAL/GroupDRO")
         if any(index < 0 or index >= 6 for index in self.zero_channel_indices):
             raise ValueError("input ablation channel indices must lie in [0, 5]")
         if (
@@ -169,12 +184,70 @@ def configure_determinism(seed: int) -> None:
     torch.use_deterministic_algorithms(True)
 
 
-def build_model(config: TrainingConfig) -> nn.Module:
+def build_model(
+    config: TrainingConfig,
+    *,
+    num_source_domains: int | None = None,
+) -> nn.Module:
     if config.model_name == "more_har":
         return MoReHAR(num_classes=config.num_classes)
+    if config.model_name == "dann_compact_residual_96":
+        if num_source_domains is None:
+            raise ValueError("DANN reconstruction requires the source-domain count")
+        return DANNCompactResidualHAR(
+            num_classes=config.num_classes,
+            num_source_domains=num_source_domains,
+        )
     if config.model_name.startswith("legacy_"):
         return build_exact_legacy_model(config.model_name, num_classes=config.num_classes)
     return build_baseline(config.model_name, num_classes=config.num_classes)
+
+
+def _validated_dann_checkpoint_metadata(
+    payload: dict[str, Any],
+    config: TrainingConfig,
+) -> tuple[int, dict[str, int]]:
+    """Fail closed on DANN architecture and source-domain reconstruction metadata."""
+
+    domain_record = payload.get("domain_adversarial")
+    if not isinstance(domain_record, dict):
+        raise ValueError("DANN checkpoint lacks domain-adversarial metadata")
+    recorded_domain_count = domain_record.get("num_source_domains")
+    if (
+        isinstance(recorded_domain_count, bool)
+        or not isinstance(recorded_domain_count, int)
+        or recorded_domain_count < 2
+    ):
+        raise ValueError("DANN checkpoint has an invalid source-domain count")
+    raw_domain_map = domain_record.get("participant_domain_map")
+    if not isinstance(raw_domain_map, dict) or not all(
+        isinstance(participant, str)
+        and participant
+        and not isinstance(index, bool)
+        and isinstance(index, int)
+        for participant, index in raw_domain_map.items()
+    ):
+        raise ValueError("DANN checkpoint has an invalid source participant-domain map")
+    participant_domain_map = {
+        str(participant): int(index) for participant, index in raw_domain_map.items()
+    }
+    if len(participant_domain_map) != recorded_domain_count or sorted(
+        participant_domain_map.values()
+    ) != list(range(recorded_domain_count)):
+        raise ValueError("DANN checkpoint source domains are not contiguous and complete")
+    if domain_record.get("participant_or_disability_metadata_required_at_inference") is not False:
+        raise ValueError("DANN checkpoint does not attest metadata-free inference")
+    if domain_record.get("domain_head_checkpointed_in_model_state") is not True:
+        raise ValueError("DANN checkpoint does not attest a checkpointed domain head")
+    if domain_record.get("domain_definition") != "source_training_participant_id_only":
+        raise ValueError("DANN checkpoint domain definition is not source-participant-only")
+    if domain_record.get("domain_loss_weight") != config.dann_domain_loss_weight:
+        raise ValueError("DANN checkpoint domain-loss metadata disagrees with configuration")
+    if domain_record.get("grl_max_strength") != config.dann_grl_max_strength:
+        raise ValueError("DANN checkpoint GRL metadata disagrees with configuration")
+    if domain_record.get("grl_warmup_epochs") != config.dann_grl_warmup_epochs:
+        raise ValueError("DANN checkpoint GRL schedule disagrees with configuration")
+    return recorded_domain_count, participant_domain_map
 
 
 def training_config_from_dict(payload: dict[str, Any]) -> TrainingConfig:
@@ -287,6 +360,24 @@ def _advance_scheduler_after_optimizer_updates(
     return True
 
 
+def _dann_grl_strength(
+    config: TrainingConfig,
+    *,
+    epoch: int,
+    batch_index: int,
+    batch_count: int,
+) -> float:
+    """Return the predeclared linear source-only GRL warmup value."""
+
+    if config.model_name != "dann_compact_residual_96":
+        return 0.0
+    if epoch < 1 or batch_count < 1 or not 0 <= batch_index < batch_count:
+        raise ValueError("invalid epoch/batch position for DANN GRL scheduling")
+    completed_epochs = (epoch - 1) + (batch_index + 1) / batch_count
+    warmup_fraction = min(1.0, completed_epochs / config.dann_grl_warmup_epochs)
+    return config.dann_grl_max_strength * warmup_fraction
+
+
 def _train_epoch(
     model: nn.Module,
     loader: DataLoader[tuple[Tensor, Tensor, Tensor]],
@@ -294,6 +385,7 @@ def _train_epoch(
     scaler: Any,
     config: TrainingConfig,
     *,
+    epoch: int,
     device: torch.device,
     augmentation_generator: torch.Generator,
     group_dro: GroupDROState | None,
@@ -303,8 +395,10 @@ def _train_epoch(
     examples = 0
     optimizer_updates = 0
     amp_skipped_steps = 0
+    dann_strength_total = 0.0
     amp_enabled, amp_dtype = _autocast_settings(config, device)
-    for signals, labels, domains in loader:
+    batch_count = len(loader)
+    for batch_index, (signals, labels, domains) in enumerate(loader):
         signals = _apply_input_ablation(signals.to(device), config.zero_channel_indices)
         labels = labels.to(device)
         domains = domains.to(device)
@@ -314,7 +408,18 @@ def _train_epoch(
             dtype=amp_dtype,
             enabled=amp_enabled,
         ):
-            clean = cast(HAROutput, model(signals))
+            dann_strength = _dann_grl_strength(
+                config,
+                epoch=epoch,
+                batch_index=batch_index,
+                batch_count=batch_count,
+            )
+            if config.model_name == "dann_compact_residual_96":
+                if not isinstance(model, DANNCompactResidualHAR):
+                    raise TypeError("DANN configuration did not construct the DANN model")
+                clean = model(signals, grl_strength=dann_strength)
+            else:
+                clean = cast(HAROutput, model(signals))
             component_losses: dict[str, Tensor]
             if config.model_name == "more_har" and config.use_augmentation:
                 augmented_batch = physically_plausible_augmentation(
@@ -352,6 +457,15 @@ def _train_epoch(
                 total_loss = per_example.mean()
                 component_losses = {"classification": total_loss}
 
+            if config.model_name == "dann_compact_residual_96":
+                if clean.domain_logits is None:
+                    raise RuntimeError("DANN model did not return source-domain logits")
+                domain_loss = F.cross_entropy(clean.domain_logits, domains)
+                domain_accuracy = (clean.domain_logits.argmax(dim=1) == domains).float().mean()
+                total_loss = total_loss + config.dann_domain_loss_weight * domain_loss
+                component_losses["domain_adversarial"] = domain_loss
+                component_losses["domain_accuracy"] = domain_accuracy
+
             if config.coral_weight:
                 if clean.content is None:
                     raise ValueError("CORAL requires model content features")
@@ -380,11 +494,15 @@ def _train_epoch(
             optimizer_updates += 1
         batch_size = labels.numel()
         examples += batch_size
+        dann_strength_total += dann_strength * batch_size
         totals["total"] = totals.get("total", 0.0) + float(total_loss.detach()) * batch_size
         for name, value in component_losses.items():
             totals[name] = totals.get(name, 0.0) + float(value.detach()) * batch_size
+    averaged = {name: value / examples for name, value in totals.items()}
+    if config.model_name == "dann_compact_residual_96":
+        averaged["grl_strength_mean"] = dann_strength_total / examples
     return (
-        {name: value / examples for name, value in totals.items()},
+        averaged,
         optimizer_updates,
         amp_skipped_steps,
     )
@@ -492,7 +610,8 @@ def train_source_model(
         drop_last=False,
         pin_memory=device.type == "cuda",
     )
-    model = build_model(config).to(device)
+    num_source_domains = len(participant_domain_map)
+    model = build_model(config, num_source_domains=num_source_domains).to(device)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.learning_rate,
@@ -530,6 +649,16 @@ def train_source_model(
             raise ValueError("resume checkpoint configuration hash mismatch")
         if checkpoint["lineage"]["split_manifest_sha256"] != lineage.split_manifest_sha256:
             raise ValueError("resume checkpoint split hash mismatch")
+        if config.model_name == "dann_compact_residual_96":
+            recorded_domain_count, recorded_domain_map = _validated_dann_checkpoint_metadata(
+                checkpoint,
+                config,
+            )
+            if (
+                recorded_domain_count != num_source_domains
+                or recorded_domain_map != participant_domain_map
+            ):
+                raise ValueError("DANN resume checkpoint source-domain mapping mismatch")
         model.load_state_dict(checkpoint["model_state"])
         optimizer.load_state_dict(checkpoint["optimizer_state"])
         scheduler.load_state_dict(checkpoint["scheduler_state"])
@@ -567,6 +696,7 @@ def train_source_model(
             optimizer,
             scaler,
             config,
+            epoch=epoch,
             device=device,
             augmentation_generator=augmentation_generator,
             group_dro=group_dro,
@@ -652,6 +782,21 @@ def train_source_model(
             "environment": _device_environment(device),
             "parameter_count": trainable_parameter_count(model),
             "group_dro_weights": None if group_dro is None else group_dro.weights.detach().cpu(),
+            "domain_adversarial": (
+                {
+                    "baseline_status": "established_baseline_not_proposed_contribution",
+                    "domain_definition": "source_training_participant_id_only",
+                    "participant_or_disability_metadata_required_at_inference": False,
+                    "num_source_domains": num_source_domains,
+                    "participant_domain_map": participant_domain_map,
+                    "domain_loss_weight": config.dann_domain_loss_weight,
+                    "grl_max_strength": config.dann_grl_max_strength,
+                    "grl_warmup_epochs": config.dann_grl_warmup_epochs,
+                    "domain_head_checkpointed_in_model_state": True,
+                }
+                if config.model_name == "dann_compact_residual_96"
+                else None
+            ),
         }
         last_checkpoint = checkpoint_payload
         if epoch % config.checkpoint_interval == 0:
@@ -726,7 +871,10 @@ def reconstruct_checkpoint(
 
     payload = torch.load(checkpoint_path, map_location=device, weights_only=False)
     config = training_config_from_dict(payload["configuration"])
-    model = build_model(config).to(device)
+    num_source_domains: int | None = None
+    if config.model_name == "dann_compact_residual_96":
+        num_source_domains, _ = _validated_dann_checkpoint_metadata(payload, config)
+    model = build_model(config, num_source_domains=num_source_domains).to(device)
     model.load_state_dict(payload["model_state"], strict=True)
     if config.num_classes != len(payload["label_schema"]):
         raise ValueError("checkpoint model and label schema disagree")

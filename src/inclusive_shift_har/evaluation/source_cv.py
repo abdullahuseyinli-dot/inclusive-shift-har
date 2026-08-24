@@ -187,7 +187,29 @@ def derive_model_identity(configuration: Mapping[str, Any]) -> dict[str, str]:
         name="configuration.coral_weight",
     )
     coral_token = str(coral_weight).replace("-", "m").replace(".", "p")
-    if model_name != "more_har":
+    if model_name == "dann_compact_residual_96":
+        dann_weight = _finite_float(
+            configuration.get("dann_domain_loss_weight"),
+            name="configuration.dann_domain_loss_weight",
+            lower=0.0,
+        )
+        grl_max = _finite_float(
+            configuration.get("dann_grl_max_strength"),
+            name="configuration.dann_grl_max_strength",
+            lower=0.0,
+        )
+        warmup = _positive_int(
+            configuration.get("dann_grl_warmup_epochs"),
+            name="configuration.dann_grl_warmup_epochs",
+        )
+        if dann_weight <= 0.0 or not 0.0 < grl_max <= 1.0:
+            raise SourceCVAggregationError(
+                "DANN loss weight and maximum GRL strength must be positive, with GRL <= 1"
+            )
+        dann_token = str(dann_weight).replace("-", "m").replace(".", "p")
+        grl_token = str(grl_max).replace("-", "m").replace(".", "p")
+        variant_name = f"established_lambda_{dann_token}_grl_{grl_token}_warmup_{warmup}"
+    elif model_name != "more_har":
         variant_name = f"coral_{coral_token}" if coral_weight > 0.0 else model_name
     else:
         flags = {

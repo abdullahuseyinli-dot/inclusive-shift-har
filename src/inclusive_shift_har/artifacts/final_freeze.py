@@ -187,6 +187,7 @@ def build_final_freeze_inventory(
     protocol_lock_sha256: str,
     target_seal_id: str,
     required_seed_order: Sequence[int],
+    selection_plan_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Build an inventory that can be published only while the target remains sealed."""
 
@@ -198,6 +199,8 @@ def build_final_freeze_inventory(
         ("target_seal_id", target_seal_id),
     ):
         _require_sha256(value, name=name)
+    if selection_plan_sha256 is not None:
+        _require_sha256(selection_plan_sha256, name="selection_plan_sha256")
     if not created_at_utc or not code_commit:
         raise FinalFreezeError("freeze inventory requires timestamp and code commit")
     seeds = tuple(int(seed) for seed in required_seed_order)
@@ -292,6 +295,8 @@ def build_final_freeze_inventory(
         "models": entries,
         "frozen_artifact_set_sha256": canonical_json_sha256(artifact_identity),
     }
+    if selection_plan_sha256 is not None:
+        payload["selection_plan_sha256"] = selection_plan_sha256
     payload["inventory_sha256"] = canonical_json_sha256(payload)
     return payload
 
@@ -386,6 +391,9 @@ def validate_final_freeze_inventory_file(
             expected = expected_lineage.get(name)
             if expected is not None and value != expected:
                 raise FinalFreezeError(f"freeze inventory {name} differs from expected lineage")
+        selection_plan_sha256 = payload.get("selection_plan_sha256")
+        if selection_plan_sha256 is not None and not _is_sha256(selection_plan_sha256):
+            raise FinalFreezeError("freeze inventory has invalid selection_plan_sha256")
         target_state = payload.get("target_state")
         if target_state != {
             "unlock_record": None,
