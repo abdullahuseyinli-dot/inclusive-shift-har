@@ -8,6 +8,7 @@ import torch
 from inclusive_shift_har.training.engine import (
     TrainingConfig,
     TrainingLineage,
+    _advance_scheduler_after_optimizer_updates,
     reconstruct_checkpoint,
     train_source_model,
 )
@@ -66,6 +67,9 @@ def test_source_training_checkpoint_is_complete_and_reconstructable(tmp_path: Pa
     assert payload["lineage"]["split_manifest_sha256"] == "b" * 64
     assert payload["configuration_sha256"] == result["configuration_sha256"]
     assert reconstructed(torch.from_numpy(validation_windows[:2])).logits.shape == (2, 3)
+    assert all(item["optimizer_update_count"] == 3 for item in result["history"])
+    assert all(item["amp_skipped_step_count"] == 0 for item in result["history"])
+    assert all(item["scheduler_advanced"] is True for item in result["history"])
 
 
 def test_fixed_epoch_training_selects_last_epoch_without_early_stopping(tmp_path: Path) -> None:
@@ -126,3 +130,18 @@ def test_training_config_records_explicit_cudnn_backend_choice() -> None:
         disable_cudnn=True,
     )
     assert config.disable_cudnn is True
+
+
+def test_scheduler_does_not_advance_when_grad_scaler_skips_every_update() -> None:
+    class CountingScheduler:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def step(self) -> None:
+            self.calls += 1
+
+    scheduler = CountingScheduler()
+    assert _advance_scheduler_after_optimizer_updates(scheduler, 0) is False
+    assert scheduler.calls == 0
+    assert _advance_scheduler_after_optimizer_updates(scheduler, 1) is True
+    assert scheduler.calls == 1

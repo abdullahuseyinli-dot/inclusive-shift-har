@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "preserved_training_failure",
+  "status": "quarantined_amp_scheduler_desynchronization",
+  "detected_at_local": "2026-08-24T01:06:28.0037641+01:00",
+  "code_commit": "3d7336001b1c1d542a5624780d7053f6203d4d5c",
+  "device": "cuda",
+  "mixed_precision": "float16",
+  "model_name": "more_har",
+  "variant": "full_without_accelerometer",
+  "attempt_count": 2,
+  "historical_checkpoint_audit": {
+    "method": "compare maximum serialized AdamW parameter step with completed checkpoint epoch multiplied by ceiling(train_window_count / batch_size)",
+    "cuda_float16_summaries_audited": 121,
+    "affected_summary_count": 17,
+    "skipped_optimizer_updates_per_affected_summary": 1,
+    "quarantined_grouped_fold_summary_count": 15,
+    "quarantined_source_development_summary_count": 6,
+    "unaffected_groupdro_companion_folds_quarantined_to_avoid_configuration_fold_collisions": 4,
+    "grouped_fold_directory": "results/failures/amp_scheduler_desynchronization/source_cv",
+    "source_development_directory": "results/failures/amp_scheduler_desynchronization/source_development",
+    "prior_aggregates_status": "immutable_historical_snapshots_superseded_after_corrected_reruns"
+  },
+  "completed_summary": {
+    "path": "results/failures/amp_scheduler_desynchronization/more_har_full_no_acc-seed11-lr3e4-wd1e4-exact3d73360-final_source_split.json",
+    "file_sha256": "e34a4a043f9f4183f726c305a247e10508d840c57057caf1e64457cccb2f2782"
+  },
+  "preserved_run_directories": [
+    "results/runs/source-dev-v1/more_har_full_no_acc-seed11-lr3e4-wd1e4-exact3d73360-final_source_split",
+    "results/runs/source-cv-v1/more_har_full_no_acc-seed11-lr3e4-wd1e4-exact3d73360-source_cv_01"
+  ],
+  "failure": "GradScaler could skip all optimizer steps in an epoch while CosineAnnealingLR still advanced",
+  "disposition": "exclude_affected_attempts_and_rerun_after_optimizer_scheduler_coupling_fix",
+  "target_subject_or_window_records_loaded": false,
+  "target_performance_or_prediction_accessed": false
+}

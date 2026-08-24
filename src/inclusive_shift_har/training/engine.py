@@ -273,6 +273,20 @@ def _autocast_settings(config: TrainingConfig, device: torch.device) -> tuple[bo
     return enabled, dtype
 
 
+def _advance_scheduler_after_optimizer_updates(
+    scheduler: Any,
+    optimizer_updates: int,
+) -> bool:
+    """Advance an epoch scheduler only after at least one real optimizer update."""
+
+    if optimizer_updates < 0:
+        raise ValueError("optimizer update count cannot be negative")
+    if optimizer_updates == 0:
+        return False
+    scheduler.step()
+    return True
+
+
 def _train_epoch(
     model: nn.Module,
     loader: DataLoader[tuple[Tensor, Tensor, Tensor]],
@@ -283,10 +297,12 @@ def _train_epoch(
     device: torch.device,
     augmentation_generator: torch.Generator,
     group_dro: GroupDROState | None,
-) -> dict[str, float]:
+) -> tuple[dict[str, float], int, int]:
     model.train()
     totals: dict[str, float] = {}
     examples = 0
+    optimizer_updates = 0
+    amp_skipped_steps = 0
     amp_enabled, amp_dtype = _autocast_settings(config, device)
     for signals, labels, domains in loader:
         signals = _apply_input_ablation(signals.to(device), config.zero_channel_indices)
@@ -355,14 +371,23 @@ def _train_epoch(
         scaler.scale(total_loss).backward()
         scaler.unscale_(optimizer)
         torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip_norm)
+        scale_before_step = float(scaler.get_scale())
         scaler.step(optimizer)
         scaler.update()
+        if float(scaler.get_scale()) < scale_before_step:
+            amp_skipped_steps += 1
+        else:
+            optimizer_updates += 1
         batch_size = labels.numel()
         examples += batch_size
         totals["total"] = totals.get("total", 0.0) + float(total_loss.detach()) * batch_size
         for name, value in component_losses.items():
             totals[name] = totals.get(name, 0.0) + float(value.detach()) * batch_size
-    return {name: value / examples for name, value in totals.items()}
+    return (
+        {name: value / examples for name, value in totals.items()},
+        optimizer_updates,
+        amp_skipped_steps,
+    )
 
 
 def predict_model(
@@ -536,7 +561,7 @@ def train_source_model(
     stopped_early = False
     last_checkpoint: dict[str, Any] | None = None
     for epoch in range(start_epoch, config.epochs + 1):
-        train_losses = _train_epoch(
+        train_losses, optimizer_updates, amp_skipped_steps = _train_epoch(
             model,
             loader,
             optimizer,
@@ -546,7 +571,10 @@ def train_source_model(
             augmentation_generator=augmentation_generator,
             group_dro=group_dro,
         )
-        scheduler.step()
+        scheduler_advanced = _advance_scheduler_after_optimizer_updates(
+            scheduler,
+            optimizer_updates,
+        )
         _, _, validation_report = predict_model(
             model,
             validation_windows,
@@ -579,6 +607,9 @@ def train_source_model(
             {
                 "epoch": epoch,
                 "training_losses": train_losses,
+                "optimizer_update_count": optimizer_updates,
+                "amp_skipped_step_count": amp_skipped_steps,
+                "scheduler_advanced": scheduler_advanced,
                 "learning_rate": float(optimizer.param_groups[0]["lr"]),
                 "validation_mean_participant_macro_f1": metric,
                 "validation_worst_participant_macro_f1": worst,
