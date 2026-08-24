@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "retrospective_secondary_aggregation_deviation",
+  "status": "documented_after_event",
+  "recorded_at_utc": "2026-08-24T05:39:50.2433787Z",
+  "failure_time_utc": null,
+  "failure_time_status": "not_recorded_by_failed_cli_invocation",
+  "failure_artifact_created_at_event": false,
+  "operation": "secondary_sensor_reliability_aggregation",
+  "input_index": {
+    "path": "results/postconfirmatory/sensor_stress_v1/sensor_reliability_stress_index.json",
+    "file_sha256": "ce6dce0736a26fe04c44d689d356e222ede16bbe1b1d5a476e851d1feaba2d92",
+    "record_sha256": "db74699730f9e71b2bbe9b8ae5c536d6ce452236c6c4a4e523260b19a06c285a"
+  },
+  "attempted_code_commit": "a95e013e5a6a318a7a73e85dbd4ee7f8de0bedff",
+  "exception_type": "SecondaryAggregationError",
+  "message": "sensor reliability stress index escapes artifact_root",
+  "root_cause": "Windows pathlib rendered a safe relative Path with backslash separators and the validator incorrectly treated any backslash as an escape",
+  "scientific_outputs_modified_by_failure": false,
+  "resolution_code_commit": "e493ca47696b616c56bd524a1e88f8ef6acdbaae",
+  "successful_aggregate": {
+    "path": "results/postconfirmatory/sensor_stress_v1/sensor_stress_aggregate.json",
+    "file_sha256": "4e8fc5eebd9e6d31c975f9cc0a3b5babafb4ad16e42a518f1d7d103a645d7ad9",
+    "record_sha256": "abe1aee172e9b680e2aca16848c84bf6788491d005964b3d18e597098a06df90",
+    "aggregation_code_commit": "e493ca47696b616c56bd524a1e88f8ef6acdbaae"
+  },
+  "record_sha256": "76db29a27fbc38906279df75b587e00584ffea9e1993804c289e176237f6efb0"
+}
