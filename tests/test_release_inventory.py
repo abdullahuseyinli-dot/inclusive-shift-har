@@ -253,6 +253,9 @@ def test_generate_and_validate_draft_with_explicit_not_run_tracks(tmp_path: Path
     workspace = _build_workspace(tmp_path)
     inventory = _generate(workspace)
 
+    assert inventory["schema_version"] == "1.1.0"
+    assert inventory["delivery_mode"] == "external_release_asset"
+    assert inventory["tracked"] is False
     assert inventory["status"] == "draft"
     assert inventory["repository"]["worktree_clean"] is True
     assert inventory["repository"]["remote_visibility"] == "absent"
@@ -327,6 +330,15 @@ def test_generator_rejects_bad_declared_embedded_self_hash(tmp_path: Path) -> No
     workspace = _build_workspace(tmp_path, bad_opening_self_hash=True)
 
     with pytest.raises(ReleaseEvidenceError, match="embedded self-hash"):
+        _generate(workspace)
+
+
+def test_generator_rejects_onnx_payload_reference(tmp_path: Path) -> None:
+    workspace = _build_workspace(tmp_path)
+    workspace.spec["artifacts"][0]["path"] = "evidence/model.onnx"
+    _write_json(workspace.spec_path, workspace.spec)
+
+    with pytest.raises(ReleaseEvidenceError, match="prohibited raw/checkpoint extension"):
         _generate(workspace)
 
 

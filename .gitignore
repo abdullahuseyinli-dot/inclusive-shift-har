@@ -56,6 +56,10 @@ Thumbs.db
 *.ckpt
 *.pkl
 *.onnx
+*.zip
+*.npy
+*.npz
+*.docx
 
 # Source archives must remain outside normal Git history
 /legacy/source_archives/

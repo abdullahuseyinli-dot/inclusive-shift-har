@@ -32,6 +32,7 @@ from inclusive_shift_har.evaluation.efficiency import (
     FROZEN_NEURAL_SEEDS,
     RECURRENT_CUDNN_DISABLED_MODEL_IDS,
     EfficiencyProfileConfig,
+    efficiency_semantic_contract,
     load_efficiency_profile_config,
     profile_neural_model,
     write_efficiency_profile_new,
@@ -276,6 +277,12 @@ def _contention_attestation(
         value.get("status") != "pass_no_unapproved_compute_processes" for value in snapshots
     ):
         raise PostconfirmatoryEfficiencyError("GPU contention attestation coverage is incomplete")
+    device_indices = {value.get("device_index") for value in snapshots}
+    if len(device_indices) != 1 or any(
+        isinstance(value, bool) or not isinstance(value, int) or value < 0
+        for value in device_indices
+    ):
+        raise PostconfirmatoryEfficiencyError("GPU contention snapshots do not share one device")
     ambient = sorted(
         {
             str(process["process_name_basename"])
@@ -291,6 +298,8 @@ def _contention_attestation(
         "created_at_utc": timestamp,
         "profiler_code_commit": profiler_code_commit,
         "profile_config_sha256": config.config_sha256,
+        "profile_config_file_sha256": config.file_sha256,
+        "device_index": next(iter(device_indices)),
         "monitor": "nvidia_smi_selected_device_compute_apps",
         "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
         "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
@@ -324,6 +333,26 @@ def _resolve_frozen_file(record: Mapping[str, Any], *, artifact_root: Path, name
     if candidate.is_symlink():
         raise PostconfirmatoryEfficiencyError(f"{name} may not be a symlink")
     resolved = candidate.resolve(strict=True)
+    try:
+        resolved.relative_to(artifact_root)
+    except ValueError as exc:
+        raise PostconfirmatoryEfficiencyError(f"{name} escapes artifact_root") from exc
+    if not resolved.is_file():
+        raise PostconfirmatoryEfficiencyError(f"{name} is not a regular file")
+    return resolved
+
+
+def _resolve_artifact_input(value: str | Path, *, artifact_root: Path, name: str) -> Path:
+    """Resolve an operator-supplied file beneath the artifact root without symlinks."""
+
+    raw = Path(value)
+    candidate = raw if raw.is_absolute() else artifact_root / raw
+    if candidate.is_symlink():
+        raise PostconfirmatoryEfficiencyError(f"{name} may not be a symlink")
+    try:
+        resolved = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise PostconfirmatoryEfficiencyError(f"{name} is not readable") from exc
     try:
         resolved.relative_to(artifact_root)
     except ValueError as exc:
@@ -536,13 +565,16 @@ def _profile_with_cudnn_policy(
 def _index_contract(
     *,
     timestamp: str,
+    profile_config_path: str | None,
     profile_config_sha256: str | None,
+    profile_config_file_sha256: str | None,
     inventory: Mapping[str, Any] | None,
     context: ConsumedTargetContext | None,
     profile_entries: list[dict[str, Any]],
     validation_entries: list[dict[str, Any]],
     profiler_code_commit: str,
     contention_attestation: Mapping[str, Any] | None,
+    execution_environment: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
     return {
         "schema_version": "1.0.0",
@@ -551,7 +583,13 @@ def _index_contract(
         "execution": "sequential_cuda_one_frozen_model_seed_at_a_time",
         "required_device": "cuda",
         "cuda_available_at_start": True,
+        "profile_config_path": profile_config_path,
         "profile_config_sha256": profile_config_sha256,
+        "profile_config_file_sha256": profile_config_file_sha256,
+        "profile_semantics": efficiency_semantic_contract(),
+        "execution_environment": None
+        if execution_environment is None
+        else dict(execution_environment),
         "final_freeze_inventory_sha256": None
         if inventory is None
         else inventory.get("inventory_sha256"),
@@ -597,13 +635,16 @@ def _publish_failure_artifacts(
     output: Path,
     output_root: Path,
     timestamp: str,
+    profile_config_path: str | None,
     profile_config_sha256: str | None,
+    profile_config_file_sha256: str | None,
     inventory: Mapping[str, Any] | None,
     context: ConsumedTargetContext | None,
     profile_entries: list[dict[str, Any]],
     validation_entries: list[dict[str, Any]],
     profiler_code_commit: str,
     contention_snapshots: list[dict[str, Any]],
+    execution_environment: Mapping[str, Any] | None,
     error: Exception,
 ) -> None:
     failure_path = output / "failure.json"
@@ -621,6 +662,9 @@ def _publish_failure_artifacts(
         "completed_checkpoint_validation_count": len(validation_entries),
         "completed_profile_count": len(profile_entries),
         "profiler_code_commit": profiler_code_commit,
+        "profile_config_path": profile_config_path,
+        "profile_config_sha256": profile_config_sha256,
+        "profile_config_file_sha256": profile_config_file_sha256,
         "gpu_contention": {
             "snapshot_count": len(contention_snapshots),
             "snapshots": contention_snapshots,
@@ -647,13 +691,16 @@ def _publish_failure_artifacts(
     failure_file_sha256 = sha256_file(failure_path)
     index = _index_contract(
         timestamp=timestamp,
+        profile_config_path=profile_config_path,
         profile_config_sha256=profile_config_sha256,
+        profile_config_file_sha256=profile_config_file_sha256,
         inventory=inventory,
         context=context,
         profile_entries=profile_entries,
         validation_entries=validation_entries,
         profiler_code_commit=profiler_code_commit,
         contention_attestation=None,
+        execution_environment=execution_environment,
     )
     index.update(
         {
@@ -673,6 +720,7 @@ def _publish_failure_artifacts(
 def run_frozen_efficiency_profiles(
     *,
     profile_config_path: str | Path,
+    expected_profile_config_file_sha256: str,
     final_freeze_inventory_path: str | Path,
     opening_receipt_path: str | Path,
     locked_target_index_path: str | Path,
@@ -690,13 +738,24 @@ def run_frozen_efficiency_profiles(
             "CUDA is required before any frozen checkpoint or consumed index is opened"
         )
     timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
-    config = load_efficiency_profile_config(profile_config_path)
-    if config.batch_sizes != EFFICIENCY_BATCH_SIZES or config.precisions != EFFICIENCY_PRECISIONS:
-        raise PostconfirmatoryEfficiencyError("efficiency profile matrix differs from the lock")
     root_candidate = Path(artifact_root)
     if root_candidate.is_symlink():
         raise PostconfirmatoryEfficiencyError("artifact_root may not be a symlink")
     root = root_candidate.resolve(strict=True)
+    profile_config = _resolve_artifact_input(
+        profile_config_path, artifact_root=root, name="efficiency profile config"
+    )
+    config = load_efficiency_profile_config(
+        profile_config,
+        allowed_root=root,
+        expected_file_sha256=_sha256(
+            expected_profile_config_file_sha256,
+            name="expected efficiency profile config file hash",
+        ),
+    )
+    if config.batch_sizes != EFFICIENCY_BATCH_SIZES or config.precisions != EFFICIENCY_PRECISIONS:
+        raise PostconfirmatoryEfficiencyError("efficiency profile matrix differs from the lock")
+    profile_config_relative = profile_config.relative_to(root).as_posix()
     profiler_commit = _require_profiler_head(root, profiler_code_commit)
     outputs_root = Path(output_root)
     output = _output_directory(Path(output_directory), output_root=outputs_root)
@@ -707,6 +766,7 @@ def run_frozen_efficiency_profiles(
     profile_entries: list[dict[str, Any]] = []
     validation_entries: list[dict[str, Any]] = []
     contention_snapshots: list[dict[str, Any]] = []
+    execution_environment: Mapping[str, Any] | None = None
     try:
         initial_contention = _capture_gpu_contention_snapshot(
             config=config,
@@ -884,11 +944,28 @@ def run_frozen_efficiency_profiles(
                         )
                         contention_snapshots.append(contention_after)
                         _require_contention_pass(contention_after)
+                        environment = _mapping(
+                            profile.get("environment"), name="profile execution environment"
+                        )
+                        profile_device_index = environment.get("device_index")
+                        if profile_device_index != contention_before.get(
+                            "device_index"
+                        ) or profile_device_index != contention_after.get("device_index"):
+                            raise PostconfirmatoryEfficiencyError(
+                                "profile and contention snapshots used different CUDA devices"
+                            )
+                        if execution_environment is None:
+                            execution_environment = dict(environment)
+                        elif dict(environment) != dict(execution_environment):
+                            raise PostconfirmatoryEfficiencyError(
+                                "efficiency profiles do not share one execution environment"
+                            )
                         profile_body = dict(profile)
                         profile_body.pop("record_sha256")
                         profile_body.update(
                             {
                                 "created_at_utc": timestamp,
+                                "profile_config_path": profile_config_relative,
                                 "training_configuration_sha256": configuration_hash,
                                 "split_manifest_sha256": split_hash,
                                 "frozen_code_commit": code_commit,
@@ -960,13 +1037,16 @@ def run_frozen_efficiency_profiles(
         }
         index = _index_contract(
             timestamp=timestamp,
+            profile_config_path=profile_config_relative,
             profile_config_sha256=config.config_sha256,
+            profile_config_file_sha256=config.file_sha256,
             inventory=inventory,
             context=context,
             profile_entries=profile_entries,
             validation_entries=validation_entries,
             profiler_code_commit=profiler_commit,
             contention_attestation=contention_reference,
+            execution_environment=execution_environment,
         )
         if (
             index["checkpoint_validation_count"] != index["neural_model_seed_count"]
@@ -987,13 +1067,16 @@ def run_frozen_efficiency_profiles(
             output=output,
             output_root=outputs_root,
             timestamp=timestamp,
+            profile_config_path=profile_config_relative,
             profile_config_sha256=config.config_sha256,
+            profile_config_file_sha256=config.file_sha256,
             inventory=inventory,
             context=context,
             profile_entries=profile_entries,
             validation_entries=validation_entries,
             profiler_code_commit=profiler_commit,
             contention_snapshots=contention_snapshots,
+            execution_environment=execution_environment,
             error=exc,
         )
         raise
@@ -1002,6 +1085,7 @@ def run_frozen_efficiency_profiles(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile-config", type=Path, required=True)
+    parser.add_argument("--expected-profile-config-file-sha256", required=True)
     parser.add_argument("--final-freeze-inventory", type=Path, required=True)
     parser.add_argument("--opening-receipt", type=Path, required=True)
     parser.add_argument("--locked-target-index", type=Path, required=True)
@@ -1018,6 +1102,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         result = run_frozen_efficiency_profiles(
             profile_config_path=args.profile_config,
+            expected_profile_config_file_sha256=args.expected_profile_config_file_sha256,
             final_freeze_inventory_path=args.final_freeze_inventory,
             opening_receipt_path=args.opening_receipt,
             locked_target_index_path=args.locked_target_index,

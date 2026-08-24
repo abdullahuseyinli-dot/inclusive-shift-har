@@ -36,11 +36,14 @@ it does not validate later edits automatically.
 
 ## Corrected UCI official-train reproduction
 
-Status recorded in `results/legacy_reproduction/uci_har_v1.status.json`:
-`configured_not_run`. The matrix is exactly 3 models × 5 grouped folds × 5
-seeds = 75 CUDA runs. It never opens the official UCI test or InclusiveHAR
-target. Use the inner verified archive described in
-`docs/DATA_ACQUISITION_RUNBOOK.md`.
+The historical `results/legacy_reproduction/uci_har_v1.status.json` declaration
+remains preserved as `configured_not_run`. It is superseded operationally by the
+completed, self-hashed v1.1 report at
+`results/legacy_reproduction/uci_har_source_grouped_v1/uci_source_grouped_report_v1.json`:
+all 3 models × 5 grouped folds × 5 seeds completed, for 75 first-attempt CUDA
+runs. The commands below are retained for reproducibility; do not rerun them into
+the existing create-only destinations. The route never opened the official UCI
+test or the InclusiveHAR target.
 
 The runner consumes and byte-pins the v1.1 YAML. Model scope, folds, seeds,
 hyperparameters, mixed precision, and the model-specific recurrent cuDNN policy
@@ -146,14 +149,17 @@ Substitute the externally recorded cache-record file hash below.
 $manifestPath = "results/protocol/few_person_inclusion_curve_v1_1.json"
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
-$cacheRecordFileHash = "<EXTERNALLY_RECORDED_PRIMARY_CACHE_RECORD_FILE_SHA256>"
+$cacheRecordFileHash = "02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba"
 $outputRoot = "results/postconfirmatory/few_person_v1_1"
 $executionCommit = (git rev-parse HEAD).Trim()
+$attempt = 1
+$attemptToken = "{0:d3}" -f $attempt
 foreach ($scenario in $manifest.scenarios) {
   foreach ($model in $manifest.models) {
-    $output = "$outputRoot/$($scenario.scenario_id)/$($model.model_id)/seed-$($model.seed)"
+    $cellId = "$($model.model_id)--seed-$($model.seed)--$($scenario.fold_id)--k$($scenario.k)"
+    $output = "$outputRoot/$cellId--attempt-$attemptToken"
     $createdAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
-    uv run inclusive-shift-har train few-person run-scenario `
+    .venv\Scripts\inclusive-shift-har.exe train few-person run-scenario `
       --manifest $manifestPath `
       --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json `
       --opening-receipt results/protocol/confirmatory_target_opening_1.json `
@@ -167,22 +173,27 @@ foreach ($scenario in $manifest.scenarios) {
       --code-commit $executionCommit `
       --created-at-utc $createdAt `
       --output-directory $output --output-root .
-    if ($LASTEXITCODE -ne 0) { throw "Few-person run failed: $output" }
+    if ($LASTEXITCODE -ne 0) { throw "Few-person run failed: $cellId attempt $attemptToken" }
   }
 }
 ```
+
+The result directory basename must remain the canonical `$cellId` followed by
+`--attempt-NNN`. After a preserved failure, increment `$attempt`, retain every
+prior directory unchanged, and rerun only the missing cell in its new
+create-only attempt directory.
 
 Validate progress at any time. Aggregate only when `aggregation_ready` is true:
 
 ```powershell
 $statisticsCreatedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
 
-uv run inclusive-shift-har evaluate few-person-statistics validate-progress `
+.venv\Scripts\inclusive-shift-har.exe evaluate few-person-statistics validate-progress `
   --manifest results/protocol/few_person_inclusion_curve_v1_1.json `
   --results-root results/postconfirmatory/few_person_v1_1 `
   --artifact-root . --full-json
 
-uv run inclusive-shift-har evaluate few-person-statistics aggregate `
+.venv\Scripts\inclusive-shift-har.exe evaluate few-person-statistics aggregate `
   --manifest results/protocol/few_person_inclusion_curve_v1_1.json `
   --results-root results/postconfirmatory/few_person_v1_1 `
   --artifact-root . `

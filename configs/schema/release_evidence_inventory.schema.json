@@ -1,12 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:inclusive-shift-har:schema:release-evidence-inventory:1.0.0",
+  "$id": "urn:inclusive-shift-har:schema:release-evidence-inventory:1.1.0",
   "title": "InclusiveShift-HAR final release evidence inventory",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_version",
     "inventory_kind",
+    "delivery_mode",
+    "tracked",
     "status",
     "created_at_utc",
     "generation_spec",
@@ -20,8 +22,10 @@
     "record_sha256"
   ],
   "properties": {
-    "schema_version": { "const": "1.0.0" },
+    "schema_version": { "const": "1.1.0" },
     "inventory_kind": { "const": "final_release_evidence_inventory" },
+    "delivery_mode": { "const": "external_release_asset" },
+    "tracked": { "const": false },
     "status": { "enum": ["draft", "blocked", "ready", "released"] },
     "created_at_utc": { "type": "string", "format": "date-time" },
     "generation_spec": { "$ref": "#/$defs/spec_reference" },

@@ -1,0 +1,7 @@
+title = "InclusiveShift-HAR complete-history secret scan"
+
+[extend]
+useDefault = true
+
+# Reviewed false positives are pinned by finding fingerprint in .gitleaksignore.
+# Do not add broad path, regex, commit, or rule allowlists here.

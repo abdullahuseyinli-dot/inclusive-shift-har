@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.0.0",
+  "policy_kind": "final_release_gate_policy",
+  "policy_id": "inclusive-shift-har-release-gate-v1",
+  "maximum_blob_size_bytes": 16777216,
+  "forbidden_path_prefixes": [
+    ".audit/",
+    "checkpoints/",
+    "data/cache/",
+    "data/processed/",
+    "data/raw/",
+    "data/restricted/",
+    "legacy/checkpoints/",
+    "legacy/extracted/",
+    "legacy/source_archives/",
+    "outputs/",
+    "results/runs/"
+  ],
+  "forbidden_suffixes": [
+    ".ckpt",
+    ".docx",
+    ".key",
+    ".npy",
+    ".npz",
+    ".onnx",
+    ".p12",
+    ".pem",
+    ".pfx",
+    ".pickle",
+    ".pkl",
+    ".pt",
+    ".pth",
+    ".zip"
+  ],
+  "disguised_binary_signatures": {
+    "elf": "7f454c46",
+    "numpy": "934e554d5059",
+    "pdf": "25504446",
+    "pe": "4d5a",
+    "pickle_protocol": "8002",
+    "zip": "504b0304"
+  },
+  "allowed_signature_suffixes": {
+    "pdf": [".pdf"]
+  },
+  "gitleaks": {
+    "version": "8.30.1",
+    "linux_x64_archive": "gitleaks_8.30.1_linux_x64.tar.gz",
+    "linux_x64_archive_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+    "release_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+    "required_scope": "complete_reachable_git_history"
+  },
+  "prohibited_license_tokens": [
+    "affero general public license",
+    "agpl",
+    "commercial",
+    "general public license",
+    "gpl",
+    "proprietary",
+    "unknown"
+  ],
+  "license_exceptions": [],
+  "ci_action_pins": {
+    "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
+    "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065",
+    "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+    "astral-sh/setup-uv": "d0cc045d04ccac9d8b7881df0226f9e82c39688e"
+  },
+  "external_attestation_root": ".audit/release-attestations",
+  "external_release_asset_root": ".audit/release-assets"
+}

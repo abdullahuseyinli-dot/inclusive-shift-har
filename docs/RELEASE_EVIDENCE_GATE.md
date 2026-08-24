@@ -39,9 +39,14 @@ listed as not run; incompleteness must not be hidden by omitting a role.
 
 ## Evidence inventory
 
-`configs/schema/release_evidence_inventory.schema.json` defines a draft
-machine-readable inventory. Generate the actual inventory only after the
-candidate commit and files are stable. For each evidence item record its
+`configs/schema/release_evidence_inventory.schema.json` defines the version
+1.1 external release-asset inventory. Generate the actual inventory only after
+the candidate commit and files are stable. The inventory must use
+`delivery_mode: external_release_asset` and `tracked: false`; place it at
+`.audit/release-assets/<candidate>/final_release_evidence_inventory.json` and
+attach that exact file to the eventual GitHub release. This avoids an
+impossible commit self-reference. Record the inventory SHA-256 in the annotated
+release tag message. For each evidence item record its
 repository-relative path, exact byte size, file SHA-256, embedded record SHA-256
 where present, evidence status, validation status, claim scope, and whether it
 is release-required.
@@ -64,7 +69,8 @@ coverage, declared embedded self-hashes, and the one-opening/no-rerun state.
 
 ## Inventory generation runbook
 
-Prepare a reviewed strict-JSON generation spec. It has exactly these top-level
+Prepare a reviewed strict-JSON generation spec. The spec remains version 1.0
+while its generated inventory contract is version 1.1. It has exactly these top-level
 keys: `schema_version`, `spec_kind`, `requested_status`, `created_at_utc`,
 `protocol_tag`, `remote`, `confirmatory_state`, `artifacts`, `gates`,
 `postconfirmatory_statuses`, and `blockers`. Use schema version `1.0.0` and spec
@@ -105,11 +111,11 @@ uv run python -m inclusive_shift_har.artifacts.release_inventory generate `
   --repository-root . `
   --candidate-commit $candidate `
   --require-clean-worktree `
-  --allowed-output-root results `
-  --destination release/final_release_evidence_inventory.json
+  --allowed-output-root .audit `
+  --destination release-assets/$candidate/final_release_evidence_inventory.json
 
 uv run python -m inclusive_shift_har.artifacts.release_inventory validate `
-  --inventory results/release/final_release_evidence_inventory.json `
+  --inventory .audit/release-assets/$candidate/final_release_evidence_inventory.json `
   --spec $spec `
   --repository-root . `
   --candidate-commit $candidate
@@ -120,6 +126,65 @@ do not edit or overwrite the output. Validation recomputes the complete
 inventory from the pinned candidate Git blobs and the supplied attestation
 bundle, so changing and merely re-self-hashing the inventory is insufficient.
 Neither operation loads sensor arrays or raw target recordings.
+
+## Final security/provenance report
+
+The tracked `results/release/final_release_gate_report.json` is deliberately a
+`tracked_precommit_report`: it binds its parent commit, leaves
+`content_commit` null, records every gate as `not_run`, and says that the exact
+candidate attestation is pending. It must never be edited to claim that the
+commit containing itself has passed. After that report is committed, create
+the exact, ignored attestation under
+`.audit/release-attestations/<candidate>/final_release_gate_report.json`.
+
+The release-security commands are create-only:
+
+```powershell
+$candidate = (git rev-parse HEAD).Trim()
+$now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$evidence = ".audit/release-attestations/$candidate"
+
+uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository `
+  --repository-root . --candidate-commit $candidate `
+  --policy configs/release/release_gate_policy_v1.json `
+  --created-at-utc $now --output "$evidence/repository_scan.json"
+
+uv run python -m inclusive_shift_har.artifacts.release_gate validate-secret-scan `
+  --repository-root . --report "$evidence/gitleaks.json" `
+  --candidate-commit $candidate --gitleaks-version 8.30.1 `
+  --policy configs/release/release_gate_policy_v1.json `
+  --created-at-utc $now --output "$evidence/secret_scan.json"
+
+uv run python -m inclusive_shift_har.artifacts.release_gate audit-licenses `
+  --repository-root . --inventory "$evidence/python_licenses.json" `
+  --candidate-commit $candidate --pip-licenses-version 5.5.5 `
+  --policy configs/release/release_gate_policy_v1.json `
+  --created-at-utc $now --output "$evidence/license_audit.json"
+
+uv run python -m inclusive_shift_har.artifacts.release_gate assemble `
+  --repository-root . --policy configs/release/release_gate_policy_v1.json `
+  --mode exact_candidate_attestation --created-at-utc $now `
+  --spec "$evidence/attestation_spec.json" `
+  --output "$evidence/final_release_gate_report.json"
+
+uv run python -m inclusive_shift_har.artifacts.release_gate validate `
+  --report "$evidence/final_release_gate_report.json" --repository-root .
+```
+
+The repository scanner reads candidate and historical Git objects, rejects
+protected/raw/archive/checkpoint paths and suffixes (including ONNX), blobs over
+16 MiB, symlinks, submodules, case collisions, and disguised binary payloads.
+It does not walk or open raw worktree paths. Gitleaks is pinned to 8.30.1; the
+official Linux x64 archive SHA-256 is
+`551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`.
+The release dependency group locks `pip-licenses==5.5.5`.
+
+CI assembles and validates a candidate-scoped attestation only after the
+synthetic matrix and its substantive security/quality steps succeed. Its
+sanitized ignored JSON evidence is uploaded even when a preceding gate fails.
+The external inventory is generated only after successful remote CI evidence
+can be pinned; generating it inside the still-running CI job would overstate
+that circular state.
 
 ## Private GitHub sequence
 

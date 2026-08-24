@@ -20,7 +20,8 @@ from inclusive_shift_har.manifests.canonical import (
     load_json_strict,
 )
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+SPEC_SCHEMA_VERSION = "1.0.0"
 INVENTORY_KIND = "final_release_evidence_inventory"
 SPEC_KIND = "release_evidence_inventory_spec"
 MAX_EVIDENCE_BYTES = 16 * 1024 * 1024
@@ -109,7 +110,17 @@ _FORBIDDEN_PREFIXES = (
     ("legacy", "extracted"),
     ("checkpoints",),
 )
-_FORBIDDEN_SUFFIXES = {".ckpt", ".docx", ".npy", ".npz", ".pkl", ".pt", ".pth", ".zip"}
+_FORBIDDEN_SUFFIXES = {
+    ".ckpt",
+    ".docx",
+    ".npy",
+    ".npz",
+    ".onnx",
+    ".pkl",
+    ".pt",
+    ".pth",
+    ".zip",
+}
 
 
 class ReleaseEvidenceError(RuntimeError):
@@ -695,7 +706,7 @@ def _build_inventory(
         },
         name="generation spec",
     )
-    if spec.get("schema_version") != SCHEMA_VERSION or spec.get("spec_kind") != SPEC_KIND:
+    if spec.get("schema_version") != SPEC_SCHEMA_VERSION or spec.get("spec_kind") != SPEC_KIND:
         raise ReleaseEvidenceError("generation spec version or kind differs")
     status = _string(spec["requested_status"], name="requested_status")
     if status not in _INVENTORY_STATUSES:
@@ -741,6 +752,8 @@ def _build_inventory(
     body: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "inventory_kind": INVENTORY_KIND,
+        "delivery_mode": "external_release_asset",
+        "tracked": False,
         "status": status,
         "created_at_utc": _timestamp(spec["created_at_utc"]),
         "generation_spec": {

@@ -65,3 +65,36 @@ def test_machine_provenance_matches_registry_and_keeps_claims_blocked(
         record = records[key]
         assert record["source_code"]["audited_commit"] == spec.audited_commit
         assert record["faithful_local_implementation"] is False
+
+
+def test_extension_status_addendum_distinguishes_blocked_from_not_run(
+    repository_root: Path,
+) -> None:
+    path = repository_root / "docs/baselines/third_party_baseline_provenance.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    addendum = payload["extension_status_addendum"]
+
+    cross_source = addendum["cross_source_pretraining"]
+    assert cross_source["reported_result_status"] == "not_run"
+    assert cross_source["uci_native_grouped_reproduction"]["status"] == (
+        "complete_source_development_not_cross_source_pretraining"
+    )
+    exact = cross_source["exact_label_all_cohort"]
+    assert exact["gate_status"] == "blocked"
+    assert exact["execution_status"] == "not_run"
+    assert exact["exact_classes"] == ["sitting"]
+    adapted = cross_source["adapted_label_representation_transfer"]
+    assert adapted["gate_status"] == "not_implemented"
+    assert adapted["execution_status"] == "not_run"
+    assert adapted["scientifically_ruled_out"] is False
+
+    ssl_foundation = addendum["ssl_foundation_comparison"]
+    assert ssl_foundation["gate_status"] == "blocked_no_candidate_cleared_all_requirements"
+    assert ssl_foundation["execution_status"] == "not_run"
+    assert ssl_foundation["local_checkpoint_status"] == "none_for_benchhar_simmtm_or_focal"
+    candidate_status = ssl_foundation["candidate_status"]
+    assert candidate_status["benchhar"].startswith("blocked_no_software_license")
+    assert candidate_status["simmtm"].startswith("blocked_no_software_license")
+    assert candidate_status["focal"] == (
+        "mit_source_available_but_inertial_adapter_not_implemented"
+    )

@@ -242,6 +242,7 @@ def test_operational_runners_refuse_before_opening_any_path_without_cuda(
     with pytest.raises(PostconfirmatoryEfficiencyError, match="before any frozen checkpoint"):
         run_frozen_efficiency_profiles(
             profile_config_path=missing,
+            expected_profile_config_file_sha256="a" * 64,
             final_freeze_inventory_path=missing,
             opening_receipt_path=missing,
             locked_target_index_path=missing,
@@ -384,6 +385,8 @@ def test_module_clis_expose_no_raw_unlock_or_opening_acknowledgement() -> None:
         assert "--unlock-record" not in help_text
         assert "acknowledge" not in help_text.casefold()
     stress_help = build_stress_parser().format_help()
+    efficiency_help = build_efficiency_parser().format_help()
+    assert "--expected-profile-config-file-sha256" in efficiency_help
     assert "--primary-cache-record" in stress_help
     assert "--expected-primary-cache-record-file-sha256" in stress_help
     assert "--implementation-code-commit" in stress_help

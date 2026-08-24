@@ -262,6 +262,50 @@ adapter is legally eligible but must be independently implemented and validated.
 SimMTM remains blocked until authors provide licensing or a clean-room design is
 specified from the paper and validated without copying source.
 
+### Execution-status addendum — 2026-08-24
+
+The preceding source audit is preserved as a time-scoped provenance record. A
+later feasibility check at commit
+`ad657d3aec3e2476ce7a1e8226bb2fd3a99bd721` found the following local state:
+
+- clean, ignored audit checkouts exist for BenchHAR, SimMTM, and FOCAL at the
+  revisions recorded above; they are evidence copies, not integrated package
+  dependencies or validated benchmark adapters;
+- no `.pt`, `.pth`, `.ckpt`, `.safetensors`, or `.onnx` checkpoint exists in any
+  of those three audit checkouts;
+- the main package contains no BenchHAR, SimMTM, FOCAL, BioBankSSL, LIMU-BERT,
+  CRT, TS-TCC, TS2Vec, or CrossHAR model/experiment configuration or executable
+  comparison route; and
+- no compatible licensed wearable-foundation checkpoint, preprocessing adapter,
+  frozen linear-probe route, parameter-efficient adaptation route, full-fine-tune
+  route, or equal-budget source-only configuration exists locally.
+
+The empirical status of every SSL/foundation comparison is therefore **not
+run**. The combined comparison gate is **blocked** because no candidate has
+cleared licence, temporal-interface, checkpoint, source-only-selection, and
+artifact-lineage requirements together. BenchHAR and SimMTM are specifically
+licence-blocked; their 20 Hz/120-sample interface is also not interchangeable
+with the locked 50 Hz/128-sample interface. FOCAL is not licence-blocked, but its
+MIT upstream is acoustic/seismic and the required smartphone-inertial adapter has
+not been implemented or validated. These are documented omissions, not negative
+results.
+
+The adjacent cross-source extension has two different statuses and must not be
+collapsed into one claim. Exact-label, all-cohort UCI→InclusiveHAR
+classification is **blocked and not run** because sitting is the only exact
+shared class; standing is provisional and ordinary UCI walking is not wheelchair
+propulsion. Adapted-label or representation-transfer pretraining is **not
+implemented and not run**, rather than scientifically ruled out. The completed
+UCI-native grouped reproduction is source-development evidence only: there is no
+all-source encoder refit, encoder-transfer/head-replacement pipeline, or
+InclusiveHAR transfer result.
+
+Claim-safe manuscript text is: “Cross-source pretraining and SSL/foundation
+comparisons were not evaluated. Their absence reflects the locked exact-label
+ontology and unresolved implementation, licensing, interface, and checkpoint
+gates; it is not evidence of empirical failure.” Any later target-side comparison
+is post-confirmatory because the locked target opening is already consumed.
+
 ## LITEWAY current-date addition
 
 LITEWAY v1 was submitted on 2026-08-10 and is marked accepted at UbiComp/ISWC

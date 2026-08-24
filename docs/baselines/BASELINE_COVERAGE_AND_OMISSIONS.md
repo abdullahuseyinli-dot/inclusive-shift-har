@@ -65,6 +65,35 @@ and source-only model selection before any evaluation.
 | Foundation-model linear probe/adaptation/fine-tune | Omitted | No compatible, licensed, frozen adapter or equal-budget source-only experiment exists |
 | Cross-source pretraining | Omitted as a result | UCI grouped reproduction is configured separately; exact all-cohort cross-source classification is scientifically blocked beyond sitting, with standing provisional and walking semantically incompatible |
 
+## Feasibility and execution addendum — 2026-08-24
+
+This addendum preserves the frozen-primary disposition above while recording the
+later execution state at commit `ad657d3aec3e2476ce7a1e8226bb2fd3a99bd721`.
+The corrected UCI-HAR source-grouped reproduction is now complete, but it is a
+six-class, UCI-native source-development result. It did not refit a transferable
+encoder on all source participants, replace or adapt its classification head,
+or evaluate an InclusiveHAR participant. It therefore does not constitute
+cross-source pretraining evidence.
+
+| Extension track | Gate status | Empirical status | Evidence-safe interpretation |
+|---|---|---|---|
+| Exact-label, all-cohort UCI→InclusiveHAR classification | **Blocked** | **Not run** | Sitting is the only exact shared class. Standing remains provisional, and UCI ordinary walking is not InclusiveHAR manual wheelchair propulsion. A one-class track is not a classification benchmark. |
+| Adapted-label or representation-transfer pretraining | Not implemented | **Not run** | A separately declared adapted-label track is scientifically possible, but no all-source refit, encoder-transfer/head-replacement route, target-blind adaptation configuration, equal-budget selection procedure, or result artifact exists. This absence is not evidence that pretraining fails. |
+| BenchHAR/SimMTM SSL comparison | **Blocked** | **Not run** | The audited HAR-Bench and SimMTM revisions have no software licence, and the BenchHAR 20 Hz/120-sample instance-normalized interface is not the locked 50 Hz/128-sample interface. No local checkpoint was available. |
+| FOCAL inertial adaptation | Adapter not implemented | **Not run** | The official MIT-licensed source targets paired acoustic/seismic inputs. No independently implemented and validated smartphone-IMU adapter or local checkpoint exists. |
+| Wearable-foundation-model linear probe, parameter-efficient adaptation, or full fine-tuning | **Blocked** | **Not run** | No compatible licensed local checkpoint, frozen adapter, model-specific preprocessing manifest, or equal-budget source-only configuration passed the evidence gate. |
+
+BioBankSSL, LIMU-BERT, CRT, TS-TCC, TS2Vec, and CrossHAR remain
+literature-audited candidates only; they have no integrated local implementation,
+configuration, checkpoint, or result. The machine-readable form of this addendum
+is `extension_status_addendum` in
+`docs/baselines/third_party_baseline_provenance.json`.
+
+Publication wording must say that these comparisons were **not evaluated**.
+They are neither zero-valued rows nor negative empirical findings. Because target
+opening 1 is consumed, any future target-side comparison is post-confirmatory and
+cannot enter or revise the locked-primary ranking.
+
 Full paper/repository pins and reopening criteria are in
 `docs/baselines/THIRD_PARTY_BASELINE_AUDIT.md`. Missing baselines must stay visible
 in limitations and tables; they are not zero-valued results and must not be

@@ -12,10 +12,16 @@ from torch import nn
 import inclusive_shift_har.experiments.postconfirmatory_efficiency as runner
 from inclusive_shift_har.evaluation.efficiency import (
     EFFICIENCY_BATCH_SIZES,
+    EFFICIENCY_COUNTED_MODULES,
+    EFFICIENCY_EXCLUDED_OPERATIONS,
     EFFICIENCY_PRECISIONS,
+    EFFICIENCY_TIMING_METHOD,
+    EFFICIENCY_TIMING_SCOPE,
+    EFFICIENCY_VRAM_SCOPE,
     FROZEN_NEURAL_MODEL_IDS,
     FROZEN_NEURAL_SEEDS,
     RECURRENT_CUDNN_DISABLED_MODEL_IDS,
+    efficiency_semantic_contract,
     load_efficiency_profile_config,
 )
 from inclusive_shift_har.evaluation.secondary_aggregation import (
@@ -56,7 +62,7 @@ def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) ->
         "monitor": "nvidia_smi_selected_device_compute_apps",
         "monitor_return_code": 0,
         "monitor_error": None,
-        "allowed_ambient_process_names": ["dwm.exe"],
+        "allowed_ambient_process_names": ["dwm.exe", "explorer.exe"],
         "observed_compute_processes": [],
         "unapproved_competing_process_count": 0,
         "status": "pass_no_unapproved_compute_processes",
@@ -66,6 +72,25 @@ def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) ->
 
 
 def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
+    config_path = root / "configs/experiments/neural_efficiency_profile_v1.yaml"
+    config_path.parent.mkdir(parents=True, exist_ok=True)
+    config_path.write_bytes(
+        (
+            Path(__file__).parents[1] / "configs/experiments/neural_efficiency_profile_v1.yaml"
+        ).read_bytes()
+    )
+    config = load_efficiency_profile_config(config_path)
+    environment = {
+        "torch_version": "2.12.0+cu132",
+        "torch_cuda_version": "13.2",
+        "device_type": "cuda",
+        "device": "cuda:0",
+        "device_index": 0,
+        "device_name": "Synthetic CUDA GPU",
+        "device_total_memory_bytes": 12_000_000_000,
+        "device_compute_capability": [12, 0],
+        "cudnn_version": 92000,
+    }
     validations: list[dict[str, Any]] = []
     profiles: list[dict[str, Any]] = []
     contention_snapshots = [_contention_snapshot("before_run", None)]
@@ -127,7 +152,10 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                         "required_device": "cuda",
                         "execution_device_type": "cuda",
                         "cuda_available_at_profile": True,
-                        "profile_config_sha256": "b" * 64,
+                        "profile_id": config.profile_id,
+                        "profile_config_path": config_path.relative_to(root).as_posix(),
+                        "profile_config_sha256": config.config_sha256,
+                        "profile_config_file_sha256": config.file_sha256,
                         "model_id": model_id,
                         "seed": seed,
                         "precision": precision,
@@ -153,7 +181,7 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                             "backend_enabled_after_profile": True,
                             "original_backend_state_restored": True,
                         },
-                        "environment": {"device_type": "cuda", "device": "cuda:0"},
+                        "environment": environment,
                         "gpu_contention_samples": {
                             "before_record_sha256": contention_before["record_sha256"],
                             "after_record_sha256": contention_after["record_sha256"],
@@ -164,20 +192,38 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                             "state_tensor_bytes": 400,
                         },
                         "complexity": {
+                            "definition": "one_scalar_multiply_accumulate",
+                            "counted_modules": list(EFFICIENCY_COUNTED_MODULES),
+                            "excluded_operations": list(EFFICIENCY_EXCLUDED_OPERATIONS),
+                            "supported_operator_macs_scope": "one_profiled_batch",
                             "supported_operator_macs_per_window": 1000 + model_index,
                             "estimated_flops_from_supported_macs_per_window": 2000
                             + 2 * model_index,
+                            "flop_conversion": "2_flops_per_mac",
                             "coverage_status": "supported_operator_subset_only",
                         },
                         "latency_ms_per_batch": {
+                            "warmup_iterations": 20,
+                            "measured_iterations": 100,
                             "mean": latency,
                             "median": latency,
+                            "minimum": latency - 0.1,
+                            "maximum": latency + 0.1,
+                            "sample_standard_deviation": 0.01,
                             "mean_per_window": latency / batch_size,
-                            "percentiles": {"95.0": latency + 0.1},
+                            "percentiles": {"50.0": latency, "95.0": latency + 0.1},
+                            "timing_method": EFFICIENCY_TIMING_METHOD,
+                            "scope": EFFICIENCY_TIMING_SCOPE,
                         },
                         "vram_bytes": {
+                            "baseline_allocated": 500,
+                            "baseline_reserved": 1000,
                             "peak_allocated": 1000 + seed,
                             "peak_reserved": 2000 + seed,
+                            "incremental_peak_allocated": 500 + seed,
+                            "incremental_peak_reserved": 1000 + seed,
+                            "cache_cleared_before_profile": True,
+                            "measurement_scope": EFFICIENCY_VRAM_SCOPE,
                         },
                         "model_size": {
                             "checkpoint_file_bytes": checkpoint.stat().st_size,
@@ -213,11 +259,13 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
         "status": "pass_no_unapproved_compute_processes_sampled",
         "created_at_utc": "2099-01-01T00:00:00Z",
         "profiler_code_commit": "9" * 40,
-        "profile_config_sha256": "b" * 64,
+        "profile_config_sha256": config.config_sha256,
+        "profile_config_file_sha256": config.file_sha256,
+        "device_index": 0,
         "monitor": "nvidia_smi_selected_device_compute_apps",
         "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
         "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
-        "allowed_ambient_process_names": ["dwm.exe"],
+        "allowed_ambient_process_names": ["dwm.exe", "explorer.exe"],
         "observed_allowlisted_ambient_process_names": [],
         "timing_validity": "valid_exclusive_compute_process_samples",
         "expected_snapshot_count": 641,
@@ -233,7 +281,11 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
         "execution": "sequential_cuda_one_frozen_model_seed_at_a_time",
         "required_device": "cuda",
         "cuda_available_at_start": True,
-        "profile_config_sha256": "b" * 64,
+        "profile_config_path": config_path.relative_to(root).as_posix(),
+        "profile_config_sha256": config.config_sha256,
+        "profile_config_file_sha256": config.file_sha256,
+        "profile_semantics": efficiency_semantic_contract(),
+        "execution_environment": environment,
         "final_freeze_inventory_sha256": "a" * 64,
         "frozen_artifact_set_sha256": "c" * 64,
         "split_manifest_sha256": "d" * 64,
@@ -285,6 +337,8 @@ def test_exact_320_cell_efficiency_matrix_aggregates(tmp_path: Path) -> None:
     assert result["validated_profile_count"] == 320
     assert result["profiler_code_commit"] == "9" * 40
     assert result["gpu_timing_validity"] == "valid_exclusive_compute_process_samples"
+    assert result["execution_environment"]["device"] == "cuda:0"
+    assert result["profile_semantics"] == efficiency_semantic_contract()
     assert len(result["tables"]["model_batch_precision_aggregates"]) == 64
 
 
@@ -346,11 +400,54 @@ def test_profile_contention_link_change_is_rejected(tmp_path: Path) -> None:
         _aggregate(index_path, tmp_path)
 
 
+def test_profile_semantic_or_environment_drift_is_rejected(tmp_path: Path) -> None:
+    index_path, index = _exact_fixture(tmp_path)
+    entry = index["profiles"][0]
+    profile_path = tmp_path / entry["path"]
+    profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    profile.pop("record_sha256")
+    profile["latency_ms_per_batch"]["warmup_iterations"] = 19
+    _write(profile_path, profile)
+    entry["file_sha256"] = sha256_file(profile_path)
+    entry["record_sha256"] = profile["record_sha256"]
+    _rewrite_index(index_path, index)
+    with pytest.raises(SecondaryAggregationError, match="latency measurement semantics"):
+        _aggregate(index_path, tmp_path)
+
+
+def test_contention_snapshot_and_profile_device_must_match(tmp_path: Path) -> None:
+    index_path, index = _exact_fixture(tmp_path)
+    index["execution_environment"]["device"] = "cuda:1"
+    index["execution_environment"]["device_index"] = 1
+    _rewrite_index(index_path, index)
+    with pytest.raises(SecondaryAggregationError, match="contention device differ"):
+        _aggregate(index_path, tmp_path)
+
+
 def test_runner_rejects_escape_before_creating_directory(tmp_path: Path) -> None:
     escaped = tmp_path.parent / f"{tmp_path.name}-escaped"
     with pytest.raises(runner.PostconfirmatoryEfficiencyError, match="escapes output_root"):
         runner._output_directory(escaped, output_root=tmp_path)
     assert not escaped.exists()
+
+
+def test_runner_confines_profile_config_and_rejects_symlink(tmp_path: Path) -> None:
+    outside = tmp_path.parent / f"{tmp_path.name}-profile.yaml"
+    outside.write_text("profile", encoding="utf-8")
+    with pytest.raises(runner.PostconfirmatoryEfficiencyError, match="escapes artifact_root"):
+        runner._resolve_artifact_input(
+            outside, artifact_root=tmp_path.resolve(), name="efficiency profile config"
+        )
+
+    link = tmp_path / "profile-link.yaml"
+    try:
+        link.symlink_to(outside)
+    except OSError:
+        pytest.skip("symlink creation is unavailable on this platform")
+    with pytest.raises(runner.PostconfirmatoryEfficiencyError, match="symlink"):
+        runner._resolve_artifact_input(
+            link, artifact_root=tmp_path.resolve(), name="efficiency profile config"
+        )
 
 
 def test_runner_recurrent_policy_validation_is_strict() -> None:
@@ -481,13 +578,16 @@ def test_failure_and_failed_index_are_create_only_and_preserve_partial_counts(
         output=output,
         output_root=tmp_path,
         timestamp="2099-01-01T00:00:00Z",
+        profile_config_path="configs/profile.yaml",
         profile_config_sha256="a" * 64,
+        profile_config_file_sha256="b" * 64,
         inventory=None,
         context=None,
         profile_entries=[{"model_id": "partial"}],
         validation_entries=[{"model_id": "partial"}],
         profiler_code_commit="9" * 40,
         contention_snapshots=[],
+        execution_environment=None,
         error=RuntimeError("synthetic failure"),
     )
     failure = json.loads((output / "failure.json").read_text(encoding="utf-8"))
@@ -511,6 +611,8 @@ def test_efficiency_main_returns_nonzero_on_failure(
         [
             "--profile-config",
             "config.yaml",
+            "--expected-profile-config-file-sha256",
+            "a" * 64,
             "--final-freeze-inventory",
             "freeze.json",
             "--opening-receipt",

@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:inclusive-shift-har:schema:final-release-gate-report:1.0.0",
+  "title": "InclusiveShift-HAR final release gate report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_kind",
+    "mode",
+    "status",
+    "created_at_utc",
+    "repository",
+    "policy",
+    "gates",
+    "external_candidate_attestation",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "record_kind": {"const": "final_release_gate_report"},
+    "mode": {"enum": ["tracked_precommit_report", "exact_candidate_attestation"]},
+    "status": {"enum": ["pending", "pass", "fail"]},
+    "created_at_utc": {"type": "string", "format": "date-time"},
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_commit", "content_commit", "worktree_clean"],
+      "properties": {
+        "parent_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "content_commit": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+          ]
+        },
+        "worktree_clean": {"type": "boolean"}
+      }
+    },
+    "policy": {"$ref": "#/$defs/file_reference"},
+    "gates": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/gate"},
+      "propertyNames": {
+        "enum": [
+          "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+          "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+        ]
+      },
+      "required": [
+        "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+        "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+      ]
+    },
+    "external_candidate_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "expected_root", "report_path"],
+      "properties": {
+        "status": {"enum": ["pending", "complete"]},
+        "expected_root": {"const": ".audit/release-attestations/<candidate_commit>/"},
+        "report_path": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "pattern": "^\\.audit/release-attestations/[0-9a-f]{40}/final_release_gate_report\\.json$"}
+          ]
+        }
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+    },
+    "file_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size_bytes", "file_sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/safe_relative_path"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"enum": ["pass", "fail", "not_run"]},
+        "evidence": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/file_reference"}
+          ]
+        }
+      }
+    }
+  }
+}

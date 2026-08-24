@@ -16,10 +16,23 @@ import numpy as np
 from inclusive_shift_har.evaluation._strict_config import require_utc_timestamp
 from inclusive_shift_har.evaluation.efficiency import (
     EFFICIENCY_BATCH_SIZES,
+    EFFICIENCY_CHANNEL_COUNT,
+    EFFICIENCY_COUNTED_MODULES,
+    EFFICIENCY_EXCLUDED_OPERATIONS,
+    EFFICIENCY_LATENCY_PERCENTILES,
+    EFFICIENCY_MEASURED_ITERATIONS,
     EFFICIENCY_PRECISIONS,
+    EFFICIENCY_PROFILE_ID,
+    EFFICIENCY_TIMING_METHOD,
+    EFFICIENCY_TIMING_SCOPE,
+    EFFICIENCY_VRAM_SCOPE,
+    EFFICIENCY_WARMUP_ITERATIONS,
+    EFFICIENCY_WINDOW_LENGTH_SAMPLES,
     FROZEN_NEURAL_MODEL_IDS,
     FROZEN_NEURAL_SEEDS,
     RECURRENT_CUDNN_DISABLED_MODEL_IDS,
+    efficiency_semantic_contract,
+    load_efficiency_profile_config,
 )
 from inclusive_shift_har.manifests.canonical import (
     atomic_write_json_new,
@@ -186,8 +199,10 @@ def _validate_gpu_contention_attestation(
     *,
     root: Path,
     profile_config_sha256: str,
+    profile_config_file_sha256: str,
     profiler_code_commit: str,
-) -> tuple[Mapping[str, Any], dict[tuple[tuple[str, int, int, str], str], str]]:
+    allowed_ambient_process_names: tuple[str, ...],
+) -> tuple[Mapping[str, Any], dict[tuple[tuple[str, int, int, str], str], str], int]:
     """Validate complete sampled process-gate coverage for every timed profile."""
 
     reference = _mapping(reference_value, name="GPU contention attestation reference")
@@ -213,10 +228,11 @@ def _validate_gpu_contention_attestation(
         "status": "pass_no_unapproved_compute_processes_sampled",
         "profiler_code_commit": profiler_code_commit,
         "profile_config_sha256": profile_config_sha256,
+        "profile_config_file_sha256": profile_config_file_sha256,
         "monitor": "nvidia_smi_selected_device_compute_apps",
         "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
         "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
-        "allowed_ambient_process_names": ["dwm.exe"],
+        "allowed_ambient_process_names": list(allowed_ambient_process_names),
         "expected_snapshot_count": expected_snapshot_count,
         "observed_snapshot_count": expected_snapshot_count,
         "unapproved_competing_process_count": 0,
@@ -234,6 +250,11 @@ def _validate_gpu_contention_attestation(
     except ValueError as exc:
         raise SecondaryAggregationError("GPU contention timestamp is invalid") from exc
     timing_validity = _string(attestation.get("timing_validity"), name="timing validity")
+    attestation_device_index = _integer(
+        attestation.get("device_index"), name="contention attestation device index"
+    )
+    if attestation_device_index < 0:
+        raise SecondaryAggregationError("contention attestation device index is invalid")
     if (
         timing_validity not in timing_validities
         or reference.get("status") != attestation["status"]
@@ -264,7 +285,7 @@ def _validate_gpu_contention_attestation(
             "monitor": "nvidia_smi_selected_device_compute_apps",
             "monitor_return_code": 0,
             "monitor_error": None,
-            "allowed_ambient_process_names": ["dwm.exe"],
+            "allowed_ambient_process_names": list(allowed_ambient_process_names),
             "unapproved_competing_process_count": 0,
             "status": "pass_no_unapproved_compute_processes",
         }
@@ -285,6 +306,8 @@ def _validate_gpu_contention_attestation(
         device_index = snapshot.get("device_index")
         if isinstance(device_index, bool) or not isinstance(device_index, int) or device_index < 0:
             raise SecondaryAggregationError("GPU contention device index is invalid")
+        if device_index != attestation_device_index:
+            raise SecondaryAggregationError("GPU contention snapshots use different devices")
         phase = snapshot.get("phase")
         identity_value = snapshot.get("profile_identity")
         if phase == "before_run" and identity_value is None:
@@ -371,7 +394,43 @@ def _validate_gpu_contention_attestation(
     )
     if timing_validity != expected_validity:
         raise SecondaryAggregationError("GPU contention timing validity differs from snapshots")
-    return reference, snapshot_hashes
+    return reference, snapshot_hashes, attestation_device_index
+
+
+def _validated_cuda_environment(value: Any) -> dict[str, Any]:
+    environment = dict(_mapping(value, name="CUDA environment"))
+    expected_keys = {
+        "torch_version",
+        "torch_cuda_version",
+        "device_type",
+        "device",
+        "device_index",
+        "device_name",
+        "device_total_memory_bytes",
+        "device_compute_capability",
+        "cudnn_version",
+    }
+    if set(environment) != expected_keys:
+        raise SecondaryAggregationError("CUDA environment fields are incomplete or unexpected")
+    device_index = _integer(environment.get("device_index"), name="CUDA device index")
+    capability = environment.get("device_compute_capability")
+    if (
+        device_index < 0
+        or environment.get("device_type") != "cuda"
+        or environment.get("device") != f"cuda:{device_index}"
+        or not _string(environment.get("torch_version"), name="torch version")
+        or not _string(environment.get("torch_cuda_version"), name="torch CUDA version")
+        or not _string(environment.get("device_name"), name="CUDA device name")
+        or _integer(environment.get("device_total_memory_bytes"), name="CUDA memory") <= 0
+        or not isinstance(capability, list)
+        or len(capability) != 2
+        or any(
+            isinstance(item, bool) or not isinstance(item, int) or item < 0 for item in capability
+        )
+        or _integer(environment.get("cudnn_version"), name="cuDNN version") <= 0
+    ):
+        raise SecondaryAggregationError("CUDA environment identity is invalid")
+    return environment
 
 
 def _mean(values: Sequence[float]) -> float:
@@ -408,6 +467,7 @@ def aggregate_efficiency_profiles(
         "required_seed_order": list(FROZEN_NEURAL_SEEDS),
         "required_batch_sizes": list(EFFICIENCY_BATCH_SIZES),
         "required_precisions": list(EFFICIENCY_PRECISIONS),
+        "profile_semantics": efficiency_semantic_contract(),
         "neural_model_count": len(FROZEN_NEURAL_MODEL_IDS),
         "neural_model_seed_count": len(FROZEN_NEURAL_MODEL_IDS) * len(FROZEN_NEURAL_SEEDS),
         "profiles_per_model_seed": len(EFFICIENCY_BATCH_SIZES) * len(EFFICIENCY_PRECISIONS),
@@ -428,6 +488,7 @@ def aggregate_efficiency_profiles(
         raise SecondaryAggregationError(f"efficiency index contract mismatch: {mismatches}")
     lineage_fields = (
         "profile_config_sha256",
+        "profile_config_file_sha256",
         "final_freeze_inventory_sha256",
         "frozen_artifact_set_sha256",
         "split_manifest_sha256",
@@ -435,16 +496,38 @@ def aggregate_efficiency_profiles(
         "opening_receipt_record_sha256",
     )
     lineage = {field: _sha256(index.get(field), name=field) for field in lineage_fields}
+    profile_config_path = _resolve_file(
+        index.get("profile_config_path"), root=root, name="efficiency profile config"
+    )
+    if sha256_file(profile_config_path) != lineage["profile_config_file_sha256"]:
+        raise SecondaryAggregationError("efficiency profile config file hash changed")
+    try:
+        profile_config = load_efficiency_profile_config(
+            profile_config_path,
+            allowed_root=root,
+            expected_file_sha256=lineage["profile_config_file_sha256"],
+        )
+    except ValueError as exc:
+        raise SecondaryAggregationError(f"efficiency profile config is invalid: {exc}") from exc
+    if profile_config.config_sha256 != lineage["profile_config_sha256"]:
+        raise SecondaryAggregationError("efficiency profile config self-hash differs from index")
+    shared_environment = _validated_cuda_environment(index.get("execution_environment"))
     frozen_code_commit = _string(index.get("frozen_code_commit"), name="frozen code commit")
     profiler_code_commit = _git_commit(
         index.get("profiler_code_commit"), name="profiler code commit"
     )
-    contention_reference, contention_samples = _validate_gpu_contention_attestation(
-        index.get("gpu_contention_attestation"),
-        root=root,
-        profile_config_sha256=lineage["profile_config_sha256"],
-        profiler_code_commit=profiler_code_commit,
+    contention_reference, contention_samples, contention_device_index = (
+        _validate_gpu_contention_attestation(
+            index.get("gpu_contention_attestation"),
+            root=root,
+            profile_config_sha256=lineage["profile_config_sha256"],
+            profile_config_file_sha256=lineage["profile_config_file_sha256"],
+            profiler_code_commit=profiler_code_commit,
+            allowed_ambient_process_names=profile_config.contention_allowed_ambient_process_names,
+        )
     )
+    if shared_environment["device_index"] != contention_device_index:
+        raise SecondaryAggregationError("profile environment and contention device differ")
 
     validation_values = _sequence(
         index.get("checkpoint_validations"), name="checkpoint validations"
@@ -560,7 +643,7 @@ def aggregate_efficiency_profiles(
         profile_hash = _self_hash(profile, field="record_sha256", name="efficiency profile")
         if profile_hash != entry.get("record_sha256"):
             raise SecondaryAggregationError("efficiency profile record differs from index")
-        environment = _mapping(profile.get("environment"), name="CUDA environment")
+        environment = _validated_cuda_environment(profile.get("environment"))
         checkpoint_link = _mapping(
             profile.get("checkpoint_validation"), name="checkpoint validation link"
         )
@@ -575,12 +658,14 @@ def aggregate_efficiency_profiles(
             or profile.get("required_device") != "cuda"
             or profile.get("execution_device_type") != "cuda"
             or profile.get("cuda_available_at_profile") is not True
-            or environment.get("device_type") != "cuda"
-            or not str(environment.get("device", "")).startswith("cuda")
+            or environment != shared_environment
             or profile.get("model_selection_use") is not False
+            or profile.get("profile_id") != EFFICIENCY_PROFILE_ID
+            or profile.get("profile_config_path") != index.get("profile_config_path")
             or profile.get("model_id") != profile_identity[0]
             or profile.get("seed") != profile_identity[1]
-            or profile.get("input_shape") != [profile_identity[2], 128, 6]
+            or profile.get("input_shape")
+            != [profile_identity[2], EFFICIENCY_WINDOW_LENGTH_SAMPLES, EFFICIENCY_CHANNEL_COUNT]
             or profile.get("precision") != profile_identity[3]
         ):
             raise SecondaryAggregationError(
@@ -632,10 +717,49 @@ def aggregate_efficiency_profiles(
         latency = _mapping(profile.get("latency_ms_per_batch"), name="latency profile")
         vram = _mapping(profile.get("vram_bytes"), name="VRAM profile")
         percentiles = _mapping(latency.get("percentiles"), name="latency percentiles")
-        if complexity.get("coverage_status") != "supported_operator_subset_only":
+        if (
+            complexity.get("coverage_status") != "supported_operator_subset_only"
+            or complexity.get("definition") != "one_scalar_multiply_accumulate"
+            or complexity.get("counted_modules") != list(EFFICIENCY_COUNTED_MODULES)
+            or complexity.get("excluded_operations") != list(EFFICIENCY_EXCLUDED_OPERATIONS)
+            or complexity.get("supported_operator_macs_scope") != "one_profiled_batch"
+            or complexity.get("flop_conversion") != "2_flops_per_mac"
+        ):
             raise SecondaryAggregationError(
                 "MAC coverage scope is not the declared operator subset"
             )
+        p50 = _finite(percentiles.get("50.0"), name="p50 latency")
+        p95 = _finite(percentiles.get("95.0"), name="p95 latency")
+        median = _finite(latency.get("median"), name="median latency")
+        if (
+            set(percentiles) != {str(value) for value in EFFICIENCY_LATENCY_PERCENTILES}
+            or latency.get("warmup_iterations") != EFFICIENCY_WARMUP_ITERATIONS
+            or latency.get("measured_iterations") != EFFICIENCY_MEASURED_ITERATIONS
+            or latency.get("timing_method") != EFFICIENCY_TIMING_METHOD
+            or latency.get("scope") != EFFICIENCY_TIMING_SCOPE
+            or not np.isclose(p50, median, rtol=1e-12, atol=1e-12)
+            or p95 < p50
+        ):
+            raise SecondaryAggregationError("latency measurement semantics differ from the lock")
+        vram_values = {
+            key: _integer(vram.get(key), name=f"VRAM {key}")
+            for key in (
+                "baseline_allocated",
+                "baseline_reserved",
+                "peak_allocated",
+                "peak_reserved",
+                "incremental_peak_allocated",
+                "incremental_peak_reserved",
+            )
+        }
+        if (
+            any(value < 0 for value in vram_values.values())
+            or vram.get("cache_cleared_before_profile") is not True
+            or vram.get("measurement_scope") != EFFICIENCY_VRAM_SCOPE
+            or vram_values["peak_allocated"] < vram_values["baseline_allocated"]
+            or vram_values["peak_reserved"] < vram_values["baseline_reserved"]
+        ):
+            raise SecondaryAggregationError("VRAM measurement semantics differ from the lock")
         seed_rows.append(
             {
                 "model_id": profile_identity[0],
@@ -657,7 +781,8 @@ def aggregate_efficiency_profiles(
                 "latency_median_ms_per_batch": _finite(
                     latency.get("median"), name="median latency"
                 ),
-                "latency_p95_ms_per_batch": _finite(percentiles.get("95.0"), name="p95 latency"),
+                "latency_p50_ms_per_batch": p50,
+                "latency_p95_ms_per_batch": p95,
                 "latency_mean_ms_per_window": _finite(
                     latency.get("mean_per_window"), name="per-window latency"
                 ),
@@ -707,6 +832,9 @@ def aggregate_efficiency_profiles(
                 "latency_p95_ms_per_batch_seed_mean": _mean(
                     [float(row["latency_p95_ms_per_batch"]) for row in rows]
                 ),
+                "latency_p50_ms_per_batch_seed_mean": _mean(
+                    [float(row["latency_p50_ms_per_batch"]) for row in rows]
+                ),
                 "latency_mean_ms_per_window_seed_mean": _mean(
                     [float(row["latency_mean_ms_per_window"]) for row in rows]
                 ),
@@ -731,6 +859,9 @@ def aggregate_efficiency_profiles(
         **lineage,
         "frozen_code_commit": frozen_code_commit,
         "profiler_code_commit": profiler_code_commit,
+        "profile_config_path": index["profile_config_path"],
+        "profile_semantics": efficiency_semantic_contract(),
+        "execution_environment": shared_environment,
         "gpu_contention_attestation": dict(contention_reference),
         "gpu_timing_validity": contention_reference["timing_validity"],
         "validated_checkpoint_count": len(validations),

@@ -50,6 +50,24 @@ FROZEN_NEURAL_MODEL_IDS = (
 FROZEN_NEURAL_SEEDS = (11, 23, 47, 89, 131)
 EFFICIENCY_BATCH_SIZES = (1, 64)
 EFFICIENCY_PRECISIONS: tuple[Precision, ...] = ("float32", "float16_autocast")
+EFFICIENCY_PROFILE_ID = "neural-efficiency-cuda-v1"
+EFFICIENCY_WINDOW_LENGTH_SAMPLES = 128
+EFFICIENCY_CHANNEL_COUNT = 6
+EFFICIENCY_WARMUP_ITERATIONS = 20
+EFFICIENCY_MEASURED_ITERATIONS = 100
+EFFICIENCY_LATENCY_PERCENTILES = (50.0, 95.0)
+EFFICIENCY_COUNTED_MODULES = ("Conv1d", "Linear", "LSTM")
+EFFICIENCY_EXCLUDED_OPERATIONS = (
+    "bias additions",
+    "normalization",
+    "activations",
+    "pooling",
+    "softmax",
+    "attention or custom functional kernels not exposed as counted modules",
+)
+EFFICIENCY_TIMING_METHOD = "torch_cuda_events_with_per_iteration_synchronization"
+EFFICIENCY_TIMING_SCOPE = "forward_pass_only_device_resident_input_no_host_to_device_transfer"
+EFFICIENCY_VRAM_SCOPE = "cell_local_after_cuda_cache_clear"
 RECURRENT_CUDNN_DISABLED_MODEL_IDS = frozenset(
     {"deepconvlstm", "legacy-bilstm", "legacy-joint-cnn-bilstm"}
 )
@@ -64,6 +82,7 @@ class EfficiencyProfileConfig:
     schema_version: str
     profile_id: str
     config_sha256: str
+    file_sha256: str
     status: str
     required_device: str
     window_length_samples: int
@@ -121,11 +140,84 @@ def _mapping(value: Any, *, location: str) -> dict[str, Any]:
         raise EfficiencyProfileError(str(exc)) from exc
 
 
-def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
+def efficiency_semantic_contract() -> dict[str, Any]:
+    """Return the normalized profiling semantics independently of YAML formatting."""
+
+    return {
+        "profile_id": EFFICIENCY_PROFILE_ID,
+        "required_device": "cuda",
+        "input": {
+            "window_length_samples": EFFICIENCY_WINDOW_LENGTH_SAMPLES,
+            "channel_count": EFFICIENCY_CHANNEL_COUNT,
+            "batch_sizes": list(EFFICIENCY_BATCH_SIZES),
+            "synthetic_values": "zeros",
+        },
+        "precision_modes": list(EFFICIENCY_PRECISIONS),
+        "latency": {
+            "warmup_iterations": EFFICIENCY_WARMUP_ITERATIONS,
+            "measured_iterations": EFFICIENCY_MEASURED_ITERATIONS,
+            "percentiles": list(EFFICIENCY_LATENCY_PERCENTILES),
+            "synchronize_each_iteration": True,
+            "timing_method": EFFICIENCY_TIMING_METHOD,
+            "scope": EFFICIENCY_TIMING_SCOPE,
+        },
+        "complexity": {
+            "mac_definition": "one_scalar_multiply_accumulate",
+            "flop_per_mac": 2,
+            "counted_modules": list(EFFICIENCY_COUNTED_MODULES),
+            "excluded_operations": list(EFFICIENCY_EXCLUDED_OPERATIONS),
+        },
+        "vram": {
+            "cache_cleared_before_profile": True,
+            "measurement_scope": EFFICIENCY_VRAM_SCOPE,
+        },
+    }
+
+
+def load_efficiency_profile_config(
+    path: str | Path,
+    *,
+    allowed_root: str | Path | None = None,
+    expected_file_sha256: str | None = None,
+) -> EfficiencyProfileConfig:
     """Load and verify the self-hashed, CUDA-only profiling configuration."""
 
+    candidate = Path(path)
+    if candidate.is_symlink():
+        raise EfficiencyProfileError("efficiency profile config may not be a symlink")
     try:
-        parsed = load_strict_yaml_mapping(path)
+        if allowed_root is not None:
+            root_candidate = Path(allowed_root)
+            if root_candidate.is_symlink():
+                raise EfficiencyProfileError("profile config allowed_root may not be a symlink")
+            root = root_candidate.resolve(strict=True)
+            candidate = candidate if candidate.is_absolute() else root / candidate
+            if candidate.is_symlink():
+                raise EfficiencyProfileError("efficiency profile config may not be a symlink")
+            resolved = candidate.resolve(strict=True)
+            try:
+                resolved.relative_to(root)
+            except ValueError as exc:
+                raise EfficiencyProfileError(
+                    "efficiency profile config escapes allowed_root"
+                ) from exc
+        else:
+            resolved = candidate.resolve(strict=True)
+    except OSError as exc:
+        raise EfficiencyProfileError("efficiency profile config is not readable") from exc
+    if not resolved.is_file():
+        raise EfficiencyProfileError("efficiency profile config must be a regular file")
+    file_sha256 = sha256_file(resolved)
+    if expected_file_sha256 is not None:
+        expected = expected_file_sha256.casefold()
+        if (
+            len(expected) != 64
+            or any(character not in "0123456789abcdef" for character in expected)
+            or file_sha256 != expected
+        ):
+            raise EfficiencyProfileError("efficiency profile config file SHA-256 mismatch")
+    try:
+        parsed = load_strict_yaml_mapping(resolved)
         require_exact_keys(parsed, _TOP_LEVEL_KEYS, location="efficiency profile")
     except StrictConfigError as exc:
         raise EfficiencyProfileError(str(exc)) from exc
@@ -149,8 +241,8 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         if parsed[key] != expected:
             raise EfficiencyProfileError(f"{key} must be {expected!r}")
     profile_id = parsed["profile_id"]
-    if not isinstance(profile_id, str) or not profile_id.strip():
-        raise EfficiencyProfileError("profile_id must be non-empty")
+    if profile_id != EFFICIENCY_PROFILE_ID:
+        raise EfficiencyProfileError(f"profile_id must remain {EFFICIENCY_PROFILE_ID!r}")
 
     input_config = _mapping(parsed["input"], location="input")
     latency = _mapping(parsed["latency"], location="latency")
@@ -210,12 +302,10 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         raise EfficiencyProfileError("efficiency output policy contract was changed")
     if complexity["mac_definition"] != "one_scalar_multiply_accumulate":
         raise EfficiencyProfileError("MAC definition contract was changed")
-    if complexity["counted_modules"] != ["Conv1d", "Linear", "LSTM"]:
+    if complexity["counted_modules"] != list(EFFICIENCY_COUNTED_MODULES):
         raise EfficiencyProfileError("counted module set was changed")
-    if not isinstance(complexity["excluded_operations"], list) or not all(
-        isinstance(item, str) for item in complexity["excluded_operations"]
-    ):
-        raise EfficiencyProfileError("excluded_operations must be a list of strings")
+    if complexity["excluded_operations"] != list(EFFICIENCY_EXCLUDED_OPERATIONS):
+        raise EfficiencyProfileError("excluded operation scope was changed")
     flop_per_mac = _integer(complexity["flop_per_mac"], location="flop_per_mac")
     if flop_per_mac != 2:
         raise EfficiencyProfileError("flop_per_mac must remain 2")
@@ -248,6 +338,11 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         )
     if input_config["synthetic_values"] != "zeros":
         raise EfficiencyProfileError("profiling input values must remain deterministic zeros")
+    if (
+        input_config["window_length_samples"] != EFFICIENCY_WINDOW_LENGTH_SAMPLES
+        or input_config["channel_count"] != EFFICIENCY_CHANNEL_COUNT
+    ):
+        raise EfficiencyProfileError("profiling input dimensions must remain 128x6")
     raw_precisions = parsed["precision_modes"]
     if not isinstance(raw_precisions, list) or not raw_precisions:
         raise EfficiencyProfileError("precision_modes must be non-empty")
@@ -267,6 +362,13 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         item <= 0.0 or item >= 100.0 for item in percentiles
     ):
         raise EfficiencyProfileError("percentiles must be sorted, unique, and inside (0,100)")
+    if percentiles != EFFICIENCY_LATENCY_PERCENTILES:
+        raise EfficiencyProfileError("latency percentiles must remain p50 and p95")
+    if (
+        latency["warmup_iterations"] != EFFICIENCY_WARMUP_ITERATIONS
+        or latency["measured_iterations"] != EFFICIENCY_MEASURED_ITERATIONS
+    ):
+        raise EfficiencyProfileError("latency iterations must remain 20 warmups and 100 measures")
     synchronize = latency["synchronize_each_iteration"]
     if synchronize is not True:
         raise EfficiencyProfileError("CUDA timing must synchronize every measured iteration")
@@ -274,6 +376,7 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
         schema_version="1.0.0",
         profile_id=profile_id,
         config_sha256=claimed_hash,
+        file_sha256=file_sha256,
         status="configured_not_run",
         required_device="cuda",
         window_length_samples=_integer(
@@ -406,17 +509,10 @@ def _analytical_macs(model: nn.Module, example_input: Tensor, context: Any) -> d
     return {
         "supported_operator_macs": total,
         "module_call_counts": calls,
-        "counted_modules": ["Conv1d", "Linear", "LSTM"],
+        "counted_modules": list(EFFICIENCY_COUNTED_MODULES),
         "definition": "one_scalar_multiply_accumulate",
         "coverage_status": "supported_operator_subset_only",
-        "excluded_operations": [
-            "bias_additions",
-            "normalization",
-            "activations",
-            "pooling",
-            "softmax",
-            "attention_or_custom_functional_kernels_not_exposed_as_counted_modules",
-        ],
+        "excluded_operations": list(EFFICIENCY_EXCLUDED_OPERATIONS),
     }
 
 
@@ -480,6 +576,8 @@ def profile_neural_model(
     training_states = [(module, module.training) for module in model.modules()]
     model.eval()
     try:
+        torch.cuda.synchronize(device)
+        torch.cuda.empty_cache()
         complexity = _analytical_macs(model, example_input, autocast_context)
         with torch.inference_mode():
             for _ in range(config.warmup_iterations):
@@ -518,6 +616,7 @@ def profile_neural_model(
 
     latency = np.asarray(elapsed_ms, dtype=np.float64)
     properties = torch.cuda.get_device_properties(device)
+    device_index = torch.cuda.current_device() if device.index is None else int(device.index)
     supported_macs = int(complexity["supported_operator_macs"])
     if supported_macs % batch_size != 0:
         raise EfficiencyProfileError("supported MAC count is not divisible by batch size")
@@ -531,6 +630,7 @@ def profile_neural_model(
         "execution_device_type": device.type,
         "profile_id": config.profile_id,
         "profile_config_sha256": config.config_sha256,
+        "profile_config_file_sha256": config.file_sha256,
         "model_id": model_id,
         "seed": seed,
         "precision": precision,
@@ -565,8 +665,8 @@ def profile_neural_model(
                 for value in config.latency_percentiles
             },
             "mean_per_window": float(latency.mean() / batch_size),
-            "timing_method": "torch_cuda_events_with_per_iteration_synchronization",
-            "scope": "forward_pass_only_device_resident_input_no_host_to_device_transfer",
+            "timing_method": EFFICIENCY_TIMING_METHOD,
+            "scope": EFFICIENCY_TIMING_SCOPE,
         },
         "vram_bytes": {
             "baseline_allocated": baseline_allocated,
@@ -575,6 +675,8 @@ def profile_neural_model(
             "peak_reserved": peak_reserved,
             "incremental_peak_allocated": max(0, peak_allocated - baseline_allocated),
             "incremental_peak_reserved": max(0, peak_reserved - baseline_reserved),
+            "cache_cleared_before_profile": True,
+            "measurement_scope": EFFICIENCY_VRAM_SCOPE,
         },
         "model_size": {
             "checkpoint_file_bytes": checkpoint_bytes,
@@ -585,10 +687,12 @@ def profile_neural_model(
             "torch_version": str(torch.__version__),
             "torch_cuda_version": torch.version.cuda,
             "device_type": device.type,
-            "device": str(device),
+            "device": f"cuda:{device_index}",
+            "device_index": device_index,
             "device_name": properties.name,
             "device_total_memory_bytes": int(properties.total_memory),
             "device_compute_capability": list(torch.cuda.get_device_capability(device)),
+            "cudnn_version": cast(Any, torch.backends.cudnn).version(),
         },
         "model_selection_use": False,
     }

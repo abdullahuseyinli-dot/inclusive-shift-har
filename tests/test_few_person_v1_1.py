@@ -264,12 +264,21 @@ def test_read_only_progress_requires_exact_1200_cells(
     )
 
 
-def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool = False) -> Path:
+def _write_valid_cell(
+    tmp_path: Path,
+    manifest_path: Path,
+    *,
+    wrong_metric: bool = False,
+    attempt: int | None = None,
+    environment_cudnn_enabled_override: bool | None = None,
+    device_cudnn_enabled_override: bool | None = None,
+) -> Path:
     plan = _load_plan(manifest_path)
     key = CellKey("compact-erm", 11, "target_outer_01", 1)
     scenario = plan.scenarios[(key.fold_id, key.k)]
     model = plan.models[(key.model_id, key.seed)]
-    run_dir = tmp_path / "results" / key.cell_id
+    run_directory_name = key.cell_id if attempt is None else f"{key.cell_id}--attempt-{attempt:03d}"
+    run_dir = tmp_path / "results" / run_directory_name
     run_dir.mkdir(parents=True)
     participants: list[str] = []
     window_ids: list[str] = []
@@ -316,7 +325,11 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
         "device_name": "synthetic",
         "device_total_memory_bytes": 1024,
         "compute_capability": [12, 0],
-        "cudnn_enabled_during_run": not configuration["disable_cudnn"],
+        "cudnn_enabled_during_run": (
+            not configuration["disable_cudnn"]
+            if environment_cudnn_enabled_override is None
+            else environment_cudnn_enabled_override
+        ),
         "cudnn_version": 9000,
         "hostname_recorded": False,
         "process_id_recorded": False,
@@ -469,7 +482,16 @@ def _write_valid_cell(tmp_path: Path, manifest_path: Path, *, wrong_metric: bool
                 "adapted_checkpoint_sha256": sha256_file(checkpoint_path),
             },
         },
-        "device": {"type": "cuda", "name": "synthetic", "peak_vram_bytes": 0},
+        "device": {
+            "type": "cuda",
+            "name": "synthetic",
+            "peak_vram_bytes": 0,
+            "cudnn_enabled": (
+                environment["cudnn_enabled_during_run"]
+                if device_cudnn_enabled_override is None
+                else device_cudnn_enabled_override
+            ),
+        },
         "code_commit": commit,
         "environment": environment,
         "elapsed_seconds": 1.0,
@@ -492,6 +514,80 @@ def test_completed_cell_hashes_and_npz_metrics_are_reconstructed(
         results_root=tmp_path / "results",
     )
     assert set(completed.participant_macro_f1) == {"12", "18"}
+
+
+def test_completed_cell_accepts_canonical_attempt_suffixed_directory(
+    tmp_path: Path, repository_root: Path
+) -> None:
+    _, manifest_path, _ = _materialize_v1_1_plan(tmp_path, repository_root)
+    result_path = _write_valid_cell(tmp_path, manifest_path, attempt=2)
+    assert result_path.parent.name == "compact-erm--seed-11--target_outer_01--k1--attempt-002"
+
+    completed = _validate_completed_record(
+        result_path,
+        plan=_load_plan(manifest_path),
+        artifact_root=tmp_path,
+        results_root=tmp_path / "results",
+    )
+
+    assert completed.key == CellKey("compact-erm", 11, "target_outer_01", 1)
+
+
+def test_completed_cell_rejects_actual_cudnn_policy_mismatch_from_frozen_config(
+    tmp_path: Path, repository_root: Path
+) -> None:
+    _, manifest_path, _ = _materialize_v1_1_plan(tmp_path, repository_root)
+    plan = _load_plan(manifest_path)
+    configuration = plan.models[("compact-erm", 11)]["training_configuration"]
+    result_path = _write_valid_cell(
+        tmp_path,
+        manifest_path,
+        device_cudnn_enabled_override=bool(configuration["disable_cudnn"]),
+    )
+
+    with pytest.raises(FewPersonStatisticsError, match="cuDNN policy differs"):
+        _validate_completed_record(
+            result_path,
+            plan=plan,
+            artifact_root=tmp_path,
+            results_root=tmp_path / "results",
+        )
+
+
+def test_completed_cell_rejects_environment_cudnn_policy_mismatch(
+    tmp_path: Path, repository_root: Path
+) -> None:
+    _, manifest_path, _ = _materialize_v1_1_plan(tmp_path, repository_root)
+    plan = _load_plan(manifest_path)
+    configuration = plan.models[("compact-erm", 11)]["training_configuration"]
+    result_path = _write_valid_cell(
+        tmp_path,
+        manifest_path,
+        environment_cudnn_enabled_override=bool(configuration["disable_cudnn"]),
+    )
+
+    with pytest.raises(FewPersonStatisticsError, match="cuDNN policy differs"):
+        _validate_completed_record(
+            result_path,
+            plan=plan,
+            artifact_root=tmp_path,
+            results_root=tmp_path / "results",
+        )
+
+
+def test_few_person_runbook_uses_pinned_cache_and_canonical_attempt_paths(
+    repository_root: Path,
+) -> None:
+    runbook = (repository_root / "docs/EXPERIMENT_RUNBOOK.md").read_text(encoding="utf-8")
+    assert (
+        '$cacheRecordFileHash = "02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba"'
+        in runbook
+    )
+    assert (
+        '$cellId = "$($model.model_id)--seed-$($model.seed)--$($scenario.fold_id)--k$($scenario.k)"'
+        in runbook
+    )
+    assert '$output = "$outputRoot/$cellId--attempt-$attemptToken"' in runbook
 
 
 def test_completed_cell_rejects_nonreconstructable_metrics(

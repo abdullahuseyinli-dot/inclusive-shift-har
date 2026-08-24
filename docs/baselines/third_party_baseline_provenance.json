@@ -4,6 +4,58 @@
   "status": "source_provenance_only_no_training_or_target_evaluation",
   "audit_clone_root": ".audit/baseline-source-audit-20260823",
   "license_interpretation": "NOASSERTION means no repository software license grant was found at the audited commit; manuscript licenses are not treated as software licenses.",
+  "extension_status_addendum": {
+    "recorded_date": "2026-08-24",
+    "basis_commit": "ad657d3aec3e2476ce7a1e8226bb2fd3a99bd721",
+    "historical_scope_preserved": true,
+    "cross_source_pretraining": {
+      "reported_result_status": "not_run",
+      "uci_native_grouped_reproduction": {
+        "status": "complete_source_development_not_cross_source_pretraining",
+        "evidence_path": "results/legacy_reproduction/uci_har_source_grouped_v1/uci_source_grouped_report_v1.json",
+        "inclusivehar_target_evaluated": false
+      },
+      "exact_label_all_cohort": {
+        "gate_status": "blocked",
+        "execution_status": "not_run",
+        "exact_classes": ["sitting"],
+        "provisional_classes": ["standing"],
+        "excluded_mappings": {
+          "walking": "UCI ordinary walking is not InclusiveHAR manual wheelchair propulsion"
+        },
+        "reason": "At least two defensible exact classes are required for classification."
+      },
+      "adapted_label_representation_transfer": {
+        "gate_status": "not_implemented",
+        "execution_status": "not_run",
+        "scientifically_ruled_out": false,
+        "missing_evidence": [
+          "all-source encoder refit",
+          "encoder-transfer and head-replacement implementation",
+          "target-blind adaptation configuration",
+          "equal-budget source-only selection procedure",
+          "validated result artifact"
+        ]
+      },
+      "claim_rule": "Do not describe the UCI-native grouped reproduction as cross-source pretraining or interpret the absent transfer result as an empirical failure."
+    },
+    "ssl_foundation_comparison": {
+      "gate_status": "blocked_no_candidate_cleared_all_requirements",
+      "execution_status": "not_run",
+      "local_checkpoint_status": "none_for_benchhar_simmtm_or_focal",
+      "candidate_status": {
+        "benchhar": "blocked_no_software_license_and_interface_mismatch",
+        "simmtm": "blocked_no_software_license_and_no_validated_smartphone_har_contract",
+        "focal": "mit_source_available_but_inertial_adapter_not_implemented",
+        "other_benchhar_methods": "literature_only_no_integrated_implementation_config_checkpoint_or_result",
+        "wearable_foundation_model": "blocked_no_compatible_licensed_checkpoint_adapter_or_equal_budget_config"
+      },
+      "locked_interface": "50 Hz, 128 samples, 6 user/body-acceleration and gyroscope channels",
+      "benchhar_interface": "20 Hz, 120 samples, per-window instance normalization",
+      "claim_rule": "Report the comparison as not evaluated, never as a zero-valued or negative empirical result."
+    },
+    "postconfirmatory_rule": "Any future target-side comparison is post-confirmatory and cannot enter or revise the consumed locked-primary ranking."
+  },
   "baselines": [
     {
       "id": "tinyhar",

@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 profile_id: "neural-efficiency-cuda-v1"
-config_sha256: "06fefd3568b7c0b19ab485c7492d46292bea304496d44c8b821dbefdc5573d77"
+config_sha256: "59db7c71322161344f669887a757dd55b1db887a5848b4e3b719147e4939bd78"
 status: "configured_not_run"
 required_device: "cuda"
 input:
@@ -36,7 +36,7 @@ contention_policy:
   sample_before_run: true
   sample_before_and_after_each_profile: true
   allow_current_process: true
-  allowed_ambient_process_names: ["dwm.exe"]
+  allowed_ambient_process_names: ["dwm.exe", "explorer.exe"]
   fail_on_unapproved_process: true
 output_policy:
   create_only: true

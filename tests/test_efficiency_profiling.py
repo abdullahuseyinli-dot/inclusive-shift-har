@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 import torch
+import yaml
 from torch import nn
 
 from inclusive_shift_har.evaluation.efficiency import (
@@ -15,6 +16,7 @@ from inclusive_shift_har.evaluation.efficiency import (
     _lstm_macs,
     _parameter_counts,
     _state_tensor_bytes,
+    efficiency_semantic_contract,
     load_efficiency_profile_config,
     profile_neural_model,
     write_efficiency_profile_new,
@@ -29,16 +31,69 @@ def _config_path(repository_root: Path) -> Path:
 def test_efficiency_config_is_self_hashed_and_cuda_only(repository_root: Path) -> None:
     config = load_efficiency_profile_config(_config_path(repository_root))
     assert config.required_device == "cuda"
+    assert (
+        config.file_sha256
+        == sha256_file(_config_path(repository_root))
+        == ("179881e7771ee8e8ae2d6bdf43f68b2bc452c57b82dbf51296874b3274d83f31")
+    )
+    assert config.config_sha256 == (
+        "59db7c71322161344f669887a757dd55b1db887a5848b4e3b719147e4939bd78"
+    )
     assert config.batch_sizes == (1, 64)
     assert config.precisions == ("float32", "float16_autocast")
     assert config.warmup_iterations == 20
     assert config.measured_iterations == 100
+    assert config.window_length_samples == 128
+    assert config.channel_count == 6
+    assert config.latency_percentiles == (50.0, 95.0)
     assert config.flop_per_mac == 2
     assert config.contention_monitor_command == "nvidia-smi"
     assert config.contention_sample_before_run is True
     assert config.contention_sample_before_and_after_each_profile is True
-    assert config.contention_allowed_ambient_process_names == ("dwm.exe",)
+    assert config.contention_allowed_ambient_process_names == ("dwm.exe", "explorer.exe")
     assert config.contention_fail_on_unapproved_process is True
+    assert efficiency_semantic_contract()["vram"]["cache_cleared_before_profile"] is True
+
+
+@pytest.mark.parametrize(
+    ("section", "field", "replacement", "message"),
+    [
+        ("input", "window_length_samples", 64, "128x6"),
+        ("input", "channel_count", 9, "128x6"),
+        ("latency", "warmup_iterations", 19, "20 warmups and 100 measures"),
+        ("latency", "measured_iterations", 99, "20 warmups and 100 measures"),
+        ("latency", "percentiles", [50.0, 90.0], "p50 and p95"),
+    ],
+)
+def test_efficiency_config_semantics_are_locked_even_with_valid_self_hash(
+    repository_root: Path,
+    tmp_path: Path,
+    section: str,
+    field: str,
+    replacement: object,
+    message: str,
+) -> None:
+    value = yaml.safe_load(_config_path(repository_root).read_text(encoding="utf-8"))
+    value[section][field] = replacement
+    value.pop("config_sha256")
+    value["config_sha256"] = canonical_json_sha256(value)
+    changed = tmp_path / "changed.yaml"
+    changed.write_text(yaml.safe_dump(value, sort_keys=False), encoding="utf-8")
+
+    with pytest.raises(EfficiencyProfileError, match=message):
+        load_efficiency_profile_config(changed)
+
+
+def test_efficiency_config_byte_hash_is_external_and_required(
+    repository_root: Path,
+) -> None:
+    path = _config_path(repository_root)
+    with pytest.raises(EfficiencyProfileError, match="file SHA-256 mismatch"):
+        load_efficiency_profile_config(
+            path,
+            allowed_root=repository_root,
+            expected_file_sha256="0" * 64,
+        )
 
 
 def test_supported_operator_mac_formulas_are_exact() -> None:

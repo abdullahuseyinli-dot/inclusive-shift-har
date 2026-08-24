@@ -191,7 +191,12 @@ def _finite_probability(value: Any, *, name: str) -> float:
     return float(value)
 
 
-def _validate_execution_metadata(record: Mapping[str, Any], *, name: str) -> tuple[str, str, str]:
+def _validate_execution_metadata(
+    record: Mapping[str, Any],
+    *,
+    name: str,
+    expected_cudnn_enabled: bool | None = None,
+) -> tuple[str, str, str]:
     timestamp = record.get("created_at_utc")
     if not isinstance(timestamp, str):
         raise FewPersonStatisticsError(f"{name} created_at_utc is missing")
@@ -236,6 +241,13 @@ def _validate_execution_metadata(record: Mapping[str, Any], *, name: str) -> tup
         or environment.get("process_id_recorded") is not False
     ):
         raise FewPersonStatisticsError(f"{name} environment metadata is invalid")
+    if (
+        expected_cudnn_enabled is not None
+        and environment.get("cudnn_enabled_during_run") is not expected_cudnn_enabled
+    ):
+        raise FewPersonStatisticsError(
+            f"{name} recorded cuDNN policy differs from the frozen configuration"
+        )
     execution_machine = dict(environment)
     execution_machine.pop("cudnn_enabled_during_run")
     return timestamp, commit, canonical_json_sha256(execution_machine)
@@ -590,6 +602,10 @@ def _validate_checkpoint(
     configuration = _mapping(
         checkpoint.get("base_training_configuration"), name="base training configuration"
     )
+    disable_cudnn = configuration.get("disable_cudnn")
+    if not isinstance(disable_cudnn, bool):
+        raise FewPersonStatisticsError(f"{key.cell_id} frozen disable_cudnn policy is not Boolean")
+    expected_cudnn_enabled = not disable_cudnn
     epochs = configuration.get("epochs")
     if (
         canonical_json_sha256(configuration) != model_entry["training_configuration_sha256"]
@@ -627,7 +643,11 @@ def _validate_checkpoint(
         raise FewPersonStatisticsError(
             f"{key.cell_id} timestamp/environment differs from checkpoint"
         )
-    _validate_execution_metadata(checkpoint, name=f"{key.cell_id} checkpoint")
+    _validate_execution_metadata(
+        checkpoint,
+        name=f"{key.cell_id} checkpoint",
+        expected_cudnn_enabled=expected_cudnn_enabled,
+    )
     rng_states = checkpoint.get("rng_states")
     if (
         not isinstance(checkpoint.get("parameter_count"), int)
@@ -1055,6 +1075,10 @@ def _validate_completed_record(
     base_configuration = _mapping(
         model_entry.get("training_configuration"), name="frozen training configuration"
     )
+    disable_cudnn = base_configuration.get("disable_cudnn")
+    if not isinstance(disable_cudnn, bool):
+        raise FewPersonStatisticsError(f"{key.cell_id} frozen disable_cudnn policy is not Boolean")
+    expected_cudnn_enabled = not disable_cudnn
     required = {
         "schema_version": "1.0.0",
         "record_kind": "few_person_outer_fold_result",
@@ -1092,10 +1116,16 @@ def _validate_completed_record(
     if mismatches:
         raise FewPersonStatisticsError(f"{key.cell_id} result mismatch: {mismatches}")
     _, commit, environment_sha256 = _validate_execution_metadata(
-        record, name=f"{key.cell_id} result"
+        record,
+        name=f"{key.cell_id} result",
+        expected_cudnn_enabled=expected_cudnn_enabled,
     )
     device = _mapping(record.get("device"), name="few-person result device")
     elapsed = record.get("elapsed_seconds")
+    if device.get("cudnn_enabled") is not expected_cudnn_enabled:
+        raise FewPersonStatisticsError(
+            f"{key.cell_id} recorded actual cuDNN policy differs from the frozen configuration"
+        )
     if (
         device.get("type") != "cuda"
         or not isinstance(device.get("peak_vram_bytes"), int)

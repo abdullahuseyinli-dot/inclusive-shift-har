@@ -21,6 +21,9 @@ def test_release_inventory_schema_keeps_consumed_target_and_required_roles(
     repository_root: Path,
 ) -> None:
     schema = _load(repository_root / "configs/schema/release_evidence_inventory.schema.json")
+    assert schema["properties"]["schema_version"]["const"] == "1.1.0"
+    assert schema["properties"]["delivery_mode"]["const"] == "external_release_asset"
+    assert schema["properties"]["tracked"]["const"] is False
     confirmatory = schema["properties"]["confirmatory_state"]["properties"]
     assert confirmatory["opening_count"]["const"] == 1
     assert confirmatory["target_rerun_permitted"]["const"] is False
@@ -77,7 +80,8 @@ def test_experiment_runbook_does_not_offer_target_rerun(repository_root: Path) -
     assert "primary_channels_opening1_v1" in text
     assert 'ToString("yyyy-MM-ddTHH:mm:ssZ")' in text
     assert "3 models" in text
-    assert "= 75 CUDA runs" in text
+    assert "75 first-attempt CUDA" in text
+    assert "completed, self-hashed v1.1 report" in text
     assert "1,200 sequential" in text
 
 
