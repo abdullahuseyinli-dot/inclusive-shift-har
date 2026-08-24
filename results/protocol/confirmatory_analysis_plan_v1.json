@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "confirmatory_target_analysis_plan",
+  "status": "predeclared_source_only_target_sealed",
+  "created_date_utc": "2026-08-24",
+  "candidate_model_id": "more-har-full",
+  "eligible_reference_model_ids": [
+    "random-forest",
+    "xgboost",
+    "svm-rbf",
+    "logistic-regression",
+    "legacy-cnn1d",
+    "legacy-bilstm",
+    "legacy-joint-cnn-bilstm",
+    "deepconvlstm",
+    "compact-erm",
+    "compact-coral",
+    "compact-dann",
+    "static-dual-branch-matched",
+    "more-har-groupdro"
+  ],
+  "required_seed_order": [
+    11,
+    23,
+    47,
+    89,
+    131
+  ],
+  "primary_endpoint": "mean participant-level macro-F1 on held-out target participants",
+  "lower_tail_endpoints": [
+    "worst participant-level macro-F1",
+    "lower-decile participant-level macro-F1"
+  ],
+  "seed_handling": "average each participant metric over the five predeclared seeds before participant-level inference",
+  "uncertainty": {
+    "method": "participant-cluster percentile bootstrap",
+    "confidence": 0.95,
+    "resamples": 10000,
+    "seed": 1729
+  },
+  "paired_tests": {
+    "primary": "two-sided exact participant sign-flip permutation test",
+    "secondary": "two-sided paired Wilcoxon signed-rank test",
+    "effect_sizes": [
+      "paired standardized mean difference",
+      "rank-biserial effect"
+    ],
+    "multiple_comparison_correction": "Holm within the candidate-versus-eligible-baseline family"
+  },
+  "source_noninferiority": {
+    "margin_absolute_macro_f1": 0.02,
+    "candidate_source_grouped_cv_mean": 0.7923957998638926,
+    "strongest_eligible_baseline_source_grouped_cv_model_id": "compact-dann",
+    "strongest_eligible_baseline_source_grouped_cv_mean": 0.8004225679388528,
+    "candidate_minus_baseline": -0.0080267680749602,
+    "gate_passed_before_target_opening": true,
+    "source_aggregate_path": "results/development/source_cv_v1/source_cv_aggregate_v6.json",
+    "source_aggregate_record_sha256": "fb23b81e417cbaec43eef587638a762b7109f0fa21a8409b22793d0c914bf56f"
+  },
+  "hypothesis_support_rule": {
+    "mean_improvement_required_against_every_eligible_baseline": true,
+    "worst_and_lower_decile_improvement_required_against_every_eligible_baseline": true,
+    "source_noninferiority_gate_required": true,
+    "statistical_significance_required": false,
+    "uncertainty_and_adjusted_tests_must_be_reported": true,
+    "negative_or_inconclusive_outcome_retained": true
+  },
+  "calibration_metrics": [
+    "negative log-likelihood",
+    "multiclass Brier score",
+    "ECE as a secondary diagnostic"
+  ],
+  "selective_prediction": "report risk-coverage and AURC descriptively; no target-tuned threshold",
+  "target_information_used_for_model_selection": false,
+  "target_subject_or_window_records_loaded": false,
+  "target_predictions_or_performance_accessed": false,
+  "analysis_plan_sha256": "7b99dd5894109370397867a1ca141758c0a30b4efb2fb3d76aba23ab1ad62177"
+}

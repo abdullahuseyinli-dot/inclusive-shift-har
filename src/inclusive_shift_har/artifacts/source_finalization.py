@@ -142,6 +142,13 @@ def load_final_selection_plan(path: str | Path) -> dict[str, Any]:
             str, entry.get("summary_path_template")
         ):
             raise SourceFinalizationError(f"{model_id} summary template must contain {{seed}}")
+        if not isinstance(entry.get("run_directory_template"), str) or "{seed}" not in cast(
+            str, entry.get("run_directory_template")
+        ):
+            raise SourceFinalizationError(
+                f"{model_id} run directory template must contain {{seed}}"
+            )
+        _require_mapping(entry.get("runner_arguments"), name=f"{model_id} runner arguments")
         _require_mapping(entry.get("configuration_expectations"), name=f"{model_id} expectations")
     return payload
 
@@ -229,7 +236,30 @@ def _validate_one_run(
     configuration = _require_mapping(summary.get("configuration"), name="training configuration")
     if summary.get("configuration_sha256") != canonical_json_sha256(configuration):
         raise SourceFinalizationError(f"{model_id} seed {seed} configuration hash mismatch")
-    expectations = cast(Mapping[str, Any], entry["configuration_expectations"])
+    common_key = (
+        "common_neural_configuration_expectations"
+        if entry["training_regime"] == "fixed_epoch_neural"
+        else "common_classical_configuration_expectations"
+    )
+    common_expectations = plan.get(common_key, {})
+    if not isinstance(common_expectations, Mapping):
+        raise SourceFinalizationError(f"selection plan {common_key} must be an object")
+    runner_expectations: Mapping[str, Any] = {}
+    if entry["training_regime"] == "fixed_epoch_neural":
+        common_runner_value = plan.get("common_neural_runner_arguments", {})
+        if not isinstance(common_runner_value, Mapping):
+            raise SourceFinalizationError(
+                "selection plan common_neural_runner_arguments must be an object"
+            )
+        runner_value = entry.get("runner_arguments")
+        if not isinstance(runner_value, Mapping):
+            raise SourceFinalizationError(f"{model_id} runner_arguments must be an object")
+        runner_expectations = {**dict(common_runner_value), **dict(runner_value)}
+    expectations = {
+        **dict(common_expectations),
+        **dict(runner_expectations),
+        **dict(cast(Mapping[str, Any], entry["configuration_expectations"])),
+    }
     mismatched_config = [
         key for key, expected in expectations.items() if configuration.get(key) != expected
     ]

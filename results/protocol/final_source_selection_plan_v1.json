@@ -1,0 +1,288 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "final_source_selection_plan",
+  "status": "predeclared_source_only_target_sealed",
+  "created_date_utc": "2026-08-24",
+  "code_commit_policy": "exact_current_commit_at_training_and_freeze",
+  "dataset_manifest_path": "manifests/datasets/inclusivehar_v4.json",
+  "dataset_manifest_sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29",
+  "source_window_manifest_path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+  "source_window_manifest_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522",
+  "split_manifest_path": "results/protocol/splits/inclusivehar_v4_released_block_v1_2.json",
+  "split_manifest_sha256": "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b",
+  "protocol_lock_path": "results/protocol/protocol_lock_v1_2.json",
+  "protocol_lock_sha256": "d39548f5d477114a160eda2f93f02921a347bc8ed4146001a39378bf106b0e29",
+  "target_seal_path": "results/protocol/target_seal_v1_2.json",
+  "target_seal_id": "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d",
+  "analysis_plan_path": "results/protocol/confirmatory_analysis_plan_v1.json",
+  "analysis_plan_sha256": "7b99dd5894109370397867a1ca141758c0a30b4efb2fb3d76aba23ab1ad62177",
+  "source_selection_aggregate_path": "results/development/source_cv_v1/source_cv_aggregate_v6.json",
+  "source_selection_aggregate_record_sha256": "fb23b81e417cbaec43eef587638a762b7109f0fa21a8409b22793d0c914bf56f",
+  "required_seed_order": [
+    11,
+    23,
+    47,
+    89,
+    131
+  ],
+  "final_source_split_id": "final_source_split",
+  "final_train_participants": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "9"
+  ],
+  "final_validation_participants": [
+    "8",
+    "10"
+  ],
+  "final_train_window_count": 582,
+  "final_validation_window_count": 143,
+  "class_names": [
+    "mobility",
+    "sitting",
+    "standing"
+  ],
+  "neural_training_device": "cuda",
+  "neural_inference_device": "cuda",
+  "classical_device_policy": "XGBoost CUDA; RF, RBF-SVM, and logistic regression use their documented CPU implementations",
+  "final_epoch_rule": "lower integer median of five grouped source-fold best epochs",
+  "calibration_fit_partition": "source_validation",
+  "common_neural_runner_arguments": {
+    "weight_decay": 0.0001,
+    "use_augmentation": false,
+    "use_content_objective": false,
+    "use_realization_factorization": false,
+    "use_group_dro": false,
+    "coral_weight": 0.0,
+    "dann_domain_loss_weight": 0.0,
+    "dann_grl_max_strength": 1.0,
+    "dann_grl_warmup_epochs": 10,
+    "disable_cudnn": false,
+    "zero_channel_indices": []
+  },
+  "common_neural_configuration_expectations": {
+    "num_classes": 3,
+    "batch_size": 256,
+    "gradient_clip_norm": 5.0,
+    "data_loader_workers": 0,
+    "mixed_precision": "float16",
+    "checkpoint_selection_rule": "fixed_last_epoch",
+    "objective_weights": {
+      "consistency": 0.2,
+      "content": 0.1,
+      "factor": 0.01,
+      "realization": 0.1
+    }
+  },
+  "common_classical_configuration_expectations": {
+    "num_classes": 3
+  },
+  "models": [
+    {
+      "model_id": "random-forest",
+      "runner_model_name": "random_forest",
+      "training_regime": "deterministic_classical",
+      "run_directory_template": "results/final/source_only_v1/runs/random-forest/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/random-forest--seed-{seed}.json",
+      "runner_arguments": {"epochs": 1, "learning_rate": 0.001, "weight_decay": 0.0001},
+      "configuration_expectations": {"model_name": "random_forest", "xgboost_device": "cpu"}
+    },
+    {
+      "model_id": "xgboost",
+      "runner_model_name": "xgboost",
+      "training_regime": "deterministic_classical",
+      "run_directory_template": "results/final/source_only_v1/runs/xgboost/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/xgboost--seed-{seed}.json",
+      "runner_arguments": {"epochs": 1, "learning_rate": 0.001, "weight_decay": 0.0001},
+      "configuration_expectations": {"model_name": "xgboost", "xgboost_device": "cuda"}
+    },
+    {
+      "model_id": "svm-rbf",
+      "runner_model_name": "svm_rbf",
+      "training_regime": "deterministic_classical",
+      "run_directory_template": "results/final/source_only_v1/runs/svm-rbf/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/svm-rbf--seed-{seed}.json",
+      "runner_arguments": {"epochs": 1, "learning_rate": 0.001, "weight_decay": 0.0001},
+      "configuration_expectations": {"model_name": "svm_rbf", "xgboost_device": "cpu"}
+    },
+    {
+      "model_id": "logistic-regression",
+      "runner_model_name": "logistic_regression",
+      "training_regime": "deterministic_classical",
+      "run_directory_template": "results/final/source_only_v1/runs/logistic-regression/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/logistic-regression--seed-{seed}.json",
+      "runner_arguments": {"epochs": 1, "learning_rate": 0.001, "weight_decay": 0.0001},
+      "configuration_expectations": {"model_name": "logistic_regression", "xgboost_device": "cpu"}
+    },
+    {
+      "model_id": "legacy-cnn1d",
+      "runner_model_name": "legacy_cnn1d_h128",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/legacy-cnn1d/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/legacy-cnn1d--seed-{seed}.json",
+      "runner_arguments": {"epochs": 5, "learning_rate": 0.001},
+      "configuration_expectations": {"model_name": "legacy_cnn1d_h128", "checkpoint_interval": 5, "patience": 2, "minimum_epochs": 5}
+    },
+    {
+      "model_id": "legacy-bilstm",
+      "runner_model_name": "legacy_bilstm_h192",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/legacy-bilstm/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/legacy-bilstm--seed-{seed}.json",
+      "runner_arguments": {"epochs": 13, "learning_rate": 0.001, "disable_cudnn": true},
+      "configuration_expectations": {"model_name": "legacy_bilstm_h192", "checkpoint_interval": 13, "patience": 4, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "legacy-joint-cnn-bilstm",
+      "runner_model_name": "legacy_joint_bilstm256_cnn128",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/legacy-joint-cnn-bilstm/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/legacy-joint-cnn-bilstm--seed-{seed}.json",
+      "runner_arguments": {"epochs": 34, "learning_rate": 0.001, "weight_decay": 0.001, "disable_cudnn": true},
+      "configuration_expectations": {"model_name": "legacy_joint_bilstm256_cnn128", "checkpoint_interval": 34, "patience": 11, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "deepconvlstm",
+      "runner_model_name": "deepconvlstm",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/deepconvlstm/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/deepconvlstm--seed-{seed}.json",
+      "runner_arguments": {"epochs": 11, "learning_rate": 0.001, "weight_decay": 0.001, "disable_cudnn": true},
+      "configuration_expectations": {"model_name": "deepconvlstm", "checkpoint_interval": 11, "patience": 3, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "compact-erm",
+      "runner_model_name": "compact_residual_96",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/compact-erm/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/compact-erm--seed-{seed}.json",
+      "runner_arguments": {"epochs": 23, "learning_rate": 0.001},
+      "configuration_expectations": {"model_name": "compact_residual_96", "checkpoint_interval": 23, "patience": 7, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "compact-coral",
+      "runner_model_name": "compact_residual_96",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/compact-coral/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/compact-coral--seed-{seed}.json",
+      "runner_arguments": {"epochs": 23, "learning_rate": 0.001, "coral_weight": 0.01},
+      "configuration_expectations": {"model_name": "compact_residual_96", "checkpoint_interval": 23, "patience": 7, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "compact-dann",
+      "runner_model_name": "dann_compact_residual_96",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/compact-dann/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/compact-dann--seed-{seed}.json",
+      "runner_arguments": {"epochs": 23, "learning_rate": 0.001, "dann_domain_loss_weight": 0.1},
+      "configuration_expectations": {"model_name": "dann_compact_residual_96", "checkpoint_interval": 23, "patience": 7, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "static-dual-branch-matched",
+      "runner_model_name": "static_dual_branch_matched",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/static-dual-branch-matched/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/static-dual-branch-matched--seed-{seed}.json",
+      "runner_arguments": {"epochs": 18, "learning_rate": 0.0003},
+      "configuration_expectations": {"model_name": "static_dual_branch_matched", "checkpoint_interval": 18, "patience": 6, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-backbone",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-backbone/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-backbone--seed-{seed}.json",
+      "runner_arguments": {"epochs": 25, "learning_rate": 0.0003},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 25, "patience": 8, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-augmentation",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-augmentation/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-augmentation--seed-{seed}.json",
+      "runner_arguments": {"epochs": 18, "learning_rate": 0.0003, "use_augmentation": true},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 18, "patience": 6, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-content",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-content/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-content--seed-{seed}.json",
+      "runner_arguments": {"epochs": 34, "learning_rate": 0.0003, "use_augmentation": true, "use_content_objective": true},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 34, "patience": 11, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-factorized",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-factorized/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-factorized--seed-{seed}.json",
+      "runner_arguments": {"epochs": 18, "learning_rate": 0.0003, "use_augmentation": true, "use_content_objective": true, "use_realization_factorization": true},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 18, "patience": 6, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-groupdro",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-groupdro/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-groupdro--seed-{seed}.json",
+      "runner_arguments": {"epochs": 26, "learning_rate": 0.0003, "use_group_dro": true},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 26, "patience": 8, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-full",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-full/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-full--seed-{seed}.json",
+      "runner_arguments": {"epochs": 27, "learning_rate": 0.0003, "use_augmentation": true, "use_content_objective": true, "use_realization_factorization": true, "use_group_dro": true},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 27, "patience": 9, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-full-no-accelerometer",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-full-no-accelerometer/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-full-no-accelerometer--seed-{seed}.json",
+      "runner_arguments": {"epochs": 24, "learning_rate": 0.0003, "use_augmentation": true, "use_content_objective": true, "use_realization_factorization": true, "use_group_dro": true, "zero_channel_indices": [0, 1, 2]},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 24, "patience": 8, "minimum_epochs": 8}
+    },
+    {
+      "model_id": "more-har-full-no-gyroscope",
+      "runner_model_name": "more_har",
+      "training_regime": "fixed_epoch_neural",
+      "run_directory_template": "results/final/source_only_v1/runs/more-har-full-no-gyroscope/seed-{seed}",
+      "summary_path_template": "results/final/source_only_v1/records/more-har-full-no-gyroscope--seed-{seed}.json",
+      "runner_arguments": {"epochs": 8, "learning_rate": 0.0003, "use_augmentation": true, "use_content_objective": true, "use_realization_factorization": true, "use_group_dro": true, "zero_channel_indices": [3, 4, 5]},
+      "configuration_expectations": {"model_name": "more_har", "checkpoint_interval": 8, "patience": 2, "minimum_epochs": 8}
+    }
+  ],
+  "excluded_from_locked_lineup": [
+    {
+      "method": "CCIL",
+      "reason": "paper-derived loss components are tested locally, but no licence-compatible official end-to-end implementation was verified; including an unfaithful reimplementation would overstate comparability"
+    },
+    {
+      "method": "BPD",
+      "reason": "official Apache-licensed trainer has incompatible 168-sample, 50%-overlap, and target-dependent assumptions; adaptation was not validated under the locked 128-sample source-only contract"
+    },
+    {
+      "method": "official TinyHAR, TinierHAR, HARMamba",
+      "reason": "no faithful licence-compatible adapter passed the exact six-channel, 128-sample checkpoint and leakage gates before freeze"
+    },
+    {
+      "method": "BenchHAR SSL or wearable foundation model",
+      "reason": "channel, sampling, checkpoint, and licence compatibility were not established before the primary freeze; these remain post-confirmatory extensions"
+    }
+  ],
+  "target_subject_or_window_records_used": false,
+  "target_predictions_or_performance_accessed": false,
+  "selection_plan_sha256": "f21c09107f565a8351ab51246de7ef8545f9a38938e33a713aa655f85c521868"
+}

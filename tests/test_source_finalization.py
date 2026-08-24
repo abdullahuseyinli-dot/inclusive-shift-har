@@ -152,6 +152,12 @@ def _fixture(tmp_path: Path) -> tuple[Path, Path]:
                 "runner_model_name": "logistic_regression",
                 "training_regime": "deterministic_classical",
                 "summary_path_template": "records/logistic--seed-{seed}.json",
+                "run_directory_template": "runs/logistic--seed-{seed}",
+                "runner_arguments": {
+                    "epochs": 1,
+                    "learning_rate": 0.001,
+                    "weight_decay": 0.0001,
+                },
                 "configuration_expectations": {
                     "model_name": "logistic_regression",
                     "num_classes": 3,
