@@ -80,7 +80,7 @@ def _resolve_file(value: Any, *, root: Path, name: str, allow_absolute: bool = F
     raw = Path(value)
     if raw.is_absolute() and not allow_absolute:
         raise PaperAdaptationAggregationError(f"{name} path must be repository-relative")
-    if not raw.is_absolute() and ("\\" in str(value) or ".." in raw.parts):
+    if not raw.is_absolute() and ".." in raw.parts:
         raise PaperAdaptationAggregationError(f"{name} path escapes repository_root")
     candidate = raw if raw.is_absolute() else root / raw
     if candidate.is_symlink():

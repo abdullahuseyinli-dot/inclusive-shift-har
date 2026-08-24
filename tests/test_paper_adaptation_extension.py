@@ -15,6 +15,7 @@ from inclusive_shift_har.evaluation.paper_adaptation_reporting import (
     _apply_target_multiplicity,
     _average_seed_reports,
     _comparison,
+    _resolve_file,
 )
 from inclusive_shift_har.experiments.ccil_bpd_postconfirmatory import (
     COMPARATOR_IDS,
@@ -38,6 +39,21 @@ from inclusive_shift_har.models.paper_adaptations import (
 )
 
 CONFIG_RELATIVE = Path("configs/experiments/ccil_bpd_postconfirmatory_v1.yaml")
+
+
+def test_aggregator_accepts_cli_path_objects_on_windows(tmp_path: Path) -> None:
+    index = tmp_path / "nested" / "index.json"
+    index.parent.mkdir()
+    index.write_text("{}\n", encoding="utf-8")
+
+    resolved = _resolve_file(
+        Path("nested") / "index.json",
+        root=tmp_path.resolve(),
+        name="synthetic index",
+        allow_absolute=True,
+    )
+
+    assert resolved == index.resolve()
 
 
 def test_config_locks_source_only_adapters_comparators_and_four_test_family(
