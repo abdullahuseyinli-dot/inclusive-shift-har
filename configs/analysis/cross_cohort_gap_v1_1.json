@@ -1,0 +1,105 @@
+{
+  "analysis_id": "cross_cohort_gap_v1_1",
+  "bootstrap": {
+    "confidence": 0.95,
+    "independent_cohort_draws": true,
+    "method": "independent_participant_cluster_percentile",
+    "resamples": 10000,
+    "seed": 1729,
+    "shared_indices_across_models": true
+  },
+  "inputs": {
+    "source": {
+      "aggregate_record_sha256": "fb23b81e417cbaec43eef587638a762b7109f0fa21a8409b22793d0c914bf56f",
+      "artifact_type": "source_only_grouped_cv_aggregate",
+      "evidence_status": "source_development_not_confirmatory",
+      "file_sha256": "0bc323d2ba04dda54776999c3b77d3a338fdfb6c804edadad1248d649907e875",
+      "path": "results/development/source_cv_v1/source_cv_aggregate_v6.json"
+    },
+    "target": {
+      "evidence_status": "locked_confirmatory_target_opening_1",
+      "file_sha256": "81d41a3b0336da4368d816f799cf787f24457527098895955489f9242c7d25eb",
+      "path": "results/confirmatory/zero_shot_v1/participant_statistics.json",
+      "record_kind": "locked_target_participant_statistics",
+      "record_sha256": "c7f20362598922223a8d72d927fba69445fca31cb3607ef9eff0b130211f2cbd"
+    }
+  },
+  "limitations": [
+    "The source model and configuration selection is consumed and this post-confirmatory derivation cannot be treated as a fresh model-selection or confirmatory analysis.",
+    "Source values are one-seed participant-grouped cross-validation development estimates, whereas target values average five final-fit seeds.",
+    "Source and target training and evaluation regimes differ, so the gap is descriptive rather than a controlled decomposition of population shift.",
+    "The ten source and ten target participants are independent unpaired cohorts; the bootstrap interval does not remove regime mismatch.",
+    "Ability-associated cohort labels support an observational description and not a causal disability effect."
+  ],
+  "lineage": {
+    "analysis_plan_sha256": "7b99dd5894109370397867a1ca141758c0a30b4efb2fb3d76aba23ab1ad62177",
+    "final_freeze_inventory_sha256": "d867ade3778fd07a1bb1404121d4f84323ddb66fe9bf15705603175fcf74b070",
+    "locked_target_index_record_sha256": "79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9",
+    "mapping_basis": {
+      "file_sha256": "c33bcb6854bacbd8f3d76bc5426505d3e4ebf974d6ca8dc1b4e23d860eab86a3",
+      "path": "results/protocol/final_source_selection_plan_v1.json",
+      "selection_plan_sha256": "f21c09107f565a8351ab51246de7ef8545f9a38938e33a713aa655f85c521868"
+    },
+    "source_window_manifest_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522",
+    "target_seal_id": "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d"
+  },
+  "model_to_source_configuration": {
+    "compact-coral": "compact_residual_96_coral_0p01--68db668cd3d1",
+    "compact-dann": "dann_compact_residual_96_established_lambda_0p1_grl_1p0_warmup_10--71935e191997",
+    "compact-erm": "compact_residual_96--2c62b52d708a",
+    "deepconvlstm": "deepconvlstm--b34c04845d41",
+    "legacy-bilstm": "legacy_bilstm_h192--fb3a1b40113f",
+    "legacy-cnn1d": "legacy_cnn1d_h128--8e57838b6dcd",
+    "legacy-joint-cnn-bilstm": "legacy_joint_bilstm256_cnn128--049dc59665fd",
+    "logistic-regression": "logistic_regression--274ba21c48ba",
+    "more-har-augmentation": "more_har_augmentation--a51fbddd208d",
+    "more-har-backbone": "more_har_backbone--b0a97d9f714e",
+    "more-har-content": "more_har_augmentation_plus_content--a43106244ae1",
+    "more-har-factorized": "more_har_augmentation_plus_content_plus_factorization--34ed274093cd",
+    "more-har-full": "more_har_full--fa82e7d61587",
+    "more-har-full-no-accelerometer": "more_har_full_zero_channels_0_1_2--6207c4fa1638",
+    "more-har-full-no-gyroscope": "more_har_full_zero_channels_3_4_5--4cfb458c7d46",
+    "more-har-groupdro": "more_har_groupdro--26d4d21386e6",
+    "random-forest": "random_forest--92126a61caee",
+    "static-dual-branch-matched": "static_dual_branch_matched--56e188fb9b96",
+    "svm-rbf": "svm_rbf--78919913d9ed",
+    "xgboost": "xgboost--e3184e63de22"
+  },
+  "record_kind": "cross_cohort_gap_analysis_specification",
+  "schema_version": "1.0.0",
+  "source_participant_ids": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10"
+  ],
+  "source_seed": 11,
+  "specification_sha256": "2ff842b06ac687744ec8f66845d309a6835995b3616246d04acff8214c63e98a",
+  "status": "locked_post_confirmatory_descriptive_analysis",
+  "target_information_used_to_choose_mapping": false,
+  "target_participant_ids": [
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16",
+    "17",
+    "18",
+    "19",
+    "20"
+  ],
+  "target_seed_order": [
+    11,
+    23,
+    47,
+    89,
+    131
+  ]
+}
