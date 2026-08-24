@@ -1,6 +1,6 @@
 {
   "title": "InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition",
-  "description": "Provisional research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. InclusiveHAR v4 trial boundaries are unrecoverable, so this is not claimed to be trial-safe. This metadata does not assert confirmatory results, fairness, clinical validity, state-of-the-art performance, publication acceptance, or a minted DOI.",
+  "description": "Research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. InclusiveHAR v4 trial boundaries are unrecoverable, so this is not claimed to be trial-safe. The locked benchmark retains an unsupported MoRe-HAR model hypothesis and makes no fairness, clinical-validity, state-of-the-art, publication-acceptance, or minted-DOI claim.",
   "upload_type": "software",
   "creators": [
     {

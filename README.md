@@ -1,150 +1,107 @@
 # InclusiveShift-HAR
 
-**Evidence-corrected provisional title:** *InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition*
+*An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition*
 
-The earlier working title used “leakage-safe.” The InclusiveHAR v4 audit found
-that timestamps and trial identifiers are absent and trial boundaries cannot be
-recovered, so that unqualified wording is no longer used. The authorized
-protocol is participant-exclusive and raw-row-disjoint, but only within
-released subject–activity blocks; hidden within-block joins remain possible.
+InclusiveShift-HAR studies how smartphone inertial HAR systems trained on conventional participant populations transfer to people whose activities may be physically realized differently, including users of assistive devices. The repository separates legacy coursework, source-only development, and a single locked target evaluation with immutable lineage.
 
-InclusiveShift-HAR is a research-software project for studying how reliably smartphone inertial human activity recognition (HAR) systems trained on conventional participant populations generalize to people whose activities may be physically realized differently, including some users of assistive devices.
+The original working title said "leakage-safe." InclusiveHAR v4 does not release timestamps or trial identifiers, so hidden joins inside released participant-activity blocks cannot be ruled out. The benchmark is participant-exclusive and raw-row-disjoint under the released schema, but it is not trial-safe. That limitation is part of the result, not a footnote.
 
-The proposed model name, **MoRe-HAR (Motion-Realization Factorized Human Activity Recognition)**, is provisional and secondary to the benchmark. This repository currently contains foundation and legacy-audit evidence, not a validated benchmark result or model claim.
+## Main result
+
+The one-time zero-shot target evaluation is complete. It used 10 held-out target participants, 807 non-overlapping released-block windows, three functional-core classes, 20 predeclared model/ablation configurations, and five frozen seeds per configuration.
+
+| Result | Mean participant macro-F1 | Worst participant | Lower decile |
+|---|---:|---:|---:|
+| Compact DANN | 0.6808 | 0.2699 | 0.3559 |
+| Compact CORAL | 0.6808 | 0.2741 | 0.3670 |
+| MoRe-HAR full | 0.6353 | 0.2584 | 0.2660 |
+
+Compact DANN had the highest target mean, while the legacy joint CNN/BiLSTM had the highest worst-participant value (0.2943) and CORAL had the highest lower-decile value (0.3670). MoRe-HAR did not improve either the mean or the required lower-tail endpoints against the strongest eligible baselines. Its preregistered hypothesis is therefore **not supported**. This negative outcome is retained, and the auditable benchmark is the primary contribution.
+
+The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. These results do not establish state of the art, fairness, clinical validity, or a causal disability effect.
 
 ## Evidence classes
 
-Results must be presented under exactly one of these evidence classes. They are not interchangeable.
-
-| Evidence class | Meaning | Current status |
+| Evidence class | Meaning | Status |
 |---|---|---|
-| **Legacy coursework** | Saved UCI-HAR coursework outputs with random window-level validation and repeated official-test evaluation. | Audited; permanently **exploratory/development-consumed**. |
-| **Corrected reproduction / development** | Subject-grouped reproduction, baseline development, ablations, debugging, and tuning conducted under explicit development protocols. | Not yet reported. These results will not be called confirmatory. |
-| **Locked confirmatory** | A preregistered configuration evaluated once on a sealed target cohort only after manifests, splits, code, and artifacts pass all gates. | **No locked confirmatory result exists.** |
+| Legacy coursework | Saved UCI-HAR notebook outputs with random window validation and repeated official-test use. | Audited; permanently `legacy_exploratory_development_consumed`. |
+| Corrected reproduction / development | Subject-grouped source development, tuning, ablations, and debugging. | Complete for the InclusiveHAR source suite; UCI official-train-only reproduction is a separate corrected track. |
+| Locked confirmatory | Frozen source-only artifacts evaluated once on the sealed target cohort after all gates passed. | Opening 1 complete; no retry or second opening is permitted. |
+| Post-confirmatory secondary | Few-person inclusion, sensor stress, efficiency, and descriptive follow-up after the primary opening. | Explicitly separate from the zero-shot confirmatory claim. |
 
-The legacy audit is in [`docs/LEGACY_AUDIT.md`](docs/LEGACY_AUDIT.md). The current InclusiveHAR audit, data card, conditionally locked protocol, and hardware record are in [`docs/DATA_AUDIT.md`](docs/DATA_AUDIT.md), [`docs/data/INCLUSIVEHAR_V4.md`](docs/data/INCLUSIVEHAR_V4.md), [`docs/LOCKED_PROTOCOL.md`](docs/LOCKED_PROTOCOL.md), and [`docs/HARDWARE.md`](docs/HARDWARE.md). Machine-readable legacy evidence is under [`legacy/`](legacy/README.md).
+The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](results/protocol/confirmatory_target_opening_1.json). The primary statistics record is [`participant_statistics.json`](results/confirmatory/zero_shot_v1/participant_statistics.json), and the human-readable table is [`model_summary_v1.md`](results/confirmatory/zero_shot_v1/model_summary_v1.md).
 
-## Research question
+## Scientific scope
+
+The research question is:
 
 > How reliably do smartphone HAR systems trained on conventional participant populations generalize to people whose activities are physically realized differently, including users of assistive devices?
 
-This is an ability-associated population-shift question. Disability labels and assistive-device status are not intended as inference inputs, and observational group differences must not be described as causal disability effects.
+This is an observational ability-associated population-shift benchmark. Disability and assistive-device labels are not model inputs. The released `walking` activity for wheelchair users denotes manual propulsion and is preserved as a distinct physical realization within the functional mobility concept. Ramps are not relabelled as stairs, and jogging is not silently mapped to another locomotion class.
+
+MoRe-HAR (Motion-Realization Factorized HAR) is a compact experimental hypothesis, not an assumed novelty claim. Its full objective combines classification, source-participant supervised contrastive alignment, clean/augmented consistency, measurable realization-descriptor prediction, cross-covariance factorization, and GroupDRO. The current evidence does not support the claim that this combination improves zero-shot ability-shift performance.
+
+## Reproducibility anchors
+
+- InclusiveHAR v4 split hash: `ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b`
+- Source-window manifest hash: `1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522`
+- Target seal ID: `aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d`
+- Frozen artifact-set hash: `e759b60f32b965e7ae3e5a994d919a08553c4958f9bdcf10d7497697f685dd51`
+- Training code commit: `b4dc38fb9d5a0c17003221b61156ebc065395170`
+- Target index record hash: `79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9`
+- Locked statistics record hash: `c7f20362598922223a8d72d927fba69445fca31cb3607ef9eff0b130211f2cbd`
+- Publication report hash: `3afe0ceee9f97025d1adc5f59ab3528b512a3212385ef5344028850e9cb39c66`
+
+The protocol tag is `protocol-v1.2.0`. Checkpoint and raw prediction arrays are intentionally outside normal Git history but are preserved locally and bound by the committed inventory and sidecar hashes.
+
+## Data and protocol
+
+The main sensing interface is three-axis user acceleration plus three-axis rotation rate at 50 Hz in 128-sample windows. Participants are partitioned before windowing. Source training may use stride 64; confirmatory validation and target evaluation use stride 128. Normalization is fitted on training participants only, calibration on source validation only, and all model selection occurred before the target opening.
+
+The functional-core result uses mobility, sitting, and standing. Inclusive-native and cross-source ontology tracks are documented separately. See:
+
+- [`docs/data/INCLUSIVEHAR_V4.md`](docs/data/INCLUSIVEHAR_V4.md)
+- [`docs/data/UCI_HAR_V1.md`](docs/data/UCI_HAR_V1.md)
+- [`docs/DATA_AUDIT.md`](docs/DATA_AUDIT.md)
+- [`docs/LOCKED_PROTOCOL.md`](docs/LOCKED_PROTOCOL.md)
+- [`docs/BENCHMARK_CARD.md`](docs/BENCHMARK_CARD.md)
+
+Raw third-party data, the coursework ZIP, secrets, and large checkpoints are excluded from Git. Dataset manifests record official/versioned retrieval sources, hashes, sizes, licences, citations, and schemas; repository code does not relicense third-party data.
+
+## Environment and commands
+
+The project targets CPython 3.11 and uses `uv`. Neural training and inference in the reported suite used an NVIDIA RTX PRO 3000 Blackwell Laptop GPU with PyTorch 2.12.0+cu132. Recurrent models retained CUDA tensors while disabling cuDNN after preserved Windows cuDNN crash records; neural CPU fallback was not used. Classical scikit-learn models use their native CPU implementations, and XGBoost training used CUDA.
+
+```powershell
+uv sync --extra training-cuda --group research
+uv run inclusive-shift-har validate-manifests
+uv run inclusive-shift-har audit-splits --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json --json
+uv run inclusive-shift-har validate-artifacts --artifact-root results --require-artifacts --json
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy src tests
+```
+
+The package also provides deterministic split/source-window builders, source-CV aggregation, a CUDA-only UCI source-fold runner, source/final experiment modules, one-time confirmatory evaluation code, locked participant statistics, and create-only publication reporting. CI uses synthetic fixtures and never downloads the research datasets.
+
+## Repository map
+
+```text
+src/inclusive_shift_har/   package code
+configs/                   dataset, ontology, protocol, model, and experiment configs
+tests/                     synthetic leakage, lineage, training, and evaluation tests
+manifests/                 immutable dataset provenance
+legacy/                    lawful legacy audit and reconstructed metrics
+results/                   committed small evidence, hashes, gates, and tables
+docs/                      audits, cards, protocol, literature, ethics, and status
+paper/                     paper-ready outline and result narrative
+```
 
 ## Claim limits
 
-This repository does **not** currently claim:
+This repository does not claim the first disability-related HAR study, the first HAR fairness study, the first disentangled HAR architecture, state-of-the-art performance, clinical validity, safety, causal disability effects, or publication acceptance. It does not treat a Transformer/Mamba swap or generic corruption benchmark as novelty. Failed runs, backend crashes, quarantines, deviations, and the unsupported MoRe-HAR hypothesis remain visible.
 
-- publishability or state-of-the-art performance;
-- fairness, clinical validity, medical utility, or safety certification;
-- the first disability-related or fairness-oriented HAR study;
-- the first disentangled HAR architecture;
-- that a generic architecture swap is a scientific contribution;
-- that legacy UCI-HAR test metrics are fresh confirmatory evidence;
-- that wheelchair propulsion is ordinary gait, ramps are stairs, or semantically different activities are interchangeable.
+## Licensing and citation
 
-Negative results, failed runs, out-of-memory events, quarantines, manual interventions, protocol deviations, and conditional passes are evidence and must remain visible.
-
-## Current repository contents
-
-```text
-README.md
-LICENSE
-CITATION.cff
-.zenodo.json
-pyproject.toml
-uv.lock
-src/inclusive_shift_har/
-    __init__.py
-    cli.py
-    artifacts/
-    data/
-    manifests/
-    preprocessing/
-    protocols/
-    py.typed
-configs/
-    ontologies/
-    preprocessing/
-    protocols/
-manifests/datasets/
-results/
-    data_audit/
-    gates/
-    protocol/
-docs/
-    DATA_AUDIT.md
-    HARDWARE.md
-    LEGACY_AUDIT.md
-    LITERATURE_MATRIX.md
-    LOCKED_PROTOCOL.md
-    PROJECT_STATUS.md
-    data/INCLUSIVEHAR_V4.md
-legacy/
-    archive_manifest.json
-    verification_results.json
-    legacy_metrics.locked.json
-    metric_reconstruction.json
-```
-
-The repository now includes immutable dataset manifests, safe acquisition/audit primitives, artifact validation, a privacy-preserving InclusiveHAR v4 audit, and deterministic released-block split construction/auditing. The Stage 4 split is participant-exclusive and raw-row-disjoint but explicitly not trial-safe. Model training and evaluation remain separate gates, and no InclusiveHAR target predictions or performance have been produced.
-
-## Environment
-
-The foundation targets CPython 3.11 and uses [`uv`](https://docs.astral.sh/uv/) for deterministic dependency resolution.
-
-```powershell
-uv sync
-uv run inclusive-shift-har --version
-uv run pytest
-uv run ruff check .
-uv run mypy src
-```
-
-The console entry point exposes validated provenance and audit commands:
-
-- `validate-manifests`
-- `audit-data` (no-access dry run by default; raw reads require a matching gate record)
-- `build-splits` (create-only construction from the frozen aggregate audit; no raw signal read)
-- `audit-splits` (deterministic rebuild and independent leakage/boundary audit)
-- `build-source-windows` (derive a source-only materialization manifest with no target records)
-- `validate-artifacts`
-
-The full privacy-safe InclusiveHAR audit is explicit and gated:
-
-```powershell
-uv run inclusive-shift-har audit-data --manifest manifests/history/inclusivehar_v4.e3fc4e0f21cdd580b930a1a694923a43e222957335fde8eb08960e007f4930bb.json --profile inclusivehar-v4 --read-only --data-root data/raw --gate-record results/gates/raw_data_read_access_inclusivehar_v4.json --json
-```
-
-`train` and `evaluate` remain visible fail-closed gates. `evaluate` requires a separate one-time final-evaluation unlock; none exists.
-
-`uv.lock` records the software environment only. Dataset versions and immutable source hashes belong in separate data manifests because a Python dependency lock cannot establish data provenance.
-
-## Data and evidence policy
-
-- Download datasets only from official, versioned sources after recording URL/DOI, version, retrieval date, size, SHA-256, licence, citation, and expected schema.
-- Keep raw data immutable and outside normal Git history.
-- Partition participants before windowing; never cross participant, known trial/discontinuity, activity, or released-block boundaries. InclusiveHAR hidden trials are unrecoverable, so its authorized released-block protocol retains a 100% unconditional hidden-join contamination bound and may not be called trial-safe.
-- Fit normalization on training data only and tune/calibrate on validation only.
-- Do not derive class mappings or output dimensions from confirmatory test labels.
-- Preserve manifests, configurations, predictions, failures, checkpoints, and protocol-opening records.
-- Never commit secrets, the legacy source ZIP, third-party raw data, or large checkpoints.
-
-The local `.audit/` directory contains preserved Stage 0 extraction evidence. It is ignored by Git but is not a cleanup target.
-
-## Reproducibility status
-
-The Stage 0 archive-integrity and legacy-artifact gate passes. It validates the checksum, complete archive inventory, and internal consistency of saved predictions—not the scientific validity of the old protocol.
-
-The two official InclusiveHAR v4 artifacts have been acquired into immutable, Git-ignored local raw storage and verified against the versioned provider sizes and SHA-256 values. Stage 3 passes artifact, schema, numeric-integrity, participant, group, and label-coverage checks, while its original trial-boundary quarantine remains preserved.
-
-Stage 4 now has an explicit user-authorized, conditionally locked revision: assign participants first, then extract non-overlapping length/stride-128 windows strictly within each released subject-label block. The structural audit validates 3,042 raw-row-disjoint windows and 7,226 dropped tail rows. The conditional three-repetition assumption bounds hidden-join crossings by 240/3,042 (7.8895%); because that assumption is unverified, the unconditional bound remains 100%. The target cohort remains sealed and no final-evaluation unlock exists.
-
-No corrected reproduction, development model result, or locked confirmatory result is reported.
-
-## Licensing
-
-Repository-authored code is licensed under the [Apache License 2.0](LICENSE). That licence does **not** relicense third-party datasets, coursework artifacts, notebooks, checkpoints, papers, figures, or other external materials. Each external asset retains its own terms and must be cited and distributed according to its source licence. Dataset access instructions and manifests do not grant redistribution rights.
-
-## Citation
-
-Citation metadata is provided in [`CITATION.cff`](CITATION.cff) and [`.zenodo.json`](.zenodo.json). These files prepare future release metadata; they do not indicate that a DOI has been minted or that a public stable release exists.
+Repository-authored code is Apache-2.0 licensed. Third-party datasets, coursework artifacts, papers, checkpoints, and other external materials retain their own terms. [`CITATION.cff`](CITATION.cff) and [`.zenodo.json`](.zenodo.json) prepare future release metadata; no DOI is claimed until a stable public release is approved.

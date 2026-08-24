@@ -1,5 +1,12 @@
 # Conditionally locked InclusiveHAR v4 protocol
 
+> Post-execution addendum (2026-08-24): the historical lock text below records the
+> pre-opening state and is retained for auditability. All pre-opening gates later
+> passed, opening 1 was consumed exactly once, and the complete locked evidence is
+> indexed at `results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json`.
+> The opening does not remove or weaken any released-block limitation in this
+> protocol.
+
 **Protocol:** `inclusivehar-released-block-v1.2`  
 **Lock date:** 2026-08-23; exact lock time was not recorded  
 **Evidence status:** participant-exclusive released-block protocol under an explicit user-authorized deviation  

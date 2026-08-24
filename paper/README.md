@@ -1,23 +1,9 @@
 # Paper workspace
 
-The working title is provisional:
+The paper-ready structure and current evidence narrative are in [`OUTLINE.md`](OUTLINE.md). Machine-readable tables remain under `results/`; the paper workspace contains no copied raw data or large model artifacts.
+
+Working title:
 
 > InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition
 
-The benchmark is the candidate primary contribution. MoRe-HAR is a secondary experimental hypothesis with high prior-work collision and may remain a negative result.
-
-The paper outline will contain:
-
-1. research questions and preregistered hypotheses;
-2. related work and claim boundaries;
-3. dataset provenance, audit, ontology, and ethics;
-4. participant-exclusive released-block benchmark construction and its
-   unrecoverable hidden-trial-boundary limitation;
-5. baselines and the optional MoRe-HAR hypothesis;
-6. locked experimental protocol and endpoints;
-7. participant-level results, uncertainty, calibration, and efficiency;
-8. ablations and negative results;
-9. limitations and ethical scope; and
-10. reproducibility and artifact statements.
-
-No result tables should be populated until their evidence status and artifact lineage validate.
+The benchmark is the primary contribution. MoRe-HAR is retained as an unsupported secondary hypothesis. No publication, state-of-the-art, fairness, clinical, or novelty-first claim is made.

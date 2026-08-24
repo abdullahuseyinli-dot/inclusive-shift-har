@@ -79,7 +79,11 @@ The two observed activity orders are perfectly group-aligned. File order, row po
 
 Observed volume is inconsistent with the reported `20 × 6 × 3 × 60 s × 50 Hz` design. Candidate short or anomalous recordings remain visible in the machine audit and must not be silently removed.
 
-Versions 1–4 provide no boundary-bearing schema. Consequently, the dataset currently passes integrity and coverage checks but remains quarantined for split construction and windowing.
+Versions 1–4 provide no boundary-bearing schema. The original Stage 3 quarantine is
+preserved. A later, explicit user-authorized deviation permitted a narrower
+participant-exclusive released-block protocol after documenting a 100% unconditional
+hidden-join risk bound. That conditional protocol does not resolve or erase the
+missing-boundary limitation and must not be described as trial-safe.
 
 ## Label-use guidance
 

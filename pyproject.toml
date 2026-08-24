@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "inclusive-shift-har"
 version = "0.1.0a0"
-description = "Leakage-safe research software for ability-associated population shift in smartphone inertial HAR"
+description = "Auditable participant-exclusive research software for ability-associated population shift in smartphone inertial HAR"
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 license = "Apache-2.0"

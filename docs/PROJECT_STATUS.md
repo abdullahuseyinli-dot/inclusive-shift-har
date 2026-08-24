@@ -1,38 +1,54 @@
 # Project status and evidence gates
 
-This file records workflow state. It is not a results page and does not authorize a confirmatory evaluation.
+This is a superseding status snapshot dated 2026-08-24. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
 
 | Stage | Status | Evidence |
 |---|---|---|
-| 0 — legacy preservation and audit | Passed (mechanics only) | `legacy/verification_results.json`; legacy UCI test remains development-consumed |
-| 1 — literature and novelty | Passed with narrowed contribution | `docs/LITERATURE_MATRIX.md`; MoRe-HAR novelty remains open/high-collision |
-| 2 — repository and provenance scaffold | Passed | `results/gates/stage2_scaffold_validation.json`; synthetic tests and static gates passed at that snapshot |
-| 3 — InclusiveHAR audit and ontology | Integrity passed; original protocol quarantine preserved | `results/data_audit/inclusivehar_v4.audit.json`; trial boundaries remain unrecoverable |
-| 4 — conditional released-block protocol | Split construction and structural audit passed conditionally | `docs/LOCKED_PROTOCOL.md`; split `ccb6c3…`; target remains sealed; no protocol tag or final-evaluation unlock |
-| 5–8 — models, experiments, metrics | No InclusiveHAR experiment result | Implementation scaffolds may exist, but no target training, prediction, performance, ablation, or confirmatory result has been produced by this gate |
-| 9 — final evidence gate | Closed | No final-evaluation authorization exists; target opening is forbidden |
-| 10 — release | Not completed | No public release or DOI exists; release/remote status must be checked independently before any claim |
+| 0 - legacy preservation and audit | Passed for archive integrity and metric reconstruction | `legacy/verification_results.json`; UCI test remains development-consumed |
+| 1 - literature and novelty | Passed with narrowed contribution | `docs/LITERATURE_MATRIX.md`; no verified novelty conflict; no "first" claim |
+| 2 - repository and provenance | Passed | package, lockfile, manifests, CLI, tests, CI, licence metadata |
+| 3 - InclusiveHAR audit and ontology | Integrity passed; trial-boundary limitation retained | `results/data_audit/inclusivehar_v4.audit.json`; timestamps/trials absent |
+| 4 - released-block protocol | Conditionally passed and locked | split `ccb6c3d...`; participant-exclusive/raw-row-disjoint, not trial-safe |
+| 5-8 - models, training, and statistics | Primary suite and locked analysis complete | 20 configurations x 5 seeds; CUDA neural execution; participant inference |
+| 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
+| 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
+| 10 - release | Local release preparation in progress | private GitHub push/tag follows final post-confirmatory validation; no DOI |
 
-## Locked facts so far
+## Confirmatory outcome
 
-- Source coursework ZIP SHA-256: `13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94`.
-- Stage 0 verification SHA-256: `F8838A2ED86E3E2B40D72B26D79D5522A40DDF8D9F257C43A15205C6802621D0`.
-- Current literature matrix SHA-256 at its recorded snapshot: `12C587D2C9D2A1CC1E7C339634FA153DBAA8DEDA2EA0583ACE3A371405295919`.
-- Current literature source registry SHA-256 at its recorded snapshot: `96EB2CA8664DC9F1F04D1B854CD9431FBD1D46496CD703ECABE60964B33913BC`.
-- Novelty-gate wording is narrowed to a candidate **auditable,
-  participant-exclusive released-block** ability-associated InclusiveHAR-v4
-  benchmark. It is not trial-safe and makes no “first,” fairness,
-  clinical-validity, state-of-the-art, or publishability claim.
-- InclusiveHAR raw-read gate file SHA-256: `0CB9F5F3ADD587E688CB539E82257FE8A38723E6AE81CF4B13EB3028164357E3`.
-- InclusiveHAR Stage 3 audit embedded report SHA-256: `673917D3BFD4B3F283A1AE521AE4A7D548E3FACADD2AE89CE33B2E27153500E8`; audit JSON physical SHA-256: `B85E641DA9FDC3AC61B6C8440A78C2B6AEE625C160B095C8170C0B9D1A4A4204`.
-- Stage 3 conclusion remains visible: artifact/schema/coverage integrity passed, but timestamp/trial/session/sample identifiers are absent and hidden trial joins are unrecoverable.
-- User-authorized deviation record canonical SHA-256: `1C0D40E1CF65CAB9371669A094CE35D6835F9BB6D5DD47C7DC04847917A44354`.
-- Active locked ontology record SHA-256: `C2B4E178AFB3D285CC76745182EDB1868099EB1E607DBEBFCEE263C973A81E33`; both runnable tracks carry explicit ordered numeric schemas.
-- Active split manifest embedded SHA-256: `CCB6C3D1254C1464C48E412AFB6F83E7942113299E853F89C77DF1D6CFAD131B`; physical SHA-256: `AF909C7D914B68C417B238B576945C112AA58740859A7D998B6B77219DFB1920`.
-- Active split audit embedded report SHA-256: `45C49761A92B9F9F3E4CABE4E3A9DBF72B4114795948BA7104F8ED0DFF37BDD8`; status `pass_conditional_released_block` with the hidden-join, conditional-bound, and unverified-rate warnings retained.
-- Source-only materialization manifest embedded SHA-256: `1AD1EE3ACCAAE5F2F93BB91AC0AFA5CE583134CE1D882C3F08323B09026FA522`; it contains 1,443 source windows and no target subject/window records.
-- Target seal ID: `AECBA05FA4A0FC4E4BBC135AC30944B686BE19C0B6A2820C838E6C8B802BB29D`; target predictions/performance have not been accessed and `unlock_record` is null.
-- Conditional protocol-lock record SHA-256: `71F3FDB2DE0E6E0AA8FEAFF8B8726BFBC999FD1423568251744A29AB541E9E3A`; the worktree is explicitly documented as uncommitted and no protocol tag exists.
-- The v1 and v1.1 split/config/audit records remain preserved and reconstructable. Their supersession records document the nested-CV and explicit-class-schema additions without target access.
+- Target cohort: participants 11-20; 10 participants, 807 functional-core windows.
+- Frozen lineup: 20 model/ablation configurations, seeds 11, 23, 47, 89, and 131.
+- Highest mean participant macro-F1: compact DANN, 0.6808438, 95% participant-bootstrap CI [0.5391426, 0.8093204].
+- MoRe-HAR full: mean 0.6353323, worst 0.2583943, lower decile 0.2659867.
+- Strongest mean reference: compact DANN; strongest worst-participant reference: legacy joint CNN/BiLSTM (0.2942991); strongest lower decile: compact CORAL (0.3669902).
+- Preregistered MoRe-HAR decision: not supported. Mean improvement and joint lower-tail improvement were both false; the source non-inferiority gate had passed.
+- Candidate minus compact-DANN participant mean: -0.0455116. Holm-adjusted exact sign-flip p = 0.7207031; Holm-adjusted Wilcoxon p = 0.7558594.
 
-Any later edit changes a file hash and must be recorded in a new validation or supersession artifact. Existing evidence files must not be overwritten or relabelled.
+Target confidence intervals are wide and participant tails are low across every model. The evidence supports a difficult ability-associated shift, not a causal explanation or a fairness/clinical claim.
+
+## Active immutable anchors
+
+- Coursework ZIP SHA-256: `13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94`
+- Literature matrix file SHA-256: `F7363E8D06E7C561ACF9BD9A47D5DD456EC5697FE3A2DCC4F60523688E30A606`
+- Literature registry file SHA-256: `6DB576249EDBE530C9CBE0411728B20928D2B4A3CE852283F888743A261F8E7D`
+- Dataset manifest file SHA-256: `52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29`
+- Split manifest embedded SHA-256: `ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b`
+- Source-window manifest embedded SHA-256: `1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522`
+- Target seal ID: `aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d`
+- Frozen artifact-set SHA-256: `e759b60f32b965e7ae3e5a994d919a08553c4958f9bdcf10d7497697f685dd51`
+- Confirmatory analysis plan SHA-256: `7b99dd5894109370397867a1ca141758c0a30b4efb2fb3d76aba23ab1ad62177`
+- Opening receipt record SHA-256: `5704f65efd416e9cd16d6ed24c2735c1d52b7fcaafddb113e481498797cd182a`
+- Locked target index record SHA-256: `79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9`
+- Participant statistics record SHA-256: `c7f20362598922223a8d72d927fba69445fca31cb3607ef9eff0b130211f2cbd`
+- Publication report record SHA-256: `3afe0ceee9f97025d1adc5f59ab3528b512a3212385ef5344028850e9cb39c66`
+- Frozen training code commit: `b4dc38fb9d5a0c17003221b61156ebc065395170`
+- One-time target evidence commit: `f0d11b2`
+- Active protocol tag: `protocol-v1.2.0`
+
+## Preserved limitations and deviations
+
+The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
+
+Recurrent cuDNN execution failed on this Windows/CUDA stack with process exit `0xc0000409`. Failure artifacts are preserved. Successful recurrent experiments used CUDA tensors with cuDNN disabled, not CPU neural fallback. Classical scikit-learn estimators retained their native CPU policy; XGBoost training used CUDA.
+
+The target opening cannot be repeated. All few-person inclusion, corruption, or other follow-up is post-confirmatory and cannot alter the locked zero-shot claim.

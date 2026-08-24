@@ -1,24 +1,17 @@
-# Locked target evaluation runner
+# Locked target evaluation
 
-`inclusive_shift_har.evaluation.locked_target.run_locked_target_evaluation` is the
-programmatic confirmatory-evaluation boundary. It validates the exact final-freeze
-inventory, internal checkpoint/configuration/normalization/calibrator lineage, the
-unlock record, and all create-only output destinations before target materialization.
+The one-time target boundary was opened at `2026-08-24T01:20:11.5974574Z` after every predeclared gate passed. The receipt was written before target materialization. It is permanently consumed and the operation must not be invoked again.
 
-The runner then writes exactly one canonical receipt named
-`confirmatory_target_opening_1.json`. Only after that receipt exists can the supplied
-materializer callback execute. Neural inference is CUDA-only; a CPU request fails
-before materialization. Frozen classical checkpoints use their serialized estimator,
-training-partition channel standardizer, and source-validation temperature calibrator.
+The evaluator validated the frozen inventory, checkpoint/configuration/normalization/calibrator lineage, unlock record, split/seal identity, clean code ancestry, and every create-only destination. Neural inference was CUDA-only. It then materialized 807 functional-core windows from 10 target participants and evaluated 20 frozen configurations over five seeds, producing 100 NPZ prediction artifacts and 100 self-hashed JSON sidecars. The create-only index was written only after all entries completed.
 
-Each model/seed produces a create-only NPZ plus a self-hashed JSON sidecar tagged
-`locked_confirmatory_target_opening_1`. The NPZ preserves ordered window IDs,
-participant IDs, labels, logits, calibrated and uncalibrated probabilities, and
-predictions. The JSON stores hashes for every ordered array and a participant-level
-metric report. A create-only index is published only after every frozen entry finishes.
+The participant-statistics step independently reloaded every indexed sidecar and NPZ, validated file and self-hashes, required exact ordered labels/windows/participants across every model and seed, reconstructed metrics, averaged each participant over the five seeds, and treated participants rather than windows as inferential units. It used 10,000 participant bootstrap resamples, exact sign-flip tests, paired Wilcoxon tests, effect sizes, and Holm correction for the predeclared candidate-versus-baseline family.
 
-The module intentionally has no raw-data path or automatic retry. Operational code
-must inject the already-reviewed materializer and retain the receipt and any partial
-artifacts if a post-opening failure occurs. CLI wiring remains gated until the final
-freeze and unlock records exist; this prevents a convenience command from becoming a
-second opening path.
+Key artifacts:
+
+- `results/protocol/confirmatory_target_opening_1.json`
+- `results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json`
+- `results/confirmatory/zero_shot_v1/participant_statistics.json`
+- `results/confirmatory/zero_shot_v1/publication_report_v1.json`
+- `results/confirmatory/zero_shot_v1/model_summary_v1.md`
+
+MoRe-HAR's hypothesis was not supported. The result remains locked confirmatory evidence; later few-person, corruption, efficiency, or exploratory subgroup work is post-confirmatory and cannot revise this decision.

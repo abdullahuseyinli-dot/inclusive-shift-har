@@ -14,9 +14,9 @@ abstract: >-
   Research software for auditable, participant-exclusive released-block
   evaluation of ability-associated population shift in smartphone inertial
   human activity recognition. InclusiveHAR v4 trial boundaries are
-  unrecoverable. The benchmark and proposed MoRe-HAR model are provisional;
-  this metadata does not assert confirmatory results, fairness, clinical
-  validity, state-of-the-art performance, or publication status.
+  unrecoverable. The locked benchmark retains an unsupported MoRe-HAR model
+  hypothesis and does not assert fairness, clinical validity, state-of-the-art
+  performance, or publication status.
 keywords:
   - human activity recognition
   - wearable sensing
