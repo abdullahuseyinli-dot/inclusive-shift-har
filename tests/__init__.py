@@ -1,1 +1,1 @@
-"""Synthetic validation tests for InclusiveShift-HAR."""
+"""InclusiveShift-HAR test package."""
