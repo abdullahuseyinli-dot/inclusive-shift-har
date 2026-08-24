@@ -24,9 +24,19 @@ The source non-inferiority gate passed before target opening. The target mean an
 
 ## 3. Related work and novelty boundary
 
-Use `docs/LITERATURE_MATRIX.md` for the current primary-source matrix covering InclusiveHAR, disability/fairness HAR, subject shift, benchmark suites, domain generalization, corruption robustness, disentanglement, SSL/foundation models, and unseen-class zero-shot HAR. The contribution is narrowly an auditable participant-exclusive, no-target-adaptation ability-associated benchmark on InclusiveHAR v4. Do not claim the first disability HAR study, first HAR fairness study, first disentangled model, generic first robustness benchmark, or architectural novelty from an encoder swap.
+Use `docs/LITERATURE_MATRIX.md` and `paper/references.bib` for the pinned primary-source record. InclusiveHAR itself reports an author-described non-disabled-only training scenario, while O'Brien et al., Lonini et al., and Jamieson et al. already evaluate healthy/non-impaired-to-disabled transfer. Mennella et al. study disability and fairness, HAR-PMD provides a user-independent mobility-aid benchmark, and Age Matters evaluates demographic cross-population generalization. These works rule out “first disability HAR,” “first fairness HAR,” “first healthy-to-disabled evaluation,” and generic “first population-shift HAR” claims.
 
-The targeted 2026-08-24 search found no verified downstream work already providing the same InclusiveHAR source-only-to-disabled, subject-exclusive benchmark with a strong baseline suite and participant statistics. This negative search is not proof of novelty and must be refreshed manually, including Google Scholar, immediately before submission.
+DAGHAR, HAROOD, BenchHAR, HARBench, WHAR Arena, and the Adaimi–Thomaz distribution-shift study already occupy broad smartphone/wearable DA, DG, OOD, SSL/foundation, and efficiency benchmark space. Adaimi and Thomaz also directly frame user-behaviour/skill change as a distribution shift, although their v1 reported selection rule uses held-out test-domain performance and is not a locked-target comparator. HARBench and BenchHAR are distinct projects and must not be conflated.
+
+The method boundary is tighter still. GILE, AFFAR, BPD, and CMD-HAR already separate activity/domain-invariant information from person/domain-specific or nuisance information. ContrastSense, SICL, MultiSupConHAR, and CCIL already learn user-, subject-, domain-, or category-invariant representations; MultiSupConHAR's same-activity/different-user positives and different-activity/same-user negatives are especially close to MoRe-HAR's content objective. Therefore, neither factorization nor source-subject contrastive alignment is a defensible generic method novelty claim.
+
+The targeted 2026-08-24 article and dataset-DOI search found no verified downstream work already providing the complete InclusiveHAR-v4 source-only-to-disabled, participant-exclusive released-block benchmark with a strong matched baseline suite, participant lower-tail/calibration evidence, and a one-time target opening. Crossref, Semantic Scholar, OpenAlex, Europe PMC, PubMed, ScienceDirect, arXiv, DataCite, and targeted IEEE/ACM/PMLR searches were negative. This is a scoped index result, not proof of novelty; an authenticated manual Google Scholar search remains required immediately before submission.
+
+### Benchmark and model gates
+
+- **Benchmark:** `pass_with_narrowed_contribution`. Claim only an auditable participant-exclusive, no-target-adaptation, ability-associated InclusiveHAR-v4 benchmark with explicit unrecoverable trial-boundary risk. Do not use “first,” “fair,” “clinical,” or unqualified “leakage-safe.”
+- **MoRe-HAR:** `closed_not_supported` / `exploratory_negative`. Compact DANN obtained mean target-participant macro-F1 0.6808438 versus 0.6353323 for full MoRe-HAR, and the candidate failed both preregistered mean and joint lower-tail improvement conditions. Preserve the negative result; do not retune against the consumed target or present a positive model-novelty claim.
+- **Predecessor adaptations:** local post-confirmatory CCIL/BPD adaptations are paper-derived and non-faithful. They cannot establish faithful head-to-head superiority and do not reopen the closed model gate.
 
 ## 4. Benchmark construction
 
