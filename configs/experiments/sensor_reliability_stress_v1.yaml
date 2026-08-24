@@ -1,0 +1,67 @@
+schema_version: "1.0.0"
+config_id: "inclusivehar-sensor-reliability-secondary-v1"
+config_sha256: "4d94c31cb3728b0583a6b2a077222ee08ca8bd19ea5c7789a6d721da03d17692"
+status: "configured_not_run"
+track_role: "secondary_post_confirmatory"
+input_space: "physical_pre_normalization"
+window_length_samples: 128
+sampling_rate_hz: 50.0
+channels:
+  - "motionUserAccelerationX"
+  - "motionUserAccelerationY"
+  - "motionUserAccelerationZ"
+  - "motionRotationRateX"
+  - "motionRotationRateY"
+  - "motionRotationRateZ"
+channel_units:
+  - "g"
+  - "g"
+  - "g"
+  - "rad/s"
+  - "rad/s"
+  - "rad/s"
+deterministic_seed:
+  namespace: "inclusive-shift-har/sensor-reliability/v1"
+  global_seed: 20260824
+preconditions:
+  primary_confirmatory_status: "complete_before_stress_opening"
+  frozen_checkpoint_sha256_required: true
+  base_prediction_sha256_required: true
+  frozen_normalization_sha256_required: true
+policy:
+  primary_claim_eligible: false
+  used_for_model_selection: false
+  calibration_refit_allowed: false
+  threshold_refit_allowed: false
+  target_based_tuning_allowed: false
+  participant_level_reporting_required: true
+  stress_levels_empirically_calibrated: false
+conditions:
+  - condition_id: "gaussian-noise-level-1"
+    type: "gaussian_noise"
+    parameters:
+      channel_std: [0.02, 0.02, 0.02, 0.02, 0.02, 0.02]
+  - condition_id: "contiguous-dropout-32-all-channels"
+    type: "contiguous_dropout"
+    parameters:
+      duration_samples: 32
+      channel_indices: [0, 1, 2, 3, 4, 5]
+      fill_value: 0.0
+  - condition_id: "missing-accelerometer-z"
+    type: "missing_axis"
+    parameters:
+      channel_index: 2
+      fill_value: 0.0
+  - condition_id: "missing-gyroscope"
+    type: "missing_modality"
+    parameters:
+      modality: "gyroscope"
+      fill_value: 0.0
+  - condition_id: "rate-reduction-factor-2"
+    type: "rate_reduction"
+    parameters:
+      factor: 2
+  - condition_id: "linear-drift-level-1"
+    type: "linear_drift"
+    parameters:
+      endpoint_offsets: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05]

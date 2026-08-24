@@ -1,0 +1,35 @@
+schema_version: "1.0.0"
+profile_id: "neural-efficiency-cuda-v1"
+config_sha256: "233aa00ec8621af890dd2f66e9da9fa2c00b16bfb5c0533bfd742d6c707a7887"
+status: "configured_not_run"
+required_device: "cuda"
+input:
+  window_length_samples: 128
+  channel_count: 6
+  batch_sizes: [1, 64]
+precision_modes:
+  - "float32"
+  - "float16_autocast"
+latency:
+  warmup_iterations: 20
+  measured_iterations: 100
+  percentiles: [50.0, 95.0]
+  synchronize_each_iteration: true
+complexity:
+  mac_definition: "one_scalar_multiply_accumulate"
+  flop_per_mac: 2
+  counted_modules:
+    - "Conv1d"
+    - "Linear"
+    - "LSTM"
+  excluded_operations:
+    - "bias additions"
+    - "normalization"
+    - "activations"
+    - "pooling"
+    - "softmax"
+    - "attention or custom functional kernels not exposed as counted modules"
+output_policy:
+  create_only: true
+  checkpoint_sha256_required: true
+  checkpoint_validation_record_sha256_required: true
