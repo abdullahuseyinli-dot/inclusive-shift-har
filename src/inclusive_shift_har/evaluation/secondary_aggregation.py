@@ -764,6 +764,9 @@ def aggregate_sensor_stress(
     mismatches = [key for key, expected in required.items() if index.get(key) != expected]
     if mismatches:
         raise SecondaryAggregationError(f"stress index contract mismatch: {mismatches}")
+    implementation_code_commit = _git_commit(
+        index.get("implementation_code_commit"), name="stress implementation code commit"
+    )
     model_seed_count = _integer(index.get("model_seed_count"), name="model-seed count")
     condition_count = _integer(index.get("condition_count"), name="condition count")
     if condition_count != 6:
@@ -969,6 +972,7 @@ def aggregate_sensor_stress(
         "used_for_model_selection": False,
         "stress_index_record_sha256": index["record_sha256"],
         "stress_config_sha256": index["stress_config_sha256"],
+        "implementation_code_commit": implementation_code_commit,
         "final_freeze_inventory_sha256": index["final_freeze_inventory_sha256"],
         "locked_target_index_record_sha256": index["locked_target_index_record_sha256"],
         "tables": {

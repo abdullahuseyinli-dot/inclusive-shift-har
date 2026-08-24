@@ -64,13 +64,13 @@ foreach ($model in $models) {
         "--archive", $archive,
         "--dataset-manifest", "manifests/datasets/uci_har_v1.json",
         "--protocol", "results/protocol/uci_har_source_grouped_v1.json",
-        "--model", $model, "--fold-id", $fold, "--seed", "$seed",
+        "--model", $model, "--fold-id", $fold, "--seed", "$seed", "--attempt", "1",
         "--code-commit", $executionCommit,
         "--repository-root", ".",
         "--experiment-config", $experimentConfig,
         "--expected-experiment-config-file-sha256", $experimentConfigSha,
-        "--run-directory", "$root/runs/$stem",
-        "--summary", "$root/records/$stem.json",
+        "--run-directory", "$root/runs/$stem/attempt-001",
+        "--summary", "$root/records/$stem/attempt-001.json",
         "--allowed-output-root", "results"
       )
       & uv @arguments
@@ -276,6 +276,7 @@ uv run python -m inclusive_shift_har.experiments.postconfirmatory_sensor_stress 
   --artifact-root . `
   --output-directory results/postconfirmatory/sensor_stress_v1 `
   --output-root . `
+  --implementation-code-commit $executionCommit `
   --created-at-utc $timestamp
 
 uv run inclusive-shift-har evaluate sensor-stress `

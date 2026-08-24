@@ -21,6 +21,7 @@ from typing import Any, cast
 from uuid import uuid4
 
 import numpy as np
+import torch
 from numpy.typing import NDArray
 
 from inclusive_shift_har.data.uci_har import UCI_HAR_CHANNELS, UCI_HAR_WINDOW_LENGTH
@@ -43,6 +44,7 @@ from inclusive_shift_har.manifests.canonical import (
     load_json_strict,
     sha256_file,
 )
+from inclusive_shift_har.training.engine import reconstruct_checkpoint
 
 DEFAULT_UCI_REPRODUCTION_SEEDS: tuple[int, ...] = (42, 1337, 2025, 31415, 271828)
 
@@ -252,6 +254,65 @@ def _reports_close(observed: Any, expected: Any, *, location: str = "report") ->
         raise UCIReportingError(f"{location} differs after reconstruction")
 
 
+def _validate_prior_attempt_failures(
+    value: Any,
+    *,
+    attempt: int,
+    model: str,
+    fold_id: str,
+    seed: int,
+    code_commit: str,
+    experiment_config: UCIReproductionConfig,
+    allowed_artifact_root: Path,
+) -> list[dict[str, Any]]:
+    entries = _sequence(value, name="prior_attempt_failures")
+    if len(entries) != attempt - 1:
+        raise UCIReportingError("prior UCI attempt failure coverage is incomplete")
+    validated: list[dict[str, Any]] = []
+    for expected_attempt, raw_entry in enumerate(entries, start=1):
+        entry = _mapping(raw_entry, name="prior attempt failure reference")
+        if entry.get("attempt") != expected_attempt:
+            raise UCIReportingError("prior UCI attempt failures are not contiguous")
+        path = _artifact_path(
+            _string(entry.get("path"), name="prior attempt failure path"),
+            allowed_root=allowed_artifact_root,
+        )
+        if sha256_file(path) != entry.get("file_sha256"):
+            raise UCIReportingError("prior UCI attempt failure file hash changed")
+        failure = _mapping(load_json_strict(path), name="prior UCI attempt failure")
+        record_hash = _self_hash(failure, path=path, field="record_sha256")
+        required = {
+            "status": "corrected_uci_source_fold_failed_preserved",
+            "model_name": model,
+            "fold_id": fold_id,
+            "seed": seed,
+            "attempt": expected_attempt,
+            "code_commit": code_commit,
+            "official_test_member_opened": False,
+            "official_test_performance_or_prediction_accessed": False,
+            "inclusivehar_data_or_target_accessed": False,
+        }
+        if record_hash != entry.get("record_sha256") or any(
+            failure.get(key) != expected for key, expected in required.items()
+        ):
+            raise UCIReportingError("prior UCI attempt failure lineage changed")
+        if failure.get("experiment_config") != {
+            "experiment_id": experiment_config.experiment_id,
+            "file_sha256": experiment_config.file_sha256,
+            "canonical_sha256": experiment_config.canonical_sha256,
+        }:
+            raise UCIReportingError("prior UCI attempt experiment config changed")
+        validated.append(
+            {
+                "attempt": expected_attempt,
+                "path": path.relative_to(allowed_artifact_root).as_posix(),
+                "file_sha256": entry.get("file_sha256"),
+                "record_sha256": record_hash,
+            }
+        )
+    return validated
+
+
 def _load_run(
     path: Path,
     *,
@@ -295,6 +356,10 @@ def _load_run(
     folds = cast(Mapping[str, Mapping[str, Any]], contract["folds"])
     if fold_id not in folds:
         raise UCIReportingError(f"unknown fold {fold_id!r} in {path}")
+    attempt = _positive_integer(record.get("attempt"), name=f"{path}.attempt")
+    expected_stem = f"{model}--seed-{seed_raw}--{fold_id}"
+    if path.parent.name != expected_stem or path.name != f"attempt-{attempt:03d}.json":
+        raise UCIReportingError(f"UCI summary path does not match its matrix identity: {path}")
     expected_fold = folds[fold_id]
     for key in (
         "train_subject_ids",
@@ -313,6 +378,9 @@ def _load_run(
     device = _mapping(record.get("device"), name=f"{path}.device")
     if device.get("requested") != "cuda" or device.get("actual") != "cuda":
         raise UCIReportingError(f"non-CUDA neural run supplied: {path}")
+    expected_cudnn_enabled = not experiment_config.disable_cudnn_by_model[model]
+    if device.get("cudnn_enabled") is not expected_cudnn_enabled:
+        raise UCIReportingError(f"runtime cuDNN policy differs from the locked experiment: {path}")
     if _string(record.get("evidence_status"), name=f"{path}.evidence_status") != (
         "source_grouped_development_not_confirmatory"
     ):
@@ -322,6 +390,16 @@ def _load_run(
         raise UCIReportingError(f"class ordering mismatch in {path}")
 
     code_commit = _git_commit(record.get("code_commit"), name=f"{path}.code_commit")
+    prior_failures = _validate_prior_attempt_failures(
+        record.get("prior_attempt_failures"),
+        attempt=attempt,
+        model=model,
+        fold_id=fold_id,
+        seed=seed_raw,
+        code_commit=code_commit,
+        experiment_config=experiment_config,
+        allowed_artifact_root=allowed_artifact_root,
+    )
     dataset_manifest_sha256 = _sha256(
         record.get("dataset_manifest_sha256"), name=f"{path}.dataset_manifest_sha256"
     )
@@ -356,6 +434,50 @@ def _load_run(
         "canonical_sha256": experiment_config.canonical_sha256,
     }:
         raise UCIReportingError(f"experiment configuration lineage mismatch for {path}")
+    training = _mapping(record.get("training"), name=f"{path}.training")
+    if training.get("checkpoint_path_base") != "result_root":
+        raise UCIReportingError(f"selected checkpoint path base is not portable for {path}")
+    checkpoint_path = _artifact_path(
+        _string(training.get("checkpoint_path"), name=f"{path}.training.checkpoint_path"),
+        allowed_root=allowed_artifact_root,
+    )
+    checkpoint_sha256 = _sha256(
+        training.get("checkpoint_sha256"), name=f"{path}.training.checkpoint_sha256"
+    )
+    if sha256_file(checkpoint_path) != checkpoint_sha256:
+        raise UCIReportingError(f"selected checkpoint hash mismatch for {path}")
+    try:
+        checkpoint_model, checkpoint = reconstruct_checkpoint(
+            checkpoint_path, device=torch.device("cpu")
+        )
+    except (KeyError, RuntimeError, TypeError, ValueError) as exc:
+        raise UCIReportingError(f"selected checkpoint cannot be reconstructed for {path}") from exc
+    del checkpoint_model
+    checkpoint_configuration = _mapping(
+        checkpoint.get("configuration"), name=f"{path}.checkpoint.configuration"
+    )
+    checkpoint_lineage = _mapping(checkpoint.get("lineage"), name=f"{path}.checkpoint.lineage")
+    if (
+        canonical_json_sha256(checkpoint_configuration) != configuration_sha256
+        or checkpoint.get("configuration_sha256") != configuration_sha256
+        or checkpoint.get("checkpoint_selection_rule")
+        != configuration.get("checkpoint_selection_rule")
+        or checkpoint.get("checkpoint_role") != "source_validation_selected"
+        or checkpoint.get("selected_epoch") != training.get("selected_epoch")
+        or checkpoint.get("parameter_count") != training.get("parameter_count")
+        or checkpoint.get("evidence_status")
+        != "corrected_uci_source_grouped_development_official_test_unopened"
+        or (
+            checkpoint.get("label_schema") != list(UCI_CLASS_NAMES)
+            and checkpoint.get("label_schema") != tuple(UCI_CLASS_NAMES)
+        )
+        or checkpoint_lineage.get("dataset_manifest_sha256") != dataset_manifest_sha256
+        or checkpoint_lineage.get("split_manifest_sha256") != contract["protocol_sha256"]
+        or checkpoint_lineage.get("code_commit") != code_commit
+        or canonical_json_sha256(checkpoint_lineage.get("normalization"))
+        != canonical_json_sha256(record.get("normalization"))
+    ):
+        raise UCIReportingError(f"selected checkpoint lineage differs from summary for {path}")
     normalization = _mapping(record.get("normalization"), name=f"{path}.normalization")
     if (
         normalization.get("method") != "per_channel_population_standardization"
@@ -379,7 +501,7 @@ def _load_run(
         raise UCIReportingError(f"invalid normalization moments for {path}")
 
     artifact = _mapping(record.get("prediction_artifact"), name=f"{path}.prediction_artifact")
-    if artifact.get("path_base") != "record_directory_parent":
+    if artifact.get("path_base") != "result_root":
         raise UCIReportingError(f"prediction artifact path base is not portable for {path}")
     prediction_path = _artifact_path(
         _string(artifact.get("path"), name=f"{path}.prediction_artifact.path"),
@@ -445,11 +567,15 @@ def _load_run(
         "model": model,
         "seed": seed_raw,
         "fold_id": fold_id,
+        "attempt": attempt,
+        "prior_attempt_failures": prior_failures,
         "code_commit": code_commit,
         "summary_file_sha256": sha256_file(path),
         "dataset_manifest_sha256": dataset_manifest_sha256,
         "processed_archive_sha256": processed_archive_sha256,
         "configuration_sha256": configuration_sha256,
+        "checkpoint_path": checkpoint_path.relative_to(allowed_artifact_root).as_posix(),
+        "checkpoint_sha256": checkpoint_sha256,
         "prediction_path": prediction_path.relative_to(allowed_artifact_root).as_posix(),
         "prediction_sha256": artifact.get("sha256"),
         "probabilities": probabilities,
@@ -457,7 +583,7 @@ def _load_run(
         "participants": participants,
         "window_ids": window_ids,
         "parameter_count": _positive_integer(
-            _mapping(record.get("training"), name=f"{path}.training").get("parameter_count"),
+            training.get("parameter_count"),
             name=f"{path}.training.parameter_count",
         ),
         "elapsed_seconds": _finite(record.get("elapsed_seconds"), name=f"{path}.elapsed_seconds"),
@@ -516,7 +642,9 @@ def build_uci_reproduction_report(
     protocol = _protocol_contract(Path(protocol_path))
     if tuple(cast(Mapping[str, Any], protocol["folds"])) != experiment_config.fold_order:
         raise UCIReportingError("protocol fold order differs from the locked experiment config")
-    paths = sorted(root.glob("*.json"))
+    paths = sorted(root.glob("*/attempt-*.json"))
+    if set(paths) != set(root.rglob("*.json")):
+        raise UCIReportingError("record directory contains an unexpected JSON artifact")
     expected_count = len(models) * len(seeds) * len(cast(Mapping[str, Any], protocol["folds"]))
     if len(paths) != expected_count:
         raise UCIReportingError(f"expected exactly {expected_count} summaries, found {len(paths)}")
@@ -733,7 +861,11 @@ def build_uci_reproduction_report(
                 "summary_file_sha256": run["summary_file_sha256"],
                 "prediction_path": run["prediction_path"],
                 "prediction_sha256": run["prediction_sha256"],
+                "checkpoint_path": run["checkpoint_path"],
+                "checkpoint_sha256": run["checkpoint_sha256"],
                 "configuration_sha256": run["configuration_sha256"],
+                "attempt": run["attempt"],
+                "prior_attempt_failures": run["prior_attempt_failures"],
             }
             for run in runs
         ],

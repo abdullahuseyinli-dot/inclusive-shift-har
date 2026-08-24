@@ -7,6 +7,7 @@ from typing import Any
 
 import numpy as np
 import pytest
+import torch
 
 from inclusive_shift_har.data.uci_har import UCI_HAR_CHANNELS, UCI_HAR_WINDOW_LENGTH
 from inclusive_shift_har.evaluation.metrics import classification_report
@@ -31,6 +32,17 @@ EXPERIMENT_CONFIG_PATH = (
     / "uci_har_corrected_reproduction_v1_1.yaml"
 )
 EXPERIMENT_CONFIG_FILE_SHA256 = sha256_file(EXPERIMENT_CONFIG_PATH)
+
+
+@pytest.fixture(autouse=True)
+def _lightweight_checkpoint_reconstruction(monkeypatch: pytest.MonkeyPatch) -> None:
+    def reconstruct(path: Path, *, device: torch.device) -> tuple[object, dict[str, Any]]:
+        del device
+        return object(), torch.load(path, map_location="cpu", weights_only=False)
+
+    monkeypatch.setattr(
+        "inclusive_shift_har.evaluation.uci_reporting.reconstruct_checkpoint", reconstruct
+    )
 
 
 def _write_json(path: Path, value: dict[str, Any]) -> None:
@@ -110,8 +122,9 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                 window_ids = np.asarray(
                     [f"uci_har:train:{participant}:{offset:06d}" for offset in range(6)]
                 )
-                run_dir = artifact_root / f"{model}--seed-{seed}--{fold_id}"
-                run_dir.mkdir()
+                stem = f"{model}--seed-{seed}--{fold_id}"
+                run_dir = artifact_root / stem / "attempt-001"
+                run_dir.mkdir(parents=True)
                 prediction_path = run_dir / "source_validation_predictions.npz"
                 with prediction_path.open("xb") as stream:
                     np.savez_compressed(
@@ -135,6 +148,43 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                         seed=seed,
                     )
                 )
+                normalization = {
+                    "schema_version": "1.0.0",
+                    "method": "per_channel_population_standardization",
+                    "mean": [0.0] * len(UCI_HAR_CHANNELS),
+                    "scale": [1.0] * len(UCI_HAR_CHANNELS),
+                    "training_participants": fold["train_subject_ids"],
+                    "split_manifest_sha256": protocol["protocol_sha256"],
+                    "channel_names": list(UCI_HAR_CHANNELS),
+                    "fitted_value_count_per_channel": (
+                        int(fold["train_window_count"]) * UCI_HAR_WINDOW_LENGTH
+                    ),
+                    "fit_scope": "training_partition_only",
+                }
+                parameter_count = 1_000 + model_index
+                selected_epoch = 3
+                checkpoint_path = run_dir / "selected.pt"
+                torch.save(
+                    {
+                        "configuration": configuration,
+                        "configuration_sha256": canonical_json_sha256(configuration),
+                        "checkpoint_selection_rule": "source_validation_best",
+                        "checkpoint_role": "source_validation_selected",
+                        "selected_epoch": selected_epoch,
+                        "parameter_count": parameter_count,
+                        "evidence_status": (
+                            "corrected_uci_source_grouped_development_official_test_unopened"
+                        ),
+                        "label_schema": list(UCI_CLASS_NAMES),
+                        "lineage": {
+                            "dataset_manifest_sha256": "b" * 64,
+                            "split_manifest_sha256": protocol["protocol_sha256"],
+                            "code_commit": "a" * 40,
+                            "normalization": normalization,
+                        },
+                    },
+                    checkpoint_path,
+                )
                 record: dict[str, Any] = {
                     "schema_version": "1.0.0",
                     "status": "corrected_uci_source_fold_complete_official_test_unopened",
@@ -149,6 +199,8 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                     "inclusivehar_data_or_target_accessed": False,
                     "model_name": model,
                     "seed": seed,
+                    "attempt": 1,
+                    "prior_attempt_failures": [],
                     "code_commit": "a" * 40,
                     "experiment_config": {
                         "experiment_id": experiment_config.experiment_id,
@@ -159,35 +211,32 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                     "class_names": list(UCI_CLASS_NAMES),
                     "configuration": configuration,
                     "configuration_sha256": canonical_json_sha256(configuration),
-                    "normalization": {
-                        "schema_version": "1.0.0",
-                        "method": "per_channel_population_standardization",
-                        "mean": [0.0] * len(UCI_HAR_CHANNELS),
-                        "scale": [1.0] * len(UCI_HAR_CHANNELS),
-                        "training_participants": fold["train_subject_ids"],
-                        "split_manifest_sha256": protocol["protocol_sha256"],
-                        "channel_names": list(UCI_HAR_CHANNELS),
-                        "fitted_value_count_per_channel": (
-                            int(fold["train_window_count"]) * UCI_HAR_WINDOW_LENGTH
-                        ),
-                        "fit_scope": "training_partition_only",
+                    "normalization": normalization,
+                    "training": {
+                        "parameter_count": parameter_count,
+                        "selected_epoch": selected_epoch,
+                        "checkpoint_path": checkpoint_path.relative_to(tmp_path).as_posix(),
+                        "checkpoint_path_base": "result_root",
+                        "checkpoint_sha256": sha256_file(checkpoint_path),
                     },
-                    "training": {"parameter_count": 1_000 + model_index},
                     "validation_report": report,
                     "prediction_artifact": {
                         "path": prediction_path.relative_to(tmp_path).as_posix(),
-                        "path_base": "record_directory_parent",
+                        "path_base": "result_root",
                         "sha256": sha256_file(prediction_path),
                     },
                     "device": {
                         "requested": "cuda",
                         "actual": "cuda",
+                        "cudnn_enabled": not experiment_config.disable_cudnn_by_model[model],
                         "peak_vram_bytes": 123_456,
                     },
                     "elapsed_seconds": 1.5,
                 }
                 record["record_sha256"] = canonical_json_sha256(record)
-                _write_json(record_root / f"{model}--seed-{seed}--{fold_id}.json", record)
+                record_directory = record_root / stem
+                record_directory.mkdir()
+                _write_json(record_directory / "attempt-001.json", record)
     return record_root, protocol_path
 
 
@@ -215,7 +264,7 @@ def test_complete_uci_matrix_is_reconstructed_and_exported_create_only(tmp_path:
 
 def test_missing_run_fails_closed(tmp_path: Path) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    next(record_root.glob("*.json")).unlink()
+    next(record_root.rglob("*.json")).unlink()
 
     with pytest.raises(UCIReportingError, match="expected exactly"):
         build_uci_reproduction_report(
@@ -229,7 +278,7 @@ def test_missing_run_fails_closed(tmp_path: Path) -> None:
 
 def test_prediction_hash_tampering_fails_closed(tmp_path: Path) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("*.json"))
+    record_path = next(record_root.rglob("*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     (tmp_path / record["prediction_artifact"]["path"]).write_bytes(b"tampered")
 
@@ -251,7 +300,7 @@ def test_prediction_reference_must_be_relative_and_confined(
     tmp_path: Path, replacement: str, message: str
 ) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("*.json"))
+    record_path = next(record_root.rglob("*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     if replacement == "absolute":
         replacement = str((tmp_path / record["prediction_artifact"]["path"]).resolve())
@@ -281,7 +330,7 @@ def test_run_dataset_lineage_must_match_protocol_pins(
     tmp_path: Path, field: str, message: str
 ) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("*.json"))
+    record_path = next(record_root.rglob("*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     record[field] = "d" * 64
     record.pop("record_sha256")
@@ -302,7 +351,7 @@ def test_locked_experiment_rejects_recurrent_backend_or_hyperparameter_drift(
     tmp_path: Path,
 ) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("legacy_bilstm_h192*.json"))
+    record_path = next(record_root.rglob("legacy_bilstm_h192*/attempt-*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     record["configuration"]["disable_cudnn"] = False
     record["configuration_sha256"] = canonical_json_sha256(record["configuration"])
@@ -322,7 +371,7 @@ def test_locked_experiment_rejects_recurrent_backend_or_hyperparameter_drift(
 
 def test_misaligned_prediction_vectors_fail_closed(tmp_path: Path) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("*.json"))
+    record_path = next(record_root.rglob("*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     prediction_path = tmp_path / record["prediction_artifact"]["path"]
     with np.load(prediction_path, allow_pickle=False) as arrays:
@@ -348,7 +397,7 @@ def test_misaligned_prediction_vectors_fail_closed(tmp_path: Path) -> None:
 
 def test_window_label_identity_must_match_across_runs(tmp_path: Path) -> None:
     record_root, protocol_path = _materialize_complete_matrix(tmp_path)
-    record_path = next(record_root.glob("*.json"))
+    record_path = next(record_root.rglob("*.json"))
     record = json.loads(record_path.read_text(encoding="utf-8"))
     prediction_path = tmp_path / record["prediction_artifact"]["path"]
     with np.load(prediction_path, allow_pickle=False) as arrays:

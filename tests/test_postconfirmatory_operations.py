@@ -249,6 +249,7 @@ def test_operational_runners_refuse_before_opening_any_path_without_cuda(
             output_directory=missing,
             output_root=missing,
             created_at_utc="2099-01-01T00:00:00Z",
+            profiler_code_commit="a" * 40,
             device=torch.device("cuda"),
         )
     with pytest.raises(PostconfirmatoryStressError, match="before any cache"):
@@ -263,6 +264,7 @@ def test_operational_runners_refuse_before_opening_any_path_without_cuda(
             output_directory=missing,
             output_root=missing,
             created_at_utc="2099-01-01T00:00:00Z",
+            implementation_code_commit="a" * 40,
             device=torch.device("cuda"),
         )
 
@@ -271,6 +273,7 @@ def test_stress_runner_preserves_failure_record_and_failed_index_after_output_cr
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, repository_root: Path
 ) -> None:
     monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(stress_runner, "_repository_head", lambda _: "a" * 40)
 
     def fail_context_load(**_: Any) -> None:
         raise RuntimeError("synthetic consumed-context failure")
@@ -291,6 +294,7 @@ def test_stress_runner_preserves_failure_record_and_failed_index_after_output_cr
             output_directory=output,
             output_root=tmp_path,
             created_at_utc="2099-01-01T00:00:00Z",
+            implementation_code_commit="a" * 40,
             device=torch.device("cuda"),
         )
 
@@ -309,10 +313,12 @@ def test_stress_runner_preserves_failure_record_and_failed_index_after_output_cr
     assert failure["execution_stage"] == "consumed_opening_context_validation"
     assert failure["partial_outputs_preserved"] is True
     assert failure["opening_or_unlock_invoked"] is False
+    assert failure["implementation_code_commit"] == "a" * 40
     assert index["status"] == "failed_preserved_create_only"
     assert index["stress_result_count"] == 0
     assert index["failure"]["record_sha256"] == failure["record_sha256"]
     assert index["failure"]["file_sha256"] == sha256_file(failure_path)
+    assert index["implementation_code_commit"] == "a" * 40
 
     failure_file_hash = sha256_file(failure_path)
     index_file_hash = sha256_file(index_path)
@@ -362,6 +368,8 @@ def test_stress_main_returns_nonzero_for_controlled_failure(
             str(tmp_path),
             "--created-at-utc",
             "2099-01-01T00:00:00Z",
+            "--implementation-code-commit",
+            "a" * 40,
         ]
     )
 
@@ -378,8 +386,19 @@ def test_module_clis_expose_no_raw_unlock_or_opening_acknowledgement() -> None:
     stress_help = build_stress_parser().format_help()
     assert "--primary-cache-record" in stress_help
     assert "--expected-primary-cache-record-file-sha256" in stress_help
+    assert "--implementation-code-commit" in stress_help
     assert "--source-cache-array" not in stress_help
     assert "--target-cache-array" not in stress_help
+
+
+def test_stress_implementation_commit_must_equal_repository_head(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(stress_runner, "_repository_head", lambda _: "b" * 40)
+
+    with pytest.raises(PostconfirmatoryStressError, match="differs from repository HEAD"):
+        stress_runner._require_repository_head(tmp_path, "a" * 40)
+    assert stress_runner._require_repository_head(tmp_path, "b" * 40) == "b" * 40
 
 
 def test_stress_cache_loader_uses_one_external_pin_for_exact_partitions(

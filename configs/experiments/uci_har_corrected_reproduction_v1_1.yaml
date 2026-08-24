@@ -44,6 +44,9 @@ execution:
   sequential_runs: true
   create_only: true
   preserve_failures: true
+  attempt_id_format: "attempt-{positive_integer:03d}"
+  retry_policy: "new_attempt_only_after_every_prior_attempt_has_a_valid_preserved_failure"
+  aggregation_policy: "exactly_one_complete_attempt_per_matrix_cell_with_all_prior_failures_linked"
   official_test_evaluation: "forbidden_consumed_legacy_evidence"
 outputs:
   root: "results/legacy_reproduction/uci_har_source_grouped_v1"

@@ -362,6 +362,7 @@ def _run_uci_source_fold(args: argparse.Namespace) -> int:
             model_name=args.model,
             fold_id=args.fold_id,
             seed=args.seed,
+            attempt=args.attempt,
             code_commit=args.code_commit,
             repository_root=Path(args.repository_root),
             experiment_config_path=Path(args.experiment_config),
@@ -794,6 +795,7 @@ def build_parser() -> argparse.ArgumentParser:
         choices=tuple(f"uci_source_cv_{index:02d}" for index in range(1, 6)),
     )
     uci_source_parser.add_argument("--seed", type=int, required=True)
+    uci_source_parser.add_argument("--attempt", type=int, required=True)
     uci_source_parser.add_argument("--code-commit", required=True)
     uci_source_parser.add_argument("--repository-root", default=".")
     uci_source_parser.add_argument(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import subprocess
 import time
 from collections.abc import Mapping
@@ -196,6 +197,13 @@ def load_uci_reproduction_config(
         "sequential_runs": True,
         "create_only": True,
         "preserve_failures": True,
+        "attempt_id_format": "attempt-{positive_integer:03d}",
+        "retry_policy": (
+            "new_attempt_only_after_every_prior_attempt_has_a_valid_preserved_failure"
+        ),
+        "aggregation_policy": (
+            "exactly_one_complete_attempt_per_matrix_cell_with_all_prior_failures_linked"
+        ),
         "official_test_evaluation": "forbidden_consumed_legacy_evidence",
     }
     require_exact_keys(execution, set(expected_execution), location="execution")
@@ -479,6 +487,7 @@ def _validate_matrix_paths(
     model_name: str,
     fold_id: str,
     seed: int,
+    attempt: int,
     run_directory: Path,
     summary_path: Path,
     allowed_output_root: Path,
@@ -492,6 +501,7 @@ def _validate_matrix_paths(
     expected_output_root = (root / str(experiment_config.outputs["root"])).resolve(strict=False)
     expected_allowed_root = (root / "results").resolve(strict=True)
     stem = f"{model_name}--seed-{seed}--{fold_id}"
+    attempt_id = f"attempt-{attempt:03d}"
     comparisons = (
         (experiment_config.path, expected_config_path, "experiment config"),
         (dataset_manifest_path.resolve(strict=True), expected_dataset_path, "dataset manifest"),
@@ -499,12 +509,12 @@ def _validate_matrix_paths(
         (allowed_output_root.resolve(strict=True), expected_allowed_root, "allowed output root"),
         (
             run_directory.resolve(strict=False),
-            expected_output_root / "runs" / stem,
+            expected_output_root / "runs" / stem / attempt_id,
             "run directory",
         ),
         (
             summary_path.resolve(strict=False),
-            expected_output_root / "records" / f"{stem}.json",
+            expected_output_root / "records" / stem / f"{attempt_id}.json",
             "summary path",
         ),
     )
@@ -516,6 +526,91 @@ def _validate_matrix_paths(
         raise UCISourceRunError("archive path differs from the locked UCI inner archive path")
 
 
+def _validate_retry_chain(
+    *,
+    run_path: Path,
+    summary_path: Path,
+    result_root: Path,
+    model_name: str,
+    fold_id: str,
+    seed: int,
+    attempt: int,
+    code_commit: str,
+    experiment_config: UCIReproductionConfig,
+) -> list[dict[str, Any]]:
+    if isinstance(attempt, bool) or not isinstance(attempt, int) or attempt < 1 or attempt > 999:
+        raise UCISourceRunError("attempt must be an integer in [1, 999]")
+    cell_run_root = run_path.parent
+    cell_record_root = summary_path.parent
+    expected_prior_names = {f"attempt-{value:03d}" for value in range(1, attempt)}
+    for root, suffix in ((cell_run_root, ""), (cell_record_root, ".json")):
+        if not root.exists():
+            continue
+        if root.is_symlink() or not root.is_dir():
+            raise UCISourceRunError("UCI attempt parent is unsafe")
+        observed = {
+            path.name.removesuffix(suffix)
+            for path in root.iterdir()
+            if path.name.startswith("attempt-")
+        }
+        unexpected = observed - expected_prior_names
+        if unexpected:
+            raise UCISourceRunError(
+                f"unexpected or future UCI attempt artifacts exist: {sorted(unexpected)}"
+            )
+
+    prior_failures: list[dict[str, Any]] = []
+    for prior_attempt in range(1, attempt):
+        attempt_id = f"attempt-{prior_attempt:03d}"
+        prior_run = cell_run_root / attempt_id
+        prior_summary = cell_record_root / f"{attempt_id}.json"
+        failure_path = prior_run / "failure.json"
+        if os.path.lexists(prior_summary):
+            raise UCISourceRunError("retry is forbidden after a completed UCI cell attempt")
+        if (
+            prior_run.is_symlink()
+            or not prior_run.is_dir()
+            or failure_path.is_symlink()
+            or not failure_path.is_file()
+        ):
+            raise UCISourceRunError("every prior UCI attempt must have a preserved failure")
+        failure = _object_from_json(failure_path, description="prior UCI attempt failure")
+        claimed = failure.get("record_sha256")
+        body = dict(failure)
+        body.pop("record_sha256", None)
+        required = {
+            "status": "corrected_uci_source_fold_failed_preserved",
+            "model_name": model_name,
+            "fold_id": fold_id,
+            "seed": seed,
+            "attempt": prior_attempt,
+            "code_commit": code_commit,
+            "official_test_member_opened": False,
+            "official_test_performance_or_prediction_accessed": False,
+            "inclusivehar_data_or_target_accessed": False,
+        }
+        if claimed != canonical_json_sha256(body) or any(
+            failure.get(key) != expected for key, expected in required.items()
+        ):
+            raise UCISourceRunError("prior UCI attempt failure lineage is invalid")
+        lineage = failure.get("experiment_config")
+        if lineage != {
+            "experiment_id": experiment_config.experiment_id,
+            "file_sha256": experiment_config.file_sha256,
+            "canonical_sha256": experiment_config.canonical_sha256,
+        }:
+            raise UCISourceRunError("prior UCI attempt uses a different experiment config")
+        prior_failures.append(
+            {
+                "attempt": prior_attempt,
+                "path": failure_path.relative_to(result_root).as_posix(),
+                "file_sha256": sha256_file(failure_path),
+                "record_sha256": claimed,
+            }
+        )
+    return prior_failures
+
+
 def run_uci_source_fold(
     *,
     archive_path: Path,
@@ -524,6 +619,7 @@ def run_uci_source_fold(
     model_name: str,
     fold_id: str,
     seed: int,
+    attempt: int,
     code_commit: str,
     repository_root: Path,
     experiment_config_path: Path,
@@ -555,6 +651,7 @@ def run_uci_source_fold(
         model_name=model_name,
         fold_id=fold_id,
         seed=seed,
+        attempt=attempt,
         run_directory=run_directory,
         summary_path=summary_path,
         allowed_output_root=allowed_output_root,
@@ -572,40 +669,57 @@ def run_uci_source_fold(
     )
     if run_path.exists() or summary_output.exists():
         raise FileExistsError("refusing to overwrite an existing UCI run directory or summary")
-
-    prepared = prepare_uci_source_fold(
-        archive_path=archive_path,
-        dataset_manifest_path=dataset_manifest_path,
-        protocol_path=protocol_path,
+    result_root = (
+        repository_root.resolve(strict=True) / str(experiment_config.outputs["root"])
+    ).resolve(strict=False)
+    prior_failures = _validate_retry_chain(
+        run_path=run_path,
+        summary_path=summary_output,
+        result_root=result_root,
+        model_name=model_name,
         fold_id=fold_id,
-    )
-    preprocessing_sha256 = canonical_json_sha256(
-        {
-            "channels": list(UCI_HAR_CHANNELS),
-            "normalization": "per_channel_population_standardization_fold_train_only",
-            "tensor_shape": [128, 6],
-        }
-    )
-    ontology_sha256 = canonical_json_sha256(
-        {str(index): name for index, name in UCI_HAR_ACTIVITY_NAMES.items()}
-    )
-    lineage = TrainingLineage(
-        dataset_manifest_sha256=prepared.dataset_manifest_sha256,
-        split_manifest_sha256=prepared.protocol_sha256,
-        preprocessing_config_sha256=preprocessing_sha256,
-        ontology_sha256=ontology_sha256,
+        seed=seed,
+        attempt=attempt,
         code_commit=commit,
-        evidence_status="corrected_uci_source_grouped_development_official_test_unopened",
-        label_schema=UCI_CLASS_NAMES,
-        normalization=prepared.standardizer.to_dict(),
+        experiment_config=experiment_config,
     )
     run_path.parent.mkdir(parents=True, exist_ok=True)
     summary_output.parent.mkdir(parents=True, exist_ok=True)
     run_path.mkdir(exist_ok=False)
     device = torch.device("cuda")
-    torch.cuda.reset_peak_memory_stats(device)
     started = time.perf_counter()
+    prepared: PreparedUCISourceFold | None = None
+    execution_stage = "official_train_fold_preparation"
     try:
+        prepared = prepare_uci_source_fold(
+            archive_path=archive_path,
+            dataset_manifest_path=dataset_manifest_path,
+            protocol_path=protocol_path,
+            fold_id=fold_id,
+        )
+        preprocessing_sha256 = canonical_json_sha256(
+            {
+                "channels": list(UCI_HAR_CHANNELS),
+                "normalization": "per_channel_population_standardization_fold_train_only",
+                "tensor_shape": [128, 6],
+            }
+        )
+        ontology_sha256 = canonical_json_sha256(
+            {str(index): name for index, name in UCI_HAR_ACTIVITY_NAMES.items()}
+        )
+        lineage = TrainingLineage(
+            dataset_manifest_sha256=prepared.dataset_manifest_sha256,
+            split_manifest_sha256=prepared.protocol_sha256,
+            preprocessing_config_sha256=preprocessing_sha256,
+            ontology_sha256=ontology_sha256,
+            code_commit=commit,
+            evidence_status="corrected_uci_source_grouped_development_official_test_unopened",
+            label_schema=UCI_CLASS_NAMES,
+            normalization=prepared.standardizer.to_dict(),
+        )
+        execution_stage = "cuda_peak_memory_reset"
+        torch.cuda.reset_peak_memory_stats(device)
+        execution_stage = "cuda_source_training"
         trained = train_source_model(
             prepared.train_windows,
             prepared.train_labels,
@@ -621,6 +735,21 @@ def run_uci_source_fold(
         logits = cast(NDArray[np.float64], trained.pop("validation_logits"))
         probabilities = cast(NDArray[np.float64], trained.pop("validation_probabilities"))
         report = cast(dict[str, Any], trained.pop("validation_report"))
+        checkpoint_path_value = trained.get("checkpoint_path")
+        if not isinstance(checkpoint_path_value, str):
+            raise UCISourceRunError("training result lacks its selected checkpoint path")
+        checkpoint_path = Path(checkpoint_path_value).resolve(strict=True)
+        if checkpoint_path.is_symlink() or sha256_file(checkpoint_path) != trained.get(
+            "checkpoint_sha256"
+        ):
+            raise UCISourceRunError("selected checkpoint hash changed before publication")
+        trained["checkpoint_path"] = _portable_output_reference(
+            checkpoint_path,
+            allowed_root=result_root,
+            kind="selected checkpoint",
+        )
+        trained["checkpoint_path_base"] = "result_root"
+        execution_stage = "validation_prediction_publication"
         prediction_path = run_path / "source_validation_predictions.npz"
         prediction_sha256 = _write_predictions_new(
             prediction_path,
@@ -646,6 +775,8 @@ def run_uci_source_fold(
             "inclusivehar_data_or_target_accessed": False,
             "model_name": model_name,
             "seed": seed,
+            "attempt": attempt,
+            "prior_attempt_failures": prior_failures,
             "code_commit": commit,
             "experiment_config": {
                 "experiment_id": experiment_config.experiment_id,
@@ -670,10 +801,10 @@ def run_uci_source_fold(
             "prediction_artifact": {
                 "path": _portable_output_reference(
                     prediction_path,
-                    allowed_root=summary_output.parent.parent,
+                    allowed_root=result_root,
                     kind="prediction artifact",
                 ),
-                "path_base": "record_directory_parent",
+                "path_base": "result_root",
                 "sha256": prediction_sha256,
             },
             "device": {
@@ -699,11 +830,16 @@ def run_uci_source_fold(
             "schema_version": "1.0.0",
             "status": "corrected_uci_source_fold_failed_preserved",
             "evidence_status": "failed_source_development_not_model_result",
-            "dataset_manifest_sha256": prepared.dataset_manifest_sha256,
-            "source_protocol_sha256": prepared.protocol_sha256,
+            "execution_stage": execution_stage,
+            "dataset_manifest_sha256": (
+                None if prepared is None else prepared.dataset_manifest_sha256
+            ),
+            "source_protocol_sha256": None if prepared is None else prepared.protocol_sha256,
             "fold_id": fold_id,
             "model_name": model_name,
             "seed": seed,
+            "attempt": attempt,
+            "prior_attempt_failures": prior_failures,
             "code_commit": commit,
             "experiment_config": {
                 "experiment_id": experiment_config.experiment_id,
@@ -712,6 +848,11 @@ def run_uci_source_fold(
             },
             "exception_type": type(exc).__name__,
             "message": str(exc),
+            "input_files": {
+                "archive_sha256": sha256_file(archive_path),
+                "dataset_manifest_file_sha256": sha256_file(dataset_manifest_path),
+                "protocol_file_sha256": sha256_file(protocol_path),
+            },
             "official_test_member_opened": False,
             "official_test_performance_or_prediction_accessed": False,
             "inclusivehar_data_or_target_accessed": False,

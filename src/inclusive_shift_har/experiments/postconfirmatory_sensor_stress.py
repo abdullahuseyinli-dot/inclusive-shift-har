@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import sys
 from collections.abc import Mapping
 from pathlib import Path
@@ -58,6 +59,42 @@ from inclusive_shift_har.training.engine import (
 
 class PostconfirmatoryStressError(RuntimeError):
     """Raised when secondary stress execution would violate frozen lineage."""
+
+
+def _full_commit(value: str) -> str:
+    normalized = value.casefold()
+    if len(normalized) != 40 or any(
+        character not in "0123456789abcdef" for character in normalized
+    ):
+        raise PostconfirmatoryStressError(
+            "implementation code commit must be a full 40-character Git object ID"
+        )
+    return normalized
+
+
+def _repository_head(repository_root: Path) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(repository_root), "rev-parse", "--verify", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise PostconfirmatoryStressError("artifact root is not a readable Git checkout") from exc
+    return _full_commit(completed.stdout.strip())
+
+
+def _require_repository_head(repository_root: Path, supplied_commit: str) -> str:
+    commit = _full_commit(supplied_commit)
+    observed = _repository_head(repository_root)
+    if observed != commit:
+        raise PostconfirmatoryStressError(
+            f"implementation code commit {commit} differs from repository HEAD {observed}"
+        )
+    return commit
 
 
 def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
@@ -389,6 +426,7 @@ def _publish_stress_failure_artifacts(
         "execution_stage": stage,
         "exception_type": type(error).__name__,
         "message": str(error),
+        "implementation_code_commit": state.get("implementation_code_commit"),
         "stress_config_sha256": config.config_sha256,
         "cache_loading_attempted": bool(state.get("cache_loading_attempted", False)),
         "target_cache_loaded": bool(state.get("target_cache_loaded", False)),
@@ -426,6 +464,7 @@ def _publish_stress_failure_artifacts(
         "raw_target_materialization_invoked": False,
         "opening_or_unlock_invoked": False,
         "execution_stage": stage,
+        "implementation_code_commit": state.get("implementation_code_commit"),
         "stress_config_sha256": config.config_sha256,
         "model_family_id": config.model_family_id,
         "eligible_training_model_names": list(config.eligible_training_model_names),
@@ -478,6 +517,7 @@ def _run_postconfirmatory_sensor_stress(
     output_directory: str | Path,
     output_root: str | Path,
     created_at_utc: str,
+    implementation_code_commit: str,
     device: torch.device,
     failure_state: dict[str, Any],
 ) -> dict[str, Any]:
@@ -493,6 +533,9 @@ def _run_postconfirmatory_sensor_stress(
     config = load_sensor_reliability_config(stress_config_path)
     failure_state["config"] = config
     root = Path(artifact_root).resolve(strict=True)
+    failure_state["stage"] = "implementation_commit_validation"
+    implementation_commit = _require_repository_head(root, implementation_code_commit)
+    failure_state["implementation_code_commit"] = implementation_commit
     outputs_root = Path(output_root).resolve(strict=True)
     try:
         outputs_root.relative_to(root)
@@ -735,6 +778,7 @@ def _run_postconfirmatory_sensor_stress(
         "target_clean_inference_rerun": False,
         "raw_target_materialization_invoked": False,
         "opening_or_unlock_invoked": False,
+        "implementation_code_commit": implementation_commit,
         "stress_config_sha256": config.config_sha256,
         "model_family_id": config.model_family_id,
         "eligible_training_model_names": list(config.eligible_training_model_names),
@@ -792,6 +836,7 @@ def run_postconfirmatory_sensor_stress(
     output_directory: str | Path,
     output_root: str | Path,
     created_at_utc: str,
+    implementation_code_commit: str,
     device: torch.device,
 ) -> dict[str, Any]:
     """Run all stresses and preserve a failed index after output creation."""
@@ -809,6 +854,7 @@ def run_postconfirmatory_sensor_stress(
             output_directory=output_directory,
             output_root=output_root,
             created_at_utc=created_at_utc,
+            implementation_code_commit=implementation_code_commit,
             device=device,
             failure_state=failure_state,
         )
@@ -853,6 +899,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--created-at-utc", required=True)
+    parser.add_argument("--implementation-code-commit", required=True)
     return parser
 
 
@@ -872,6 +919,7 @@ def main(argv: list[str] | None = None) -> int:
             output_directory=args.output_directory,
             output_root=args.output_root,
             created_at_utc=args.created_at_utc,
+            implementation_code_commit=args.implementation_code_commit,
             device=torch.device("cuda"),
         )
     except (OSError, RuntimeError, ValueError) as exc:

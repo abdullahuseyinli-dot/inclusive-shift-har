@@ -7,11 +7,13 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+import inclusive_shift_har.experiments.uci_source as uci_runner
 from inclusive_shift_har.data.uci_har import load_uci_har_split
 from inclusive_shift_har.experiments.uci_source import (
     UCISourceRunError,
     _portable_output_reference,
     _validate_repository_head,
+    _validate_retry_chain,
     load_uci_reproduction_config,
     prepare_uci_source_fold,
     run_uci_source_fold,
@@ -107,6 +109,7 @@ def test_runner_refuses_to_fall_back_to_cpu(
             model_name="legacy_cnn1d_h128",
             fold_id="uci_source_cv_01",
             seed=42,
+            attempt=1,
             code_commit="a" * 40,
             repository_root=tmp_path,
             experiment_config_path=EXPERIMENT_CONFIG_PATH,
@@ -167,3 +170,104 @@ def test_repository_head_binding_rejects_supplied_commit_drift(
 
     with pytest.raises(UCISourceRunError, match="does not match executing HEAD"):
         _validate_repository_head(tmp_path, expected_commit="a" * 40)
+
+
+def test_retry_requires_contiguous_self_hashed_failures(tmp_path: Path) -> None:
+    config = load_uci_reproduction_config(
+        EXPERIMENT_CONFIG_PATH,
+        expected_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
+    )
+    result_root = tmp_path / "matrix"
+    run_path = result_root / "runs" / "cell" / "attempt-002"
+    summary_path = result_root / "records" / "cell" / "attempt-002.json"
+    failure_path = result_root / "runs" / "cell" / "attempt-001" / "failure.json"
+    failure_path.parent.mkdir(parents=True)
+    failure = {
+        "schema_version": "1.0.0",
+        "status": "corrected_uci_source_fold_failed_preserved",
+        "model_name": "legacy_cnn1d_h128",
+        "fold_id": "uci_source_cv_01",
+        "seed": 42,
+        "attempt": 1,
+        "code_commit": "a" * 40,
+        "experiment_config": {
+            "experiment_id": config.experiment_id,
+            "file_sha256": config.file_sha256,
+            "canonical_sha256": config.canonical_sha256,
+        },
+        "official_test_member_opened": False,
+        "official_test_performance_or_prediction_accessed": False,
+        "inclusivehar_data_or_target_accessed": False,
+    }
+    failure["record_sha256"] = canonical_json_sha256(failure)
+    failure_path.write_text(json.dumps(failure), encoding="utf-8")
+
+    references = _validate_retry_chain(
+        run_path=run_path,
+        summary_path=summary_path,
+        result_root=result_root,
+        model_name="legacy_cnn1d_h128",
+        fold_id="uci_source_cv_01",
+        seed=42,
+        attempt=2,
+        code_commit="a" * 40,
+        experiment_config=config,
+    )
+    assert references[0]["record_sha256"] == failure["record_sha256"]
+    failure["seed"] = 43
+    failure_path.write_text(json.dumps(failure), encoding="utf-8")
+    with pytest.raises(UCISourceRunError, match="failure lineage is invalid"):
+        _validate_retry_chain(
+            run_path=run_path,
+            summary_path=summary_path,
+            result_root=result_root,
+            model_name="legacy_cnn1d_h128",
+            fold_id="uci_source_cv_01",
+            seed=42,
+            attempt=2,
+            code_commit="a" * 40,
+            experiment_config=config,
+        )
+
+
+def test_preparation_failure_is_preserved_inside_attempt(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr("torch.cuda.is_available", lambda: True)
+    monkeypatch.setattr(uci_runner, "_validate_repository_head", lambda *args, **kwargs: "a" * 40)
+    monkeypatch.setattr(uci_runner, "_validate_matrix_paths", lambda **kwargs: None)
+
+    def fail_prepare(**_: object) -> None:
+        raise RuntimeError("synthetic preparation failure")
+
+    monkeypatch.setattr(uci_runner, "prepare_uci_source_fold", fail_prepare)
+    archive_path = tmp_path / "archive.zip"
+    dataset_path = tmp_path / "dataset.json"
+    protocol_path = tmp_path / "protocol.json"
+    archive_path.write_bytes(b"synthetic")
+    dataset_path.write_text("{}", encoding="utf-8")
+    protocol_path.write_text("{}", encoding="utf-8")
+    run_path = tmp_path / "matrix" / "runs" / "cell" / "attempt-001"
+    summary_path = tmp_path / "matrix" / "records" / "cell" / "attempt-001.json"
+    with pytest.raises(UCISourceRunError, match="evidence preserved"):
+        run_uci_source_fold(
+            archive_path=archive_path,
+            dataset_manifest_path=dataset_path,
+            protocol_path=protocol_path,
+            model_name="legacy_cnn1d_h128",
+            fold_id="uci_source_cv_01",
+            seed=42,
+            attempt=1,
+            code_commit="a" * 40,
+            repository_root=tmp_path,
+            experiment_config_path=EXPERIMENT_CONFIG_PATH,
+            expected_experiment_config_file_sha256=EXPERIMENT_CONFIG_FILE_SHA256,
+            run_directory=run_path,
+            summary_path=summary_path,
+            allowed_output_root=tmp_path,
+        )
+    failure = json.loads((run_path / "failure.json").read_text(encoding="utf-8"))
+    body = dict(failure)
+    assert body.pop("record_sha256") == canonical_json_sha256(body)
+    assert failure["execution_stage"] == "official_train_fold_preparation"
+    assert failure["attempt"] == 1

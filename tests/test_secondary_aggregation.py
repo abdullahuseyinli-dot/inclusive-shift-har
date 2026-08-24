@@ -180,6 +180,7 @@ def test_sensor_stress_aggregation_builds_participant_and_cohort_delta_tables(
         "raw_target_materialization_invoked": False,
         "opening_or_unlock_invoked": False,
         "stress_config_sha256": "3" * 64,
+        "implementation_code_commit": "7" * 40,
         "final_freeze_inventory_sha256": "5" * 64,
         "locked_target_index_record_sha256": "6" * 64,
         "model_seed_count": 1,
@@ -197,6 +198,7 @@ def test_sensor_stress_aggregation_builds_participant_and_cohort_delta_tables(
         created_at_utc="2099-01-01T00:00:00Z",
     )
     assert len(result["tables"]["participant_seed_deltas"]) == 12
+    assert result["implementation_code_commit"] == "7" * 40
     source_row = next(
         row
         for row in result["tables"]["cohort_condition_aggregates"]
@@ -251,6 +253,7 @@ def test_sensor_stress_index_rejects_absolute_result_record_references(tmp_path:
         "raw_target_materialization_invoked": False,
         "opening_or_unlock_invoked": False,
         "stress_config_sha256": "3" * 64,
+        "implementation_code_commit": "7" * 40,
         "final_freeze_inventory_sha256": "5" * 64,
         "locked_target_index_record_sha256": "6" * 64,
         "model_seed_count": 1,
