@@ -182,20 +182,23 @@ def derive_model_identity(configuration: Mapping[str, Any]) -> dict[str, str]:
     """Derive semantic and configuration-specific identifiers from a run config."""
 
     model_name = _string(configuration.get("model_name"), name="configuration.model_name")
+    coral_weight = _finite_float(
+        configuration.get("coral_weight", 0.0),
+        name="configuration.coral_weight",
+    )
+    coral_token = str(coral_weight).replace("-", "m").replace(".", "p")
     if model_name != "more_har":
-        variant_name = model_name
+        variant_name = f"coral_{coral_token}" if coral_weight > 0.0 else model_name
     else:
         flags = {
             "augmentation": configuration.get("use_augmentation") is True,
             "content": configuration.get("use_content_objective") is True,
             "factorization": configuration.get("use_realization_factorization") is True,
             "groupdro": configuration.get("use_group_dro") is True,
-            "coral": _finite_float(
-                configuration.get("coral_weight", 0.0), name="configuration.coral_weight"
-            )
-            > 0.0,
         }
         enabled = [name for name, active in flags.items() if active]
+        if coral_weight > 0.0:
+            enabled.append(f"coral_{coral_token}")
         if not enabled:
             variant_name = "backbone"
         elif enabled == ["augmentation", "content", "factorization", "groupdro"]:

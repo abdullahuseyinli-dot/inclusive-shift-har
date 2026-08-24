@@ -197,6 +197,16 @@ def test_more_har_identity_is_derived_from_flags_not_filename() -> None:
     assert full == derive_model_identity(_configuration("more_har"))
 
 
+def test_model_identity_names_non_more_coral_weight() -> None:
+    configuration = _configuration("compact_residual_96")
+    configuration["coral_weight"] = 0.01
+
+    identity = derive_model_identity(configuration)
+
+    assert identity["variant_name"] == "coral_0p01"
+    assert identity["model_variant_id"] == "compact_residual_96_coral_0p01"
+
+
 def test_source_cv_aggregate_validates_exact_participant_coverage_and_is_deterministic(
     tmp_path: Path,
 ) -> None:
