@@ -187,6 +187,7 @@ Validate progress at any time. Aggregate only when `aggregation_ready` is true:
 
 ```powershell
 $statisticsCreatedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
+$aggregationCommit = (git rev-parse HEAD).Trim()
 
 .venv\Scripts\inclusive-shift-har.exe evaluate few-person-statistics validate-progress `
   --manifest results/protocol/few_person_inclusion_curve_v1_1.json `
@@ -197,10 +198,16 @@ $statisticsCreatedAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ
   --manifest results/protocol/few_person_inclusion_curve_v1_1.json `
   --results-root results/postconfirmatory/few_person_v1_1 `
   --artifact-root . `
-  --output-directory results/postconfirmatory/few_person_v1_1/statistics `
+  --output-directory results/postconfirmatory/few_person_v1_1/statistics_attempt_002 `
   --zero-shot-index results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json `
-  --created-at-utc $statisticsCreatedAt
+  --created-at-utc $statisticsCreatedAt `
+  --aggregation-code-commit $aggregationCommit
 ```
+
+The create-only `statistics` directory is preserved as failed attempt 1. Its
+`failure.json` records the pre-export Windows legacy-path rejection. Attempt 2
+must use the tested, commit-bound compatibility resolver and the distinct
+`statistics_attempt_002` destination shown above.
 
 Each run rejects a supplied commit that is not the checkout's actual `HEAD`.
 Aggregation safely creates only the final `statistics` directory beneath the

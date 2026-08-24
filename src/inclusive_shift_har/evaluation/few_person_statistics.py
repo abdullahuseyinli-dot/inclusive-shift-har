@@ -9,11 +9,12 @@ import io
 import json
 import os
 import re
+import subprocess
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, cast
 
 import numpy as np
@@ -86,6 +87,7 @@ EXPECTED_CELL_COUNT = 16 * 5 * 5 * 3
 _RUN_DIRECTORY_PATTERN = re.compile(
     r".+--seed-(?:11|23|47|89|131)--target_outer_0[1-5]--k(?:1|2|4)(?:--attempt-\d+)?$"
 )
+_GIT_COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
 
 class FewPersonStatisticsError(RuntimeError):
@@ -261,6 +263,27 @@ def _digest(value: Any, *, name: str) -> str:
     ):
         raise FewPersonStatisticsError(f"{name} must be a lowercase SHA-256 digest")
     return value
+
+
+def _require_repository_head(root: Path, *, expected_commit: str) -> str:
+    """Bind statistics-generation code to the repository's actual HEAD."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise FewPersonStatisticsError("could not resolve repository Git HEAD") from exc
+    observed = completed.stdout.strip().casefold()
+    if _GIT_COMMIT_PATTERN.fullmatch(observed) is None:
+        raise FewPersonStatisticsError("repository Git HEAD is not a full object ID")
+    if observed != expected_commit:
+        raise FewPersonStatisticsError("aggregation code commit differs from repository Git HEAD")
+    return observed
 
 
 def _expected_adaptation_seed(base_seed: int, fold_id: str, k: int) -> int:
@@ -521,6 +544,63 @@ def _resolve_repository_file(value: Any, *, artifact_root: Path, name: str) -> P
         resolved.relative_to(root)
     except ValueError as exc:
         raise FewPersonStatisticsError(f"{name} escapes artifact root") from exc
+    if resolved.is_symlink() or not resolved.is_file():
+        raise FewPersonStatisticsError(f"{name} is not a regular file")
+    return resolved
+
+
+_LOCKED_ZERO_SHOT_SUBTREE = ("results", "confirmatory", "zero_shot_v1")
+
+
+def _resolve_locked_zero_shot_file(value: Any, *, artifact_root: Path, name: str) -> Path:
+    """Rebase only the immutable opening-1 zero-shot artifact namespace.
+
+    Opening 1 predates repository-relative index paths. Its hash-pinned index
+    stores absolute Windows result paths, while the result records store
+    prediction paths relative to the historical ``results`` artifact root.
+    Accepting arbitrary absolute paths would weaken the current artifact
+    contract, so this compatibility resolver recognizes only the exact frozen
+    ``results/confirmatory/zero_shot_v1/<file>`` suffix.
+    """
+
+    if not isinstance(value, str) or not value:
+        raise FewPersonStatisticsError(f"{name} path is missing")
+    portable = PurePosixPath(value.replace("\\", "/"))
+    parts = tuple(part for part in portable.parts if part not in ("", "/", "//"))
+    if any(part in (".", "..") for part in parts):
+        raise FewPersonStatisticsError(f"{name} path contains a traversal component")
+    lowered = tuple(part.casefold() for part in parts)
+    marker = tuple(part.casefold() for part in _LOCKED_ZERO_SHOT_SUBTREE)
+    matches = [
+        index
+        for index in range(len(parts) - len(marker) + 1)
+        if lowered[index : index + len(marker)] == marker
+    ]
+    if len(matches) == 1:
+        relative_parts = parts[matches[0] :]
+    elif lowered[:2] == marker[1:]:
+        relative_parts = (_LOCKED_ZERO_SHOT_SUBTREE[0], *parts)
+    else:
+        raise FewPersonStatisticsError(
+            f"{name} path is outside the frozen zero-shot artifact namespace"
+        )
+    if len(relative_parts) != len(_LOCKED_ZERO_SHOT_SUBTREE) + 1:
+        raise FewPersonStatisticsError(f"{name} path has an unexpected frozen layout")
+
+    root_candidate = Path(artifact_root)
+    if root_candidate.is_symlink():
+        raise FewPersonStatisticsError("artifact root must not be a symlink")
+    root = root_candidate.resolve(strict=True)
+    subtree = root.joinpath(*_LOCKED_ZERO_SHOT_SUBTREE).resolve(strict=True)
+    candidate = root.joinpath(*relative_parts)
+    if candidate.is_symlink():
+        raise FewPersonStatisticsError(f"{name} must not be a symlink")
+    resolved = candidate.resolve(strict=True)
+    for boundary, label in ((root, "artifact root"), (subtree, "zero-shot subtree")):
+        try:
+            resolved.relative_to(boundary)
+        except ValueError as exc:
+            raise FewPersonStatisticsError(f"{name} escapes {label}") from exc
     if resolved.is_symlink() or not resolved.is_file():
         raise FewPersonStatisticsError(f"{name} is not a regular file")
     return resolved
@@ -1491,10 +1571,19 @@ def _load_zero_shot(
     *,
     artifact_root: Path,
     class_names: tuple[str, ...],
+    expected_index_record_sha256: str,
+    expected_index_file_sha256: str,
 ) -> tuple[dict[tuple[str, int], Mapping[str, float]], Mapping[str, Any]]:
-    value = load_json_strict(index_path)
+    resolved_index_path = _resolve_repository_file(
+        str(index_path), artifact_root=artifact_root, name="zero-shot index"
+    )
+    if _cached_sha256_file(resolved_index_path) != expected_index_file_sha256:
+        raise FewPersonStatisticsError("zero-shot index file hash differs from manifest")
+    value = load_json_strict(resolved_index_path)
     index = _mapping(value, name="zero-shot index")
-    _self_hash(index, field="record_sha256", name="zero-shot index")
+    index_record_sha256 = _self_hash(index, field="record_sha256", name="zero-shot index")
+    if index_record_sha256 != expected_index_record_sha256:
+        raise FewPersonStatisticsError("zero-shot index record hash differs from manifest")
     required = {
         "schema_version": "1.0.0",
         "record_kind": "locked_target_evaluation_index",
@@ -1521,10 +1610,9 @@ def _load_zero_shot(
         key = (model_id, int(cast(int, seed)))
         if key in selected:
             raise FewPersonStatisticsError(f"duplicate zero-shot model/seed: {key}")
-        record_path = _resolve_artifact(
+        record_path = _resolve_locked_zero_shot_file(
             entry.get("record_path"),
             artifact_root=root,
-            required_subtree=root,
             name="zero-shot result",
         )
         if sha256_file(record_path) != entry.get("record_file_sha256"):
@@ -1534,10 +1622,9 @@ def _load_zero_shot(
         if result.get("record_sha256") != entry.get("record_sha256"):
             raise FewPersonStatisticsError(f"zero-shot record hash differs from index: {key}")
         prediction = _mapping(result.get("prediction_array"), name="zero-shot prediction")
-        array_path = _resolve_artifact(
+        array_path = _resolve_locked_zero_shot_file(
             prediction.get("path"),
             artifact_root=root,
-            required_subtree=root,
             name="zero-shot prediction",
         )
         if sha256_file(array_path) != prediction.get("sha256") or prediction.get(
@@ -1829,9 +1916,15 @@ def aggregate_few_person_statistics(
     bootstrap_confidence: float = 0.95,
     bootstrap_seed: int = 1729,
     created_at_utc: str,
+    aggregation_code_commit: str,
 ) -> dict[str, Any]:
     """Aggregate exact complete coverage after reconstructing every stored metric."""
 
+    root = Path(artifact_root).resolve(strict=True)
+    commit = aggregation_code_commit.casefold()
+    if _GIT_COMMIT_PATTERN.fullmatch(commit) is None:
+        raise FewPersonStatisticsError("aggregation code commit must be a full Git object ID")
+    _require_repository_head(root, expected_commit=commit)
     output, json_path, csv_path, markdown_path = _preflight_statistics_destinations(
         output_directory, prefix, allowed_root=artifact_root
     )
@@ -1848,6 +1941,8 @@ def aggregate_few_person_statistics(
             zero_shot_index_path,
             artifact_root=Path(artifact_root),
             class_names=scan.plan.class_names,
+            expected_index_record_sha256=str(scan.plan.record["zero_shot_index_record_sha256"]),
+            expected_index_file_sha256=str(scan.plan.record["zero_shot_index_file_sha256"]),
         )
         curves.update(_zero_seed_average(zero_values))
     summaries: list[dict[str, Any]] = []
@@ -1877,6 +1972,7 @@ def aggregate_few_person_statistics(
         "evidence_status": FEW_PERSON_V1_1_EVIDENCE_STATUS,
         "protocol_id": FEW_PERSON_V1_1_PROTOCOL_ID,
         "few_person_manifest_sha256": scan.plan.manifest_sha256,
+        "aggregation_code_commit": commit,
         "validated_scenario_result_count": len(scan.completed),
         "execution_lineage": scan.progress["execution_lineage"],
         "exact_coverage": {
@@ -1970,6 +2066,7 @@ def build_parser() -> argparse.ArgumentParser:
     aggregate.add_argument("--bootstrap-confidence", type=float, default=0.95)
     aggregate.add_argument("--bootstrap-seed", type=int, default=1729)
     aggregate.add_argument("--created-at-utc", required=True)
+    aggregate.add_argument("--aggregation-code-commit", required=True)
     return parser
 
 
@@ -2010,6 +2107,7 @@ def main(argv: list[str] | None = None) -> int:
                 bootstrap_confidence=args.bootstrap_confidence,
                 bootstrap_seed=args.bootstrap_seed,
                 created_at_utc=args.created_at_utc,
+                aggregation_code_commit=args.aggregation_code_commit,
             )
             payload = {
                 "status": record["status"],

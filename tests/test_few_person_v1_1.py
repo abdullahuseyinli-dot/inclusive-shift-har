@@ -692,6 +692,46 @@ def test_result_rejects_absolute_machine_artifact_path(
         )
 
 
+def test_locked_zero_shot_resolver_rebases_only_frozen_namespace(tmp_path: Path) -> None:
+    subtree = tmp_path / "results" / "confirmatory" / "zero_shot_v1"
+    subtree.mkdir(parents=True)
+    result = subtree / "compact-coral--seed-11.result.json"
+    result.write_text("{}\n", encoding="utf-8")
+    prediction = subtree / "compact-coral--seed-11.predictions.npz"
+    prediction.write_bytes(b"fixture")
+
+    historical = (
+        r"C:\Users\researcher\workspace\inclusive-shift-har\results\confirmatory"
+        r"\zero_shot_v1\compact-coral--seed-11.result.json"
+    )
+    assert statistics_module._resolve_locked_zero_shot_file(
+        historical, artifact_root=tmp_path, name="zero-shot result"
+    ) == result.resolve(strict=True)
+    assert statistics_module._resolve_locked_zero_shot_file(
+        "confirmatory/zero_shot_v1/compact-coral--seed-11.predictions.npz",
+        artifact_root=tmp_path,
+        name="zero-shot prediction",
+    ) == prediction.resolve(strict=True)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [
+        r"C:\outside\compact-coral--seed-11.result.json",
+        "results/confirmatory/other/compact-coral--seed-11.result.json",
+        "results/confirmatory/zero_shot_v1/nested/result.json",
+        "results/confirmatory/zero_shot_v1/../result.json",
+    ],
+)
+def test_locked_zero_shot_resolver_rejects_other_paths(tmp_path: Path, value: str) -> None:
+    subtree = tmp_path / "results" / "confirmatory" / "zero_shot_v1"
+    subtree.mkdir(parents=True)
+    with pytest.raises(FewPersonStatisticsError):
+        statistics_module._resolve_locked_zero_shot_file(
+            value, artifact_root=tmp_path, name="zero-shot result"
+        )
+
+
 def test_checkpoint_rejects_claimed_precheckpoint_evaluation_access(
     tmp_path: Path, repository_root: Path
 ) -> None:
@@ -776,6 +816,11 @@ def test_statistics_preflights_every_destination_before_scanning(
         scan_called = True
         raise AssertionError("scan must occur only after destination preflight")
 
+    monkeypatch.setattr(
+        statistics_module,
+        "_require_repository_head",
+        lambda _root, *, expected_commit: expected_commit,
+    )
     monkeypatch.setattr(statistics_module, "_scan_progress", forbidden_scan)
     with pytest.raises(FileExistsError, match="refusing to overwrite"):
         aggregate_few_person_statistics(
@@ -785,6 +830,7 @@ def test_statistics_preflights_every_destination_before_scanning(
             output_directory=output,
             prefix="blocked",
             created_at_utc="2099-01-01T00:00:00Z",
+            aggregation_code_commit="a" * 40,
         )
     assert scan_called is False
     assert not (output / "blocked.json").exists()
@@ -841,6 +887,11 @@ def test_statistics_json_completion_marker_is_written_last(
         },
     )
     monkeypatch.setattr(statistics_module, "_scan_progress", lambda *args, **kwargs: fake_scan)
+    monkeypatch.setattr(
+        statistics_module,
+        "_require_repository_head",
+        lambda _root, *, expected_commit: expected_commit,
+    )
     monkeypatch.setattr(statistics_module, "_seed_averaged_curves", lambda _: curves)
     monkeypatch.setattr(statistics_module, "_comparisons", lambda _: [])
     original_writer = atomic_write_json_new
@@ -859,6 +910,7 @@ def test_statistics_json_completion_marker_is_written_last(
         prefix="ordered",
         bootstrap_resamples=100,
         created_at_utc="2099-01-01T00:00:00Z",
+        aggregation_code_commit="a" * 40,
     )
     assert (output / "ordered.json").is_file()
 
