@@ -55,6 +55,12 @@ cells. Rebuilding it is a validation exercise only; do not overwrite it.
 Run from a committed repository state after the participant-sharded primary
 cache exists. Capture its physical file hash externally:
 
+The runner resolves `git rev-parse --verify HEAD` itself and requires it to
+equal the full object ID supplied through `--code-commit` before it loads the
+within-group manifest, opening receipt, target index, freeze, or cache. A stale,
+mistyped, or synthetic commit therefore fails closed instead of being copied
+into otherwise valid-looking cell evidence.
+
 ```powershell
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
 $cacheRecordSha = (Get-FileHash -Algorithm SHA256 $cacheRecord).Hash.ToLowerInvariant()

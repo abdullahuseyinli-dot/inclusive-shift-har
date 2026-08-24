@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,7 @@ import pytest
 import torch
 import yaml
 
+import inclusive_shift_har.experiments.within_group as within_group_runner
 from inclusive_shift_har.data.inclusivehar import INCLUSIVEHAR_PRIMARY_CHANNELS
 from inclusive_shift_har.data.materialize import MaterializedWindows
 from inclusive_shift_har.evaluation.metrics import classification_report
@@ -253,6 +255,40 @@ def test_neural_device_fails_closed_without_cuda(monkeypatch: pytest.MonkeyPatch
 
     with pytest.raises(WithinGroupRunError, match="CPU fallback is forbidden"):
         require_cuda_device()
+
+
+def test_cell_rejects_supplied_commit_that_differs_from_repository_head_before_evidence_load(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def forbidden_plan_load(**_: Any) -> None:
+        raise AssertionError("evidence must not load after the Git HEAD gate fails")
+
+    monkeypatch.setattr(within_group_runner, "_load_plan_and_cell", forbidden_plan_load)
+    monkeypatch.setattr(
+        subprocess,
+        "run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args=args, returncode=0, stdout="b" * 40 + "\n", stderr=""
+        ),
+    )
+
+    with pytest.raises(WithinGroupRunError, match="differs from the repository Git HEAD"):
+        within_group_runner.run_within_group_cell(
+            manifest_path=tmp_path / "missing-manifest.json",
+            split_manifest_path=tmp_path / "missing-split.json",
+            opening_receipt_path=tmp_path / "missing-receipt.json",
+            locked_target_index_path=tmp_path / "missing-index.json",
+            final_freeze_inventory_path=tmp_path / "missing-freeze.json",
+            primary_cache_record_path=tmp_path / "missing-cache.json",
+            primary_cache_record_file_sha256="c" * 64,
+            artifact_root=tmp_path,
+            output_root=tmp_path,
+            fold_id="disabled_outer_01",
+            model_id="compact-erm",
+            seed=11,
+            code_commit="a" * 40,
+            created_at_utc="2099-01-01T00:00:00Z",
+        )
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA-only synthetic smoke")

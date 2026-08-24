@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, cast
@@ -324,7 +325,148 @@ def _stress_index_entry(
     }
 
 
-def run_postconfirmatory_sensor_stress(
+def _preserved_partial_artifacts(output: Path, *, output_root: Path) -> list[dict[str, Any]]:
+    artifacts: list[dict[str, Any]] = []
+    excluded = {"failure.json", "sensor_reliability_stress_index.json"}
+    for path in sorted(output.iterdir(), key=lambda value: value.name):
+        if path.name in excluded or path.is_symlink() or not path.is_file():
+            continue
+        artifacts.append(
+            {
+                "path": path.relative_to(output_root).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": sha256_file(path),
+            }
+        )
+    return artifacts
+
+
+def _cache_failure_lineage(
+    evidence: PreparedPrimaryCacheEvidence | None, *, artifact_root: Path
+) -> dict[str, Any] | None:
+    if evidence is None:
+        return None
+    return {
+        "record_path": evidence.record_path.relative_to(artifact_root).as_posix(),
+        "record_file_sha256": evidence.record_file_sha256,
+        "record_sha256": evidence.record_sha256,
+        "partition": evidence.cache.metadata.get("partition"),
+        "array_sha256": evidence.cache.array_sha256,
+        "metadata_sha256": evidence.cache.metadata_sha256,
+    }
+
+
+def _publish_stress_failure_artifacts(
+    *,
+    output: Path,
+    output_root: Path,
+    artifact_root: Path,
+    timestamp: str,
+    config: SensorReliabilityConfig,
+    state: Mapping[str, Any],
+    error: BaseException,
+) -> dict[str, Any]:
+    """Publish a create-only failure record and failed index for a partial run."""
+
+    failure_path = output / "failure.json"
+    index_path = output / "sensor_reliability_stress_index.json"
+    for path in (failure_path, index_path):
+        if os.path.lexists(path):
+            raise FileExistsError(f"refusing to overwrite stress failure evidence: {path}")
+
+    source_references = [dict(value) for value in state.get("source_references", [])]
+    target_references = [dict(value) for value in state.get("target_references", [])]
+    stress_entries = [dict(value) for value in state.get("stress_entries", [])]
+    partial_artifacts = _preserved_partial_artifacts(output, output_root=output_root)
+    stage = str(state.get("stage", "unknown"))
+    failure: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "secondary_sensor_reliability_failure",
+        "status": "failed_preserved_create_only",
+        "created_at_utc": timestamp,
+        "track_role": "secondary_post_confirmatory",
+        "primary_claim_eligible": False,
+        "execution_stage": stage,
+        "exception_type": type(error).__name__,
+        "message": str(error),
+        "stress_config_sha256": config.config_sha256,
+        "cache_loading_attempted": bool(state.get("cache_loading_attempted", False)),
+        "target_cache_loaded": bool(state.get("target_cache_loaded", False)),
+        "opening_context_loaded": bool(state.get("context") is not None),
+        "partial_outputs_preserved": True,
+        "preserved_partial_artifacts": partial_artifacts,
+        "source_clean_reference_count": len(source_references),
+        "target_clean_reference_count": len(target_references),
+        "stress_result_count": len(stress_entries),
+        "target_clean_inference_rerun": False,
+        "raw_target_materialization_invoked": False,
+        "opening_or_unlock_invoked": False,
+    }
+    failure["record_sha256"] = canonical_json_sha256(failure)
+    atomic_write_json_new(failure, failure_path, allowed_root=output_root)
+    failure_entry = {
+        "path": failure_path.relative_to(output_root).as_posix(),
+        "file_sha256": sha256_file(failure_path),
+        "record_sha256": failure["record_sha256"],
+    }
+
+    context = cast(ConsumedTargetContext | None, state.get("context"))
+    inventory = cast(Mapping[str, Any] | None, state.get("inventory"))
+    source_cache = cast(PreparedPrimaryCacheEvidence | None, state.get("source_cache"))
+    target_cache = cast(PreparedPrimaryCacheEvidence | None, state.get("target_cache"))
+    failed_index: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "secondary_sensor_reliability_index",
+        "status": "failed_preserved_create_only",
+        "created_at_utc": timestamp,
+        "track_role": "secondary_post_confirmatory",
+        "primary_claim_eligible": False,
+        "used_for_model_selection": False,
+        "target_clean_inference_rerun": False,
+        "raw_target_materialization_invoked": False,
+        "opening_or_unlock_invoked": False,
+        "execution_stage": stage,
+        "stress_config_sha256": config.config_sha256,
+        "model_family_id": config.model_family_id,
+        "eligible_training_model_names": list(config.eligible_training_model_names),
+        "final_freeze_inventory_sha256": (
+            None if inventory is None else inventory.get("inventory_sha256")
+        ),
+        "frozen_artifact_set_sha256": (
+            None if inventory is None else inventory.get("frozen_artifact_set_sha256")
+        ),
+        "opening_receipt_record_sha256": (
+            None if context is None else context.receipt.get("record_sha256")
+        ),
+        "locked_target_index_record_sha256": (
+            None if context is None else context.index.get("record_sha256")
+        ),
+        "cache_loading_attempted": bool(state.get("cache_loading_attempted", False)),
+        "cache_evidence": {
+            "source": _cache_failure_lineage(source_cache, artifact_root=artifact_root),
+            "target": _cache_failure_lineage(target_cache, artifact_root=artifact_root),
+        },
+        "target_cache_loaded": bool(state.get("target_cache_loaded", False)),
+        "model_seed_count": int(state.get("prepared_model_count", 0)),
+        "condition_count": len(config.conditions),
+        "stress_result_count": len(stress_entries),
+        "source_clean_references": source_references,
+        "target_clean_references": target_references,
+        "stress_results": stress_entries,
+        "preserved_partial_artifacts": partial_artifacts,
+        "failure": failure_entry,
+        "partial_outputs_preserved": True,
+        "normalization": "frozen_source_training_statistics_no_refit",
+        "calibration": "frozen_source_validation_temperature_no_refit",
+        "threshold_selection": "none",
+        "statistical_unit": "participant",
+    }
+    failed_index["record_sha256"] = canonical_json_sha256(failed_index)
+    atomic_write_json_new(failed_index, index_path, allowed_root=output_root)
+    return failed_index
+
+
+def _run_postconfirmatory_sensor_stress(
     *,
     stress_config_path: str | Path,
     final_freeze_inventory_path: str | Path,
@@ -337,15 +479,19 @@ def run_postconfirmatory_sensor_stress(
     output_root: str | Path,
     created_at_utc: str,
     device: torch.device,
+    failure_state: dict[str, Any],
 ) -> dict[str, Any]:
     """Run all locked stresses on source validation and consumed target caches."""
 
+    failure_state["stage"] = "cuda_preflight"
     if device.type != "cuda" or not torch.cuda.is_available():
         raise PostconfirmatoryStressError(
             "CUDA is required before any cache, target index, or checkpoint is opened"
         )
     timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
+    failure_state["stage"] = "stress_configuration_validation"
     config = load_sensor_reliability_config(stress_config_path)
+    failure_state["config"] = config
     root = Path(artifact_root).resolve(strict=True)
     outputs_root = Path(output_root).resolve(strict=True)
     try:
@@ -353,11 +499,26 @@ def run_postconfirmatory_sensor_stress(
     except ValueError as exc:
         raise PostconfirmatoryStressError("output_root must be beneath artifact_root") from exc
     output = _output_directory(Path(output_directory), output_root=outputs_root)
+    failure_state.update(
+        {
+            "artifact_root": root,
+            "output_root": outputs_root,
+            "output": output,
+            "stage": "consumed_opening_context_validation",
+        }
+    )
+    failure_path = output / "failure.json"
+    index_path = output / "sensor_reliability_stress_index.json"
+    for path in (failure_path, index_path):
+        if os.path.lexists(path):
+            raise FileExistsError(f"refusing to overwrite secondary stress evidence: {path}")
     context: ConsumedTargetContext = load_consumed_target_context(
         opening_receipt_path=opening_receipt_path,
         locked_target_index_path=locked_target_index_path,
         artifact_root=root,
     )
+    failure_state["context"] = context
+    failure_state["stage"] = "final_freeze_inventory_validation"
     inventory_candidate = Path(final_freeze_inventory_path)
     if not inventory_candidate.is_absolute():
         inventory_candidate = root / inventory_candidate
@@ -374,12 +535,15 @@ def run_postconfirmatory_sensor_stress(
             f"final freeze inventory is invalid: {inventory_report.to_dict()}"
         )
     inventory = _mapping(load_json_strict(inventory_path), name="final freeze inventory")
+    failure_state["inventory"] = inventory
     if inventory.get("inventory_sha256") != context.index.get("final_freeze_inventory_sha256"):
         raise PostconfirmatoryStressError("freeze inventory differs from opening-1 index")
     entries = _eligible_entries(inventory, config)
     _, index_path = _planned_paths(entries, config, output)
 
     split_hash = str(inventory["split_manifest_sha256"])
+    failure_state["stage"] = "source_and_target_cache_loading"
+    failure_state["cache_loading_attempted"] = True
     source_cache_evidence, target_cache_evidence = _load_pinned_primary_stress_caches(
         primary_cache_record_path=primary_cache_record_path,
         expected_primary_cache_record_file_sha256=(expected_primary_cache_record_file_sha256),
@@ -390,6 +554,9 @@ def run_postconfirmatory_sensor_stress(
         source_partition=config.source_partition,
         target_partition=config.target_partition,
     )
+    failure_state["source_cache"] = source_cache_evidence
+    failure_state["target_cache"] = target_cache_evidence
+    failure_state["target_cache_loaded"] = True
     source_cache = source_cache_evidence.cache
     target_cache = target_cache_evidence.cache
     if set(source_cache.batch.participant_ids) & set(target_cache.batch.participant_ids):
@@ -397,6 +564,7 @@ def run_postconfirmatory_sensor_stress(
     if set(source_cache.batch.window_ids) & set(target_cache.batch.window_ids):
         raise PostconfirmatoryStressError("source and target cache window IDs overlap")
     target_subjects = frozenset(target_cache.batch.participant_ids)
+    failure_state["stage"] = "frozen_model_preparation"
     prepared_models = [
         _prepare_model(
             entry,
@@ -406,6 +574,7 @@ def run_postconfirmatory_sensor_stress(
         )
         for entry in entries
     ]
+    failure_state["prepared_model_count"] = len(prepared_models)
     if any(model.neural_config is None for model in prepared_models):
         raise PostconfirmatoryStressError("stress family unexpectedly contains a non-neural model")
     for model in prepared_models:
@@ -426,7 +595,11 @@ def run_postconfirmatory_sensor_stress(
         for reference in target_references.values()
     ]
     stress_entries: list[dict[str, Any]] = []
+    failure_state["source_references"] = source_references
+    failure_state["target_references"] = target_reference_entries
+    failure_state["stress_entries"] = stress_entries
     for prepared in prepared_models:
+        failure_state["stage"] = f"frozen_model_inference:{prepared.model_id}:seed-{prepared.seed}"
         configuration = cast(TrainingConfig, prepared.neural_config)
         neural, payload = reconstruct_checkpoint(prepared.checkpoint_path, device=device)
         if canonical_json_sha256(payload["configuration"]) != prepared.configuration_sha256:
@@ -550,6 +723,7 @@ def run_postconfirmatory_sensor_stress(
             torch.cuda.synchronize(device)
             torch.cuda.empty_cache()
 
+    failure_state["stage"] = "complete_index_publication"
     index: dict[str, Any] = {
         "schema_version": "1.0.0",
         "record_kind": "secondary_sensor_reliability_index",
@@ -606,6 +780,67 @@ def run_postconfirmatory_sensor_stress(
     }
 
 
+def run_postconfirmatory_sensor_stress(
+    *,
+    stress_config_path: str | Path,
+    final_freeze_inventory_path: str | Path,
+    opening_receipt_path: str | Path,
+    locked_target_index_path: str | Path,
+    primary_cache_record_path: str | Path,
+    expected_primary_cache_record_file_sha256: str,
+    artifact_root: str | Path,
+    output_directory: str | Path,
+    output_root: str | Path,
+    created_at_utc: str,
+    device: torch.device,
+) -> dict[str, Any]:
+    """Run all stresses and preserve a failed index after output creation."""
+
+    failure_state: dict[str, Any] = {}
+    try:
+        return _run_postconfirmatory_sensor_stress(
+            stress_config_path=stress_config_path,
+            final_freeze_inventory_path=final_freeze_inventory_path,
+            opening_receipt_path=opening_receipt_path,
+            locked_target_index_path=locked_target_index_path,
+            primary_cache_record_path=primary_cache_record_path,
+            expected_primary_cache_record_file_sha256=(expected_primary_cache_record_file_sha256),
+            artifact_root=artifact_root,
+            output_directory=output_directory,
+            output_root=output_root,
+            created_at_utc=created_at_utc,
+            device=device,
+            failure_state=failure_state,
+        )
+    except Exception as exc:
+        output = cast(Path | None, failure_state.get("output"))
+        config = cast(SensorReliabilityConfig | None, failure_state.get("config"))
+        resolved_output_root = cast(Path | None, failure_state.get("output_root"))
+        root = cast(Path | None, failure_state.get("artifact_root"))
+        if output is None or config is None or resolved_output_root is None or root is None:
+            raise
+        try:
+            timestamp = require_utc_timestamp(created_at_utc, location="created_at_utc")
+            failed_index = _publish_stress_failure_artifacts(
+                output=output,
+                output_root=resolved_output_root,
+                artifact_root=root,
+                timestamp=timestamp,
+                config=config,
+                state=failure_state,
+                error=exc,
+            )
+        except Exception as publication_error:
+            raise PostconfirmatoryStressError(
+                "sensor-stress execution failed and failure evidence publication also failed"
+            ) from publication_error
+        raise PostconfirmatoryStressError(
+            "sensor-stress execution failed at "
+            f"{failure_state.get('stage', 'unknown')}; create-only failure evidence preserved "
+            f"with index {failed_index['record_sha256']}"
+        ) from exc
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stress-config", type=Path, required=True)
@@ -623,19 +858,25 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    result = run_postconfirmatory_sensor_stress(
-        stress_config_path=args.stress_config,
-        final_freeze_inventory_path=args.final_freeze_inventory,
-        opening_receipt_path=args.opening_receipt,
-        locked_target_index_path=args.locked_target_index,
-        primary_cache_record_path=args.primary_cache_record,
-        expected_primary_cache_record_file_sha256=(args.expected_primary_cache_record_file_sha256),
-        artifact_root=args.artifact_root,
-        output_directory=args.output_directory,
-        output_root=args.output_root,
-        created_at_utc=args.created_at_utc,
-        device=torch.device("cuda"),
-    )
+    try:
+        result = run_postconfirmatory_sensor_stress(
+            stress_config_path=args.stress_config,
+            final_freeze_inventory_path=args.final_freeze_inventory,
+            opening_receipt_path=args.opening_receipt,
+            locked_target_index_path=args.locked_target_index,
+            primary_cache_record_path=args.primary_cache_record,
+            expected_primary_cache_record_file_sha256=(
+                args.expected_primary_cache_record_file_sha256
+            ),
+            artifact_root=args.artifact_root,
+            output_directory=args.output_directory,
+            output_root=args.output_root,
+            created_at_utc=args.created_at_utc,
+            device=torch.device("cuda"),
+        )
+    except (OSError, RuntimeError, ValueError) as exc:
+        print(json.dumps({"status": "fail", "message": str(exc)}, sort_keys=True), file=sys.stderr)
+        return 2
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
 

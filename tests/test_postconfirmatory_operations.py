@@ -267,6 +267,108 @@ def test_operational_runners_refuse_before_opening_any_path_without_cuda(
         )
 
 
+def test_stress_runner_preserves_failure_record_and_failed_index_after_output_creation(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, repository_root: Path
+) -> None:
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+
+    def fail_context_load(**_: Any) -> None:
+        raise RuntimeError("synthetic consumed-context failure")
+
+    monkeypatch.setattr(stress_runner, "load_consumed_target_context", fail_context_load)
+    output = tmp_path / "stress"
+    with pytest.raises(PostconfirmatoryStressError, match="create-only failure evidence preserved"):
+        run_postconfirmatory_sensor_stress(
+            stress_config_path=(
+                repository_root / "configs/experiments/sensor_reliability_stress_v1.yaml"
+            ),
+            final_freeze_inventory_path=tmp_path / "missing-freeze.json",
+            opening_receipt_path=tmp_path / "missing-receipt.json",
+            locked_target_index_path=tmp_path / "missing-index.json",
+            primary_cache_record_path=tmp_path / "missing-cache.json",
+            expected_primary_cache_record_file_sha256="a" * 64,
+            artifact_root=tmp_path,
+            output_directory=output,
+            output_root=tmp_path,
+            created_at_utc="2099-01-01T00:00:00Z",
+            device=torch.device("cuda"),
+        )
+
+    failure_path = output / "failure.json"
+    index_path = output / "sensor_reliability_stress_index.json"
+    failure = json.loads(failure_path.read_text(encoding="utf-8"))
+    index = json.loads(index_path.read_text(encoding="utf-8"))
+    failure_body = dict(failure)
+    failure_hash = failure_body.pop("record_sha256")
+    index_body = dict(index)
+    index_hash = index_body.pop("record_sha256")
+
+    assert failure_hash == canonical_json_sha256(failure_body)
+    assert index_hash == canonical_json_sha256(index_body)
+    assert failure["status"] == "failed_preserved_create_only"
+    assert failure["execution_stage"] == "consumed_opening_context_validation"
+    assert failure["partial_outputs_preserved"] is True
+    assert failure["opening_or_unlock_invoked"] is False
+    assert index["status"] == "failed_preserved_create_only"
+    assert index["stress_result_count"] == 0
+    assert index["failure"]["record_sha256"] == failure["record_sha256"]
+    assert index["failure"]["file_sha256"] == sha256_file(failure_path)
+
+    failure_file_hash = sha256_file(failure_path)
+    index_file_hash = sha256_file(index_path)
+    config = load_sensor_reliability_config(
+        repository_root / "configs/experiments/sensor_reliability_stress_v1.yaml"
+    )
+    with pytest.raises(FileExistsError, match="refusing to overwrite stress failure evidence"):
+        stress_runner._publish_stress_failure_artifacts(
+            output=output,
+            output_root=tmp_path,
+            artifact_root=tmp_path,
+            timestamp="2099-01-01T00:00:00Z",
+            config=config,
+            state={},
+            error=RuntimeError("second failure"),
+        )
+    assert sha256_file(failure_path) == failure_file_hash
+    assert sha256_file(index_path) == index_file_hash
+
+
+def test_stress_main_returns_nonzero_for_controlled_failure(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def fail_run(**_: Any) -> None:
+        raise PostconfirmatoryStressError("synthetic controlled failure")
+
+    monkeypatch.setattr(stress_runner, "run_postconfirmatory_sensor_stress", fail_run)
+    exit_code = stress_runner.main(
+        [
+            "--stress-config",
+            str(tmp_path / "config.yaml"),
+            "--final-freeze-inventory",
+            str(tmp_path / "freeze.json"),
+            "--opening-receipt",
+            str(tmp_path / "receipt.json"),
+            "--locked-target-index",
+            str(tmp_path / "index.json"),
+            "--primary-cache-record",
+            str(tmp_path / "cache.json"),
+            "--expected-primary-cache-record-file-sha256",
+            "a" * 64,
+            "--artifact-root",
+            str(tmp_path),
+            "--output-directory",
+            str(tmp_path / "stress"),
+            "--output-root",
+            str(tmp_path),
+            "--created-at-utc",
+            "2099-01-01T00:00:00Z",
+        ]
+    )
+
+    assert exit_code == 2
+    assert "synthetic controlled failure" in capsys.readouterr().err
+
+
 def test_module_clis_expose_no_raw_unlock_or_opening_acknowledgement() -> None:
     for parser in (build_efficiency_parser(), build_stress_parser()):
         help_text = parser.format_help()

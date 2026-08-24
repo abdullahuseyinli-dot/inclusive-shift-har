@@ -10,6 +10,7 @@ import os
 import platform
 import random
 import re
+import subprocess
 import time
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
@@ -855,6 +856,29 @@ def _portable(path: Path, root: Path) -> str:
     return path.resolve(strict=True).relative_to(root).as_posix()
 
 
+def _require_repository_head(root: Path, *, expected_commit: str) -> str:
+    """Bind a supplied run commit to the repository's actual checked-out HEAD."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise WithinGroupRunError("could not resolve repository Git HEAD") from exc
+    observed = completed.stdout.strip().casefold()
+    if _COMMIT_RE.fullmatch(observed) is None:
+        raise WithinGroupRunError("repository Git HEAD is not a full object ID")
+    if observed != expected_commit:
+        raise WithinGroupRunError(
+            "code_commit differs from the repository Git HEAD; refusing mixed-code evidence"
+        )
+    return observed
+
+
 def _failure_record(
     *,
     directory: Path,
@@ -928,6 +952,7 @@ def run_within_group_cell(
     commit = code_commit.casefold()
     if _COMMIT_RE.fullmatch(commit) is None:
         raise WithinGroupRunError("code_commit must be a full Git object ID")
+    _require_repository_head(root, expected_commit=commit)
     if _UTC_RE.fullmatch(created_at_utc) is None:
         raise WithinGroupRunError("created_at_utc must be an explicit UTC Z timestamp")
     plan, plan_sha256, split, fold, model_entry, context = _load_plan_and_cell(
