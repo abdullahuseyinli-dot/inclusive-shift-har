@@ -275,6 +275,7 @@ def _validate_gpu_contention_attestation(
     snapshot_hashes: dict[tuple[tuple[str, int, int, str], str], str] = {}
     initial_count = 0
     observed_ambient_names: set[str] = set()
+    allowed_ambient_names = {name.casefold() for name in allowed_ambient_process_names}
     for value in snapshots:
         snapshot = _mapping(value, name="GPU contention snapshot")
         snapshot_hash = _self_hash(snapshot, field="record_sha256", name="GPU contention snapshot")
@@ -352,8 +353,9 @@ def _validate_gpu_contention_attestation(
             resolution = process.get("process_name_resolution")
             resolution_error = process.get("process_name_resolution_error")
             if classification == "allowlisted_ambient_process":
-                if basename != "dwm.exe":
+                if basename not in allowed_ambient_names:
                     raise SecondaryAggregationError("an ambient process is not allowlisted")
+                assert basename is not None
                 observed_ambient_names.add(basename)
             elif classification != "current_profiler_process":
                 raise SecondaryAggregationError("contention attestation contains a competitor")
@@ -363,7 +365,7 @@ def _validate_gpu_contention_attestation(
                 if (
                     resolution != "windows_get_process_exact_pid"
                     or resolution_error is not None
-                    or basename != "dwm.exe"
+                    or basename not in allowed_ambient_names
                 ):
                     raise SecondaryAggregationError(
                         "protected Windows process was not resolved by its exact PID"

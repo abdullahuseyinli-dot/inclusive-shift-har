@@ -76,7 +76,7 @@ $aggregationCreatedAtUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:
 .venv\Scripts\python.exe -m inclusive_shift_har.evaluation.secondary_aggregation efficiency `
   --index results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_profile_index.json `
   --artifact-root . `
-  --destination results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate.json `
+  --destination results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate_attempt_002.json `
   --created-at-utc $aggregationCreatedAtUtc `
   --aggregation-code-commit $aggregationCommit
 ```
@@ -84,6 +84,13 @@ $aggregationCreatedAtUtc = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:
 The aggregation commit is independently bound to its current `HEAD`; it may be
 newer than the profiler commit and must not be copied from the profiling shell
 variable without re-reading `HEAD`.
+
+The first aggregation attempt is preserved as
+`neural_efficiency_aggregate_attempt_001.failure.json`. The validator initially
+hard-coded `dwm.exe` as the only acceptable ambient process even though the
+locked configuration explicitly allowlisted both `dwm.exe` and `explorer.exe`.
+Attempt 2 validates membership in the exact configuration-derived allowlist;
+unknown processes and resolution mismatches still fail closed.
 
 Reported analytical MACs/FLOPs cover only the declared `Conv1d`, `Linear`, and
 `LSTM` operator subset. They are not full-graph operation counts.

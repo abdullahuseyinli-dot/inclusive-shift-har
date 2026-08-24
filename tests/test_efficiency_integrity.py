@@ -50,7 +50,34 @@ def _rewrite_index(path: Path, value: dict[str, Any]) -> None:
     _write(path, value)
 
 
-def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) -> dict[str, Any]:
+def _contention_snapshot(
+    phase: str,
+    profile_identity: dict[str, Any] | None,
+    *,
+    ambient_processes: bool = False,
+) -> dict[str, Any]:
+    observed_processes = (
+        [
+            {
+                "pid": 2268,
+                "nvidia_smi_reported_process_name": "[Insufficient Permissions]",
+                "process_name_basename": "dwm.exe",
+                "process_name_resolution": "windows_get_process_exact_pid",
+                "process_name_resolution_error": None,
+                "classification": "allowlisted_ambient_process",
+            },
+            {
+                "pid": 11352,
+                "nvidia_smi_reported_process_name": "C:\\Windows\\explorer.exe",
+                "process_name_basename": "explorer.exe",
+                "process_name_resolution": "nvidia_smi_reported_process_name",
+                "process_name_resolution_error": None,
+                "classification": "allowlisted_ambient_process",
+            },
+        ]
+        if ambient_processes
+        else []
+    )
     snapshot: dict[str, Any] = {
         "schema_version": "1.0.0",
         "record_kind": "gpu_contention_snapshot",
@@ -63,7 +90,7 @@ def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) ->
         "monitor_return_code": 0,
         "monitor_error": None,
         "allowed_ambient_process_names": ["dwm.exe", "explorer.exe"],
-        "observed_compute_processes": [],
+        "observed_compute_processes": observed_processes,
         "unapproved_competing_process_count": 0,
         "status": "pass_no_unapproved_compute_processes",
     }
@@ -71,7 +98,7 @@ def _contention_snapshot(phase: str, profile_identity: dict[str, Any] | None) ->
     return snapshot
 
 
-def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
+def _exact_fixture(root: Path, *, ambient_processes: bool = False) -> tuple[Path, dict[str, Any]]:
     config_path = root / "configs/experiments/neural_efficiency_profile_v1.yaml"
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_bytes(
@@ -93,7 +120,9 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
     }
     validations: list[dict[str, Any]] = []
     profiles: list[dict[str, Any]] = []
-    contention_snapshots = [_contention_snapshot("before_run", None)]
+    contention_snapshots = [
+        _contention_snapshot("before_run", None, ambient_processes=ambient_processes)
+    ]
     for model_index, model_id in enumerate(FROZEN_NEURAL_MODEL_IDS):
         for seed in FROZEN_NEURAL_SEEDS:
             disabled = model_id in RECURRENT_CUDNN_DISABLED_MODEL_IDS
@@ -137,8 +166,12 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
                         "batch_size": batch_size,
                         "precision": precision,
                     }
-                    contention_before = _contention_snapshot("before_profile", identity)
-                    contention_after = _contention_snapshot("after_profile", identity)
+                    contention_before = _contention_snapshot(
+                        "before_profile", identity, ambient_processes=ambient_processes
+                    )
+                    contention_after = _contention_snapshot(
+                        "after_profile", identity, ambient_processes=ambient_processes
+                    )
                     contention_snapshots.extend((contention_before, contention_after))
                     profile_path = (
                         root / "profiles" / f"{model_id}--{seed}--{batch_size}--{precision}.json"
@@ -266,8 +299,14 @@ def _exact_fixture(root: Path) -> tuple[Path, dict[str, Any]]:
         "sampling_policy": "before_run_and_immediately_before_and_after_every_profile",
         "sampling_limit": "sampled_process_gate_not_continuous_utilization_monitoring",
         "allowed_ambient_process_names": ["dwm.exe", "explorer.exe"],
-        "observed_allowlisted_ambient_process_names": [],
-        "timing_validity": "valid_exclusive_compute_process_samples",
+        "observed_allowlisted_ambient_process_names": (
+            ["dwm.exe", "explorer.exe"] if ambient_processes else []
+        ),
+        "timing_validity": (
+            "valid_with_declared_allowlisted_ambient_system_processes"
+            if ambient_processes
+            else "valid_exclusive_compute_process_samples"
+        ),
         "expected_snapshot_count": 641,
         "observed_snapshot_count": 641,
         "unapproved_competing_process_count": 0,
@@ -340,6 +379,14 @@ def test_exact_320_cell_efficiency_matrix_aggregates(tmp_path: Path) -> None:
     assert result["execution_environment"]["device"] == "cuda:0"
     assert result["profile_semantics"] == efficiency_semantic_contract()
     assert len(result["tables"]["model_batch_precision_aggregates"]) == 64
+
+
+def test_declared_dwm_and_explorer_ambient_processes_aggregate(tmp_path: Path) -> None:
+    index_path, _ = _exact_fixture(tmp_path, ambient_processes=True)
+    result = _aggregate(index_path, tmp_path)
+    assert (
+        result["gpu_timing_validity"] == "valid_with_declared_allowlisted_ambient_system_processes"
+    )
 
 
 def test_missing_profile_combination_is_rejected(tmp_path: Path) -> None:

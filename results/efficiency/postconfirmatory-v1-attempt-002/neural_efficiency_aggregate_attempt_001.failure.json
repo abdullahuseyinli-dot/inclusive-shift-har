@@ -1,0 +1,22 @@
+{
+  "aggregation_code_commit": "24f565432e611d2823a4d07cc5d4546e1589b23f",
+  "attempt": 1,
+  "cause": "The aggregation validator hard-coded dwm.exe as the only acceptable ambient process although the locked profile configuration allowlists both dwm.exe and explorer.exe.",
+  "created_at_utc": "2026-08-24T21:51:19.3723339Z",
+  "destination": "results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate.json",
+  "evidence_status": "failed_aggregation_not_result",
+  "exception_type": "SecondaryAggregationError",
+  "index_file_sha256": "525c14404998a8d139d39d28999b766e773e9b6336cdda50e65e0c3d12e7c22b",
+  "index_record_sha256": "8a570fefc6deddb1d23cf95002243411cc4c133bc1fb7e85f07ef5048d40b9e2",
+  "message": "an ambient process is not allowlisted",
+  "output_written": false,
+  "profile_count_in_complete_index": 320,
+  "record_kind": "neural_efficiency_aggregate_failed_attempt",
+  "record_sha256": "6c36efedb2f45761c1005394a9d568faca2af54917965f2420abc14a67f1374b",
+  "recorded_at_utc": "2026-08-24T21:52:06.5954863Z",
+  "resolution_policy": "Preserve this failure, validate against the exact configuration-derived ambient-process allowlist, add full 641-snapshot regression coverage for dwm.exe and explorer.exe, commit the fix, and use a new create-only destination.",
+  "schema_version": "1.0.0",
+  "status": "failed_preserved_postconfirmatory_secondary",
+  "target_signals_or_metrics_accessed": false,
+  "validated_profile_count_before_failure": 0
+}
