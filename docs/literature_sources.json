@@ -1,6 +1,11 @@
 {
   "schema_version": "1.0.0",
   "audit_date": "2026-08-23",
+  "targeted_current_date_refresh": {
+    "date": "2026-08-24",
+    "scope": "InclusiveHAR citation/use search plus claim-collision search for zero-shot, setup-agnostic, lightweight, and ability-associated HAR work.",
+    "outcome": "No InclusiveHAR downstream use or collision with the narrowed benchmark combination was verified. ZeroHAR and AnyMo were added to delimit unseen-class zero-shot and setup-agnostic/cross-device claims."
+  },
   "scope": "Primary papers, official proceedings or publisher pages, official repositories, and versioned dataset records inspected for Stage 1 claim and novelty gating.",
   "evidence_labels": {
     "V": "verified in an inspected primary or official source",
@@ -20,7 +25,8 @@
     "target_article_doi": "10.1016/j.dib.2026.112620",
     "target_dataset_doi": "10.17632/r78dn3f6nc.4",
     "target_dataset_version": 4,
-    "result": "No post-release citing or using paper was verified in the searched sources as of the audit date.",
+    "last_refresh_date": "2026-08-24",
+    "result": "No post-release citing or using paper was verified in the searched sources through the targeted current-date refresh.",
     "result_label": "N",
     "limitations": [
       "Indexing lag and incomplete full-text indexing can produce false negatives.",
@@ -38,11 +44,13 @@
       {
         "service": "Crossref",
         "url": "https://api.crossref.org/works/10.1016/j.dib.2026.112620",
+        "last_checked": "2026-08-24",
         "observed": "is-referenced-by-count=0"
       },
       {
         "service": "Semantic Scholar Graph API",
         "url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1016/j.dib.2026.112620?fields=title,year,citationCount,influentialCitationCount,citations.title,citations.year,citations.externalIds",
+        "last_checked": "2026-08-24",
         "observed": "citationCount=0; influentialCitationCount=0; citations=[]"
       },
       {
@@ -53,21 +61,25 @@
       {
         "service": "Europe PMC",
         "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1016/j.dib.2026.112620&format=json",
+        "last_checked": "2026-08-24",
         "observed": "one source record; citedByCount=0"
       },
       {
         "service": "PubMed",
         "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=InclusiveHAR&retmode=json",
+        "last_checked": "2026-08-24",
         "observed": "one result, PMID 41853668, the source article"
       },
       {
         "service": "ScienceDirect",
         "url": "https://www.sciencedirect.com/science/article/pii/S2352340926001733",
+        "last_checked": "2026-08-24",
         "observed": "Cited by (0) displayed when inspected"
       },
       {
         "service": "arXiv API",
         "url": "https://export.arxiv.org/api/query?search_query=all%3AInclusiveHAR&start=0&max_results=20",
+        "last_checked": "2026-08-24",
         "observed": "no downstream match"
       },
       {
@@ -159,6 +171,17 @@
       "key_boundary": "Preempts generic standardized accuracy-efficiency comparison; no ability-defined one-way target."
     },
     {
+      "id": "zerohar",
+      "title": "ZeroHAR: Sensor Context Augments Zero-Shot Wearable Action Recognition",
+      "year": 2025,
+      "doi": "10.1609/aaai.v39i15.33762",
+      "primary_urls": [
+        "https://ojs.aaai.org/index.php/AAAI/article/view/33762"
+      ],
+      "source_status": "aaai_2025_peer_reviewed_proceedings_no_official_code_verified",
+      "key_boundary": "Preempts a generic zero-shot inertial HAR claim, but its zero-shot variable is the unseen activity class rather than target-participant supervision under a fixed shared ontology."
+    },
+    {
       "id": "ccil",
       "title": "Generalizable Sensor-Based Activity Recognition via Categorical Concept Invariant Learning",
       "year": 2025,
@@ -217,6 +240,20 @@
       ],
       "source_status": "arxiv_preprint_project_and_mit_repository",
       "key_boundary": "Preempts a generic wearable foundation-model-scale study; its pretraining scale is out of scope and it has no ability-defined target."
+    },
+    {
+      "id": "anymo",
+      "title": "AnyMo: Geometry-Aware Setup-Agnostic Modeling of Human Motion in the Wild",
+      "year": 2026,
+      "doi": "10.48550/arXiv.2605.22715",
+      "primary_urls": [
+        "https://arxiv.org/abs/2605.22715v2",
+        "https://baiyuchen.com/project/AnyMo",
+        "https://github.com/Breezelled/AnyMo",
+        "https://huggingface.co/datasets/CRUISEResearchGroup/AnyMo-Bench"
+      ],
+      "source_status": "arxiv_v2_project_unlicensed_code_and_cc_by_nc_benchmark_with_upstream_terms",
+      "key_boundary": "Preempts generic setup-agnostic, cross-device, wearable-foundation, and zero-shot-recognition claims. AnyMo Bench is subject-exclusive but has no ability-defined target or one-way non-disabled-to-disabled protocol."
     },
     {
       "id": "liteway",
