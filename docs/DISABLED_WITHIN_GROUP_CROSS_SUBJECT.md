@@ -102,7 +102,9 @@ Each cell runs in its own process and is create-only. A controlled failure
 returns nonzero and retains `failure.json` and any partial artifacts. Do not
 delete, overwrite, or reuse a failed cell directory.
 
-After all 75 cells complete, aggregate once into a new directory:
+After all 75 cells complete, aggregate once into a new directory. The
+aggregator binds its own implementation to the current Git HEAD and separately
+records the single execution commit shared by all 75 immutable cells:
 
 ```powershell
 $aggregateAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")

@@ -9,6 +9,7 @@ import itertools
 import json
 import os
 import re
+import subprocess
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -71,6 +72,7 @@ class ValidatedCell:
     record_path: Path
     record_file_sha256: str
     record_sha256: str
+    execution_code_commit: str
     window_ids: tuple[str, ...]
     participant_ids: tuple[str, ...]
     labels: NDArray[np.int64]
@@ -91,6 +93,27 @@ def _self_hash(record: Mapping[str, Any], *, field: str, name: str) -> str:
     if not isinstance(value, str) or value != canonical_json_sha256(body):
         raise WithinGroupStatisticsError(f"{name} self-hash does not validate")
     return value
+
+
+def _require_repository_head(root: Path, *, expected_commit: str) -> str:
+    """Bind aggregation code lineage to the repository's actual HEAD."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise WithinGroupStatisticsError("could not resolve repository Git HEAD") from exc
+    observed = completed.stdout.strip().casefold()
+    if _COMMIT_RE.fullmatch(observed) is None:
+        raise WithinGroupStatisticsError("repository Git HEAD is not a full object ID")
+    if observed != expected_commit:
+        raise WithinGroupStatisticsError("aggregation code commit differs from repository Git HEAD")
+    return observed
 
 
 def _resolve_file(value: Any, *, root: Path, name: str) -> Path:
@@ -321,6 +344,12 @@ def validate_cell(
     mismatches = [name for name, expected in required.items() if record.get(name) != expected]
     if mismatches:
         raise WithinGroupStatisticsError(f"cell contract differs {key.cell_id}: {mismatches}")
+    execution_code_commit = record.get("code_commit")
+    if (
+        not isinstance(execution_code_commit, str)
+        or _COMMIT_RE.fullmatch(execution_code_commit) is None
+    ):
+        raise WithinGroupStatisticsError("cell execution code commit is invalid")
     model_entry = _model_by_key(plan, key.model_id, key.seed)
     configuration = _mapping(record.get("configuration"), name="result configuration")
     if configuration != _mapping(
@@ -398,7 +427,7 @@ def validate_cell(
         payload.get("configuration"), name="checkpoint configuration"
     )
     if (
-        checkpoint_configuration != configuration
+        canonical_json_sha256(checkpoint_configuration) != record.get("configuration_sha256")
         or payload.get("configuration_sha256") != record.get("configuration_sha256")
         or payload.get("label_schema") != list(FUNCTIONAL_CORE_CLASS_ORDER)
         or payload.get("epoch") != checkpoint.get("selected_epoch")
@@ -531,6 +560,7 @@ def validate_cell(
         record_path=record_path,
         record_file_sha256=sha256_file(record_path),
         record_sha256=record_sha256,
+        execution_code_commit=execution_code_commit,
         window_ids=window_ids,
         participant_ids=participant_ids,
         labels=labels,
@@ -674,6 +704,7 @@ def aggregate_within_group_statistics(
     commit = code_commit.casefold()
     if _COMMIT_RE.fullmatch(commit) is None or _UTC_RE.fullmatch(created_at_utc) is None:
         raise WithinGroupStatisticsError("aggregate requires full commit and UTC timestamp")
+    _require_repository_head(root, expected_commit=commit)
     manifest_file = manifest_path.resolve(strict=True)
     split_file = split_manifest_path.resolve(strict=True)
     cache_file = primary_cache_record_path.resolve(strict=True)
@@ -705,6 +736,7 @@ def aggregate_within_group_statistics(
     if os.path.lexists(destination):
         raise FileExistsError(f"refusing to overwrite aggregate directory: {destination}")
     destination.mkdir(parents=True, exist_ok=False)
+    execution_code_commit: str | None = None
     try:
         expected = expected_cells(plan)
         _validate_result_tree(results, expected)
@@ -720,6 +752,10 @@ def aggregate_within_group_statistics(
             )
             for key in expected
         ]
+        execution_commits = {cell.execution_code_commit for cell in cells}
+        if len(execution_commits) != 1:
+            raise WithinGroupStatisticsError("cell execution commits are mixed")
+        execution_code_commit = next(iter(execution_commits))
         participants = sorted(TARGET_PARTICIPANTS, key=int)
         policy = _mapping(plan.get("statistics_policy"), name="statistics policy")
         replicates = int(cast(int, policy["bootstrap_replicates"]))
@@ -895,6 +931,9 @@ def aggregate_within_group_statistics(
             "protocol_id": WITHIN_GROUP_PROTOCOL_ID,
             "created_at_utc": created_at_utc,
             "code_commit": commit,
+            "code_commit_role": "aggregation_implementation",
+            "aggregation_code_commit": commit,
+            "cell_execution_code_commit": execution_code_commit,
             "manifest": {
                 "path": manifest_file.relative_to(root).as_posix(),
                 "record_sha256": plan_sha256,
@@ -956,6 +995,9 @@ def aggregate_within_group_statistics(
             "manifest_sha256": plan_sha256,
             "created_at_utc": created_at_utc,
             "code_commit": commit,
+            "code_commit_role": "aggregation_implementation",
+            "aggregation_code_commit": commit,
+            "cell_execution_code_commit": execution_code_commit,
             "exception_type": type(exc).__name__,
             "message": str(exc),
             "partial_artifacts_preserved": True,

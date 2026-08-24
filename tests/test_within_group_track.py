@@ -10,6 +10,7 @@ import pytest
 import torch
 import yaml
 
+import inclusive_shift_har.evaluation.within_group_statistics as within_group_statistics
 import inclusive_shift_har.experiments.within_group as within_group_runner
 from inclusive_shift_har.data.inclusivehar import INCLUSIVEHAR_PRIMARY_CHANNELS
 from inclusive_shift_har.data.materialize import MaterializedWindows
@@ -291,6 +292,23 @@ def test_cell_rejects_supplied_commit_that_differs_from_repository_head_before_e
         )
 
 
+def test_statistics_rejects_supplied_commit_that_differs_from_repository_head(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "inclusive_shift_har.evaluation.within_group_statistics.subprocess.run",
+        lambda *args, **kwargs: subprocess.CompletedProcess(
+            args=args, returncode=0, stdout="b" * 40 + "\n", stderr=""
+        ),
+    )
+
+    with pytest.raises(WithinGroupStatisticsError, match="differs from repository Git HEAD"):
+        within_group_statistics._require_repository_head(
+            tmp_path,
+            expected_commit="a" * 40,
+        )
+
+
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA-only synthetic smoke")
 @pytest.mark.parametrize(
     ("model_name", "disable_cudnn"),
@@ -474,6 +492,7 @@ def _synthetic_completed_cell(tmp_path: Path) -> tuple[dict[str, Any], Any, Path
         "fold_id": key.fold_id,
         "model_id": key.model_id,
         "seed": key.seed,
+        "code_commit": "a" * 40,
         "manifest_sha256": plan["manifest_sha256"],
         "split_manifest_sha256": plan["split_manifest"]["record_sha256"],
         "source_artifact_sha256": plan["source_artifact_sha256"],

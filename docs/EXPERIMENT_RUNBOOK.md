@@ -240,7 +240,9 @@ foreach ($fold in $withinFolds) {
 }
 ```
 
-Aggregate only after every cell is complete and no `failure.json` exists:
+Aggregate only after every cell is complete and no cell `failure.json` exists.
+The aggregation commit may be newer than the immutable cell-execution commit;
+both are validated and recorded separately:
 
 ```powershell
 $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
