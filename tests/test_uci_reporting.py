@@ -64,7 +64,10 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
     artifact_root.mkdir()
     folds: list[dict[str, Any]] = []
     all_window_ids: list[str] = []
-    synthetic_participants = ("1", "2", "3", "4", "5")
+    # Include a two-digit identifier so the fixture exercises the normalizer's
+    # canonical lexicographic participant ordering rather than accidentally
+    # matching the protocol's numeric subject order.
+    synthetic_participants = ("1", "2", "3", "4", "11")
     for index, participant in enumerate(synthetic_participants, start=1):
         fold_id = f"uci_source_cv_{index:02d}"
         validation_ids = [f"uci_har:train:{participant}:{offset:06d}" for offset in range(6)]
@@ -153,7 +156,7 @@ def _materialize_complete_matrix(tmp_path: Path) -> tuple[Path, Path]:
                     "method": "per_channel_population_standardization",
                     "mean": [0.0] * len(UCI_HAR_CHANNELS),
                     "scale": [1.0] * len(UCI_HAR_CHANNELS),
-                    "training_participants": fold["train_subject_ids"],
+                    "training_participants": sorted(fold["train_subject_ids"]),
                     "split_manifest_sha256": protocol["protocol_sha256"],
                     "channel_names": list(UCI_HAR_CHANNELS),
                     "fitted_value_count_per_channel": (

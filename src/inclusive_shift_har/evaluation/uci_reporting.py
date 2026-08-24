@@ -482,7 +482,7 @@ def _load_run(
     if (
         normalization.get("method") != "per_channel_population_standardization"
         or normalization.get("fit_scope") != "training_partition_only"
-        or normalization.get("training_participants") != expected_fold["train_subject_ids"]
+        or normalization.get("training_participants") != sorted(expected_fold["train_subject_ids"])
         or normalization.get("split_manifest_sha256") != contract["protocol_sha256"]
         or normalization.get("channel_names") != list(UCI_HAR_CHANNELS)
         or normalization.get("fitted_value_count_per_channel")
