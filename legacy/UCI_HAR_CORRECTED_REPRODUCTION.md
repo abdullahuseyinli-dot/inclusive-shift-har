@@ -2,7 +2,7 @@
 
 ## Evidence boundary
 
-This track reconstructs the coursework architectures and replaces its random window validation with participant-exclusive validation. It contains **no corrected model result yet**. Existing saved test metrics remain legacy exploratory/development-consumed and are not re-labelled.
+This track reconstructs the coursework architectures and replaces its random window validation with participant-exclusive validation. At this document snapshot it contains **no corrected model result yet**. Existing saved test metrics remain legacy exploratory/development-consumed and are not re-labelled. The executable three-model/five-seed scope is locked in `configs/experiments/uci_har_corrected_reproduction_v1_1.yaml`; it supersedes the earlier planning YAML that also listed an unimplemented temporal BiLSTM variant.
 
 The official UCI test is excluded from:
 

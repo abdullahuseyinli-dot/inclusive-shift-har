@@ -9,6 +9,7 @@ import pytest
 from inclusive_shift_har.data.uci_har import load_uci_har_split
 from inclusive_shift_har.experiments.uci_source import (
     UCISourceRunError,
+    _portable_output_reference,
     prepare_uci_source_fold,
     run_uci_source_fold,
 )
@@ -108,3 +109,19 @@ def test_runner_refuses_to_fall_back_to_cpu(
             checkpoint_selection_rule="fixed_last_epoch",
         )
     assert not (tmp_path / "outputs").exists()
+
+
+def test_prediction_reference_is_output_root_relative_and_confined(tmp_path: Path) -> None:
+    output_root = tmp_path / "outputs"
+    prediction = output_root / "run" / "predictions.npz"
+    prediction.parent.mkdir(parents=True)
+    prediction.write_bytes(b"synthetic")
+
+    assert (
+        _portable_output_reference(prediction, allowed_root=output_root, kind="prediction artifact")
+        == "run/predictions.npz"
+    )
+    outside = tmp_path / "outside.npz"
+    outside.write_bytes(b"synthetic")
+    with pytest.raises(UCISourceRunError, match="escapes"):
+        _portable_output_reference(outside, allowed_root=output_root, kind="prediction artifact")

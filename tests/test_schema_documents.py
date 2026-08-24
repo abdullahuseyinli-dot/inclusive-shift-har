@@ -45,6 +45,7 @@ def test_schema_documents_are_valid_json_with_only_local_references(
         "dataset_manifest.schema.json",
         "final_freeze.schema.json",
         "locked_target_result.schema.json",
+        "release_evidence_inventory.schema.json",
         "source_calibrator.schema.json",
     }
     for path in paths:

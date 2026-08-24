@@ -6,7 +6,7 @@ import os
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 from uuid import uuid4
 
 import numpy as np
@@ -128,6 +128,136 @@ def _validated_condition_metadata(
     return metadata
 
 
+def create_source_clean_reference_artifacts(
+    *,
+    prediction_path: Path,
+    record_path: Path,
+    allowed_root: Path,
+    logits: NDArray[np.floating[Any]],
+    probabilities: NDArray[np.floating[Any]],
+    labels: NDArray[np.integer[Any]],
+    participant_ids: Sequence[str],
+    window_ids: Sequence[str],
+    class_names: Sequence[str],
+    model_id: str,
+    seed: int,
+    stress_config_sha256: str,
+    final_freeze_inventory_sha256: str,
+    frozen_checkpoint_sha256: str,
+    frozen_normalization_sha256: str,
+    frozen_calibrator_sha256: str,
+    locked_target_index_record_sha256: str,
+    primary_cache_record_file_sha256: str,
+    primary_cache_record_sha256: str,
+    created_at_utc: str,
+) -> dict[str, Any]:
+    """Publish the source-validation clean reference used only for stress deltas."""
+
+    if not model_id.strip():
+        raise SensorStressArtifactError("model_id must be non-empty")
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise SensorStressArtifactError("seed must be a non-negative integer")
+    config_hash = _sha256(stress_config_sha256, description="stress config hash")
+    inventory_hash = _sha256(
+        final_freeze_inventory_sha256, description="final freeze inventory hash"
+    )
+    checkpoint_hash = _sha256(frozen_checkpoint_sha256, description="checkpoint hash")
+    normalization_hash = _sha256(frozen_normalization_sha256, description="normalization hash")
+    calibrator_hash = _sha256(frozen_calibrator_sha256, description="calibrator hash")
+    target_index_hash = _sha256(
+        locked_target_index_record_sha256, description="locked target index hash"
+    )
+    cache_record_file_hash = _sha256(
+        primary_cache_record_file_sha256,
+        description="primary cache record file hash",
+    )
+    cache_record_hash = _sha256(
+        primary_cache_record_sha256, description="primary cache record hash"
+    )
+    timestamp = _timestamp(created_at_utc)
+    logit_array = np.asarray(logits, dtype=np.float64)
+    probability_array = np.asarray(probabilities, dtype=np.float64)
+    label_array = np.asarray(labels, dtype=np.int64)
+    participants = tuple(participant_ids)
+    windows = tuple(window_ids)
+    if logit_array.ndim != 2 or probability_array.shape != logit_array.shape:
+        raise SensorStressArtifactError("logits and probabilities must be aligned matrices")
+    if label_array.ndim != 1 or label_array.size != logit_array.shape[0]:
+        raise SensorStressArtifactError("labels must align with prediction rows")
+    if len(participants) != label_array.size or len(windows) != label_array.size:
+        raise SensorStressArtifactError("participant/window IDs must align with predictions")
+    if any(not isinstance(item, str) or not item for item in participants + windows):
+        raise SensorStressArtifactError("participant/window IDs must be non-empty strings")
+    if len(set(windows)) != len(windows):
+        raise SensorStressArtifactError("window IDs must be unique")
+    if not np.isfinite(logit_array).all() or not np.isfinite(probability_array).all():
+        raise SensorStressArtifactError("prediction arrays must be finite")
+    report = classification_report(
+        label_array,
+        probability_array,
+        participants,
+        class_names=tuple(class_names),
+    )
+    prediction_target = _confined_new_path(
+        prediction_path,
+        allowed_root=allowed_root,
+        description="source clean-reference prediction artifact",
+    )
+    record_target = _confined_new_path(
+        record_path,
+        allowed_root=allowed_root,
+        description="source clean-reference record",
+    )
+    arrays: dict[str, NDArray[Any]] = {
+        "logits": logit_array,
+        "probabilities": probability_array,
+        "labels": label_array,
+        "participant_ids": np.asarray(participants, dtype=np.str_),
+        "window_ids": np.asarray(windows, dtype=np.str_),
+    }
+    prediction_hash = _write_npz_new(prediction_target, arrays)
+    root = allowed_root.resolve(strict=True)
+    record: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "secondary_source_clean_reference",
+        "status": "complete_create_only",
+        "created_at_utc": timestamp,
+        "track_role": "secondary_post_confirmatory",
+        "cohort": "source",
+        "required_partition": "source_validation",
+        "primary_claim_eligible": False,
+        "used_for_model_selection": False,
+        "calibration_refit": False,
+        "threshold_refit": False,
+        "target_based_tuning": False,
+        "model_id": model_id,
+        "seed": seed,
+        "class_names": list(class_names),
+        "stress_config_sha256": config_hash,
+        "final_freeze_inventory_sha256": inventory_hash,
+        "locked_target_index_record_sha256": target_index_hash,
+        "primary_cache_record_file_sha256": cache_record_file_hash,
+        "primary_cache_record_sha256": cache_record_hash,
+        "frozen_lineage": {
+            "checkpoint_sha256": checkpoint_hash,
+            "normalization_sha256": normalization_hash,
+            "calibrator_sha256": calibrator_hash,
+        },
+        "prediction_artifact": {
+            "path": prediction_target.relative_to(root).as_posix(),
+            "sha256": prediction_hash,
+            "format": "npz",
+            "keys": list(_PREDICTION_KEYS),
+            "create_only": True,
+        },
+        "participant_level_report": report,
+        "independence_note": "windows are not treated as independent statistical units",
+    }
+    record["record_sha256"] = canonical_json_sha256(record)
+    atomic_write_json_new(record, record_target, allowed_root=root)
+    return record
+
+
 def create_secondary_stress_artifacts(
     *,
     prediction_path: Path,
@@ -141,12 +271,16 @@ def create_secondary_stress_artifacts(
     class_names: Sequence[str],
     config: SensorReliabilityConfig,
     condition_metadata: Mapping[str, Any],
+    cohort: Literal["source", "target"],
     model_id: str,
     seed: int,
     frozen_checkpoint_sha256: str,
     frozen_normalization_sha256: str,
+    frozen_calibrator_sha256: str,
     base_prediction_sha256: str,
     primary_confirmatory_completion_record_sha256: str,
+    primary_cache_record_file_sha256: str,
+    primary_cache_record_sha256: str,
     created_at_utc: str,
 ) -> dict[str, Any]:
     """Publish aligned predictions plus participant-level secondary metrics.
@@ -158,17 +292,26 @@ def create_secondary_stress_artifacts(
 
     if not model_id.strip():
         raise SensorStressArtifactError("model_id must be non-empty")
+    if cohort not in {"source", "target"}:
+        raise SensorStressArtifactError("cohort must be source or target")
+    expected_partition = "source_validation" if cohort == "source" else "target_sealed"
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise SensorStressArtifactError("seed must be a non-negative integer")
     metadata = _validated_condition_metadata(condition_metadata, config=config)
     checkpoint_hash = _sha256(frozen_checkpoint_sha256, description="checkpoint hash")
-    normalization_hash = _sha256(
-        frozen_normalization_sha256, description="normalization hash"
-    )
+    normalization_hash = _sha256(frozen_normalization_sha256, description="normalization hash")
+    calibrator_hash = _sha256(frozen_calibrator_sha256, description="calibrator hash")
     base_hash = _sha256(base_prediction_sha256, description="base prediction hash")
     completion_hash = _sha256(
         primary_confirmatory_completion_record_sha256,
         description="primary confirmatory completion record hash",
+    )
+    cache_record_file_hash = _sha256(
+        primary_cache_record_file_sha256,
+        description="primary cache record file hash",
+    )
+    cache_record_hash = _sha256(
+        primary_cache_record_sha256, description="primary cache record hash"
     )
     timestamp = _timestamp(created_at_utc)
 
@@ -221,6 +364,8 @@ def create_secondary_stress_artifacts(
         "status": "secondary_post_confirmatory_stress_complete",
         "created_at_utc": timestamp,
         "track_role": "secondary_post_confirmatory",
+        "cohort": cohort,
+        "required_partition": expected_partition,
         "primary_claim_eligible": False,
         "used_for_model_selection": False,
         "calibration_refit": False,
@@ -232,10 +377,13 @@ def create_secondary_stress_artifacts(
         "class_names": list(class_names),
         "stress_config_id": config.config_id,
         "stress_config_sha256": config.config_sha256,
+        "primary_cache_record_file_sha256": cache_record_file_hash,
+        "primary_cache_record_sha256": cache_record_hash,
         "condition": metadata,
         "frozen_lineage": {
             "checkpoint_sha256": checkpoint_hash,
             "normalization_sha256": normalization_hash,
+            "calibrator_sha256": calibrator_hash,
             "base_prediction_sha256": base_hash,
             "primary_confirmatory_completion_record_sha256": completion_hash,
         },

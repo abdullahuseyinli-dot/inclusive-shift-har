@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -8,11 +9,8 @@ from inclusive_shift_har.experiments.few_person import (
     FewPersonRunError,
     run_few_person_scenario,
 )
-from inclusive_shift_har.protocols.few_person import (
-    build_few_person_manifest,
-    write_few_person_manifest_new,
-)
-from tests.test_few_person_protocol import materialize_few_person_inputs
+from inclusive_shift_har.manifests.canonical import canonical_json_sha256
+from tests.test_few_person_v1_1 import _materialize_v1_1_plan
 
 
 def test_neural_runner_refuses_cpu_before_raw_or_checkpoint_access(
@@ -20,17 +18,11 @@ def test_neural_runner_refuses_cpu_before_raw_or_checkpoint_access(
     repository_root: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    config_path = repository_root / "configs/protocols/few_person_inclusion_curve_v1.yaml"
-    split, receipt, zero, inventory = materialize_few_person_inputs(tmp_path, config_path)
-    manifest = build_few_person_manifest(
-        split_manifest_path=split,
-        config_path=config_path,
-        opening_receipt_path=receipt,
-        zero_shot_index_path=zero,
-        final_freeze_inventory_path=inventory,
-    )
-    manifest_path = tmp_path / "few-person.json"
-    write_few_person_manifest_new(manifest, manifest_path, allowed_root=tmp_path)
+    _, manifest_path, _ = _materialize_v1_1_plan(tmp_path, repository_root)
+    split = tmp_path / "split.json"
+    receipt = tmp_path / "receipt.json"
+    zero = tmp_path / "zero.json"
+    inventory = tmp_path / "freeze.json"
     monkeypatch.setattr("torch.cuda.is_available", lambda: False)
     output = tmp_path / "outputs" / "run"
 
@@ -57,25 +49,22 @@ def test_neural_runner_refuses_cpu_before_raw_or_checkpoint_access(
 def test_unplanned_k_or_participant_assignment_is_rejected(
     tmp_path: Path, repository_root: Path
 ) -> None:
-    config_path = repository_root / "configs/protocols/few_person_inclusion_curve_v1.yaml"
-    split, receipt, zero, inventory = materialize_few_person_inputs(tmp_path, config_path)
-    manifest = build_few_person_manifest(
-        split_manifest_path=split,
-        config_path=config_path,
-        opening_receipt_path=receipt,
-        zero_shot_index_path=zero,
-        final_freeze_inventory_path=inventory,
-    )
+    _, manifest_path, manifest = _materialize_v1_1_plan(tmp_path, repository_root)
+    split = tmp_path / "split.json"
+    receipt = tmp_path / "receipt.json"
+    zero = tmp_path / "zero.json"
+    inventory = tmp_path / "freeze.json"
     scenario = manifest["scenarios"][0]
     scenario["evaluation_subjects"] = scenario["target_inclusion_subjects"]
     manifest.pop("manifest_sha256")
-    from inclusive_shift_har.manifests.canonical import canonical_json_sha256
-
     manifest["manifest_sha256"] = canonical_json_sha256(manifest)
     manifest_path = tmp_path / "tampered-plan.json"
-    write_few_person_manifest_new(manifest, manifest_path, allowed_root=tmp_path)
+    manifest_path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
-    with pytest.raises(FewPersonRunError, match="participant sets overlap"):
+    with pytest.raises(FewPersonRunError, match="differs from pre-opening split"):
         run_few_person_scenario(
             manifest_path=manifest_path,
             split_manifest_path=split,

@@ -1,0 +1,37 @@
+schema_version: "1.0.0"
+preprocessing_id: "inclusivehar-primary-six-si-128-sensitivity-v1"
+dataset_id: "inclusivehar_v4"
+status: "predeclared_post_confirmatory_preprocessing_sensitivity"
+evidence_status: "post_confirmatory_unit_sensitivity"
+track_role: "numerical_unit-representation_sensitivity_not_model_evaluation"
+primary_claim_eligible: false
+channels:
+  - "motionUserAccelerationX"
+  - "motionUserAccelerationY"
+  - "motionUserAccelerationZ"
+  - "motionRotationRateX"
+  - "motionRotationRateY"
+  - "motionRotationRateZ"
+units:
+  motionUserAcceleration_input: "g"
+  motionUserAcceleration_output: "m/s^2"
+  motionRotationRate: "rad/s"
+conversion:
+  acceleration_multiplier: 9.80665
+  timing: "before_training_only_standardization"
+window_length_samples: 128
+window_stride_samples: 128
+declared_sampling_rate_hz: 50
+boundary_unit: "released_contiguous_subject_activity_block"
+remainder_policy: "drop_tail_shorter_than_128_per_released_block"
+normalization:
+  method: "per_channel_z_score"
+  fit_scope: "source_training_partition_only"
+  validation_in_fit: false
+  target_in_fit: false
+  epsilon: 1.0e-8
+interpretation: "A positive constant unit change is algebraically removed by per-channel z-scoring; verify numerically rather than claim a new model result."
+forbidden_claims:
+  - "confirmatory_model_result"
+  - "accuracy_improvement"
+  - "independent_experiment"

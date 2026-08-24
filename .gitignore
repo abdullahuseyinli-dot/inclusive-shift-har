@@ -48,6 +48,9 @@ Thumbs.db
 /results/development/**/source_validation_predictions.npz
 /results/final/**/source_validation_predictions.npz
 /results/confirmatory/**/*.npz
+/results/postconfirmatory/**/*.npz
+/results/legacy_reproduction/**/*.npz
+/results/**/runtime_logs/
 *.pt
 *.pth
 *.ckpt

@@ -1,0 +1,56 @@
+schema_version: "1.0.0"
+protocol_id: "inclusivehar-v4-disabled-within-group-cross-subject-v1"
+status: "predeclared_post_confirmatory_descriptive"
+dataset_id: "inclusivehar_v4"
+ontology_track: "functional_core"
+class_order: ["mobility", "sitting", "standing"]
+target_participants: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+source_locked_model_ids: ["compact-erm", "deepconvlstm", "more-har-backbone"]
+seeds: [11, 23, 47, 89, 131]
+folds:
+  - fold_id: "disabled_outer_01"
+    training_subjects: ["11", "14", "16", "17", "19", "20"]
+    validation_subjects: ["13", "15"]
+    evaluation_subjects: ["12", "18"]
+  - fold_id: "disabled_outer_02"
+    training_subjects: ["11", "12", "14", "16", "18", "20"]
+    validation_subjects: ["17", "19"]
+    evaluation_subjects: ["13", "15"]
+  - fold_id: "disabled_outer_03"
+    training_subjects: ["11", "12", "13", "15", "18", "20"]
+    validation_subjects: ["14", "16"]
+    evaluation_subjects: ["17", "19"]
+  - fold_id: "disabled_outer_04"
+    training_subjects: ["12", "13", "15", "17", "18", "19"]
+    validation_subjects: ["11", "20"]
+    evaluation_subjects: ["14", "16"]
+  - fold_id: "disabled_outer_05"
+    training_subjects: ["13", "14", "15", "16", "17", "19"]
+    validation_subjects: ["12", "18"]
+    evaluation_subjects: ["11", "20"]
+normalization:
+  fit_scope: "fold_training_participants_only"
+  method: "per_channel_population_standardization"
+  minimum_scale: 1.0e-8
+calibration:
+  method: "scalar_temperature"
+  fit_scope: "fold_validation_participants_only"
+  checkpoint_selection: "forbidden_fixed_last_epoch"
+  evaluation_access_before_calibrator_freeze: false
+execution:
+  neural_device: "cuda_only"
+  cpu_neural_fallback: false
+  one_cell_per_process: true
+  sequential_runs_required: true
+  create_only_artifacts: true
+  failures_preserved: true
+  raw_csv_interface: false
+  new_target_opening_interface: false
+statistics:
+  participant_is_independent_unit: true
+  window_as_independent_unit: false
+  bootstrap_replicates: 10000
+  bootstrap_seed: 20260824
+  paired_reference_model_id: "compact-erm"
+  multiple_comparison_correction: "holm"
+evidence_status: "post_confirmatory_descriptive_disabled_within_group_cross_subject"

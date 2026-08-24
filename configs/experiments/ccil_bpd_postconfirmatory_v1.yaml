@@ -1,0 +1,170 @@
+schema_version: "1.0.0"
+experiment_id: "ccil-bpd-postconfirmatory-v1"
+status: "post_confirmatory_extension_predeclared_after_consumed_opening_1"
+evidence_status: "post_confirmatory_descriptive_paper_adaptation"
+designed_after_target_opening: true
+primary_claim_eligible: false
+protocol:
+  description: "participant-exclusive released-block protocol; not trial-safe"
+  trial_safe: false
+  hidden_join_unconditional_risk_bound: 1.0
+  split_manifest_path: "results/protocol/splits/inclusivehar_v4_released_block_v1_2.json"
+  split_manifest_sha256: "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b"
+  split_manifest_file_sha256: "af909c7d914b68c417b238b576945c112aa58740859a7d998b6b77219dfb1920"
+  source_artifact_sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+  dataset_manifest_path: "manifests/datasets/inclusivehar_v4.json"
+  dataset_manifest_file_sha256: "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  preprocessing_config_path: "configs/preprocessing/inclusivehar_primary_128.yaml"
+  preprocessing_config_file_sha256: "bb23327375f491708c81aa2a605b0a24e9a8274a20dee9ef66b8232cc9525145"
+  ontology_config_sha256: "85f6d8ed911420f51c971da05539b739bad30c9e1816d376445abd18ade6d03e"
+  ontology_track: "functional_core"
+  class_names: ["mobility", "sitting", "standing"]
+  channels:
+    - "motionUserAccelerationX"
+    - "motionUserAccelerationY"
+    - "motionUserAccelerationZ"
+    - "motionRotationRateX"
+    - "motionRotationRateY"
+    - "motionRotationRateZ"
+  window_shape: [128, 6]
+  window_stride_samples: 128
+  source_train_participants: ["1", "2", "3", "4", "5", "6", "7", "9"]
+  source_validation_participants: ["8", "10"]
+  target_participants: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+  expected_source_train_windows: 582
+  expected_source_validation_windows: 143
+  expected_target_windows: 807
+opening_1:
+  opening_receipt_path: "results/protocol/confirmatory_target_opening_1.json"
+  opening_receipt_file_sha256: "71711626f595c354d00fe3950127516a86cfabae8bef76bf54018c98707ab719"
+  opening_receipt_record_sha256: "5704f65efd416e9cd16d6ed24c2735c1d52b7fcaafddb113e481498797cd182a"
+  locked_target_index_path: "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json"
+  locked_target_index_file_sha256: "ae0daace937bc275bce2edd895f1c05eb540f61d1554eda471c9d2f27bf60e49"
+  locked_target_index_record_sha256: "79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9"
+  target_seal_id: "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d"
+  unlock_or_new_opening_invocation_allowed: false
+comparator:
+  model_ids: ["compact-erm", "more-har-full"]
+  architectures:
+    compact-erm: "compact_residual_96"
+    more-har-full: "locked MoRe-HAR full model"
+  source_model_names:
+    compact-erm: "compact_residual_96"
+    more-har-full: "more_har"
+  evidence: "frozen source-only artifacts and consumed opening-1 results; neither comparator is rerun"
+  final_freeze_path: "results/protocol/final_source_artifact_freeze_v1.json"
+  final_freeze_file_sha256: "e62ca1233c55ef086f3d7f2352c9dca8ef5a8eb6ce8a3a568e2e3ee53d5af690"
+  final_freeze_inventory_sha256: "d867ade3778fd07a1bb1404121d4f84323ddb66fe9bf15705603175fcf74b070"
+  frozen_artifact_set_sha256: "e759b60f32b965e7ae3e5a994d919a08553c4958f9bdcf10d7497697f685dd51"
+  source_record_templates:
+    compact-erm: "results/final/source_only_v1/records/compact-erm--seed-{seed}.json"
+    more-har-full: "results/final/source_only_v1/records/more-har-full--seed-{seed}.json"
+  source_calibrator_templates:
+    compact-erm: "results/final/source_only_v1/calibrators/compact-erm--seed-{seed}.json"
+    more-har-full: "results/final/source_only_v1/calibrators/more-har-full--seed-{seed}.json"
+execution:
+  required_device: "cuda"
+  one_process_one_gpu: true
+  sequential_runs: true
+  required_seed_order: [11, 23, 47, 89, 131]
+  selection_seed: 11
+  source_checkpoint_rule: "fixed_last_epoch_23_matching_frozen_compact_erm"
+  target_stage_after_durable_source_lock: true
+  target_tuning_or_refit: false
+  mixed_precision: "float16"
+training:
+  epochs: 23
+  batch_size: 256
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  gradient_clip_norm: 5.0
+  data_loader_workers: 0
+  optimizer: "adamw"
+  scheduler: "cosine_annealing_per_completed_epoch"
+  normalization: "per_channel_population_standardization_fit_source_train_only"
+  calibration: "scalar_temperature_fit_source_validation_only_per_final_seed"
+methods:
+  - model_id: "ccil-paper-loss-compact"
+    claim_label: "paper-derived CCIL equations 2-6 on local compact_residual_96; not official code or faithful reproduction"
+    architecture: "compact_residual_96"
+    official_code_used: false
+    paper_doi: "10.1609/aaai.v39i1.32077"
+    implementation_module: "inclusive_shift_har.training.ccil_paper.CCILPaperConceptMeanLoss"
+    selection_candidates:
+      - candidate_id: "alpha-0p01-ema-0p01"
+        alpha: 0.01
+        ema_update_weight: 0.01
+      - candidate_id: "alpha-0p01-ema-0p1"
+        alpha: 0.01
+        ema_update_weight: 0.1
+      - candidate_id: "alpha-0p1-ema-0p01"
+        alpha: 0.1
+        ema_update_weight: 0.01
+      - candidate_id: "alpha-0p1-ema-0p1"
+        alpha: 0.1
+        ema_update_weight: 0.1
+  - model_id: "bpd-boundary-safe-compact-adaptation"
+    claim_label: "paper-derived BPD roles re-expressed over local compact_residual_96; boundary-safe protocol adaptation, not official-faithful BPD"
+    architecture: "compact_residual_96_generator_plus_local_factorization_heads"
+    official_code_used: false
+    third_party_code_copied: false
+    paper_doi: "10.1145/3517252"
+    implementation_module: "inclusive_shift_har.models.paper_adaptations.BPDBoundarySafeCompactAdapter"
+    latent_dim: 24
+    mine_steps_per_batch: 1
+    selection_candidates:
+      - candidate_id: "mi-0p0001-confusion-0p1-reconstruction-1"
+        mutual_information_weight: 0.0001
+        confusion_weight: 0.1
+        reconstruction_weight: 1.0
+      - candidate_id: "mi-0p0001-confusion-1-reconstruction-1"
+        mutual_information_weight: 0.0001
+        confusion_weight: 1.0
+        reconstruction_weight: 1.0
+      - candidate_id: "mi-0p001-confusion-0p1-reconstruction-1"
+        mutual_information_weight: 0.001
+        confusion_weight: 0.1
+        reconstruction_weight: 1.0
+      - candidate_id: "mi-0p001-confusion-1-reconstruction-1"
+        mutual_information_weight: 0.001
+        confusion_weight: 1.0
+        reconstruction_weight: 1.0
+selection:
+  equal_candidate_count_per_method: 4
+  fit_partition: "source_train"
+  scoring_partition: "source_validation"
+  primary_metric: "mean_participant_macro_f1"
+  tie_breakers:
+    - "worst_participant_macro_f1"
+    - "candidate_id_lexicographic"
+  target_signals_labels_predictions_or_metrics_allowed: false
+statistics:
+  statistical_unit: "participant"
+  seed_aggregation: "mean_each_participant_across_five_seeds_before_model_comparison"
+  comparison_references: ["compact-erm", "more-har-full"]
+  participant_bootstrap_resamples: 10000
+  participant_bootstrap_seed: 1729
+  paired_permutation_samples: 100000
+  paired_permutation_seed: 2718
+  multiple_comparison_correction: "holm_across_four_adapter_vs_locked_comparator_target_comparisons"
+outputs:
+  output_directory: "results/postconfirmatory/ccil_bpd_v1"
+  selection_lock_filename: "source_selection_lock.json"
+  source_stage_lock_filename: "source_stage_lock.json"
+  index_filename: "ccil_bpd_postconfirmatory_index.json"
+  aggregate_filename: "ccil_bpd_postconfirmatory_aggregate.json"
+limitations:
+  - "The extension was designed after opening-1 target results existed and is descriptive only."
+  - "CCIL has no verified official implementation; only published concept-mean equations are adapted."
+  - "BPD's official trainer is not used; local objectives and optimization schedule are an explicitly qualified protocol adaptation."
+  - "Only two source-validation participants are available for hyperparameter selection and calibration."
+  - "Released trial identifiers and timestamps are absent, so the participant-exclusive released-block protocol is not trial-safe."
+  - "Target participants are evaluated through the consumed opening-1 cache; no new confirmatory opening exists."
+  - "Compact ERM and MoRe-HAR full comparisons reuse frozen source artifacts and consumed opening-1 results without rerunning either comparator."
+forbidden_claims:
+  - "official CCIL reproduction"
+  - "official or faithful BPD reproduction"
+  - "confirmatory evidence"
+  - "trial-safe or leakage-safe recordings"
+  - "causal disability effect"
+  - "fairness or clinical validity"

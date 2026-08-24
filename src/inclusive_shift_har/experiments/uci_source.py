@@ -197,6 +197,18 @@ def _confined_output(path: Path, *, allowed_root: Path, kind: str) -> Path:
     return candidate
 
 
+def _portable_output_reference(path: Path, *, allowed_root: Path, kind: str) -> str:
+    root = allowed_root.resolve(strict=True)
+    resolved = path.resolve(strict=True)
+    try:
+        relative = resolved.relative_to(root)
+    except ValueError as exc:
+        raise UCISourceRunError(f"{kind} escapes the allowed output root") from exc
+    if relative == Path("."):
+        raise UCISourceRunError(f"{kind} cannot be the allowed output root itself")
+    return relative.as_posix()
+
+
 def _write_predictions_new(
     path: Path,
     *,
@@ -371,7 +383,12 @@ def run_uci_source_fold(
             "training": trained,
             "validation_report": report,
             "prediction_artifact": {
-                "path": prediction_path.as_posix(),
+                "path": _portable_output_reference(
+                    prediction_path,
+                    allowed_root=summary_output.parent.parent,
+                    kind="prediction artifact",
+                ),
+                "path_base": "record_directory_parent",
                 "sha256": prediction_sha256,
             },
             "device": {

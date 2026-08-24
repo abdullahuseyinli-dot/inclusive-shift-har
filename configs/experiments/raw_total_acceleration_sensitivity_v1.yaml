@@ -1,0 +1,122 @@
+schema_version: "1.0.0"
+experiment_id: "raw-total-acceleration-sensitivity-v1"
+status: "predeclared_post_confirmatory_exploratory"
+track_role: "post_confirmatory_signal_definition_sensitivity"
+primary_claim_eligible: false
+selection_basis: "compact_erm_backbone_and_more_har_full_predeclared_independent_of_observed_ranking"
+dataset:
+  dataset_manifest_path: "manifests/datasets/inclusivehar_v4.json"
+  dataset_manifest_file_sha256: "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  source_window_manifest_path: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+  source_window_manifest_file_sha256: "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+  source_window_manifest_sha256: "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522"
+  split_manifest_path: "results/protocol/splits/inclusivehar_v4_released_block_v1_2.json"
+  split_manifest_file_sha256: "af909c7d914b68c417b238b576945c112aa58740859a7d998b6b77219dfb1920"
+  split_manifest_sha256: "ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b"
+  raw_sensor_artifact_sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+  ontology_config_sha256: "85f6d8ed911420f51c971da05539b739bad30c9e1816d376445abd18ade6d03e"
+  ontology_track: "functional_core"
+  class_names: ["mobility", "sitting", "standing"]
+  source_train_participants: ["1", "2", "3", "4", "5", "6", "7", "9"]
+  source_validation_participants: ["8", "10"]
+  target_participants: ["11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+  expected_source_train_windows: 582
+  expected_source_validation_windows: 143
+  expected_target_windows: 807
+signal_interface:
+  channels:
+    - "accelerometerAccelerationX"
+    - "accelerometerAccelerationY"
+    - "accelerometerAccelerationZ"
+    - "motionRotationRateX"
+    - "motionRotationRateY"
+    - "motionRotationRateZ"
+  acceleration_definition: "released_raw_or_total_device_acceleration_including_gravity"
+  gyroscope_definition: "released_motion_rotation_rate"
+  acceleration_unit_status: "not_encoded_in_released_csv"
+  preprocessing_config_path: "configs/preprocessing/inclusivehar_raw_total_acceleration_128.yaml"
+  preprocessing_config_file_sha256: "ecba128a7ad1bee62ff06b36b2cc39fce4bc8f3884a1045809e8c4b4a8fe1384"
+  window_length_samples: 128
+  window_stride_samples: 128
+  uci_body_acceleration_equivalent: false
+  trial_safe: false
+  trial_boundary_status: "unrecoverable"
+normalization:
+  method: "per_channel_population_standardization"
+  fit_partition: "source_train"
+  fit_participants: ["1", "2", "3", "4", "5", "6", "7", "9"]
+  target_in_fit: false
+execution:
+  neural_device: "cuda"
+  mixed_precision: "float16"
+  data_loader_workers: 0
+  sequential_runs: true
+  require_clean_worktree: true
+  source_stage_must_complete_before_target_access: true
+  source_checkpoint_rule: "fixed_last_epoch"
+  required_seed_order: [11, 23, 47, 89, 131]
+opening_context:
+  opening_number: 1
+  opening_receipt_path: "results/protocol/confirmatory_target_opening_1.json"
+  opening_receipt_file_sha256: "71711626f595c354d00fe3950127516a86cfabae8bef76bf54018c98707ab719"
+  opening_receipt_record_sha256: "5704f65efd416e9cd16d6ed24c2735c1d52b7fcaafddb113e481498797cd182a"
+  locked_target_index_path: "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json"
+  locked_target_index_file_sha256: "ae0daace937bc275bce2edd895f1c05eb540f61d1554eda471c9d2f27bf60e49"
+  locked_target_index_record_sha256: "79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9"
+  target_seal_id: "aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d"
+  unlock_or_new_opening_invocation_allowed: false
+selection_lineage:
+  final_source_selection_plan_path: "results/protocol/final_source_selection_plan_v1.json"
+  final_source_selection_plan_file_sha256: "c33bcb6854bacbd8f3d76bc5426505d3e4ebf974d6ca8dc1b4e23d860eab86a3"
+  final_source_selection_plan_sha256: "f21c09107f565a8351ab51246de7ef8545f9a38938e33a713aa655f85c521868"
+  target_metrics_used_to_select_architectures: false
+models:
+  - model_id: "compact-erm"
+    runner_model_name: "compact_residual_96"
+    epochs: 23
+    batch_size: 256
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    patience: 7
+    minimum_epochs: 8
+    use_augmentation: false
+    use_content_objective: false
+    use_realization_factorization: false
+    use_group_dro: false
+  - model_id: "more-har-full"
+    runner_model_name: "more_har"
+    epochs: 27
+    batch_size: 256
+    learning_rate: 0.0003
+    weight_decay: 0.0001
+    patience: 9
+    minimum_epochs: 8
+    use_augmentation: true
+    use_content_objective: true
+    use_realization_factorization: true
+    use_group_dro: true
+calibration:
+  method: "scalar_temperature"
+  fit_partition: "source_validation"
+  target_labels_or_metrics_used_for_fit: false
+  target_calibration_or_refit_allowed: false
+outputs:
+  output_directory: "results/postconfirmatory/raw_total_acceleration_v1"
+  source_stage_lock_filename: "source_stage_lock.json"
+  index_filename: "raw_total_acceleration_index.json"
+  aggregate_json_filename: "raw_total_acceleration_aggregate.json"
+  aggregate_csv_filename: "raw_total_acceleration_summary.csv"
+  aggregate_markdown_filename: "raw_total_acceleration_summary.md"
+  failure_directory_name: "failures"
+aggregation:
+  statistical_unit: "participant"
+  seed_handling: "participant_metric_averaged_over_five_locked_seeds_before_summary"
+  paired_bootstrap_resamples: 10000
+  paired_bootstrap_seed: 1729
+  confidence: 0.95
+  multiple_comparison_status: "exploratory_no_confirmatory_claim"
+forbidden_claims:
+  - "confirmatory"
+  - "exact_UCI_signal_match"
+  - "trial_safe"
+  - "causal_disability_effect"

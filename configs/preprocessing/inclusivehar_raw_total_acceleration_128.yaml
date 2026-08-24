@@ -1,0 +1,28 @@
+schema_version: "1.0.0"
+preprocessing_id: "inclusivehar-raw-total-acceleration-gyro-128-sensitivity-v1"
+dataset_id: "inclusivehar_v4"
+evidence_status: "post_confirmatory_signal_definition_sensitivity"
+channels:
+  - "accelerometerAccelerationX"
+  - "accelerometerAccelerationY"
+  - "accelerometerAccelerationZ"
+  - "motionRotationRateX"
+  - "motionRotationRateY"
+  - "motionRotationRateZ"
+signal_definition:
+  acceleration: "raw_or_total_device_acceleration_including_gravity"
+  contrast: "motionUserAcceleration is gravity-separated by the Core Motion processing pipeline"
+  unit_status: "not_encoded_in_the_released_CSV; any g interpretation must remain explicit"
+  cross_source_status: "not_equivalent_to_UCI_body_acceleration"
+window_length_samples: 128
+window_stride_samples: 128
+declared_sampling_rate_hz: 50
+boundary_unit: "released_contiguous_subject_activity_block"
+normalization:
+  method: "per_channel_z_score"
+  fit_scope: "source_training_partition_only"
+  target_in_fit: false
+forbidden_claims:
+  - "confirmatory"
+  - "exact_UCI_signal_match"
+  - "trial_safe"

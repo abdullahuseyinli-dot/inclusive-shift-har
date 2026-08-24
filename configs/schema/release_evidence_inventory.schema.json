@@ -1,0 +1,395 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:inclusive-shift-har:schema:release-evidence-inventory:1.0.0",
+  "title": "InclusiveShift-HAR final release evidence inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "inventory_kind",
+    "status",
+    "created_at_utc",
+    "generation_spec",
+    "repository",
+    "confirmatory_state",
+    "required_roles",
+    "artifacts",
+    "gates",
+    "postconfirmatory_statuses",
+    "blockers",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "inventory_kind": { "const": "final_release_evidence_inventory" },
+    "status": { "enum": ["draft", "blocked", "ready", "released"] },
+    "created_at_utc": { "type": "string", "format": "date-time" },
+    "generation_spec": { "$ref": "#/$defs/spec_reference" },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code_commit",
+        "worktree_clean",
+        "protocol_tag",
+        "remote_visibility",
+        "remote_url",
+        "remote_evidence_scope",
+        "remote_evidence_path",
+        "remote_evidence_sha256"
+      ],
+      "properties": {
+        "code_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "worktree_clean": { "type": "boolean" },
+        "protocol_tag": { "type": "string", "minLength": 1 },
+        "remote_visibility": { "enum": ["absent", "private", "public"] },
+        "remote_url": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^https://github\\.com/[^/]+/[^/]+$" }
+          ]
+        },
+        "remote_evidence_path": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/safe_relative_path" }
+          ]
+        },
+        "remote_evidence_scope": {
+          "oneOf": [
+            { "type": "null" },
+            { "enum": ["repository_root", "spec_root"] }
+          ]
+        },
+        "remote_evidence_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        }
+      }
+    },
+    "confirmatory_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opening_count",
+        "target_rerun_permitted",
+        "opening_receipt_path",
+        "opening_receipt_record_sha256",
+        "target_index_path",
+        "target_index_record_sha256"
+      ],
+      "properties": {
+        "opening_count": { "const": 1 },
+        "target_rerun_permitted": { "const": false },
+        "opening_receipt_path": { "$ref": "#/$defs/safe_relative_path" },
+        "opening_receipt_record_sha256": { "$ref": "#/$defs/sha256" },
+        "target_index_path": { "$ref": "#/$defs/safe_relative_path" },
+        "target_index_record_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "required_roles": {
+      "const": [
+        "legacy_audit",
+        "legacy_verification",
+        "literature_matrix",
+        "dataset_manifest",
+        "dataset_card",
+        "data_audit",
+        "ontology_lock",
+        "locked_protocol",
+        "split_manifest_and_audit",
+        "source_artifact_freeze",
+        "opening_receipt",
+        "locked_target_index",
+        "participant_statistics",
+        "publication_report",
+        "benchmark_card",
+        "model_card",
+        "baseline_coverage",
+        "experiment_runbook",
+        "paper_outline",
+        "release_gate_report"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/artifact" }
+    },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tests",
+        "lint",
+        "format",
+        "types",
+        "manifests",
+        "splits",
+        "configuration",
+        "artifacts",
+        "tracked_file_scan",
+        "secret_scan",
+        "license_audit",
+        "ci"
+      ],
+      "properties": {
+        "tests": { "$ref": "#/$defs/gate" },
+        "lint": { "$ref": "#/$defs/gate" },
+        "format": { "$ref": "#/$defs/gate" },
+        "types": { "$ref": "#/$defs/gate" },
+        "manifests": { "$ref": "#/$defs/gate" },
+        "splits": { "$ref": "#/$defs/gate" },
+        "configuration": { "$ref": "#/$defs/gate" },
+        "artifacts": { "$ref": "#/$defs/gate" },
+        "tracked_file_scan": { "$ref": "#/$defs/gate" },
+        "secret_scan": { "$ref": "#/$defs/gate" },
+        "license_audit": { "$ref": "#/$defs/gate" },
+        "ci": { "$ref": "#/$defs/gate" }
+      }
+    },
+    "postconfirmatory_statuses": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": { "$ref": "#/$defs/postconfirmatory_status" }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["blocker_id", "status", "description", "evidence_role"],
+        "properties": {
+          "blocker_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+          "status": { "enum": ["open", "resolved", "accepted_limitation"] },
+          "description": { "type": "string", "minLength": 1 },
+          "evidence_role": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "string", "minLength": 1 }
+            ]
+          }
+        }
+      }
+    },
+    "record_sha256": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+    },
+    "file_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "size_bytes", "file_sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/safe_relative_path" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "file_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "spec_reference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "path",
+            "absolute_path_recorded",
+            "size_bytes",
+            "file_sha256"
+          ],
+          "properties": {
+            "scope": { "const": "repository_root" },
+            "path": { "$ref": "#/$defs/safe_relative_path" },
+            "absolute_path_recorded": { "const": false },
+            "size_bytes": { "type": "integer", "minimum": 0 },
+            "file_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scope",
+            "basename",
+            "absolute_path_recorded",
+            "size_bytes",
+            "file_sha256"
+          ],
+          "properties": {
+            "scope": { "const": "external_spec" },
+            "basename": { "type": "string", "minLength": 1, "pattern": "^[^/\\\\:]+$" },
+            "absolute_path_recorded": { "const": false },
+            "size_bytes": { "type": "integer", "minimum": 0 },
+            "file_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "path",
+        "size_bytes",
+        "file_sha256",
+        "record_sha256",
+        "embedded_self_hash_field",
+        "evidence_status",
+        "validation_status",
+        "required_for_release",
+        "claim_scope"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "legacy_audit",
+            "legacy_verification",
+            "literature_matrix",
+            "dataset_manifest",
+            "dataset_card",
+            "data_audit",
+            "ontology_lock",
+            "locked_protocol",
+            "split_manifest_and_audit",
+            "source_artifact_freeze",
+            "opening_receipt",
+            "locked_target_index",
+            "participant_statistics",
+            "publication_report",
+            "benchmark_card",
+            "model_card",
+            "baseline_coverage",
+            "experiment_runbook",
+            "paper_outline",
+            "release_gate_report",
+            "postconfirmatory_ccil_bpd",
+            "postconfirmatory_cross_source",
+            "postconfirmatory_efficiency",
+            "postconfirmatory_few_person",
+            "postconfirmatory_raw_total",
+            "postconfirmatory_sensor_stress",
+            "postconfirmatory_si_unit",
+            "postconfirmatory_ssl_foundation",
+            "postconfirmatory_uci_reproduction",
+            "postconfirmatory_within_group",
+            "failure_or_deviation",
+            "license_notice",
+            "environment_record"
+          ]
+        },
+        "path": { "$ref": "#/$defs/safe_relative_path" },
+        "size_bytes": { "type": "integer", "minimum": 0 },
+        "file_sha256": { "$ref": "#/$defs/sha256" },
+        "record_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        },
+        "embedded_self_hash_field": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" }
+          ]
+        },
+        "evidence_status": { "type": "string", "minLength": 1 },
+        "validation_status": {
+          "enum": ["pass", "conditional", "failed", "quarantined", "not_run", "incomplete", "blocked"]
+        },
+        "required_for_release": { "type": "boolean" },
+        "claim_scope": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence_scope",
+        "evidence_path",
+        "evidence_sha256",
+        "tool_version",
+        "note"
+      ],
+      "properties": {
+        "status": { "enum": ["pass", "fail", "not_run", "not_applicable"] },
+        "evidence_scope": {
+          "oneOf": [
+            { "type": "null" },
+            { "enum": ["repository_root", "spec_root"] }
+          ]
+        },
+        "evidence_path": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/safe_relative_path" }
+          ]
+        },
+        "evidence_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        },
+        "tool_version": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "note": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        }
+      }
+    },
+    "postconfirmatory_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["track", "status", "evidence_role", "note", "primary_claim_eligible"],
+      "properties": {
+        "track": {
+          "enum": [
+            "ccil_bpd_postconfirmatory_v1",
+            "cross_source_pretraining",
+            "few_person_inclusion_curve_v1_1",
+            "neural_efficiency_profile_v1",
+            "raw_total_acceleration_sensitivity_v1",
+            "sensor_reliability_stress_v1",
+            "si_unit_sensitivity_v1",
+            "ssl_foundation_comparison",
+            "uci_corrected_reproduction_v1_1",
+            "within_group_cross_subject"
+          ]
+        },
+        "status": {
+          "enum": ["completed", "incomplete", "not_run", "blocked", "not_applicable"]
+        },
+        "evidence_role": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "note": { "type": "string", "minLength": 1 },
+        "primary_claim_eligible": { "const": false }
+      }
+    }
+  }
+}

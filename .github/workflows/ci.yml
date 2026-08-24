@@ -45,7 +45,7 @@ jobs:
           cache-dependency-glob: uv.lock
 
       - name: Install locked development environment
-        run: uv sync --locked
+        run: uv sync --locked --extra training-cpu --group research
 
       - name: Run synthetic tests
         run: uv run pytest -q

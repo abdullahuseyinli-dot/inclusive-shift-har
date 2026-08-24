@@ -56,7 +56,7 @@ The protocol tag is `protocol-v1.2.0`. Checkpoint and raw prediction arrays are 
 
 ## Data and protocol
 
-The main sensing interface is three-axis user acceleration plus three-axis rotation rate at 50 Hz in 128-sample windows. Participants are partitioned before windowing. Source training may use stride 64; confirmatory validation and target evaluation use stride 128. Normalization is fitted on training participants only, calibration on source validation only, and all model selection occurred before the target opening.
+The locked main sensing interface is three-axis user acceleration plus three-axis rotation rate at 50 Hz in 128-sample windows. Participants are partitioned before windowing, and the executed released-block protocol uses stride 128 in source training, source validation, and target evaluation. A stride-64 training option was considered in the initial proposal but was not used in the locked experiment. Normalization is fitted on training participants only, calibration on source validation only, and all model selection occurred before the target opening.
 
 The functional-core result uses mobility, sitting, and standing. Inclusive-native and cross-source ontology tracks are documented separately. See:
 

@@ -10,6 +10,7 @@ import yaml
 from inclusive_shift_har.artifacts.sensor_stress import (
     SensorStressArtifactError,
     create_secondary_stress_artifacts,
+    create_source_clean_reference_artifacts,
 )
 from inclusive_shift_har.evaluation.sensor_reliability import (
     SensorReliabilityError,
@@ -183,17 +184,23 @@ def test_secondary_artifacts_reuse_prediction_contract_and_participant_metrics(
         class_names=("mobility", "sitting", "standing"),
         config=config,
         condition_metadata=corruption.metadata,
+        cohort="target",
         model_id="synthetic-model",
         seed=7,
         frozen_checkpoint_sha256="a" * 64,
         frozen_normalization_sha256="b" * 64,
+        frozen_calibrator_sha256="e" * 64,
         base_prediction_sha256="c" * 64,
         primary_confirmatory_completion_record_sha256="d" * 64,
+        primary_cache_record_file_sha256="f" * 64,
+        primary_cache_record_sha256="1" * 64,
         created_at_utc="2099-01-01T00:00:00Z",
     )
     assert record["track_role"] == "secondary_post_confirmatory"
     assert record["primary_claim_eligible"] is False
     assert record["participant_level_report"]["participant_count"] == 2
+    assert record["primary_cache_record_file_sha256"] == "f" * 64
+    assert record["primary_cache_record_sha256"] == "1" * 64
     stored = json.loads((tmp_path / "record.json").read_text(encoding="utf-8"))
     claimed = stored.pop("record_sha256")
     assert claimed == canonical_json_sha256(stored)
@@ -221,14 +228,49 @@ def test_secondary_artifacts_reuse_prediction_contract_and_participant_metrics(
             class_names=("mobility", "sitting", "standing"),
             config=config,
             condition_metadata=corruption.metadata,
+            cohort="target",
             model_id="synthetic-model",
             seed=7,
             frozen_checkpoint_sha256="a" * 64,
             frozen_normalization_sha256="b" * 64,
+            frozen_calibrator_sha256="e" * 64,
             base_prediction_sha256="c" * 64,
             primary_confirmatory_completion_record_sha256="d" * 64,
+            primary_cache_record_file_sha256="f" * 64,
+            primary_cache_record_sha256="1" * 64,
             created_at_utc="2099-01-01T00:00:00Z",
         )
+
+
+def test_source_clean_result_binds_primary_cache_record_hashes(tmp_path: Path) -> None:
+    labels = np.asarray([0, 1, 2], dtype=np.int64)
+    probabilities = np.eye(3, dtype=np.float64) * 0.8 + 0.2 / 3.0
+    probabilities /= probabilities.sum(axis=1, keepdims=True)
+    record = create_source_clean_reference_artifacts(
+        prediction_path=tmp_path / "source-clean.npz",
+        record_path=tmp_path / "source-clean.json",
+        allowed_root=tmp_path,
+        logits=np.log(probabilities),
+        probabilities=probabilities,
+        labels=labels,
+        participant_ids=("p1", "p1", "p2"),
+        window_ids=("w1", "w2", "w3"),
+        class_names=("mobility", "sitting", "standing"),
+        model_id="synthetic-model",
+        seed=7,
+        stress_config_sha256="a" * 64,
+        final_freeze_inventory_sha256="b" * 64,
+        frozen_checkpoint_sha256="c" * 64,
+        frozen_normalization_sha256="d" * 64,
+        frozen_calibrator_sha256="e" * 64,
+        locked_target_index_record_sha256="f" * 64,
+        primary_cache_record_file_sha256="1" * 64,
+        primary_cache_record_sha256="2" * 64,
+        created_at_utc="2099-01-01T00:00:00Z",
+    )
+
+    assert record["primary_cache_record_file_sha256"] == "1" * 64
+    assert record["primary_cache_record_sha256"] == "2" * 64
 
 
 def test_secondary_artifact_rejects_changed_condition_metadata(repository_root: Path) -> None:
@@ -254,11 +296,15 @@ def test_secondary_artifact_rejects_changed_condition_metadata(repository_root: 
             class_names=("a", "b"),
             config=config,
             condition_metadata=changed,
+            cohort="target",
             model_id="synthetic",
             seed=0,
             frozen_checkpoint_sha256="a" * 64,
             frozen_normalization_sha256="b" * 64,
+            frozen_calibrator_sha256="e" * 64,
             base_prediction_sha256="c" * 64,
             primary_confirmatory_completion_record_sha256="d" * 64,
+            primary_cache_record_file_sha256="f" * 64,
+            primary_cache_record_sha256="1" * 64,
             created_at_utc="2099-01-01T00:00:00Z",
         )

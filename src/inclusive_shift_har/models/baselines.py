@@ -151,7 +151,7 @@ class DeepConvLSTM(nn.Module):
 
 
 class CompactResidualHAR(nn.Module):
-    """CNN-HAR/TinyHAR-style compact residual temporal baseline."""
+    """Repository-authored compact residual temporal baseline."""
 
     def __init__(
         self,

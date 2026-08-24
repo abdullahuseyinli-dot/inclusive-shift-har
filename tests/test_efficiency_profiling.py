@@ -108,6 +108,8 @@ def test_efficiency_record_writer_is_self_hashed_and_create_only(tmp_path: Path)
         "schema_version": "1.0.0",
         "record_kind": "cuda_neural_efficiency_profile",
         "status": "profile_complete",
+        "required_device": "cuda",
+        "execution_device_type": "cuda",
         "model_selection_use": False,
         "parameters": {"total": 15},
     }
@@ -126,6 +128,8 @@ def test_efficiency_record_writer_rejects_selection_use(tmp_path: Path) -> None:
         "schema_version": "1.0.0",
         "record_kind": "cuda_neural_efficiency_profile",
         "status": "profile_complete",
+        "required_device": "cuda",
+        "execution_device_type": "cuda",
         "model_selection_use": True,
     }
     record["record_sha256"] = canonical_json_sha256(record)

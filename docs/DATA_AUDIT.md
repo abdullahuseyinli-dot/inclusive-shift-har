@@ -2,7 +2,7 @@
 
 ## Current gate decision
 
-InclusiveHAR v4 passes artifact, schema, numeric-integrity, identity, label, and participant-coverage checks. It does **not** pass the split/windowing gate. The released CSV has no timestamp, trial, session, recording, or raw-sample identifier, so the three repetitions reported by the article cannot be separated reliably. Split construction, windowing, normalization, training, and evaluation remain blocked.
+InclusiveHAR v4 passes artifact, schema, numeric-integrity, identity, label, and participant-coverage checks. The original Stage 3 trial-safe split/windowing gate **failed and remains failed**: the released CSV has no timestamp, trial, session, recording, or raw-sample identifier, so the three repetitions reported by the article cannot be separated reliably. A later explicit deviation authorized a narrower participant-exclusive released-block protocol after recording the unconditional hidden-join risk bound. Training and the one-time target evaluation proceeded only under that superseding conditional protocol; they do not retroactively make the dataset trial-safe or erase this audit failure. See `docs/LOCKED_PROTOCOL.md` and the immutable deviation/supersession records under `results/protocol/`.
 
 Machine-readable evidence: [`results/data_audit/inclusivehar_v4.audit.json`](../results/data_audit/inclusivehar_v4.audit.json).
 

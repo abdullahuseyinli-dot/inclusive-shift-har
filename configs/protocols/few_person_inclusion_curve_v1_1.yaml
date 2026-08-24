@@ -1,0 +1,56 @@
+schema_version: "1.0.0"
+protocol_id: "inclusivehar-v4-few-person-inclusion-curve-v1.1"
+status: "predeclared_post_confirmatory_secondary_superseding_incompatible_v1"
+supersedes_protocol_id: "inclusivehar-v4-few-person-inclusion-curve-v1"
+supersession_reason: "v1 copied inclusive-native scenario window hashes while its runner selected functional-core windows"
+parent_protocol_id: "inclusivehar-released-block-v1.2"
+dataset_id: "inclusivehar_v4"
+ontology_track: "functional_core"
+class_order: ["mobility", "sitting", "standing"]
+k_values: [1, 2, 4]
+outer_folds:
+  - fold_id: "target_outer_01"
+    evaluation_subjects: ["12", "18"]
+    inclusion_order: ["13", "15", "17", "19", "16", "14", "11", "20"]
+  - fold_id: "target_outer_02"
+    evaluation_subjects: ["13", "15"]
+    inclusion_order: ["18", "12", "17", "19", "16", "14", "11", "20"]
+  - fold_id: "target_outer_03"
+    evaluation_subjects: ["17", "19"]
+    inclusion_order: ["18", "12", "13", "15", "16", "14", "11", "20"]
+  - fold_id: "target_outer_04"
+    evaluation_subjects: ["14", "16"]
+    inclusion_order: ["18", "12", "13", "15", "17", "19", "11", "20"]
+  - fold_id: "target_outer_05"
+    evaluation_subjects: ["11", "20"]
+    inclusion_order: ["18", "12", "13", "15", "17", "19", "16", "14"]
+scenario_window_lineage: "derive counts and sorted-ID hashes from parent target_sealed windows carrying the functional_core canonical label"
+model_scope: "all_fixed_epoch_neural_entries_in_preconfirmatory_freeze"
+adaptation:
+  initialization: "frozen_source_only_selected_checkpoint"
+  training_data: "only_the_k_predeclared_target_inclusion_participants"
+  objective: "supervised_cross_entropy_only"
+  optimizer: "new_adamw_state"
+  hyperparameters: "inherit_epochs_batch_size_learning_rate_weight_decay_gradient_clip_mixed_precision_and_cudnn_policy_from_source_checkpoint"
+  checkpoint_selection: "fixed_last_epoch_no_early_stopping"
+  normalization: "reuse_frozen_source_training_statistics_without_refit"
+  calibration: "reuse_frozen_source_validation_temperature_without_refit"
+  threshold_selection: "none"
+  target_validation: "forbidden"
+  augmentation: "disabled_for_uniform_adaptation_objective"
+execution:
+  neural_device: "cuda_only"
+  one_scenario_per_process: true
+  sequential_runs_required: true
+  create_only_artifacts: true
+  failures_preserved: true
+  all_metadata_preflight_before_output_creation: true
+ordering:
+  folds: ["target_outer_01", "target_outer_02", "target_outer_03", "target_outer_04", "target_outer_05"]
+  k_values: [1, 2, 4]
+  model_seed_order: "final_freeze_inventory_order"
+gate:
+  zero_shot_index_required: true
+  opening_receipt_required: true
+  target_results_allowed_for_design_or_selection: false
+evidence_status: "post_confirmatory_secondary_few_person_v1_1"

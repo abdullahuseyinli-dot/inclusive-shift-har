@@ -23,8 +23,8 @@ The full provenance, file sizes, hashes, retrieval record, expected schema, and 
 - Nominal duration: 2.56 seconds at 50 Hz.
 - Class order: `mobility`, `sitting`, `standing`.
 - Functional mapping: released `Walking` maps to `mobility`; for wheelchair users this released label denotes manual propulsion and must not be described as ordinary gait.
-- Source development stride: 64 after participant partitioning.
-- Confirmatory validation/target stride: 128.
+- Executed source-development stride: 128 after participant partitioning.
+- Executed source-validation/target stride: 128.
 
 Ramp ascent/descent are not stairs, and jogging has no UCI-HAR v1 counterpart. These labels are excluded from the functional-core primary result rather than silently remapped.
 

@@ -10,7 +10,7 @@
 **Protocol:** `inclusivehar-released-block-v1.2`  
 **Lock date:** 2026-08-23; exact lock time was not recorded  
 **Evidence status:** participant-exclusive released-block protocol under an explicit user-authorized deviation  
-**Target status:** sealed; no target predictions or performance have been inspected
+**Historical target status at lock:** sealed; no target predictions or performance had been inspected. **Current status:** opening 1 was later authorized, consumed exactly once, and completed as recorded in the addendum above.
 
 This protocol is locked for local development subject to the residual risks below. It is **not trial-safe**. It does not erase the Stage 3 quarantine, authorize a confirmatory target opening, or claim that 2.56-second windows correspond to recovered recordings.
 
@@ -149,7 +149,7 @@ The primary zero-shot cohort is IDs 11–20 together. It is not a model-selectio
 
 Target seal ID: `aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d`.
 
-The target may be opened at most once, and only after a separate `final_evaluation_unlock` record binds the split hash, protocol-lock hash, code commit, machine, reason, opening number, and successful tests/lint/types/manifests/split/artifact gates. No such unlock exists. Building and auditing the split use only the preserved descriptive block metadata and do not compute target predictions or metrics.
+The target may be opened at most once, and only after a separate `final_evaluation_unlock` record binds the split hash, protocol-lock hash, code commit, machine, reason, opening number, and successful tests/lint/types/manifests/split/artifact gates. **Historical note:** no unlock existed when this protocol text was locked. The later create-only unlock is preserved at `results/protocol/final_evaluation_unlock_v1.json`; opening 1 was then consumed and cannot be repeated. Building and auditing the split used only the preserved descriptive block metadata and did not compute target predictions or metrics.
 
 ## Few-person inclusion curve
 

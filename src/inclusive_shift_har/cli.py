@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -38,32 +38,33 @@ EXIT_ERROR = 1
 EXIT_VALIDATION = 2
 EXIT_GATE_CLOSED = 3
 
-_GATED_COMMANDS: dict[str, dict[str, str]] = {
-    "train": {
-        "code": "TRAINING_GATE_CLOSED_NOT_IMPLEMENTED",
-        "required_gate": "split_audit_pass",
-        "message": "training is gated and not implemented in the Stage 2 provenance scaffold",
-    },
-    "evaluate": {
-        "code": "EVALUATION_GATE_CLOSED_NOT_IMPLEMENTED",
-        "required_gate": "final_evaluation_unlock",
-        "message": "evaluation is gated and not implemented; no confirmatory target was opened",
-    },
+_TRAIN_TRACKS: dict[str, str] = {
+    "inclusivehar-source": "run one participant-exclusive InclusiveHAR source-development job",
+    "final-source-suite": "run the predeclared final source-only model/seed suite sequentially",
+    "uci-source-fold": "run one official-train-only grouped UCI-HAR fold",
+    "few-person": "build or run a post-confirmatory few-person scenario",
+    "within-group": ("run one cache-backed post-confirmatory disabled-cohort grouped-CV cell"),
+    "raw-total-sensitivity": (
+        "run the predeclared post-confirmatory raw/total-acceleration sensitivity"
+    ),
 }
 
+_EVALUATE_TRACKS: dict[str, str] = {
+    "source-cv": "validate and aggregate source-only grouped-CV evidence",
+    "uci-source": "validate and aggregate official-train-only UCI-HAR reproduction evidence",
+    "few-person-statistics": "validate progress or aggregate few-person participant statistics",
+    "within-group-statistics": (
+        "validate and aggregate disabled-cohort grouped-CV participant statistics"
+    ),
+    "efficiency": "aggregate frozen post-confirmatory efficiency profiles",
+    "sensor-stress": "aggregate frozen post-confirmatory sensor-stress evidence",
+    "raw-total-statistics": "aggregate raw/total-acceleration sensitivity evidence",
+}
 
-def gated_command_payload(command: str) -> dict[str, Any]:
-    """Return the stable machine-readable payload for a gated placeholder."""
+_INCLUSIVEHAR_NATIVE_CPU_MODELS = frozenset({"random_forest", "svm_rbf", "logistic_regression"})
+_INCLUSIVEHAR_XGBOOST_MODEL = "xgboost"
 
-    detail = _GATED_COMMANDS[command]
-    return {
-        "code": detail["code"],
-        "command": command,
-        "exit_code": EXIT_GATE_CLOSED,
-        "message": detail["message"],
-        "required_gate": detail["required_gate"],
-        "status": "gated_not_implemented",
-    }
+WorkflowMain = Callable[[list[str] | None], int]
 
 
 def _emit(payload: MappingLike, *, as_json: bool) -> None:
@@ -398,10 +399,241 @@ def _run_uci_source_fold(args: argparse.Namespace) -> int:
     return EXIT_SUCCESS
 
 
-def _gated(args: argparse.Namespace) -> int:
-    payload = gated_command_payload(args.command)
+def _aggregate_uci_source(args: argparse.Namespace) -> int:
+    try:
+        from inclusive_shift_har.evaluation.uci_reporting import (
+            UCIReportingError,
+            build_uci_reproduction_report,
+            write_uci_reproduction_exports_new,
+        )
+
+        report = build_uci_reproduction_report(
+            record_directory=args.record_directory,
+            protocol_path=args.protocol,
+            bootstrap_resamples=args.bootstrap_resamples,
+            bootstrap_seed=args.bootstrap_seed,
+        )
+        outputs = write_uci_reproduction_exports_new(
+            report,
+            output_directory=args.output_directory,
+        )
+    except (FileExistsError, OSError, UCIReportingError, ValueError) as exc:
+        payload: MappingLike = {
+            "code": "UCI_SOURCE_AGGREGATION_VALIDATION_ERROR",
+            "command": "aggregate-uci-source",
+            "message": str(exc),
+            "status": "fail",
+        }
+        _emit(payload, as_json=args.json)
+        return EXIT_VALIDATION
+    payload = {
+        "command": "aggregate-uci-source",
+        "official_test_member_opened": False,
+        "official_test_performance_or_prediction_accessed": False,
+        "inclusivehar_data_or_target_accessed": False,
+        "outputs": {key: value.as_posix() for key, value in outputs.items()},
+        "record_sha256": report["record_sha256"],
+        "status": report["status"],
+    }
     _emit(payload, as_json=args.json)
-    return EXIT_GATE_CLOSED
+    return EXIT_SUCCESS
+
+
+def _workflow_entrypoint(
+    workflow: str,
+    track: str,
+) -> tuple[WorkflowMain, tuple[str, ...], bool]:
+    """Resolve one explicitly allowlisted workflow without importing target-opening code."""
+
+    if workflow == "train":
+        if track == "inclusivehar-source":
+            from inclusive_shift_har.experiments.inclusivehar_source import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "final-source-suite":
+            from inclusive_shift_har.experiments.final_source_suite import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "uci-source-fold":
+            return main, ("run-uci-source-fold",), True
+        if track == "few-person":
+            from inclusive_shift_har.experiments.few_person import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "within-group":
+            from inclusive_shift_har.experiments.within_group import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "raw-total-sensitivity":
+            from inclusive_shift_har.experiments.raw_total_acceleration import main as entrypoint
+
+            return entrypoint, (), False
+    elif workflow == "evaluate":
+        if track == "source-cv":
+            return main, ("aggregate-source-cv",), True
+        if track == "uci-source":
+            return main, ("aggregate-uci-source",), True
+        if track == "few-person-statistics":
+            from inclusive_shift_har.evaluation.few_person_statistics import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "within-group-statistics":
+            from inclusive_shift_har.evaluation.within_group_statistics import main as entrypoint
+
+            return entrypoint, (), False
+        if track in {"efficiency", "sensor-stress"}:
+            from inclusive_shift_har.evaluation.secondary_aggregation import main as entrypoint
+
+            return entrypoint, (track,), False
+        if track == "raw-total-statistics":
+            from inclusive_shift_har.evaluation.raw_total_reporting import main as entrypoint
+
+            return entrypoint, (), False
+    raise KeyError(track)
+
+
+def _workflow_error(
+    *,
+    workflow: str,
+    track: str | None,
+    message: str,
+    code: str,
+    as_json: bool,
+) -> int:
+    payload: MappingLike = {
+        "code": code,
+        "command": workflow,
+        "exit_code": EXIT_VALIDATION,
+        "message": message,
+        "one_time_confirmatory_target_operation_exposed": False,
+        "status": "fail",
+        "track": track,
+    }
+    _emit(payload, as_json=as_json)
+    return EXIT_VALIDATION
+
+
+def _forwarded_option(arguments: Sequence[str], option: str) -> str | None:
+    """Return argparse's last option value without consuming or rewriting argv."""
+
+    value: str | None = None
+    prefix = f"{option}="
+    index = 0
+    while index < len(arguments):
+        argument = arguments[index]
+        if argument == "--":
+            break
+        if argument.startswith(prefix):
+            value = argument[len(prefix) :]
+        elif argument == option and index + 1 < len(arguments):
+            candidate = arguments[index + 1]
+            if candidate != "--" and not candidate.startswith("--"):
+                value = candidate
+                index += 1
+        index += 1
+    return value
+
+
+def _inclusivehar_source_device_policy_error(arguments: Sequence[str]) -> str | None:
+    """Keep neural and XGBoost routed jobs on CUDA while preserving native CPU methods."""
+
+    if _forwarded_option(arguments, "--device") != "cpu":
+        return None
+    model = _forwarded_option(arguments, "--model")
+    if model in _INCLUSIVEHAR_NATIVE_CPU_MODELS:
+        return None
+    if model == _INCLUSIVEHAR_XGBOOST_MODEL:
+        return "XGBoost must use --device cuda in the unified InclusiveHAR source route"
+    return (
+        "neural InclusiveHAR source models must use --device cuda; CPU is reserved for the "
+        "native random_forest, svm_rbf, and logistic_regression baselines"
+    )
+
+
+def _dispatch_workflow(args: argparse.Namespace) -> int:
+    """Forward arguments to a current safe module entry point without shell interpretation."""
+
+    workflow = str(args.workflow)
+    track = None if args.track is None else str(args.track)
+    tracks = _TRAIN_TRACKS if workflow == "train" else _EVALUATE_TRACKS
+    as_json = bool(args.json)
+    if track is None:
+        return _workflow_error(
+            workflow=workflow,
+            track=None,
+            message=f"{workflow} requires one of these tracks: {', '.join(tracks)}",
+            code=f"{workflow.upper()}_TRACK_REQUIRED",
+            as_json=as_json,
+        )
+    if track not in tracks:
+        return _workflow_error(
+            workflow=workflow,
+            track=track,
+            message=f"unknown {workflow} track {track!r}; choose one of: {', '.join(tracks)}",
+            code=f"UNKNOWN_{workflow.upper()}_TRACK",
+            as_json=as_json,
+        )
+    forwarded = [str(value) for value in args.arguments]
+    if forwarded[:1] == ["--"]:
+        forwarded = forwarded[1:]
+    if workflow == "train" and track == "inclusivehar-source":
+        policy_error = _inclusivehar_source_device_policy_error(forwarded)
+        if policy_error is not None:
+            return _workflow_error(
+                workflow=workflow,
+                track=track,
+                message=policy_error,
+                code="TRAIN_TRACK_DEVICE_POLICY_ERROR",
+                as_json=as_json,
+            )
+    try:
+        entrypoint, prefix, accepts_json = _workflow_entrypoint(workflow, track)
+        child_arguments = [*prefix, *forwarded]
+        if as_json and accepts_json and "--json" not in child_arguments:
+            child_arguments.append("--json")
+        return int(entrypoint(child_arguments))
+    except SystemExit as exc:
+        exit_code = exc.code if isinstance(exc.code, int) else EXIT_ERROR
+        if exit_code != EXIT_SUCCESS and as_json:
+            _workflow_error(
+                workflow=workflow,
+                track=track,
+                message="forwarded arguments were rejected; see the track usage on stderr",
+                code=f"{workflow.upper()}_TRACK_ARGUMENT_ERROR",
+                as_json=True,
+            )
+        return exit_code
+    except (ImportError, OSError, RuntimeError, TypeError, ValueError) as exc:
+        return _workflow_error(
+            workflow=workflow,
+            track=track,
+            message=str(exc),
+            code=f"{workflow.upper()}_TRACK_EXECUTION_ERROR",
+            as_json=as_json,
+        )
+
+
+def _workflow_epilog(tracks: Mapping[str, str], *, locked_report_note: bool = False) -> str:
+    lines = ["Available tracks:"]
+    lines.extend(f"  {name:<24} {description}" for name, description in tracks.items())
+    lines.extend(
+        [
+            "",
+            "Arguments after TRACK are forwarded as an argv list without shell execution.",
+            "Use `--` before a forwarded `--help` request, for example: TRACK -- --help.",
+            "The one-time confirmatory target-opening operation is never routed here.",
+        ]
+    )
+    if locked_report_note:
+        lines.extend(
+            [
+                "",
+                "No locked-report track is exposed: the current publication-report API is",
+                "create-only and has no public read-only validator. `validate-artifacts` remains",
+                "available for repository artifact manifests.",
+            ]
+        )
+    return "\n".join(lines)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -594,15 +826,63 @@ def build_parser() -> argparse.ArgumentParser:
     uci_source_parser.add_argument("--json", action="store_true")
     uci_source_parser.set_defaults(handler=_run_uci_source_fold)
 
-    for command in _GATED_COMMANDS:
-        gated_parser = subparsers.add_parser(command, help=_GATED_COMMANDS[command]["message"])
-        gated_parser.add_argument("--json", action="store_true", help="emit machine-readable JSON")
-        gated_parser.add_argument(
-            "arguments",
-            nargs=argparse.REMAINDER,
-            help="reserved for the later validated implementation; currently ignored",
-        )
-        gated_parser.set_defaults(handler=_gated)
+    uci_aggregate_parser = subparsers.add_parser(
+        "aggregate-uci-source",
+        help="verify and aggregate the complete CUDA UCI official-train grouped-CV matrix",
+    )
+    uci_aggregate_parser.add_argument(
+        "--record-directory",
+        default="results/legacy_reproduction/uci_har_source_grouped_v1/records",
+    )
+    uci_aggregate_parser.add_argument(
+        "--protocol", default="results/protocol/uci_har_source_grouped_v1.json"
+    )
+    uci_aggregate_parser.add_argument(
+        "--output-directory",
+        default="results/legacy_reproduction/uci_har_source_grouped_v1",
+    )
+    uci_aggregate_parser.add_argument("--bootstrap-resamples", type=int, default=10_000)
+    uci_aggregate_parser.add_argument("--bootstrap-seed", type=int, default=1729)
+    uci_aggregate_parser.add_argument("--json", action="store_true")
+    uci_aggregate_parser.set_defaults(handler=_aggregate_uci_source)
+
+    train_parser = subparsers.add_parser(
+        "train",
+        help="dispatch an allowlisted source or post-confirmatory training track",
+        description=(
+            "Dispatch a current training module. This namespace cannot invoke the consumed "
+            "one-time confirmatory target-opening operation."
+        ),
+        epilog=_workflow_epilog(_TRAIN_TRACKS),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    train_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="emit machine-readable dispatcher errors; routed direct commands also receive it",
+    )
+    train_parser.add_argument("track", nargs="?", metavar="TRACK")
+    train_parser.add_argument("arguments", nargs=argparse.REMAINDER, metavar="ARG")
+    train_parser.set_defaults(handler=_dispatch_workflow, workflow="train")
+
+    evaluate_parser = subparsers.add_parser(
+        "evaluate",
+        help="dispatch an allowlisted aggregation or read-only validation track",
+        description=(
+            "Dispatch current derivation and validation modules over existing evidence. This "
+            "namespace never invokes a target opening or target inference operation."
+        ),
+        epilog=_workflow_epilog(_EVALUATE_TRACKS, locked_report_note=True),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    evaluate_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="emit machine-readable dispatcher errors; routed direct commands also receive it",
+    )
+    evaluate_parser.add_argument("track", nargs="?", metavar="TRACK")
+    evaluate_parser.add_argument("arguments", nargs=argparse.REMAINDER, metavar="ARG")
+    evaluate_parser.set_defaults(handler=_dispatch_workflow, workflow="evaluate")
     return parser
 
 

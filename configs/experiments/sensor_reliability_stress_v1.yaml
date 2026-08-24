@@ -1,6 +1,6 @@
 schema_version: "1.0.0"
 config_id: "inclusivehar-sensor-reliability-secondary-v1"
-config_sha256: "4d94c31cb3728b0583a6b2a077222ee08ca8bd19ea5c7789a6d721da03d17692"
+config_sha256: "911690b3734d231d7129e6a675a8389c58e605444f1d41652c0ab2d440521800"
 status: "configured_not_run"
 track_role: "secondary_post_confirmatory"
 input_space: "physical_pre_normalization"
@@ -36,6 +36,20 @@ policy:
   target_based_tuning_allowed: false
   participant_level_reporting_required: true
   stress_levels_empirically_calibrated: false
+operation:
+  model_family:
+    family_id: "frozen-compact-residual-96-v1"
+    inventory_training_regime: "fixed_epoch_neural"
+    eligible_training_model_names:
+      - "compact_residual_96"
+    selection_rule: "exact_training_configuration_model_name"
+  cohorts:
+    source:
+      required_partition: "source_validation"
+      clean_reference: "recompute_once_with_frozen_pipeline"
+    target:
+      required_partition: "target_sealed"
+      clean_reference: "reuse_locked_target_opening_1_artifact"
 conditions:
   - condition_id: "gaussian-noise-level-1"
     type: "gaussian_noise"

@@ -10,6 +10,7 @@ import os
 import random
 import time
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from itertools import pairwise
 from pathlib import Path
 from typing import Any, cast
@@ -28,6 +29,13 @@ from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.evaluation.source_calibration import (
     load_source_temperature_calibrator_file,
 )
+from inclusive_shift_har.experiments.postconfirmatory_cache import (
+    FUNCTIONAL_CORE_CLASS_NAMES,
+    PRIMARY_CACHE_EVIDENCE_STATUS,
+    PRIMARY_CACHE_RECORD_KIND,
+    PRIMARY_CACHE_SCHEMA_VERSION,
+    PreparedPrimaryCacheEvidence,
+)
 from inclusive_shift_har.manifests.canonical import (
     atomic_write_json_new,
     canonical_json_sha256,
@@ -37,11 +45,15 @@ from inclusive_shift_har.manifests.canonical import (
 from inclusive_shift_har.models.common import HAROutput, trainable_parameter_count
 from inclusive_shift_har.preprocessing.normalization import ChannelStandardizer
 from inclusive_shift_har.protocols.few_person import (
-    FEW_PERSON_EVIDENCE_STATUS,
     FEW_PERSON_PROTOCOL_ID,
     FewPersonProtocolError,
-    build_few_person_manifest,
-    write_few_person_manifest_new,
+)
+from inclusive_shift_har.protocols.few_person_v1_1 import (
+    FEW_PERSON_V1_1_EVIDENCE_STATUS,
+    FEW_PERSON_V1_1_PROTOCOL_ID,
+    build_few_person_v1_1_manifest,
+    validate_few_person_v1_1_manifest_assignments,
+    write_few_person_v1_1_manifest_new,
 )
 from inclusive_shift_har.training.engine import (
     TrainingConfig,
@@ -54,6 +66,14 @@ from inclusive_shift_har.training.engine import (
 
 class FewPersonRunError(RuntimeError):
     """Raised when a few-person run violates its frozen boundary."""
+
+
+@dataclass(frozen=True, slots=True)
+class _PrimaryCacheMetadataPreflight:
+    record_path: Path
+    record_file_sha256: str
+    record_sha256: str
+    participant_shards: Mapping[str, Mapping[str, Any]]
 
 
 def _mapping(value: Any, *, name: str) -> Mapping[str, Any]:
@@ -92,6 +112,245 @@ def _confined(path: Path, *, root: Path, name: str, must_exist: bool) -> Path:
     except ValueError as exc:
         raise FewPersonRunError(f"{name} escapes its declared root") from exc
     return resolved
+
+
+def _sha256_digest(value: Any, *, name: str) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdef" for character in value)
+    ):
+        raise FewPersonRunError(f"{name} must be a lowercase SHA-256")
+    return value
+
+
+def _preflight_primary_cache_metadata(
+    *,
+    record_path: Path,
+    expected_record_file_sha256: str,
+    artifact_root: Path,
+    split_manifest_path: Path,
+    split_manifest_sha256: str,
+    split_manifest_file_sha256: str,
+    source_artifact_sha256: str,
+    plan: Mapping[str, Any],
+) -> _PrimaryCacheMetadataPreflight:
+    """Validate target-cache lineage and bytes without loading any signal array."""
+
+    root = artifact_root.resolve(strict=True)
+    path = _confined(record_path, root=root, name="primary cache record", must_exist=True)
+    pinned_file_hash = _sha256_digest(
+        expected_record_file_sha256, name="primary cache record file hash"
+    )
+    if sha256_file(path) != pinned_file_hash:
+        raise FewPersonRunError("primary cache record file hash changed")
+    record = _json_object(path, name="primary cache record")
+    record_sha256 = _self_hash(record, field="record_sha256", name="primary cache record")
+    required = {
+        "schema_version": PRIMARY_CACHE_SCHEMA_VERSION,
+        "record_kind": PRIMARY_CACHE_RECORD_KIND,
+        "status": "complete_create_only",
+        "evidence_status": PRIMARY_CACHE_EVIDENCE_STATUS,
+        "ontology_track": "functional_core",
+        "class_names": list(FUNCTIONAL_CORE_CLASS_NAMES),
+        "primary_channels": list(INCLUSIVEHAR_PRIMARY_CHANNELS),
+        "target_cache_ordered_alignment_validated_against_opening_1": True,
+        "unlock_api_called": False,
+        "new_target_opening_created": False,
+    }
+    mismatches = [key for key, expected in required.items() if record.get(key) != expected]
+    if mismatches:
+        raise FewPersonRunError(f"primary cache record contract differs: {mismatches}")
+
+    split_reference = _mapping(record.get("split_manifest"), name="cache split lineage")
+    referenced_split = _confined(
+        root / str(split_reference.get("path")),
+        root=root,
+        name="cache-referenced split manifest",
+        must_exist=True,
+    )
+    supplied_split = split_manifest_path.resolve(strict=True)
+    if (
+        referenced_split != supplied_split
+        or split_reference.get("record_sha256") != split_manifest_sha256
+        or split_reference.get("file_sha256") != split_manifest_file_sha256
+        or sha256_file(referenced_split) != split_manifest_file_sha256
+    ):
+        raise FewPersonRunError("primary cache does not reference the exact parent split file")
+
+    raw_reference = _mapping(record.get("raw_sensor_csv"), name="cache raw lineage")
+    if raw_reference.get("sha256") != source_artifact_sha256:
+        raise FewPersonRunError("primary cache raw-source lineage changed")
+
+    opening = _mapping(record.get("opening_1"), name="cache opening-1 lineage")
+    opening_required = {
+        "receipt_record_sha256": plan["opening_receipt_record_sha256"],
+        "receipt_file_sha256": plan["opening_receipt_file_sha256"],
+        "index_record_sha256": plan["zero_shot_index_record_sha256"],
+        "index_file_sha256": plan["zero_shot_index_file_sha256"],
+        "target_seal_id": plan["target_seal_id"],
+    }
+    if any(opening.get(key) != value for key, value in opening_required.items()):
+        raise FewPersonRunError("primary cache differs from consumed opening 1")
+
+    caches = _mapping(record.get("caches"), name="primary cache references")
+    target = _mapping(caches.get("target_sealed"), name="target cache reference")
+    target_count = plan.get("functional_core_target_window_count")
+    target_ids_hash = plan.get("functional_core_target_window_ids_sha256")
+    if (
+        not isinstance(target_count, int)
+        or target_count <= 0
+        or target.get("partition") != "target_sealed"
+        or target.get("window_count") != target_count
+        or target.get("window_ids_sha256") != target_ids_hash
+    ):
+        raise FewPersonRunError("target cache coverage differs from the v1.1 manifest")
+    for field in ("window_ids_sha256",):
+        _sha256_digest(target.get(field), name=f"target cache {field}")
+    shard_values = _mapping(
+        record.get("target_participant_shards"), name="target participant shard index"
+    )
+    target_subjects = {str(value) for value in range(11, 21)}
+    if set(shard_values) != target_subjects:
+        raise FewPersonRunError("target participant shard subject set changed")
+    split_record = _json_object(referenced_split, name="cache-referenced split manifest")
+    windows = split_record.get("windows")
+    if not isinstance(windows, list):
+        raise FewPersonRunError("cache-referenced split lacks windows")
+    expected_ids_by_subject = {
+        participant: sorted(
+            str(value["window_id"])
+            for value in windows
+            if isinstance(value, Mapping)
+            and value.get("partition") == "target_sealed"
+            and value.get("subject_id") == participant
+            and isinstance(value.get("canonical_labels"), Mapping)
+            and "functional_core" in cast(Mapping[str, Any], value["canonical_labels"])
+        )
+        for participant in sorted(target_subjects, key=int)
+    }
+    participant_shards: dict[str, Mapping[str, Any]] = {}
+    all_ids: set[str] = set()
+    total = 0
+    array_paths: set[Path] = set()
+    metadata_paths: set[Path] = set()
+    for participant, expected_ids in expected_ids_by_subject.items():
+        shard = _mapping(shard_values.get(participant), name=f"target shard {participant}")
+        array_path = _confined(
+            root / str(shard.get("array_path")),
+            root=root,
+            name=f"target shard {participant} array",
+            must_exist=True,
+        )
+        metadata_path = _confined(
+            root / str(shard.get("metadata_path")),
+            root=root,
+            name=f"target shard {participant} metadata",
+            must_exist=True,
+        )
+        if array_path in array_paths or metadata_path in metadata_paths:
+            raise FewPersonRunError("target participant shard paths are reused")
+        array_paths.add(array_path)
+        metadata_paths.add(metadata_path)
+        expected_hash = canonical_json_sha256(expected_ids)
+        if (
+            not expected_ids
+            or shard.get("participant_id") != participant
+            or shard.get("partition") != "target_sealed"
+            or shard.get("window_count") != len(expected_ids)
+            or shard.get("window_ids_sha256") != expected_hash
+        ):
+            raise FewPersonRunError(f"target shard {participant} differs from the split")
+        for field in (
+            "window_ids_sha256",
+            "ordered_window_ids_sha256",
+            "ordered_participant_ids_sha256",
+            "ordered_labels_sha256",
+            "array_sha256",
+            "metadata_sha256",
+        ):
+            _sha256_digest(shard.get(field), name=f"target shard {participant} {field}")
+        if sha256_file(metadata_path) != shard.get("metadata_sha256"):
+            raise FewPersonRunError(f"target shard {participant} metadata hash changed")
+        metadata = _json_object(metadata_path, name=f"target shard {participant} metadata")
+        if (
+            metadata.get("schema_version") != "1.0.0"
+            or metadata.get("array_sha256") != shard.get("array_sha256")
+            or metadata.get("window_count") != len(expected_ids)
+            or metadata.get("shape") != [len(expected_ids), 128, 6]
+            or metadata.get("class_names") != list(FUNCTIONAL_CORE_CLASS_NAMES)
+            or metadata.get("ontology_track") != "functional_core"
+        ):
+            raise FewPersonRunError(f"target shard {participant} metadata changed")
+        lineage = _mapping(metadata.get("lineage"), name=f"target shard {participant} lineage")
+        lineage_required = {
+            "split_manifest_sha256": split_manifest_sha256,
+            "source_artifact_sha256": source_artifact_sha256,
+            "opening_receipt_record_sha256": plan["opening_receipt_record_sha256"],
+            "opening_receipt_file_sha256": plan["opening_receipt_file_sha256"],
+            "locked_target_index_record_sha256": plan["zero_shot_index_record_sha256"],
+            "locked_target_index_file_sha256": plan["zero_shot_index_file_sha256"],
+            "target_seal_id": plan["target_seal_id"],
+            "partition": "target_sealed",
+            "cache_role": "few_person_target_participant_shard",
+            "participant_id": participant,
+            "window_count": len(expected_ids),
+            "window_ids_sha256": expected_hash,
+        }
+        if any(lineage.get(key) != value for key, value in lineage_required.items()):
+            raise FewPersonRunError(f"target shard {participant} lineage changed")
+        for field in (
+            "window_ids_sha256",
+            "ordered_window_ids_sha256",
+            "ordered_participant_ids_sha256",
+            "ordered_labels_sha256",
+        ):
+            if shard.get(field) != lineage.get(field):
+                raise FewPersonRunError(f"target shard {participant} {field} differs from metadata")
+        participant_shards[participant] = {
+            "participant_id": participant,
+            "window_count": len(expected_ids),
+            "window_ids_sha256": expected_hash,
+            "array_path": array_path.relative_to(root).as_posix(),
+            "array_sha256": shard["array_sha256"],
+            "metadata_path": metadata_path.relative_to(root).as_posix(),
+            "metadata_sha256": shard["metadata_sha256"],
+        }
+        overlap = all_ids & set(expected_ids)
+        if overlap:
+            raise FewPersonRunError("target participant shard split identities overlap")
+        all_ids.update(expected_ids)
+        total += len(expected_ids)
+    audit = _mapping(
+        record.get("target_participant_shard_audit"), name="target participant shard audit"
+    )
+    if (
+        total != target_count
+        or canonical_json_sha256(sorted(all_ids)) != target_ids_hash
+        or audit.get("status") != "exact_disjoint_union_validated_against_opening_1"
+        or audit.get("participant_ids") != sorted(target_subjects, key=int)
+        or audit.get("shard_count") != len(target_subjects)
+        or audit.get("total_window_count") != target_count
+        or audit.get("union_window_ids_sha256") != target_ids_hash
+        or audit.get("whole_target_window_ids_sha256") != target_ids_hash
+        or audit.get("pairwise_window_id_disjoint") is not True
+        or audit.get("exact_whole_target_union") is not True
+    ):
+        raise FewPersonRunError("target participant shard union audit changed")
+    return _PrimaryCacheMetadataPreflight(
+        record_path=path,
+        record_file_sha256=pinned_file_hash,
+        record_sha256=record_sha256,
+        participant_shards=participant_shards,
+    )
+
+
+def _raw_input_lineage(path: Path, *, root: Path, source_sha256: str) -> dict[str, Any]:
+    return {
+        "mode": "immutable_raw_csv_authorized_windows_only",
+        "source_path": path.relative_to(root).as_posix(),
+        "source_artifact_sha256": source_sha256,
+    }
 
 
 def _selected(
@@ -252,6 +511,232 @@ def _materialize_authorized_records(
     )
 
 
+def _select_cached_records(
+    evidence: PreparedPrimaryCacheEvidence,
+    records: Sequence[WindowRecord],
+    *,
+    class_names: tuple[str, ...],
+) -> MaterializedWindows:
+    batch = evidence.cache.batch
+    if batch.class_names != class_names or batch.ontology_track != "functional_core":
+        raise FewPersonRunError("target cache class/ontology schema changed")
+    index_by_id = {window_id: index for index, window_id in enumerate(batch.window_ids)}
+    if len(index_by_id) != len(batch.window_ids):
+        raise FewPersonRunError("target cache window identities are duplicated")
+    ordered = tuple(sorted(records, key=lambda value: value.start_row_inclusive))
+    try:
+        indices = np.asarray([index_by_id[record.window_id] for record in ordered], dtype=np.int64)
+    except KeyError as exc:
+        raise FewPersonRunError("target cache lacks a predeclared scenario window") from exc
+    class_to_index = {name: index for index, name in enumerate(class_names)}
+    for record, index in zip(ordered, indices.tolist(), strict=True):
+        if (
+            batch.participant_ids[index] != record.subject_id
+            or batch.released_labels[index] != record.activity_label
+            or batch.partitions[index] != "target_sealed"
+            or int(batch.labels[index])
+            != class_to_index[record.canonical_labels["functional_core"]]
+        ):
+            raise FewPersonRunError("target cache row metadata differs from the split")
+    return MaterializedWindows(
+        signals=np.asarray(batch.signals[indices], dtype=np.float32),
+        labels=np.asarray(batch.labels[indices], dtype=np.int64),
+        window_ids=tuple(batch.window_ids[index] for index in indices.tolist()),
+        participant_ids=tuple(batch.participant_ids[index] for index in indices.tolist()),
+        released_labels=tuple(batch.released_labels[index] for index in indices.tolist()),
+        partitions=tuple(batch.partitions[index] for index in indices.tolist()),
+        class_names=batch.class_names,
+        ontology_track=batch.ontology_track,
+    )
+
+
+def _shard_input_lineage(
+    preflight: _PrimaryCacheMetadataPreflight,
+    participants: set[str],
+    records: Sequence[WindowRecord],
+    *,
+    root: Path,
+) -> dict[str, Any]:
+    selected = {
+        participant: dict(preflight.participant_shards[participant])
+        for participant in sorted(participants, key=int)
+    }
+    expected_count = sum(int(value["window_count"]) for value in selected.values())
+    if (
+        set(record.subject_id for record in records) != participants
+        or len(records) != expected_count
+    ):
+        raise FewPersonRunError("scenario records differ from participant-shard lineage")
+    return {
+        "mode": "hash_pinned_target_participant_shards",
+        "record_path": preflight.record_path.relative_to(root).as_posix(),
+        "record_file_sha256": preflight.record_file_sha256,
+        "record_sha256": preflight.record_sha256,
+        "participant_ids": sorted(participants, key=int),
+        "participant_shards": selected,
+        "selected_window_count": expected_count,
+        "selected_window_ids_sha256": canonical_json_sha256(
+            sorted(record.window_id for record in records)
+        ),
+    }
+
+
+def _select_across_cached_shards(
+    batches: Sequence[MaterializedWindows],
+    records: Sequence[WindowRecord],
+    *,
+    class_names: tuple[str, ...],
+) -> MaterializedWindows:
+    rows: dict[str, tuple[NDArray[np.float32], int, str, str, str]] = {}
+    for batch in batches:
+        if batch.class_names != class_names or batch.ontology_track != "functional_core":
+            raise FewPersonRunError("target shard class/ontology schema changed")
+        for index, window_id in enumerate(batch.window_ids):
+            if window_id in rows:
+                raise FewPersonRunError("loaded target participant shards overlap")
+            rows[window_id] = (
+                np.asarray(batch.signals[index], dtype=np.float32),
+                int(batch.labels[index]),
+                batch.participant_ids[index],
+                batch.released_labels[index],
+                batch.partitions[index],
+            )
+    ordered = tuple(sorted(records, key=lambda value: value.start_row_inclusive))
+    if set(rows) != {record.window_id for record in ordered}:
+        raise FewPersonRunError("loaded participant shards differ from scenario window identities")
+    class_to_index = {name: index for index, name in enumerate(class_names)}
+    signals: list[NDArray[np.float32]] = []
+    labels: list[int] = []
+    participants: list[str] = []
+    released: list[str] = []
+    partitions: list[str] = []
+    for record in ordered:
+        signal, label, participant, released_label, partition = rows[record.window_id]
+        if (
+            participant != record.subject_id
+            or released_label != record.activity_label
+            or partition != "target_sealed"
+            or label != class_to_index[record.canonical_labels["functional_core"]]
+        ):
+            raise FewPersonRunError("target shard row metadata differs from split")
+        signals.append(signal)
+        labels.append(label)
+        participants.append(participant)
+        released.append(released_label)
+        partitions.append(partition)
+    return MaterializedWindows(
+        signals=np.asarray(signals, dtype=np.float32),
+        labels=np.asarray(labels, dtype=np.int64),
+        window_ids=tuple(record.window_id for record in ordered),
+        participant_ids=tuple(participants),
+        released_labels=tuple(released),
+        partitions=tuple(partitions),
+        class_names=class_names,
+        ontology_track="functional_core",
+    )
+
+
+def _load_preflight_shard_array(
+    reference: Mapping[str, Any],
+    *,
+    artifact_root: Path,
+    class_names: tuple[str, ...],
+) -> MaterializedWindows:
+    root = artifact_root.resolve(strict=True)
+    participant = str(reference["participant_id"])
+    count = int(reference["window_count"])
+    array_path = _confined(
+        root / str(reference["array_path"]),
+        root=root,
+        name=f"target shard {participant} array",
+        must_exist=True,
+    )
+    if sha256_file(array_path) != reference.get("array_sha256"):
+        raise FewPersonRunError(f"target shard {participant} array hash changed")
+    with np.load(array_path, allow_pickle=False) as arrays:
+        required = {
+            "signals",
+            "labels",
+            "window_ids",
+            "participant_ids",
+            "released_labels",
+            "partitions",
+        }
+        if set(arrays.files) != required:
+            raise FewPersonRunError(f"target shard {participant} array keys changed")
+        raw_signals = np.asarray(arrays["signals"])
+        raw_labels = np.asarray(arrays["labels"])
+        if raw_signals.dtype != np.dtype(np.float32) or raw_labels.dtype != np.dtype(np.int64):
+            raise FewPersonRunError(f"target shard {participant} dtypes changed")
+        signals = np.asarray(raw_signals, dtype=np.float32)
+        labels = np.asarray(raw_labels, dtype=np.int64)
+        window_ids = tuple(str(value) for value in arrays["window_ids"].tolist())
+        participant_ids = tuple(str(value) for value in arrays["participant_ids"].tolist())
+        released_labels = tuple(str(value) for value in arrays["released_labels"].tolist())
+        partitions = tuple(str(value) for value in arrays["partitions"].tolist())
+    if (
+        signals.shape != (count, 128, 6)
+        or labels.shape != (count,)
+        or not np.isfinite(signals).all()
+        or len(window_ids) != count
+        or len(set(window_ids)) != count
+        or len(participant_ids) != count
+        or len(released_labels) != count
+        or len(partitions) != count
+        or set(participant_ids) != {participant}
+        or set(partitions) != {"target_sealed"}
+        or labels.min() < 0
+        or labels.max() >= len(class_names)
+        or canonical_json_sha256(sorted(window_ids)) != reference["window_ids_sha256"]
+    ):
+        raise FewPersonRunError(f"target shard {participant} array alignment changed")
+    return MaterializedWindows(
+        signals=signals,
+        labels=labels,
+        window_ids=window_ids,
+        participant_ids=participant_ids,
+        released_labels=released_labels,
+        partitions=partitions,
+        class_names=class_names,
+        ontology_track="functional_core",
+    )
+
+
+def _load_cached_participant_shards(
+    *,
+    preflight: _PrimaryCacheMetadataPreflight,
+    participants: set[str],
+    records: Sequence[WindowRecord],
+    class_names: tuple[str, ...],
+    artifact_root: Path,
+    adapted_checkpoint_path: Path | None = None,
+    expected_adapted_checkpoint_sha256: str | None = None,
+) -> MaterializedWindows:
+    """Load only declared subject shards, optionally behind a checkpoint barrier."""
+
+    checkpoint_required = adapted_checkpoint_path is not None
+    if checkpoint_required != (expected_adapted_checkpoint_sha256 is not None):
+        raise FewPersonRunError("adapted checkpoint path/hash must be supplied together")
+    if checkpoint_required and (
+        adapted_checkpoint_path is None
+        or not adapted_checkpoint_path.is_file()
+        or sha256_file(adapted_checkpoint_path) != expected_adapted_checkpoint_sha256
+    ):
+        raise FewPersonRunError("held-out cache access requires the exact fixed adapted checkpoint")
+    if set(record.subject_id for record in records) != participants:
+        raise FewPersonRunError("scenario records differ from requested participant shards")
+    batches: list[MaterializedWindows] = []
+    for participant in sorted(participants, key=int):
+        reference = preflight.participant_shards[participant]
+        batch = _load_preflight_shard_array(
+            reference,
+            artifact_root=artifact_root,
+            class_names=class_names,
+        )
+        batches.append(batch)
+    return _select_across_cached_shards(batches, records, class_names=class_names)
+
+
 def _adaptation_seed(base_seed: int, fold_id: str, k: int) -> int:
     token = f"inclusive-shift-har|few-person-v1|{base_seed}|{fold_id}|k={k}"
     return int.from_bytes(hashlib.sha256(token.encode("utf-8")).digest()[:4], "big")
@@ -340,7 +825,9 @@ def run_few_person_scenario(
     opening_receipt_path: Path,
     zero_shot_index_path: Path,
     final_freeze_inventory_path: Path,
-    raw_csv_path: Path,
+    raw_csv_path: Path | None,
+    primary_cache_record_path: Path | None = None,
+    primary_cache_record_sha256: str | None = None,
     artifact_root: Path,
     fold_id: str,
     k: int,
@@ -354,15 +841,30 @@ def run_few_person_scenario(
 
     plan = _json_object(manifest_path, name="few-person manifest")
     plan_sha256 = _self_hash(plan, field="manifest_sha256", name="few-person manifest")
+    protocol_id = str(plan.get("protocol_id"))
+    if protocol_id == FEW_PERSON_PROTOCOL_ID:
+        raise FewPersonRunError(
+            "few-person v1 is preserved but scientifically incompatible; use v1.1"
+        )
+    if protocol_id != FEW_PERSON_V1_1_PROTOCOL_ID:
+        raise FewPersonRunError("few-person manifest protocol is unsupported")
+    expected_status = "ready_postconfirmatory_functional_core_v1_1_no_scenario_run"
+    evidence_status = FEW_PERSON_V1_1_EVIDENCE_STATUS
     required = {
-        "protocol_id": FEW_PERSON_PROTOCOL_ID,
-        "status": "ready_postconfirmatory_metadata_only_no_scenario_run",
-        "evidence_status": FEW_PERSON_EVIDENCE_STATUS,
+        "status": expected_status,
+        "evidence_status": evidence_status,
         "target_metrics_or_predictions_used_for_design_or_selection": False,
         "target_raw_values_accessed_during_manifest_build": False,
     }
     if any(plan.get(key) != value for key, value in required.items()):
         raise FewPersonRunError("few-person manifest contract mismatch")
+    cache_requested = primary_cache_record_path is not None
+    if (raw_csv_path is None) == (not cache_requested):
+        raise FewPersonRunError("select exactly one input mode: raw CSV or primary cache")
+    if cache_requested != (primary_cache_record_sha256 is not None):
+        raise FewPersonRunError("primary cache record and pinned file hash are both required")
+    if cache_requested and protocol_id != FEW_PERSON_V1_1_PROTOCOL_ID:
+        raise FewPersonRunError("primary cache input is restricted to functional-core v1.1")
     for path, field in (
         (opening_receipt_path, "opening_receipt_file_sha256"),
         (zero_shot_index_path, "zero_shot_index_file_sha256"),
@@ -374,6 +876,10 @@ def run_few_person_scenario(
     split_sha256 = _self_hash(split, field="split_manifest_sha256", name="parent split")
     if split_sha256 != plan.get("split_manifest_sha256"):
         raise FewPersonRunError("parent split differs from few-person manifest")
+    try:
+        validate_few_person_v1_1_manifest_assignments(plan, split)
+    except FewPersonProtocolError as exc:
+        raise FewPersonRunError(str(exc)) from exc
     scenario, model_entry = _selected(plan, fold_id=fold_id, k=k, model_id=model_id, seed=seed)
     commit = _full_commit(code_commit)
     if not torch.cuda.is_available():
@@ -382,6 +888,15 @@ def run_few_person_scenario(
         )
 
     root = artifact_root.resolve(strict=True)
+    resolved_output_root = output_root.resolve(strict=True)
+    try:
+        resolved_output_root.relative_to(root)
+    except ValueError as exc:
+        raise FewPersonRunError("few-person output root escapes artifact root") from exc
+    resolved_split_path = _confined(
+        split_manifest_path, root=root, name="parent split manifest", must_exist=True
+    )
+    split_file_sha256 = sha256_file(resolved_split_path)
     checkpoint_record = _mapping(model_entry["checkpoint"], name="checkpoint")
     calibrator_record = _mapping(model_entry["calibrator"], name="calibrator")
     checkpoint_path = _confined(
@@ -414,6 +929,11 @@ def run_few_person_scenario(
     ):
         raise FewPersonRunError("normalization is not the frozen source-training-only transform")
     class_names = tuple(str(value) for value in checkpoint["label_schema"])
+    if protocol_id == FEW_PERSON_V1_1_PROTOCOL_ID and (
+        list(class_names) != plan.get("class_names")
+        or canonical_json_sha256(list(class_names)) != plan.get("class_schema_sha256")
+    ):
+        raise FewPersonRunError("checkpoint class order differs from v1.1 ontology binding")
     calibrator_payload, calibrator = load_source_temperature_calibrator_file(
         calibrator_path,
         expected_checkpoint_sha256=str(checkpoint_record["sha256"]),
@@ -423,13 +943,6 @@ def run_few_person_scenario(
     if calibrator_payload.get("target_subject_or_window_records_used") is not False:
         raise FewPersonRunError("calibrator is not source-only")
 
-    output = _confined(
-        output_directory, root=output_root, name="output directory", must_exist=False
-    )
-    if output.exists():
-        raise FileExistsError(f"refusing to overwrite few-person output: {output}")
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.mkdir(exist_ok=False)
     inclusion = set(cast(list[str], scenario["target_inclusion_subjects"]))
     evaluation = set(cast(list[str], scenario["evaluation_subjects"]))
     ontology_track = str(plan["ontology_track"])
@@ -440,20 +953,108 @@ def run_few_person_scenario(
         expected_count=int(scenario["target_inclusion_window_count"]),
         expected_ids_sha256=str(scenario["target_inclusion_window_ids_sha256"]),
     )
-    source_sha256 = str(split["source_artifact_sha256"])
-    started = time.perf_counter()
-    torch.cuda.reset_peak_memory_stats(device)
-    original_cudnn = torch.backends.cudnn.enabled
-    try:
-        torch.backends.cudnn.enabled = not config.disable_cudnn
-        # Only inclusion values are opened before fixed-epoch adaptation.
-        train_batch = _materialize_authorized_records(
-            raw_csv_path,
-            train_records,
-            expected_source_sha256=source_sha256,
-            class_names=class_names,
-            ontology_track=ontology_track,
+    evaluation_records = _window_records(
+        split,
+        subjects=evaluation,
+        ontology_track=ontology_track,
+        expected_count=int(scenario["evaluation_window_count"]),
+        expected_ids_sha256=str(scenario["evaluation_window_ids_sha256"]),
+    )
+    if {record.window_id for record in train_records} & {
+        record.window_id for record in evaluation_records
+    }:
+        raise FewPersonRunError("inclusion/evaluation window identities overlap")
+    source_sha256 = split.get("source_artifact_sha256")
+    if source_sha256 is None:
+        source_sha256 = _mapping(
+            split.get("source_evidence"), name="parent split source evidence"
+        ).get("sensor_artifact_sha256")
+    if not isinstance(source_sha256, str) or len(source_sha256) != 64:
+        raise FewPersonRunError("parent split source artifact hash is invalid")
+    cache_preflight: _PrimaryCacheMetadataPreflight | None = None
+    if cache_requested:
+        assert primary_cache_record_path is not None
+        assert primary_cache_record_sha256 is not None
+        cache_preflight = _preflight_primary_cache_metadata(
+            record_path=primary_cache_record_path,
+            expected_record_file_sha256=primary_cache_record_sha256,
+            artifact_root=artifact_root,
+            split_manifest_path=resolved_split_path,
+            split_manifest_sha256=split_sha256,
+            split_manifest_file_sha256=split_file_sha256,
+            source_artifact_sha256=source_sha256,
+            plan=plan,
         )
+        training_lineage = _shard_input_lineage(
+            cache_preflight, inclusion, train_records, root=root
+        )
+        evaluation_lineage = _shard_input_lineage(
+            cache_preflight, evaluation, evaluation_records, root=root
+        )
+        training_raw_path: Path | None = None
+    else:
+        assert raw_csv_path is not None
+        training_raw_path = _confined(
+            raw_csv_path, root=root, name="raw sensor CSV", must_exist=True
+        )
+        if sha256_file(training_raw_path) != source_sha256:
+            raise FewPersonRunError("InclusiveHAR source artifact hash mismatch")
+        evaluation_lineage = _raw_input_lineage(
+            training_raw_path, root=root, source_sha256=source_sha256
+        )
+        training_lineage = _raw_input_lineage(
+            training_raw_path, root=root, source_sha256=source_sha256
+        )
+    split_lineage = {
+        "path": resolved_split_path.relative_to(root).as_posix(),
+        "record_sha256": split_sha256,
+        "file_sha256": split_file_sha256,
+    }
+    checkpoint_input_lineage = {
+        "schema_version": "1.0.0",
+        "split_manifest": split_lineage,
+        "training": training_lineage,
+        "evaluation": evaluation_lineage,
+        "access_barrier": {
+            "evaluation_metadata_preflight_only_before_adaptation": cache_requested,
+            "evaluation_signals_accessed_before_adapted_checkpoint_fixed": False,
+            "adapted_checkpoint_fixed_before_evaluation": False,
+        },
+    }
+    started = time.perf_counter()
+    original_cudnn = torch.backends.cudnn.enabled
+    output = _confined(
+        output_directory,
+        root=resolved_output_root,
+        name="output directory",
+        must_exist=False,
+    )
+    if output.exists():
+        raise FileExistsError(f"refusing to overwrite few-person output: {output}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.mkdir(exist_ok=False)
+    try:
+        torch.cuda.reset_peak_memory_stats(device)
+        torch.backends.cudnn.enabled = not config.disable_cudnn
+        # Cache mode loads only the k inclusion-participant shards. It never
+        # opens the whole-target cache or either held-out participant shard.
+        if cache_preflight is not None:
+            train_batch = _load_cached_participant_shards(
+                preflight=cache_preflight,
+                participants=inclusion,
+                records=train_records,
+                class_names=class_names,
+                artifact_root=artifact_root,
+            )
+        else:
+            assert training_raw_path is not None
+            train_batch = _materialize_authorized_records(
+                training_raw_path,
+                train_records,
+                expected_source_sha256=source_sha256,
+                class_names=class_names,
+                ontology_track=ontology_track,
+            )
         if set(train_batch.participant_ids) != inclusion:
             raise FewPersonRunError("training materialization differs from inclusion participants")
         adaptation_seed = _adaptation_seed(seed, fold_id, k)
@@ -469,12 +1070,23 @@ def run_few_person_scenario(
         checkpoint_payload = {
             "schema_version": "1.0.0",
             "record_kind": "few_person_adapted_neural_checkpoint",
-            "evidence_status": FEW_PERSON_EVIDENCE_STATUS,
+            "evidence_status": evidence_status,
+            "protocol_id": protocol_id,
             "model_id": model_id,
             "seed": seed,
             "adaptation_seed": adaptation_seed,
             "fold_id": fold_id,
             "k": k,
+            "inclusion_subjects": sorted(inclusion, key=int),
+            "inclusion_window_count": len(train_records),
+            "inclusion_window_ids_sha256": canonical_json_sha256(
+                sorted(record.window_id for record in train_records)
+            ),
+            "evaluation_subjects_excluded_from_training": sorted(evaluation, key=int),
+            "normalization_fit_subjects": list(normalizer.training_participants),
+            "target_validation_performed": False,
+            "calibration_refit_on_target": False,
+            "threshold_selection_performed": False,
             "model_state": model.state_dict(),
             "optimizer_state": optimizer.state_dict(),
             "normalization": normalizer.to_dict(),
@@ -494,31 +1106,33 @@ def run_few_person_scenario(
                 "torch_cuda": torch.cuda.get_rng_state_all(),
             },
             "parameter_count": trainable_parameter_count(model),
+            "input_materialization": checkpoint_input_lineage,
         }
         with checkpoint_output.open("xb") as stream:
             torch.save(checkpoint_payload, stream)
         checkpoint_sha256 = sha256_file(checkpoint_output)
 
-        # Evaluation records, labels, and values remain unopened until all
-        # adaptation epochs finish; participant disjointness was predeclared.
-        evaluation_records = _window_records(
-            split,
-            subjects=evaluation,
-            ontology_track=ontology_track,
-            expected_count=int(scenario["evaluation_window_count"]),
-            expected_ids_sha256=str(scenario["evaluation_window_ids_sha256"]),
-        )
-        if {record.window_id for record in train_records} & {
-            record.window_id for record in evaluation_records
-        }:
-            raise FewPersonRunError("inclusion/evaluation window identities overlap")
-        evaluation_batch = _materialize_authorized_records(
-            raw_csv_path,
-            evaluation_records,
-            expected_source_sha256=source_sha256,
-            class_names=class_names,
-            ontology_track=ontology_track,
-        )
+        # No held-out signal array is loaded or sliced until the adapted
+        # checkpoint has been durably written and hash-fixed above.
+        if cache_preflight is not None:
+            evaluation_batch = _load_cached_participant_shards(
+                preflight=cache_preflight,
+                participants=evaluation,
+                records=evaluation_records,
+                class_names=class_names,
+                artifact_root=artifact_root,
+                adapted_checkpoint_path=checkpoint_output,
+                expected_adapted_checkpoint_sha256=checkpoint_sha256,
+            )
+        else:
+            assert training_raw_path is not None
+            evaluation_batch = _materialize_authorized_records(
+                training_raw_path,
+                evaluation_records,
+                expected_source_sha256=source_sha256,
+                class_names=class_names,
+                ontology_track=ontology_track,
+            )
         if set(evaluation_batch.participant_ids) != evaluation:
             raise FewPersonRunError("evaluation materialization differs from outer participants")
         logits, uncalibrated, _ = predict_model(
@@ -553,11 +1167,24 @@ def run_few_person_scenario(
             },
         )
         torch.cuda.synchronize(device)
+        result_input_lineage = {
+            "schema_version": "1.0.0",
+            "split_manifest": split_lineage,
+            "training": training_lineage,
+            "evaluation": evaluation_lineage,
+            "access_barrier": {
+                "evaluation_metadata_preflight_only_before_adaptation": cache_requested,
+                "evaluation_signals_accessed_before_adapted_checkpoint_fixed": False,
+                "adapted_checkpoint_fixed_before_evaluation": True,
+                "adapted_checkpoint_sha256": checkpoint_sha256,
+            },
+        }
         result: dict[str, Any] = {
             "schema_version": "1.0.0",
             "record_kind": "few_person_outer_fold_result",
             "status": "complete_create_only_postconfirmatory_secondary",
-            "evidence_status": FEW_PERSON_EVIDENCE_STATUS,
+            "evidence_status": evidence_status,
+            "protocol_id": protocol_id,
             "model_id": model_id,
             "seed": seed,
             "adaptation_seed": adaptation_seed,
@@ -589,16 +1216,17 @@ def run_few_person_scenario(
             "evaluation_subjects": sorted(evaluation, key=int),
             "unused_target_subjects": scenario["unused_target_subjects"],
             "adapted_checkpoint": {
-                "path": checkpoint_output.as_posix(),
+                "path": checkpoint_output.relative_to(root).as_posix(),
                 "sha256": checkpoint_sha256,
             },
             "prediction_artifact": {
-                "path": prediction_path.as_posix(),
+                "path": prediction_path.relative_to(root).as_posix(),
                 "sha256": prediction_sha256,
             },
             "participant_level_report": report,
             "statistical_unit": "participant",
             "target_information_used_for_model_or_hyperparameter_selection": False,
+            "input_materialization": result_input_lineage,
             "device": {
                 "type": "cuda",
                 "name": torch.cuda.get_device_properties(device).name,
@@ -617,6 +1245,7 @@ def run_few_person_scenario(
             "record_kind": "few_person_failed_run",
             "status": "failed_preserved_postconfirmatory_secondary",
             "evidence_status": "failed_run_not_result",
+            "protocol_id": protocol_id,
             "fold_id": fold_id,
             "k": k,
             "model_id": model_id,
@@ -624,6 +1253,7 @@ def run_few_person_scenario(
             "few_person_manifest_sha256": plan_sha256,
             "exception_type": type(exc).__name__,
             "message": str(exc),
+            "input_materialization": checkpoint_input_lineage,
             "elapsed_seconds": time.perf_counter() - started,
         }
         failure["record_sha256"] = canonical_json_sha256(failure)
@@ -638,12 +1268,15 @@ def run_few_person_scenario(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    build = subparsers.add_parser("build-manifest")
+    build = subparsers.add_parser(
+        "build-manifest", help="build a create-only v1.1 manifest; v1 regeneration is disabled"
+    )
     build.add_argument("--split-manifest", type=Path, required=True)
     build.add_argument("--config", type=Path, required=True)
     build.add_argument("--opening-receipt", type=Path, required=True)
     build.add_argument("--zero-shot-index", type=Path, required=True)
     build.add_argument("--final-freeze-inventory", type=Path, required=True)
+    build.add_argument("--superseded-v1-manifest", type=Path, required=True)
     build.add_argument("--output", type=Path, required=True)
     build.add_argument("--allowed-root", type=Path, required=True)
     run = subparsers.add_parser("run-scenario")
@@ -652,7 +1285,10 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--opening-receipt", type=Path, required=True)
     run.add_argument("--zero-shot-index", type=Path, required=True)
     run.add_argument("--final-freeze-inventory", type=Path, required=True)
-    run.add_argument("--raw-csv", type=Path, required=True)
+    inputs = run.add_mutually_exclusive_group(required=True)
+    inputs.add_argument("--raw-csv", type=Path)
+    inputs.add_argument("--primary-cache-record", type=Path)
+    run.add_argument("--primary-cache-record-sha256")
     run.add_argument("--artifact-root", type=Path, required=True)
     run.add_argument("--fold-id", required=True)
     run.add_argument("--k", type=int, choices=(1, 2, 4), required=True)
@@ -668,14 +1304,17 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "build-manifest":
-            manifest = build_few_person_manifest(
+            manifest = build_few_person_v1_1_manifest(
                 split_manifest_path=args.split_manifest,
                 config_path=args.config,
                 opening_receipt_path=args.opening_receipt,
                 zero_shot_index_path=args.zero_shot_index,
                 final_freeze_inventory_path=args.final_freeze_inventory,
+                superseded_v1_manifest_path=args.superseded_v1_manifest,
             )
-            write_few_person_manifest_new(manifest, args.output, allowed_root=args.allowed_root)
+            write_few_person_v1_1_manifest_new(
+                manifest, args.output, allowed_root=args.allowed_root
+            )
             payload: Mapping[str, Any] = {
                 "status": manifest["status"],
                 "manifest_sha256": manifest["manifest_sha256"],
@@ -691,6 +1330,8 @@ def main(argv: list[str] | None = None) -> int:
                 zero_shot_index_path=args.zero_shot_index,
                 final_freeze_inventory_path=args.final_freeze_inventory,
                 raw_csv_path=args.raw_csv,
+                primary_cache_record_path=args.primary_cache_record,
+                primary_cache_record_sha256=args.primary_cache_record_sha256,
                 artifact_root=args.artifact_root,
                 fold_id=args.fold_id,
                 k=args.k,

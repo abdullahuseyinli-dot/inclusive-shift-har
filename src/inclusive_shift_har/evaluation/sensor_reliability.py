@@ -90,12 +90,7 @@ class LinearDrift:
 
 
 StressCondition: TypeAlias = (
-    GaussianNoise
-    | ContiguousDropout
-    | MissingAxis
-    | MissingModality
-    | RateReduction
-    | LinearDrift
+    GaussianNoise | ContiguousDropout | MissingAxis | MissingModality | RateReduction | LinearDrift
 )
 
 
@@ -115,6 +110,12 @@ class SensorReliabilityConfig:
     channel_units: tuple[str, ...]
     seed_namespace: str
     global_seed: int
+    model_family_id: str
+    eligible_training_model_names: tuple[str, ...]
+    required_training_regime: str
+    source_partition: str
+    target_partition: str
+    target_clean_reference: str
     conditions: tuple[StressCondition, ...]
 
     def condition(self, condition_id: str) -> StressCondition:
@@ -146,6 +147,7 @@ _TOP_LEVEL_KEYS = {
     "deterministic_seed",
     "preconditions",
     "policy",
+    "operation",
     "conditions",
 }
 _PRECONDITION_KEYS = {
@@ -163,6 +165,7 @@ _POLICY_KEYS = {
     "participant_level_reporting_required",
     "stress_levels_empirically_calibrated",
 }
+_OPERATION_KEYS = {"model_family", "cohorts"}
 
 
 def _finite_number(value: Any, *, location: str) -> float:
@@ -184,8 +187,7 @@ def _float_tuple(value: Any, *, location: str, length: int) -> tuple[float, ...]
     if not isinstance(value, list) or len(value) != length:
         raise SensorReliabilityError(f"{location} must contain exactly {length} values")
     return tuple(
-        _finite_number(item, location=f"{location}[{index}]")
-        for index, item in enumerate(value)
+        _finite_number(item, location=f"{location}[{index}]") for index, item in enumerate(value)
     )
 
 
@@ -199,9 +201,7 @@ def _mapping(value: Any, *, location: str) -> dict[str, Any]:
 def _condition_from_mapping(
     value: Mapping[str, Any], *, channel_count: int, window_length: int
 ) -> StressCondition:
-    require_exact_keys(
-        value, {"condition_id", "type", "parameters"}, location="condition"
-    )
+    require_exact_keys(value, {"condition_id", "type", "parameters"}, location="condition")
     condition_id = value["condition_id"]
     kind = value["type"]
     if not isinstance(condition_id, str) or not condition_id.strip():
@@ -216,9 +216,7 @@ def _condition_from_mapping(
         channel_std = _float_tuple(
             parameters["channel_std"], location=f"{condition_id}.channel_std", length=channel_count
         )
-        if any(item < 0.0 for item in channel_std) or not any(
-            item > 0.0 for item in channel_std
-        ):
+        if any(item < 0.0 for item in channel_std) or not any(item > 0.0 for item in channel_std):
             raise SensorReliabilityError(
                 f"{condition_id}.channel_std must be non-negative with at least one positive value"
             )
@@ -255,9 +253,7 @@ def _condition_from_mapping(
             condition_sha256,
         )
     if kind == "missing_axis":
-        require_exact_keys(
-            parameters, {"channel_index", "fill_value"}, location=condition_id
-        )
+        require_exact_keys(parameters, {"channel_index", "fill_value"}, location=condition_id)
         index = _integer(
             parameters["channel_index"], location=f"{condition_id}.channel_index", minimum=0
         )
@@ -286,7 +282,9 @@ def _condition_from_mapping(
         require_exact_keys(parameters, {"factor"}, location=condition_id)
         factor = _integer(parameters["factor"], location=f"{condition_id}.factor", minimum=2)
         if factor >= window_length:
-            raise SensorReliabilityError(f"{condition_id}.factor must be smaller than window length")
+            raise SensorReliabilityError(
+                f"{condition_id}.factor must be smaller than window length"
+            )
         return RateReduction(condition_id, factor, condition_sha256)
     if kind == "linear_drift":
         require_exact_keys(parameters, {"endpoint_offsets"}, location=condition_id)
@@ -366,9 +364,11 @@ def load_sensor_reliability_config(path: str | Path) -> SensorReliabilityConfig:
 
     preconditions = _mapping(parsed["preconditions"], location="preconditions")
     policy = _mapping(parsed["policy"], location="policy")
+    operation = _mapping(parsed["operation"], location="operation")
     try:
         require_exact_keys(preconditions, _PRECONDITION_KEYS, location="preconditions")
         require_exact_keys(policy, _POLICY_KEYS, location="policy")
+        require_exact_keys(operation, _OPERATION_KEYS, location="operation")
     except StrictConfigError as exc:
         raise SensorReliabilityError(str(exc)) from exc
     required_preconditions = {
@@ -390,6 +390,67 @@ def load_sensor_reliability_config(path: str | Path) -> SensorReliabilityConfig:
     }
     if policy != required_policy:
         raise SensorReliabilityError("secondary stress policy contract was changed")
+
+    model_family = _mapping(operation["model_family"], location="operation.model_family")
+    cohorts = _mapping(operation["cohorts"], location="operation.cohorts")
+    try:
+        require_exact_keys(
+            model_family,
+            {
+                "family_id",
+                "inventory_training_regime",
+                "eligible_training_model_names",
+                "selection_rule",
+            },
+            location="operation.model_family",
+        )
+        require_exact_keys(cohorts, {"source", "target"}, location="operation.cohorts")
+    except StrictConfigError as exc:
+        raise SensorReliabilityError(str(exc)) from exc
+    family_id = model_family["family_id"]
+    if not isinstance(family_id, str) or not family_id.strip():
+        raise SensorReliabilityError("operation.model_family.family_id must be non-empty")
+    if model_family["inventory_training_regime"] != "fixed_epoch_neural":
+        raise SensorReliabilityError("stress operation is restricted to frozen neural entries")
+    if model_family["selection_rule"] != "exact_training_configuration_model_name":
+        raise SensorReliabilityError("stress model-family selection rule changed")
+    raw_model_names = model_family["eligible_training_model_names"]
+    if (
+        not isinstance(raw_model_names, list)
+        or not raw_model_names
+        or any(not isinstance(item, str) or not item for item in raw_model_names)
+        or len(set(raw_model_names)) != len(raw_model_names)
+    ):
+        raise SensorReliabilityError("eligible training model names must be unique strings")
+    source_cohort = _mapping(cohorts["source"], location="operation.cohorts.source")
+    target_cohort = _mapping(cohorts["target"], location="operation.cohorts.target")
+    try:
+        require_exact_keys(
+            source_cohort,
+            {"required_partition", "clean_reference"},
+            location="operation.cohorts.source",
+        )
+        require_exact_keys(
+            target_cohort,
+            {"required_partition", "clean_reference"},
+            location="operation.cohorts.target",
+        )
+    except StrictConfigError as exc:
+        raise SensorReliabilityError(str(exc)) from exc
+    expected_cohorts = {
+        "source_partition": "source_validation",
+        "source_clean": "recompute_once_with_frozen_pipeline",
+        "target_partition": "target_sealed",
+        "target_clean": "reuse_locked_target_opening_1_artifact",
+    }
+    observed_cohorts = {
+        "source_partition": source_cohort["required_partition"],
+        "source_clean": source_cohort["clean_reference"],
+        "target_partition": target_cohort["required_partition"],
+        "target_clean": target_cohort["clean_reference"],
+    }
+    if observed_cohorts != expected_cohorts:
+        raise SensorReliabilityError("stress cohort or clean-reference contract changed")
 
     raw_conditions = parsed["conditions"]
     if not isinstance(raw_conditions, list) or not raw_conditions:
@@ -433,6 +494,12 @@ def load_sensor_reliability_config(path: str | Path) -> SensorReliabilityConfig:
         channel_units=units,
         seed_namespace=namespace,
         global_seed=global_seed,
+        model_family_id=family_id,
+        eligible_training_model_names=tuple(raw_model_names),
+        required_training_regime="fixed_epoch_neural",
+        source_partition="source_validation",
+        target_partition="target_sealed",
+        target_clean_reference="reuse_locked_target_opening_1_artifact",
         conditions=tuple(conditions),
     )
 
@@ -533,7 +600,11 @@ def apply_sensor_reliability_stress(
 
     if work is not result:
         result = work.astype(source.dtype, copy=False)
-    if result.shape != source.shape or result.dtype != source.dtype or not np.isfinite(result).all():
+    if (
+        result.shape != source.shape
+        or result.dtype != source.dtype
+        or not np.isfinite(result).all()
+    ):
         raise SensorReliabilityError("corruption produced an invalid tensor")
     metadata = {
         "schema_version": "1.0.0",

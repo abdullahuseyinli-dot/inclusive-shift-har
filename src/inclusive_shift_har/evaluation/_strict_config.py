@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -59,9 +60,7 @@ def load_strict_yaml_mapping(path: str | Path) -> dict[str, Any]:
     return dict(parsed)
 
 
-def require_exact_keys(
-    value: Mapping[str, Any], expected: set[str], *, location: str
-) -> None:
+def require_exact_keys(value: Mapping[str, Any], expected: set[str], *, location: str) -> None:
     """Reject missing and unexpected keys instead of silently applying defaults."""
 
     observed = set(value)
@@ -79,3 +78,17 @@ def require_mapping(value: Any, *, location: str) -> dict[str, Any]:
     if not isinstance(value, Mapping) or any(not isinstance(key, str) for key in value):
         raise StrictConfigError(f"{location} must be a string-keyed mapping")
     return dict(value)
+
+
+def require_utc_timestamp(value: str, *, location: str = "timestamp") -> str:
+    """Validate the repository's canonical ISO-8601 UTC representation."""
+
+    if not isinstance(value, str) or not value.endswith("Z"):
+        raise StrictConfigError(f"{location} must use the canonical UTC Z suffix")
+    try:
+        parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+    except ValueError as exc:
+        raise StrictConfigError(f"{location} is not valid ISO-8601") from exc
+    if parsed.tzinfo != UTC:
+        raise StrictConfigError(f"{location} must be UTC")
+    return value

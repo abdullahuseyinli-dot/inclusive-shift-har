@@ -6,6 +6,17 @@ inspection used preserved read-only clones under
 `.audit/baseline-source-audit-20260823/`; those clones are evidence, not vendored
 project code.
 
+Post-audit implementation addendum (2026-08-24): a source-only CCIL loss
+adaptation and a locally implemented boundary-safe BPD protocol adaptation now
+exist behind the post-confirmatory design in
+`configs/experiments/ccil_bpd_postconfirmatory_v1.yaml`; neither has been run on
+real InclusiveHAR data by that change. The implementation does not change this
+audit's `faithful local implementation = false` decision. It copies no BPD
+source, never uses the audited BPD trainer, selects and calibrates only on source
+participants, and can access target data only after a durable source-stage lock
+through consumed opening-1 cache lineage. See
+`docs/CCIL_BPD_POSTCONFIRMATORY.md` for the claim labels and run gates.
+
 This audit answers four separate questions for every requested baseline:
 
 1. Is there a primary paper and an author-linked or paper-linked repository?
@@ -28,7 +39,7 @@ for a linked repository.
 | TinierHAR | [UbiComp/ISWC 2025 paper](https://doi.org/10.1145/3715071.3750410) | `zhaxidele/TinierHAR` at `f2f1bbd7305689c374fb38cbb7ce853e7cefbb3f` | `NOASSERTION` | Paper: all datasets, including 9-channel UCI, use 4 s / 2 s overlap; repo UCI config instead says 50 Hz and 2.56 s | Block source reuse; architecture/count ambiguity must be resolved before any clean-room adaptation |
 | HARMamba | [IEEE IoT Journal paper](https://doi.org/10.1109/JIOT.2024.3463405) | `dianoDouble/HARMamba` at `3afb0dced3c66702d698af354d7ec7e753e772ad` | Apache-2.0 | Paper UCI: 9 channels, 50 Hz, 128 samples, 50% overlap; code defaults: 9 channels and 512 samples | License-compatible, but blocked pending a protocol-safe, runtime-validated adapter |
 | CCIL | [AAAI 2025 paper](https://doi.org/10.1609/aaai.v39i1.32077) | No official repository located | No software release to license | Cross-person interfaces vary by dataset; cross-dataset interface is 6 channels and 50 samples | Equations 2–6 only are implemented as a paper-derived loss, never as official CCIL code |
-| BPD | [IMWUT 2022 paper](https://doi.org/10.1145/3517252) | `Jie-su/BPD` at `8b2338927c118d1daa5c602d48b6ae5156dd5966` | Apache-2.0 | Paper: 168 samples, 50% overlap, dataset-specific channels/rates; code default stride is 32 | License-compatible components only; blocked until windowing and target-selection logic are replaced |
+| BPD | [IMWUT 2022 paper](https://doi.org/10.1145/3517252) | `Jie-su/BPD` at `8b2338927c118d1daa5c602d48b6ae5156dd5966` | Apache-2.0 | Paper: 168 samples, 50% overlap, dataset-specific channels/rates; code default stride is 32 | Official trainer remains blocked; a post-audit local boundary-safe adaptation now exists but is unrun and not faithful |
 | CMD-HAR | [arXiv:2503.21843v4](https://arxiv.org/abs/2503.21843) | No official repository located | No software release to license | Paper table: UCI is 9 channels, 50 Hz, 128 samples | Related-work comparator only; do not invent an implementation |
 | BenchHAR | [arXiv:2605.08296](https://arxiv.org/abs/2605.08296) | `saiketa/HAR-Bench` at `358a377929b1b9c0a2cefc417c67f56d15d4d11c` | `NOASSERTION` | 6 s non-overlapping windows resampled to 20 Hz: 120×6 or accelerometer-only 120×3 | Block source/adapter reuse; use its findings only to predeclare SSL candidates |
 | SimMTM | [NeurIPS 2023 paper](https://arxiv.org/abs/2302.00861) | `thuml/SimMTM` at `169513bef74fb676e48d98a0e30f8823793f691c` | `NOASSERTION` | Generic time-series upstream; the 120×6 inertial interface is a BenchHAR adaptation | Block code reuse; record as the BenchHAR cross-subject candidate, not a completed local baseline |
@@ -294,8 +305,9 @@ The following rules are binding for experiments built from this audit:
 4. Any changed interface or protocol is labelled an adaptation. Published metrics
    are context, not validation of the local adapter.
 5. No missing official implementation is reverse-engineered and called faithful.
-6. CCIL's local loss remains explicitly paper-derived and disabled until its
-   coefficients are selected using grouped source participants only.
+6. CCIL's local loss remains explicitly paper-derived. It is enabled only by the
+   post-confirmatory extension that selects its coefficients using grouped source
+   participants; it is not part of the locked primary inventory.
 7. The locked InclusiveHAR target remains unopened for baseline choice,
    hyperparameter tuning, normalization, calibration, or checkpoint selection.
 

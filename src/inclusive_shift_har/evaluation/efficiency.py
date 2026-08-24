@@ -29,6 +29,31 @@ from inclusive_shift_har.manifests.canonical import (
 
 Precision = Literal["float32", "float16_autocast"]
 
+FROZEN_NEURAL_MODEL_IDS = (
+    "compact-coral",
+    "compact-dann",
+    "compact-erm",
+    "deepconvlstm",
+    "legacy-bilstm",
+    "legacy-cnn1d",
+    "legacy-joint-cnn-bilstm",
+    "more-har-augmentation",
+    "more-har-backbone",
+    "more-har-content",
+    "more-har-factorized",
+    "more-har-full",
+    "more-har-full-no-accelerometer",
+    "more-har-full-no-gyroscope",
+    "more-har-groupdro",
+    "static-dual-branch-matched",
+)
+FROZEN_NEURAL_SEEDS = (11, 23, 47, 89, 131)
+EFFICIENCY_BATCH_SIZES = (1, 64)
+EFFICIENCY_PRECISIONS: tuple[Precision, ...] = ("float32", "float16_autocast")
+RECURRENT_CUDNN_DISABLED_MODEL_IDS = frozenset(
+    {"deepconvlstm", "legacy-bilstm", "legacy-joint-cnn-bilstm"}
+)
+
 
 class EfficiencyProfileError(ValueError):
     """Raised when a neural profile would be incomplete, ambiguous, or non-CUDA."""
@@ -43,6 +68,7 @@ class EfficiencyProfileConfig:
     required_device: str
     window_length_samples: int
     channel_count: int
+    synthetic_input_values: str
     batch_sizes: tuple[int, ...]
     precisions: tuple[Precision, ...]
     warmup_iterations: int
@@ -126,7 +152,7 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
     try:
         require_exact_keys(
             input_config,
-            {"window_length_samples", "channel_count", "batch_sizes"},
+            {"window_length_samples", "channel_count", "batch_sizes", "synthetic_values"},
             location="input",
         )
         require_exact_keys(
@@ -179,6 +205,12 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
     batches = tuple(_integer(item, location="batch_sizes") for item in raw_batches)
     if tuple(sorted(set(batches))) != batches:
         raise EfficiencyProfileError("batch_sizes must be sorted and unique")
+    if batches != EFFICIENCY_BATCH_SIZES:
+        raise EfficiencyProfileError(
+            f"batch_sizes must remain the locked matrix {list(EFFICIENCY_BATCH_SIZES)}"
+        )
+    if input_config["synthetic_values"] != "zeros":
+        raise EfficiencyProfileError("profiling input values must remain deterministic zeros")
     raw_precisions = parsed["precision_modes"]
     if not isinstance(raw_precisions, list) or not raw_precisions:
         raise EfficiencyProfileError("precision_modes must be non-empty")
@@ -186,6 +218,10 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
     if any(not isinstance(item, str) or item not in allowed for item in raw_precisions):
         raise EfficiencyProfileError("precision_modes contains an unsupported mode")
     precisions = cast(tuple[Precision, ...], tuple(raw_precisions))
+    if precisions != EFFICIENCY_PRECISIONS:
+        raise EfficiencyProfileError(
+            "precision_modes must remain ['float32', 'float16_autocast'] in that order"
+        )
     raw_percentiles = latency["percentiles"]
     if not isinstance(raw_percentiles, list) or not raw_percentiles:
         raise EfficiencyProfileError("latency.percentiles must be non-empty")
@@ -207,11 +243,10 @@ def load_efficiency_profile_config(path: str | Path) -> EfficiencyProfileConfig:
             input_config["window_length_samples"], location="window_length_samples"
         ),
         channel_count=_integer(input_config["channel_count"], location="channel_count"),
+        synthetic_input_values="zeros",
         batch_sizes=batches,
         precisions=precisions,
-        warmup_iterations=_integer(
-            latency["warmup_iterations"], location="warmup_iterations"
-        ),
+        warmup_iterations=_integer(latency["warmup_iterations"], location="warmup_iterations"),
         measured_iterations=_integer(
             latency["measured_iterations"], location="measured_iterations"
         ),
@@ -248,7 +283,9 @@ def _lstm_macs(module: nn.LSTM, input_tensor: Tensor) -> int:
 
 
 def _state_tensor_bytes(model: nn.Module) -> int:
-    return int(sum(tensor.numel() * tensor.element_size() for tensor in model.state_dict().values()))
+    return int(
+        sum(tensor.numel() * tensor.element_size() for tensor in model.state_dict().values())
+    )
 
 
 def _parameter_counts(model: nn.Module) -> tuple[int, int]:
@@ -418,10 +455,13 @@ def profile_neural_model(
             start = torch.cuda.Event(enable_timing=True)  # type: ignore[no-untyped-call]
             end = torch.cuda.Event(enable_timing=True)  # type: ignore[no-untyped-call]
             start.record()
-            with torch.inference_mode(), (
-                torch.autocast(device_type="cuda", dtype=torch.float16)
-                if precision == "float16_autocast"
-                else nullcontext()
+            with (
+                torch.inference_mode(),
+                (
+                    torch.autocast(device_type="cuda", dtype=torch.float16)
+                    if precision == "float16_autocast"
+                    else nullcontext()
+                ),
             ):
                 model(example_input)
             end.record()
@@ -444,6 +484,8 @@ def profile_neural_model(
         "record_kind": "cuda_neural_efficiency_profile",
         "status": "profile_complete",
         "evidence_status": "measured_cuda_efficiency_not_model_selection_evidence",
+        "required_device": "cuda",
+        "execution_device_type": device.type,
         "profile_id": config.profile_id,
         "profile_config_sha256": config.config_sha256,
         "model_id": model_id,
@@ -460,8 +502,7 @@ def profile_neural_model(
             **complexity,
             "supported_operator_macs_scope": "one_profiled_batch",
             "supported_operator_macs_per_window": supported_macs_per_window,
-            "estimated_flops_from_supported_macs_per_batch": supported_macs
-            * config.flop_per_mac,
+            "estimated_flops_from_supported_macs_per_batch": supported_macs * config.flop_per_mac,
             "estimated_flops_from_supported_macs_per_window": supported_macs_per_window
             * config.flop_per_mac,
             "flop_conversion": f"{config.flop_per_mac}_flops_per_mac",
@@ -500,6 +541,7 @@ def profile_neural_model(
         "environment": {
             "torch_version": str(torch.__version__),
             "torch_cuda_version": torch.version.cuda,
+            "device_type": device.type,
             "device": str(device),
             "device_name": properties.name,
             "device_total_memory_bytes": int(properties.total_memory),
@@ -527,6 +569,10 @@ def write_efficiency_profile_new(
         raise EfficiencyProfileError("efficiency profile self-hash does not validate")
     if value.get("record_kind") != "cuda_neural_efficiency_profile":
         raise EfficiencyProfileError("record is not a CUDA neural efficiency profile")
+    if value.get("status") != "profile_complete":
+        raise EfficiencyProfileError("efficiency profile status is not complete")
+    if value.get("required_device") != "cuda" or value.get("execution_device_type") != "cuda":
+        raise EfficiencyProfileError("efficiency profile does not prove CUDA execution")
     if value.get("model_selection_use") is not False:
         raise EfficiencyProfileError("efficiency record cannot be model-selection evidence")
     root = allowed_root.resolve(strict=True)

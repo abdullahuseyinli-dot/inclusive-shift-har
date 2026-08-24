@@ -1,12 +1,13 @@
 schema_version: "1.0.0"
 profile_id: "neural-efficiency-cuda-v1"
-config_sha256: "233aa00ec8621af890dd2f66e9da9fa2c00b16bfb5c0533bfd742d6c707a7887"
+config_sha256: "f1c9499e5c79f44acce31cced5b173cd431399ee190e497458052cdad819c853"
 status: "configured_not_run"
 required_device: "cuda"
 input:
   window_length_samples: 128
   channel_count: 6
   batch_sizes: [1, 64]
+  synthetic_values: "zeros"
 precision_modes:
   - "float32"
   - "float16_autocast"

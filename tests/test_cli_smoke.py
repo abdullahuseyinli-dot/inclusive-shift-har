@@ -10,6 +10,8 @@ from typing import Any
 
 import pytest
 
+from inclusive_shift_har import cli as cli_module
+
 from ._synthetic import materialize_checkpoint_artifact, synthetic_dataset_manifest
 
 
@@ -37,7 +39,7 @@ def _json_stdout(completed: subprocess.CompletedProcess[str]) -> dict[str, Any]:
     return payload
 
 
-def test_cli_help_lists_every_stage_2_command(
+def test_cli_help_lists_current_direct_and_dispatch_commands(
     repository_root: Path,
     offline_subprocess_environment: dict[str, str],
 ) -> None:
@@ -53,11 +55,56 @@ def test_cli_help_lists_every_stage_2_command(
         "build-splits",
         "audit-splits",
         "aggregate-source-cv",
+        "aggregate-uci-source",
         "train",
         "evaluate",
         "validate-artifacts",
     ):
         assert command in completed.stdout
+
+
+def test_train_and_evaluate_help_lists_truthful_safe_tracks(
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    train = _run_cli(
+        ["train", "--help"],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    evaluate = _run_cli(
+        ["evaluate", "--help"],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+
+    assert train.returncode == 0, train.stderr
+    assert evaluate.returncode == 0, evaluate.stderr
+    for track in (
+        "inclusivehar-source",
+        "final-source-suite",
+        "uci-source-fold",
+        "few-person",
+        "within-group",
+        "raw-total-sensitivity",
+    ):
+        assert track in train.stdout
+    for track in (
+        "source-cv",
+        "uci-source",
+        "few-person-statistics",
+        "within-group-statistics",
+        "efficiency",
+        "sensor-stress",
+        "raw-total-statistics",
+    ):
+        assert track in evaluate.stdout
+    combined = (train.stdout + evaluate.stdout).casefold()
+    assert "not implemented" not in combined
+    assert "no confirmatory target was opened" not in combined
+    assert "stage 2 provenance scaffold" not in combined
+    assert "one-time confirmatory target-opening operation is never routed" in combined
+    assert "no locked-report track is exposed" in combined
 
 
 def test_validate_manifests_cli_passes_locked_starters(
@@ -182,21 +229,9 @@ def test_validate_artifacts_cli_checks_complete_synthetic_checkpoint(
     assert payload["report"]["checked_manifests"] == 1
 
 
-@pytest.mark.parametrize(
-    ("command", "expected_code", "required_gate"),
-    [
-        ("train", "TRAINING_GATE_CLOSED_NOT_IMPLEMENTED", "split_audit_pass"),
-        (
-            "evaluate",
-            "EVALUATION_GATE_CLOSED_NOT_IMPLEMENTED",
-            "final_evaluation_unlock",
-        ),
-    ],
-)
-def test_unimplemented_cli_stages_are_visible_gates_not_false_successes(
+@pytest.mark.parametrize("command", ["train", "evaluate"])
+def test_dispatchers_require_a_track_with_machine_readable_errors(
     command: str,
-    expected_code: str,
-    required_gate: str,
     repository_root: Path,
     offline_subprocess_environment: dict[str, str],
 ) -> None:
@@ -206,16 +241,213 @@ def test_unimplemented_cli_stages_are_visible_gates_not_false_successes(
         environment=offline_subprocess_environment,
     )
     payload = _json_stdout(completed)
-    assert completed.returncode == 3
-    assert payload == {
-        "code": expected_code,
-        "command": command,
-        "exit_code": 3,
-        "message": payload["message"],
-        "required_gate": required_gate,
-        "status": "gated_not_implemented",
-    }
+    assert completed.returncode == 2
+    assert payload["code"] == f"{command.upper()}_TRACK_REQUIRED"
+    assert payload["command"] == command
+    assert payload["exit_code"] == 2
+    assert payload["one_time_confirmatory_target_operation_exposed"] is False
+    assert payload["status"] == "fail"
+    assert payload["track"] is None
     assert payload["message"]
+
+
+@pytest.mark.parametrize("command", ["train", "evaluate"])
+def test_dispatchers_never_route_confirmatory_target_operation(
+    command: str,
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    completed = _run_cli(
+        [command, "--json", "confirmatory-target"],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    payload = _json_stdout(completed)
+
+    assert completed.returncode == 2
+    assert payload["code"] == f"UNKNOWN_{command.upper()}_TRACK"
+    assert payload["one_time_confirmatory_target_operation_exposed"] is False
+    assert payload["track"] == "confirmatory-target"
+
+
+def test_forwarded_parser_failure_remains_machine_readable(
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    completed = _run_cli(
+        ["train", "--json", "uci-source-fold"],
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+    payload = _json_stdout(completed)
+
+    assert completed.returncode == 2
+    assert payload["code"] == "TRAIN_TRACK_ARGUMENT_ERROR"
+    assert payload["status"] == "fail"
+    assert payload["track"] == "uci-source-fold"
+    assert "required" in completed.stderr
+
+
+@pytest.mark.parametrize(
+    ("arguments", "expected_fragment"),
+    [
+        (["train", "uci-source-fold", "--", "--help"], "run-uci-source-fold"),
+        (["train", "inclusivehar-source", "--", "--help"], "--source-manifest"),
+        (
+            ["train", "within-group", "--", "--help"],
+            "--primary-cache-record-file-sha256",
+        ),
+        (
+            ["evaluate", "within-group-statistics", "--", "--help"],
+            "--result-root",
+        ),
+        (["evaluate", "efficiency", "--", "--help"], "--created-at-utc"),
+    ],
+)
+def test_dispatchers_forward_child_help_without_running_work(
+    arguments: list[str],
+    expected_fragment: str,
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    completed = _run_cli(
+        arguments,
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    assert expected_fragment in completed.stdout
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [
+        ["train", "within-group", "--", "--help"],
+        ["evaluate", "within-group-statistics", "--", "--help"],
+    ],
+)
+def test_within_group_dispatchers_expose_cache_evidence_but_no_opening_or_raw_route(
+    arguments: list[str],
+    repository_root: Path,
+    offline_subprocess_environment: dict[str, str],
+) -> None:
+    completed = _run_cli(
+        arguments,
+        repository_root=repository_root,
+        environment=offline_subprocess_environment,
+    )
+
+    assert completed.returncode == 0, completed.stderr
+    help_text = completed.stdout.casefold()
+    assert "--primary-cache-record" in help_text
+    assert "--raw-csv" not in help_text
+    assert "--unlock-record" not in help_text
+    assert "--opening-acknowledgement" not in help_text
+    assert "--device" not in help_text
+
+
+def test_dispatcher_forwards_exact_argv_without_shell_interpretation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    observed: list[tuple[str, str, list[str] | None]] = []
+
+    def fake_entrypoint(arguments: list[str] | None) -> int:
+        observed.append(("called", "entrypoint", arguments))
+        return 17
+
+    def fake_resolver(
+        workflow: str,
+        track: str,
+    ) -> tuple[cli_module.WorkflowMain, tuple[str, ...], bool]:
+        observed.append((workflow, track, None))
+        return fake_entrypoint, ("fixed-prefix",), True
+
+    monkeypatch.setattr(cli_module, "_workflow_entrypoint", fake_resolver)
+
+    exit_code = cli_module.main(
+        [
+            "evaluate",
+            "--json",
+            "uci-source",
+            "--",
+            "--literal",
+            "value with spaces",
+            "semi;colon",
+        ]
+    )
+
+    assert exit_code == 17
+    assert observed == [
+        ("evaluate", "uci-source", None),
+        (
+            "called",
+            "entrypoint",
+            ["fixed-prefix", "--literal", "value with spaces", "semi;colon", "--json"],
+        ),
+    ]
+
+
+@pytest.mark.parametrize("model", ["compact_residual_96", "xgboost"])
+def test_unified_inclusivehar_route_rejects_cpu_for_neural_and_xgboost(
+    model: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    def forbidden_resolver(
+        workflow: str, track: str
+    ) -> tuple[cli_module.WorkflowMain, tuple[str, ...], bool]:
+        raise AssertionError(f"device policy must reject before routing {workflow}/{track}")
+
+    monkeypatch.setattr(cli_module, "_workflow_entrypoint", forbidden_resolver)
+    exit_code = cli_module.main(
+        [
+            "train",
+            "--json",
+            "inclusivehar-source",
+            "--",
+            "--model",
+            model,
+            "--device",
+            "cpu",
+        ]
+    )
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 2
+    assert payload["code"] == "TRAIN_TRACK_DEVICE_POLICY_ERROR"
+    assert payload["track"] == "inclusivehar-source"
+    assert "cuda" in payload["message"].casefold()
+
+
+@pytest.mark.parametrize("model", ["random_forest", "svm_rbf", "logistic_regression"])
+def test_unified_inclusivehar_route_preserves_native_cpu_classical_models(
+    model: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    observed: list[list[str] | None] = []
+
+    def fake_entrypoint(arguments: list[str] | None) -> int:
+        observed.append(arguments)
+        return 0
+
+    monkeypatch.setattr(
+        cli_module,
+        "_workflow_entrypoint",
+        lambda workflow, track: (fake_entrypoint, (), False),
+    )
+    exit_code = cli_module.main(
+        [
+            "train",
+            "inclusivehar-source",
+            "--",
+            "--model",
+            model,
+            "--device=cpu",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed == [["--model", model, "--device=cpu"]]
 
 
 def test_build_and_audit_splits_cli_never_opens_target_performance(

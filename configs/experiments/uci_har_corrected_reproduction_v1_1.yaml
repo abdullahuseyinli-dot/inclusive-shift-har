@@ -1,0 +1,51 @@
+schema_version: "1.0.0"
+experiment_id: "uci_har_corrected_legacy_reproduction_v1.1"
+status: "configured_not_run_superseding_v1_model_scope"
+evidence_status: "corrected_source_development_no_results"
+supersedes: "configs/experiments/uci_har_legacy_reproduction.yaml"
+supersession_reason: "v1 listed a temporal BiLSTM variant outside the implemented exact three-model reproduction matrix"
+dataset_manifest: "manifests/datasets/uci_har_v1.json"
+protocol_manifest: "results/protocol/uci_har_source_grouped_v1.json"
+allowed_released_split: "train"
+official_test_member_opening_allowed: false
+input_shape: [128, 6]
+label_track: "uci_native_six"
+models:
+  - model_id: "legacy_cnn1d_h128"
+    disable_cudnn: false
+  - model_id: "legacy_bilstm_h192"
+    disable_cudnn: true
+  - model_id: "legacy_joint_bilstm256_cnn128"
+    disable_cudnn: true
+fold_order:
+  - "uci_source_cv_01"
+  - "uci_source_cv_02"
+  - "uci_source_cv_03"
+  - "uci_source_cv_04"
+  - "uci_source_cv_05"
+seed_order: [42, 1337, 2025, 31415, 271828]
+training:
+  device: "cuda"
+  cpu_fallback: false
+  epochs_max: 40
+  batch_size: 128
+  optimizer: "adamw"
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  early_stopping_patience: 8
+  minimum_epochs: 8
+  checkpoint_selection_rule: "source_validation_best"
+  selection_metric: "validation_participant_macro_f1"
+  normalization: "fold_training_windows_only"
+  mixed_precision: "float16"
+execution:
+  expected_run_count: 75
+  one_run_per_process: true
+  sequential_runs: true
+  create_only: true
+  preserve_failures: true
+  official_test_evaluation: "forbidden_consumed_legacy_evidence"
+outputs:
+  root: "results/legacy_reproduction/uci_har_source_grouped_v1"
+  participant_level_metrics: true
+  no_inclusivehar_target_evaluation: true
