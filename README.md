@@ -56,8 +56,16 @@ The v0.1.6 successor removes that release-evidence defect: authenticated
 repository metadata is filtered before file creation, both online capture and
 offline inventory validation reject any retained `temp_clone_token` field, and
 the scanner allowance is limited to the two canonical SHA-256 evidence fields
-in `ci.json`. It does not change an experiment, result, or target-opening
-record. No earlier tag or failure is rewritten.
+in `ci.json`. Its local gates, run `32846091138`, ready inventory, bundle
+reconstruction, and authoritative scan passed. A private draft with two
+validated assets was created but not published: the tracked Windows PowerShell
+5 example read the UTF-8 REST response with the platform default encoding and
+falsely rejected the correct body at an em dash. Strict UTF-8 decoding proves
+the local and REST bodies are identical. The sanitized record is
+[`benchmark-v0.1.6-draft-utf8-validation.json`](results/release/failures/benchmark-v0.1.6-draft-utf8-validation.json).
+The v0.1.7 successor uses strict UTF-8 decoding for saved GitHub JSON. Neither
+release patch changes an experiment, result, or target-opening record. No
+earlier tag, draft, or failure is rewritten.
 
 ## Post-confirmatory findings
 

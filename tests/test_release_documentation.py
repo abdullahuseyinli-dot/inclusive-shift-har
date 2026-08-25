@@ -2,8 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
+
+import pytest
 
 from inclusive_shift_har.artifacts.release_inventory import (
     ARTIFACT_ROLES,
@@ -17,6 +22,14 @@ def _load(path: Path) -> dict[str, Any]:
     value = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(value, dict)
     return value
+
+
+def _powershell() -> str | None:
+    return shutil.which("powershell.exe") or shutil.which("powershell")
+
+
+def _powershell_blocks(text: str) -> list[str]:
+    return re.findall(r"```powershell\n(.*?)```", text, flags=re.DOTALL)
 
 
 def test_release_inventory_schema_keeps_consumed_target_and_required_roles(
@@ -86,9 +99,9 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         "Outer-bundle Gitleaks scan failed",
         "@($remainingBundleFindings).Count -ne 0",
         "assets.Count -ne 2",
-        "git tag -a benchmark-v0.1.6 $candidate",
-        "gh release create benchmark-v0.1.6",
-        "gh release edit benchmark-v0.1.6",
+        "git tag -a benchmark-v0.1.7 $candidate",
+        "gh release create benchmark-v0.1.7",
+        "gh release edit benchmark-v0.1.7",
         "--draft=false --prerelease --latest=false",
         "published-release-api.json",
         "Published downloaded asset differs",
@@ -97,12 +110,17 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         "32836567358",
         "df8e681ced4cee4cdcdae67eb18f1aaa835410cb",
         "eaa30d18ca60b3c123d1ccf9b095d8d78a03469d",
-        "all ten tag objects/peeled targets",
+        "32846091138",
+        "e1d1de6aea68234def75eb8d57fb262ef6539db0",
+        "968a6e72d68d624e5287f8b8c7f9accc84cf26de",
+        "all eleven tag objects/peeled targets",
+        "Read-StrictUtf8Json",
+        "[System.Text.UTF8Encoding]::new($false, $true)",
     ):
         assert expected in text
     assert 'Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi' in text
     assert (
-        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.6" $publishedApi'
+        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.7" $publishedApi'
         in text
     )
     assert "-ArgumentList @('api', $Endpoint, '--jq', 'del(.temp_clone_token)')" in text
@@ -113,22 +131,135 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
     assert "$bundleFindings = @(" not in text
     assert "$remainingBundleFindings = @(" not in text
     assert "rule-local `AND` allowance" in text
-    assert "'benchmark-v0.1.4', 'benchmark-v0.1.5', 'benchmark-v0.1.6'" in text
+    assert "'benchmark-v0.1.4', 'benchmark-v0.1.5', 'benchmark-v0.1.6'," in text
+    assert "'benchmark-v0.1.7'" in text
+    final_tag_block = text.split("$requiredTags = @(", 1)[1].split("\n)", 1)[0]
+    assert re.findall(r"'([^']+)'", final_tag_block) == [
+        "benchmark-v0.1.0",
+        "benchmark-v0.1.1",
+        "benchmark-v0.1.2",
+        "benchmark-v0.1.3",
+        "benchmark-v0.1.4",
+        "benchmark-v0.1.5",
+        "benchmark-v0.1.6",
+        "benchmark-v0.1.7",
+        "legacy-audit-v0.1.0",
+        "protocol-v1.0.0",
+        "protocol-v1.2.0",
+    ]
     for obsolete_candidate_operation in (
-        "git show-ref --verify --quiet refs/tags/benchmark-v0.1.5",
-        "git tag -a benchmark-v0.1.5 $candidate",
-        "$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.5",
-        "gh release create benchmark-v0.1.5",
-        "gh release download benchmark-v0.1.5",
-        "gh release edit benchmark-v0.1.5",
-        "releases/tags/benchmark-v0.1.5",
-        "$tag -ceq 'benchmark-v0.1.5' -and $localTarget -cne $candidate",
+        "git show-ref --verify --quiet refs/tags/benchmark-v0.1.6",
+        "git tag -a benchmark-v0.1.6 $candidate",
+        "$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.6",
+        "gh release create benchmark-v0.1.6",
+        "gh release download benchmark-v0.1.6",
+        "gh release edit benchmark-v0.1.6",
+        "releases/tags/benchmark-v0.1.6",
+        "$tag -ceq 'benchmark-v0.1.6' -and $localTarget -cne $candidate",
     ):
         assert obsolete_candidate_operation not in text
     assert '$toolRoot = ".audit/tools/$review/gitleaks-8.30.1-windows-x64"' in text
-    assert "final ten-tag policy scan" in text
+    assert "final eleven-tag policy scan" in text
     assert "Set-Content -LiteralPath $draftApi" not in text
     assert "Set-Content -LiteralPath $publishedApi" not in text
+    for unsafe_saved_api_parse in (
+        "Get-Content -Raw -LiteralPath $draftApi",
+        "Get-Content -Raw -LiteralPath $publishedApi",
+        "Get-Content -Raw -LiteralPath $finalRepositoryApi",
+        "Get-Content -Raw -LiteralPath $finalMainApi",
+        'Get-Content -Raw "$external/run-artifacts-api.json"',
+    ):
+        assert unsafe_saved_api_parse not in text
+    for strict_saved_api_parse in (
+        '$artifactList = Read-StrictUtf8Json "$external/run-artifacts-api.json"',
+        "$draftMatches = @((Read-StrictUtf8Json $draftApi) |",
+        "$published = Read-StrictUtf8Json $publishedApi",
+        "$finalRepository = Read-StrictUtf8Json $finalRepositoryApi",
+        "$finalMain = Read-StrictUtf8Json $finalMainApi",
+    ):
+        assert strict_saved_api_parse in text
+    helper_block = next(
+        block for block in _powershell_blocks(text) if "Read-StrictUtf8Json" in block
+    )
+    helper = helper_block[
+        helper_block.index("function Read-StrictUtf8Json") : helper_block.index(
+            "function Save-SanitizedRepositoryApiResponse"
+        )
+    ]
+    assert "[System.Text.UTF8Encoding]::new($false, $true)" in helper
+
+
+def test_release_runbook_powershell_blocks_parse_when_powershell_is_available(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    powershell = _powershell()
+    if powershell is None:
+        pytest.skip("Windows PowerShell is unavailable")
+    text = (repository_root / "docs/RELEASE_EVIDENCE_GATE.md").read_text(encoding="utf-8")
+    blocks = _powershell_blocks(text)
+    assert len(blocks) == 15
+    parser = tmp_path / "parse.ps1"
+    parser.write_text(
+        "$tokens = $null\n"
+        "$errors = $null\n"
+        "[System.Management.Automation.Language.Parser]::ParseFile(\n"
+        "  $args[0], [ref]$tokens, [ref]$errors\n"
+        ") | Out-Null\n"
+        "if ($errors.Count -ne 0) {\n"
+        "  $errors | ForEach-Object { [Console]::Error.WriteLine($_.Message) }\n"
+        "  exit 1\n"
+        "}\n",
+        encoding="ascii",
+    )
+    for index, block in enumerate(blocks):
+        source = tmp_path / f"block-{index:02d}.ps1"
+        source.write_text(block, encoding="utf-8")
+        completed = subprocess.run(
+            [powershell, "-NoProfile", "-NonInteractive", "-File", str(parser), str(source)],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        assert completed.returncode == 0, completed.stderr
+
+
+def test_release_runbook_strict_utf8_reader_preserves_em_dash_on_windows(
+    repository_root: Path,
+    tmp_path: Path,
+) -> None:
+    powershell = _powershell()
+    if powershell is None:
+        pytest.skip("Windows PowerShell is unavailable")
+    text = (repository_root / "docs/RELEASE_EVIDENCE_GATE.md").read_text(encoding="utf-8")
+    helper_block = next(
+        block for block in _powershell_blocks(text) if "Read-StrictUtf8Json" in block
+    )
+    helper = helper_block[
+        helper_block.index("function Read-StrictUtf8Json") : helper_block.index(
+            "function Save-SanitizedRepositoryApiResponse"
+        )
+    ]
+    fixture = tmp_path / "utf8-release.json"
+    script = tmp_path / "strict-utf8-regression.ps1"
+    script.write_text(
+        helper
+        + "\n$expected = 'before ' + [char]0x2014 + ' after'\n"
+        + "$payload = '{\"body\":\"' + $expected + '\"}'\n"
+        + "[System.IO.File]::WriteAllText(\n"
+        + "  $args[0], $payload, [System.Text.UTF8Encoding]::new($false, $true)\n"
+        + ")\n"
+        + "$decoded = Read-StrictUtf8Json $args[0]\n"
+        + "if ($decoded.body -cne $expected) { throw 'Strict UTF-8 round trip failed' }\n",
+        encoding="ascii",
+    )
+    completed = subprocess.run(
+        [powershell, "-NoProfile", "-NonInteractive", "-File", str(script), str(fixture)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
 
 
 def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_root: Path) -> None:
@@ -146,7 +277,19 @@ def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_r
 
     policy = _load(repository_root / "configs/release/release_gate_policy_v1.json")
     refs = policy["git_refs"]
-    assert len(refs["required_for_release_tags"]) == 10
+    assert refs["required_for_release_tags"] == [
+        "benchmark-v0.1.0",
+        "benchmark-v0.1.1",
+        "benchmark-v0.1.2",
+        "benchmark-v0.1.3",
+        "benchmark-v0.1.4",
+        "benchmark-v0.1.5",
+        "benchmark-v0.1.6",
+        "benchmark-v0.1.7",
+        "legacy-audit-v0.1.0",
+        "protocol-v1.0.0",
+        "protocol-v1.2.0",
+    ]
     assert refs["pinned_annotated_tags"]["benchmark-v0.1.5"] == {
         "object_id": "df8e681ced4cee4cdcdae67eb18f1aaa835410cb",
         "target_commit": "eaa30d18ca60b3c123d1ccf9b095d8d78a03469d",
@@ -154,14 +297,22 @@ def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_r
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com",
     }
+    assert refs["pinned_annotated_tags"]["benchmark-v0.1.6"] == {
+        "object_id": "e1d1de6aea68234def75eb8d57fb262ef6539db0",
+        "target_commit": "968a6e72d68d624e5287f8b8c7f9accc84cf26de",
+        "message": "InclusiveShift-HAR benchmark v0.1.6",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com",
+    }
     assert refs["permitted_candidate_tags"] == {
-        "benchmark-v0.1.6": {
-            "message": "InclusiveShift-HAR benchmark v0.1.6",
+        "benchmark-v0.1.7": {
+            "message": "InclusiveShift-HAR benchmark v0.1.7",
             "tagger_name": "Abdulla Huseyinli",
             "tagger_email": "abdullahuseyinli@gmail.com",
         }
     }
     assert "32836567358" in refs["historical_notes"]["benchmark-v0.1.5"]
+    assert "32846091138" in refs["historical_notes"]["benchmark-v0.1.6"]
     exception = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]
     assert exception["review_record_sha256"] == record_hash
     assert exception["review_sha256"] == hashlib.sha256(review_path.read_bytes()).hexdigest()

@@ -23,5 +23,13 @@ repository response before it is written, rejecting any retained prohibited
 field during both capture and offline validation, and limiting the Gitleaks
 allowance to the two validated SHA-256 evidence fields in `ci.json`.
 
+The
+[`benchmark-v0.1.6` draft-validation record](failures/benchmark-v0.1.6-draft-utf8-validation.json)
+preserves the later Windows PowerShell 5 UTF-8 decoding false negative. All
+candidate, CI, inventory, bundle, and security gates passed and the two draft
+assets were uploaded, but the draft was not published. The v0.1.7 successor
+uses strict UTF-8 decoding for saved GitHub JSON; the earlier draft and external
+evidence remain unchanged.
+
 See `docs/RELEASE_EVIDENCE_GATE.md` for the create-only commands and circularity
 rules.

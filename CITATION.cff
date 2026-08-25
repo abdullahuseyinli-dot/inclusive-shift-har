@@ -6,7 +6,7 @@ title: >-
   InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for
   Ability-Associated Population Shift in Smartphone Activity Recognition
 type: software
-version: 0.1.6a0
+version: 0.1.7a0
 authors:
   - family-names: Huseyinli
     given-names: Abdulla

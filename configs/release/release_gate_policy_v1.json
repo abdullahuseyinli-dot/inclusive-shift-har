@@ -17,6 +17,7 @@
       "benchmark-v0.1.4",
       "benchmark-v0.1.5",
       "benchmark-v0.1.6",
+      "benchmark-v0.1.7",
       "legacy-audit-v0.1.0",
       "protocol-v1.0.0",
       "protocol-v1.2.0"
@@ -64,6 +65,13 @@
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       },
+      "benchmark-v0.1.6": {
+        "object_id": "e1d1de6aea68234def75eb8d57fb262ef6539db0",
+        "target_commit": "968a6e72d68d624e5287f8b8c7f9accc84cf26de",
+        "message": "InclusiveShift-HAR benchmark v0.1.6",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
       "legacy-audit-v0.1.0": {
         "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
         "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
@@ -87,8 +95,8 @@
       }
     },
     "permitted_candidate_tags": {
-      "benchmark-v0.1.6": {
-        "message": "InclusiveShift-HAR benchmark v0.1.6",
+      "benchmark-v0.1.7": {
+        "message": "InclusiveShift-HAR benchmark v0.1.7",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
@@ -100,6 +108,7 @@
       "benchmark-v0.1.3": "Preserved failed patch candidate. GitHub Actions run 32811935288 passed both operating-system test matrices but the release-security bundle rejected the Linux licence audit for the XGBoost-transitive nvidia-nccl-cu12 2.31.2 runtime; the tag is immutable and superseded by benchmark-v0.1.4.",
       "benchmark-v0.1.4": "Preserved failed patch candidate. GitHub Actions run 32829208254 failed the Ubuntu matrix with 49 synthetic release-fixture tests after 511 passed and 3 skipped: the hardened Linux x86-64 licence gate correctly required the reviewed XGBoost and NCCL packages, while generic fixtures still inventoried only safe@1. The Windows matrix passed tests, lint, formatting, and mypy; the dependent release-security job was skipped. The production licence gate was not weakened; the tag is immutable and superseded by benchmark-v0.1.5.",
       "benchmark-v0.1.5": "Preserved failed release-bundle candidate. GitHub Actions run 32836567358 passed Ubuntu, Windows, and complete-history release-security. The external bundle reconstructed exactly, but its pinned Gitleaks directory scan reported one credential-bearing temp_clone_token field from the authenticated repository API response and two deterministic SHA-256 evidence values keyed secret_scan or secret_scan.json. No GitHub release was created and no assets were uploaded. Raw failure evidence remains quarantined outside Git; the tag is immutable and superseded by benchmark-v0.1.6.",
+      "benchmark-v0.1.6": "Preserved failed draft-validation candidate. GitHub Actions run 32846091138 and all local, repository, licence, bundle, and authoritative Gitleaks gates passed. A private draft with two byte-validated assets was created but not published because the tracked Windows PowerShell 5 example decoded the UTF-8 REST response with the platform default encoding and falsely rejected the correct release body at its first em dash. Proper strict UTF-8 decoding proves the local and REST bodies are identical. The draft, tag, and external evidence remain preserved; the tag is immutable and superseded by benchmark-v0.1.7.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },
@@ -239,7 +248,7 @@
       "platform_machine": "x86_64",
       "scope": "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed",
       "lock_path": "uv.lock",
-      "lock_sha256": "da8425edb32b7dd3c6864ca57afdf7c10796db9ebe27537d1b13beb6f72d3abf",
+      "lock_sha256": "40cdd9df87658b1084e843fe42a05e38e781f59c2bce764ec55095be7c2e9c86",
       "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
       "review_sha256": "ac91805bae85ad7cde3c9eef3a95cf83411e8367854f9ce3422f92f2168dad5c",
       "review_record_sha256": "989bf532680f4696485f807508ed49061092ab2a9308dceb635207523b8213d3",

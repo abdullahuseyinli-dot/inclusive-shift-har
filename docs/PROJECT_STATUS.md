@@ -18,7 +18,7 @@ This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gat
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | v0.1.6 security-remediated successor prepared for the create-only gate | five earlier CI failures and the v0.1.5 post-CI bundle failure remain preserved; repository metadata is sanitized before capture and independently rejected if the prohibited field survives; no DOI |
+| 10 - release | v0.1.7 UTF-8-safe successor prepared for the create-only gate | five earlier CI failures, the v0.1.5 bundle failure, and the unpublished v0.1.6 draft-validation failure remain preserved; repository metadata sanitization and strict saved-JSON decoding are independently validated; no DOI |
 
 ## Confirmatory outcome
 
@@ -117,6 +117,16 @@ allowance to the two canonical SHA-256 evidence fields in `ci.json`. The
 create-only release gate still requires complete local validation, an immutable
 successor tag, exact green CI, an empty authoritative bundle scan, and
 byte-identical uploaded assets.
+
+Those gates passed for v0.1.6, including Actions run `32846091138`, a ready
+29-artifact inventory, exact bundle reconstruction, and an empty authoritative
+bundle scan. A two-asset private draft was created but not published because
+the tracked Windows PowerShell 5 example decoded the UTF-8 REST response with
+the platform default encoding and falsely rejected the correct release body at
+an em dash. Strict UTF-8 decoding proves the local and REST bodies are
+identical. The v0.1.7 successor reads all saved GitHub JSON with a strict UTF-8
+decoder; the v0.1.6 tag, draft, assets, and external failure evidence remain
+unchanged.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

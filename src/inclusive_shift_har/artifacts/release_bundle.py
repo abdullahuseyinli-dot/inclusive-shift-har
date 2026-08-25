@@ -1507,7 +1507,7 @@ def write_release_notes(
     archive_payload = archive_source.read_bytes()
     archive_reference = _payload_reference(archive_payload)
     notes = (
-        "# InclusiveShift-HAR benchmark v0.1.6 prerelease\n\n"
+        "# InclusiveShift-HAR benchmark v0.1.7 prerelease\n\n"
         f"Candidate commit: `{candidate}`\n\n"
         "This private prerelease preserves the validated benchmark code and its exact "
         "release-evidence assets. The locked target was opened once; no target rerun was "
