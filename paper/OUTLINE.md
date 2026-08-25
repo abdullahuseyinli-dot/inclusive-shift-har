@@ -184,7 +184,10 @@ Use non-stigmatizing language and frame failures as limitations of data/model co
 - Few-person and predecessor-adaptation analyses were designed or executed after the consumed target opening; none can restore confirmatory status.
 - CUDA latency is device-resident forward-only evidence on one machine under a sampled contention policy.
 - Cross-source transfer, SSL/foundation models, and several requested faithful third-party baselines were not evaluated.
-- No causal, clinical, fairness, or population-wide conclusion.
+- The released cohort label is observational, the target cohort contains ten
+  participants, and the study collected neither a randomized intervention nor
+  clinical outcomes; estimates describe this benchmark cohort and cannot
+  identify population effects.
 
 ## 12. Reproducibility statement
 

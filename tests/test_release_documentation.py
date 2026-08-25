@@ -77,7 +77,7 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         "outer-bundle offline reconstruction",
         "Outer-bundle Gitleaks scan failed",
         "assets.Count -ne 2",
-        "gh release edit benchmark-v0.1.4",
+        "gh release edit benchmark-v0.1.5",
         "--draft=false --prerelease --latest=false",
         "published-release-api.json",
         "Published downloaded asset differs",
@@ -87,9 +87,11 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         assert expected in text
     assert 'Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi' in text
     assert (
-        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.4" $publishedApi'
+        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.5" $publishedApi'
         in text
     )
+    assert '$toolRoot = ".audit/tools/$review/gitleaks-8.30.1-windows-x64"' in text
+    assert "final nine-tag policy scan" in text
     assert "Set-Content -LiteralPath $draftApi" not in text
     assert "Set-Content -LiteralPath $publishedApi" not in text
 
@@ -108,6 +110,23 @@ def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_r
     assert any("supplementary terms evidence" in item for item in review["review_findings"])
 
     policy = _load(repository_root / "configs/release/release_gate_policy_v1.json")
+    refs = policy["git_refs"]
+    assert len(refs["required_for_release_tags"]) == 9
+    assert refs["pinned_annotated_tags"]["benchmark-v0.1.4"] == {
+        "object_id": "a31c61c9299177a017d1f60134e88ffcdd55b420",
+        "target_commit": "1e2d78698bfa87641508e037c583bf863be543ed",
+        "message": "InclusiveShift-HAR benchmark v0.1.4",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com",
+    }
+    assert refs["permitted_candidate_tags"] == {
+        "benchmark-v0.1.5": {
+            "message": "InclusiveShift-HAR benchmark v0.1.5",
+            "tagger_name": "Abdulla Huseyinli",
+            "tagger_email": "abdullahuseyinli@gmail.com",
+        }
+    }
+    assert "32829208254" in refs["historical_notes"]["benchmark-v0.1.4"]
     exception = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]
     assert exception["review_record_sha256"] == record_hash
     assert exception["review_sha256"] == hashlib.sha256(review_path.read_bytes()).hexdigest()

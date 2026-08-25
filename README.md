@@ -38,11 +38,15 @@ preserved after its Ubuntu validation job passed but Windows exposed CRLF
 conversion in six byte-hash integrity tests. `benchmark-v0.1.3` and run
 `32811935288` are preserved after both operating-system matrices passed and the
 release-security job identified the Linux XGBoost-transitive
-`nvidia-nccl-cu12==2.31.2` licence declaration. The pending
-`benchmark-v0.1.4` candidate binds that one dependency to the exact Linux
-x86-64 wheel, XGBoost edge, `uv.lock`, PyPI metadata, embedded licence file,
-and the archived NVIDIA pages with their path/content version discrepancy;
-no earlier tag or failure is rewritten.
+`nvidia-nccl-cu12==2.31.2` licence declaration. `benchmark-v0.1.4` and run
+`32829208254` are preserved after Ubuntu then exposed a portability defect in
+synthetic release fixtures: they inventoried only `safe@1` even though the
+hardened Linux gate requires the reviewed XGBoost/NCCL pair. Windows passed
+tests, lint, formatting, and mypy; the dependent release-security job was
+skipped. The pending
+`benchmark-v0.1.5` candidate makes those fixtures deterministic on every host;
+it does not alter the production licence gate, research results, target
+opening, or dependency review. No earlier tag or failure is rewritten.
 
 ## Post-confirmatory findings
 

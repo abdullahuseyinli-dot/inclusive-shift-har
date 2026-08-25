@@ -701,7 +701,9 @@ def test_git_index_scan_rejects_forbidden_oversized_and_disguised_staged_blobs(
     assert {"forbidden_path", "oversized_blob", "disguised_binary_signature"} <= codes
 
 
-def test_secret_and_license_attestations_are_version_and_candidate_bound(tmp_path: Path) -> None:
+def test_secret_and_license_attestations_are_version_and_candidate_bound(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     repository, commit = _repository(tmp_path / "repository")
     policy = _policy(repository / "configs/release/release_gate_policy_v1.json")
     gitleaks = tmp_path / "gitleaks.json"
@@ -780,6 +782,12 @@ def test_secret_and_license_attestations_are_version_and_candidate_bound(tmp_pat
 
     license_repository, license_commit, license_policy = _exception_repository(
         tmp_path / "license-repository"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Windows"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "AMD64"
     )
     licenses = tmp_path / "licenses.json"
     _write_json(licenses, [{"Name": "safe", "Version": "1", "License": "MIT"}])
@@ -1070,7 +1078,7 @@ def test_nvidia_nccl_exception_rejects_additional_compatible_wheel(
         """
 [[package]]
 name = "inclusive-shift-har"
-version = "0.1.4a0"
+version = "0.1.5a0"
 source = { editable = "." }
 dependencies = [
     { name = "nvidia_nccl.cu12" },

@@ -18,7 +18,7 @@ This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gat
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | Private remote created; licence-evidence patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, `benchmark-v0.1.2`/`32802922698`, and `benchmark-v0.1.3`/`32811935288` preserved; intended successor is pending as `benchmark-v0.1.4`; no DOI |
+| 10 - release | Private remote created; cross-platform fixture patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, `benchmark-v0.1.2`/`32802922698`, `benchmark-v0.1.3`/`32811935288`, and `benchmark-v0.1.4`/`32829208254` preserved; intended successor is pending as `benchmark-v0.1.5`; no DOI |
 
 ## Confirmatory outcome
 
@@ -47,7 +47,7 @@ Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exac
 
 - Coursework ZIP SHA-256: `13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94`
 - Literature matrix file SHA-256: `B119EE0C05191777E6222F16E8A53D0D39F9583BC34107F714AE3FDF8AB0E92C`
-- Literature registry file SHA-256: `5B424C56B322EA7AAA49E2B647D70D91EA728F44E9B56B9EEE0717B4EEED82D7`
+- Literature registry file SHA-256: `0B896954537106CF9A1066956CC2B9825B937BE78723B0D827B2FB78DFCE08F6`
 - Dataset manifest file SHA-256: `52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29`
 - Split manifest embedded SHA-256: `ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b`
 - Source-window manifest embedded SHA-256: `1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522`
@@ -92,10 +92,15 @@ because Linux XGBoost 3.2.0 installed `nvidia-nccl-cu12==2.31.2`, whose PyPI
 metadata reports `LicenseRef-NVIDIA-Proprietary`. Candidate
 `benchmark-v0.1.4` records the exact Linux x86-64 wheel, dependency marker,
 metadata sidecar, embedded BSD 3-Clause text, and archived NVIDIA pages whose
-`nccl_2312` path renders a 2.29.2 label, and
-limits the exception to a locally installed transitive runtime that is not
-vendored into repository files, release assets, or container images. All four
-failed tags and runs remain visible and immutable.
+`nccl_2312` path renders a 2.29.2 label. Its run `32829208254` then failed 49
+Ubuntu synthetic release-fixture tests after 511 passed and 3 skipped: generic
+fixtures inventoried only `safe@1` while the hardened Linux gate correctly
+required the reviewed XGBoost/NCCL pair. Windows passed tests, lint, formatting,
+and mypy, and the dependent release-security job was skipped. Successor
+`benchmark-v0.1.5` retains
+the production gate and dependency evidence and makes those fixtures explicitly
+platform-deterministic; it does not alter any research result or reopen the
+target. All five failed tags and runs remain visible and immutable.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

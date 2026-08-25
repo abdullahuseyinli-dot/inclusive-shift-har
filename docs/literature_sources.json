@@ -20,7 +20,7 @@
     "model_result_status": "exploratory_negative",
     "model_result_boundary": "The consumed locked target evaluation found compact DANN mean participant macro-F1 0.6808438 versus 0.6353323 for full MoRe-HAR. The preregistered mean and joint lower-tail improvement conditions both failed; no positive model-novelty claim is supported.",
     "candidate_contribution": "An auditable participant-exclusive, released-block, one-way ability-associated population-shift benchmark on InclusiveHAR v4, with source-only model selection, explicit activity-realization ontology, matched strong baselines, participant-level lower-tail and calibration evidence, explicit unrecoverable hidden-trial-boundary risk, and a one-time target evaluation.",
-    "caveat": "This is a scoped search result and candidate distinction, not proof of novelty and not authorization to claim first, fairness, clinical validity, or publishability.",
+    "caveat": "The negative search is bounded to the recorded sources and queries through 2026-08-24. Indexing lag, incomplete full-text coverage, and unavailable automated Google Scholar access require a fresh submission-time search.",
     "refresh_required_before_submission": true
   },
   "inclusivehar_citation_search": {

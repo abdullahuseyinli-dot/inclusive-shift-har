@@ -10,6 +10,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
 import pytest
 from jsonschema import Draft202012Validator
@@ -724,15 +725,39 @@ def _build_workspace(
                 assert gate_name == "license_audit"
                 evidence_path = spec_root / "gates" / f"{gate_name}.json"
                 raw_licenses = spec_root / "gates" / "python_licenses.json"
-                _write_json(raw_licenses, [{"Name": "safe", "Version": "1", "License": "MIT"}])
-                evidence = audit_licenses(
-                    repository_root=repository,
-                    inventory_path=raw_licenses,
-                    candidate_commit=commit,
-                    policy_path=policy_path,
-                    pip_licenses_version="5.5.5",
-                    created_at_utc="2026-08-24T12:00:00Z",
+                _write_json(
+                    raw_licenses,
+                    [
+                        {
+                            "Name": "nvidia-nccl-cu12",
+                            "Version": "2.31.2",
+                            "License": "LicenseRef-NVIDIA-Proprietary",
+                        },
+                        {
+                            "Name": "xgboost",
+                            "Version": "3.2.0",
+                            "License": "Apache-2.0",
+                        },
+                    ],
                 )
+                with (
+                    patch(
+                        "inclusive_shift_har.artifacts.release_gate.platform.system",
+                        return_value="Linux",
+                    ),
+                    patch(
+                        "inclusive_shift_har.artifacts.release_gate.platform.machine",
+                        return_value="x86_64",
+                    ),
+                ):
+                    evidence = audit_licenses(
+                        repository_root=repository,
+                        inventory_path=raw_licenses,
+                        candidate_commit=commit,
+                        policy_path=policy_path,
+                        pip_licenses_version="5.5.5",
+                        created_at_utc="2026-08-24T12:00:00Z",
+                    )
                 _write_json(evidence_path, evidence)
             gates[gate_name] = {
                 "status": "pass",

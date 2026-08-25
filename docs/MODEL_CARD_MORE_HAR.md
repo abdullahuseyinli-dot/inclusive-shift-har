@@ -66,7 +66,10 @@ The CUDA efficiency aggregate reports 138,396 parameters for MoRe-HAR full and b
 - The few-person curve was post-confirmatory; none of its 80 paired comparisons survived global Holm correction.
 - CCIL/BPD rows are qualified local adaptations, not official-faithful reproductions.
 - Efficiency timing is machine- and measurement-scope-specific, not end-to-end deployment latency.
-- No claim of benefit outside the locked protocol.
+- External transfer remains unmeasured: the locked primary result covers one
+  waist-worn smartphone dataset, three functional-core labels, and ten held-out
+  target participants; no other dataset, placement, or activity ontology was
+  evaluated.
 
 ## Appropriate interpretation
 
