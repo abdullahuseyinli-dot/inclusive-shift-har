@@ -2,7 +2,11 @@
 
 ## Scientific status
 
-This track is **post-confirmatory descriptive evidence**. It does not reopen or
+This track is **complete post-confirmatory descriptive evidence**. All 75 CUDA
+cells validated and the successful participant-level aggregate is
+`results/analysis/within_group_v1_1/summary.json`, record SHA-256
+`fbe81492df167e136c3ad14bccfdd94a4c82c12497b48c2042a50e25dc521180`.
+It does not reopen or
 replace the consumed zero-shot target evaluation, and it must never be reported
 as a locked confirmatory endpoint. It asks the narrower question: how well do
 models trained on some released disabled-cohort participants transfer to other
@@ -50,6 +54,28 @@ opening-1 receipt/index, final source freeze, functional-core ontology, exact
 fold assignments, source-locked training configurations, and all 75 expected
 cells. Rebuilding it is a validation exercise only; do not overwrite it.
 
+## Completed result
+
+| Model | Mean participant macro-F1 | Participant-cluster 95% CI | Worst participant | Lower decile |
+|---|---:|---:|---:|---:|
+| Compact ERM | 0.606703 | [0.470351, 0.738584] | 0.253696 | 0.299998 |
+| MoRe-HAR backbone | 0.562632 | [0.426293, 0.696010] | 0.243720 | 0.257990 |
+| DeepConvLSTM | 0.400068 | [0.314808, 0.477823] | 0.190200 | 0.191635 |
+
+Relative to compact ERM, MoRe-HAR backbone had participant-mean paired
+difference -0.044071 with Holm-adjusted exact sign-flip p=0.025391;
+DeepConvLSTM had difference -0.206635 with adjusted p=0.003906. These tests are
+descriptive and do not restore confirmatory status. Within-group training did
+not outperform the locked zero-shot point estimates, but the training regimes
+differ, so that observation is not a controlled inclusion-effect estimate.
+
+The first aggregation attempt is preserved at
+`results/analysis/within_group_v1/failure.json` with status
+`failed_preserved_create_only` and record SHA-256
+`f1bcc774db221830bd3b88ae26cd5d8471e4acd3818ae641dd49b98ffd3fe33c`.
+It failed closed on checkpoint configuration/schema reconstruction. The
+implementation-corrected aggregate was written create-only to `within_group_v1_1`.
+
 ## CUDA execution
 
 Run from a committed repository state after the participant-sharded primary
@@ -63,7 +89,11 @@ into otherwise valid-looking cell evidence.
 
 ```powershell
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
-$cacheRecordSha = (Get-FileHash -Algorithm SHA256 $cacheRecord).Hash.ToLowerInvariant()
+$cacheRecordSha = "02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba"
+$observedCacheRecordSha = (Get-FileHash -Algorithm SHA256 $cacheRecord).Hash.ToLowerInvariant()
+if ($observedCacheRecordSha -ne $cacheRecordSha) {
+  throw "Primary cache record differs from the external pin"
+}
 $executionCommit = (git rev-parse HEAD).Trim()
 $resultRoot = "results/postconfirmatory/within_group_v1/cells"
 New-Item -ItemType Directory -Force $resultRoot | Out-Null
@@ -102,9 +132,10 @@ Each cell runs in its own process and is create-only. A controlled failure
 returns nonzero and retains `failure.json` and any partial artifacts. Do not
 delete, overwrite, or reuse a failed cell directory.
 
-After all 75 cells complete, aggregate once into a new directory. The
-aggregator binds its own implementation to the current Git HEAD and separately
-records the single execution commit shared by all 75 immutable cells:
+The following command documents the successful aggregate. Do not rerun it into
+an existing destination. The aggregator binds its own implementation to the
+current Git HEAD and separately records the single execution commit shared by
+all 75 immutable cells:
 
 ```powershell
 $aggregateAt = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
@@ -115,7 +146,7 @@ uv run inclusive-shift-har evaluate within-group-statistics `
   --primary-cache-record-file-sha256 $cacheRecordSha `
   --result-root $resultRoot `
   --artifact-root . `
-  --output-directory within_group_v1 `
+  --output-directory within_group_v1_1 `
   --output-root results/analysis `
   --code-commit $executionCommit --created-at-utc $aggregateAt
 ```

@@ -58,12 +58,12 @@ and source-only model selection before any evaluation.
 | HARMamba | Omitted | Apache-2.0 source exists, but runtime dependencies, 9-channel/default-length mismatch, and target-selecting trainer require a new protocol-safe adapter |
 | ERM, CORAL, DANN | Executed in frozen primary suite | Local controlled baselines under identical locked folds/information |
 | GroupDRO | Partial | Candidate-family `more-har-groupdro` ablation executed; no separate official/general backbone reproduction claimed |
-| CCIL | Not in frozen primary inventory | No official code was located; any local work is paper-derived and must remain explicitly labelled as such |
-| BPD | Not in frozen primary inventory | Apache-2.0 source audited, but boundary/stride conflicts and target-based checkpoint selection block direct reuse |
+| CCIL | Not in frozen primary inventory; qualified post-confirmatory adaptation complete | No official code was located; the completed local loss adaptation is paper-derived and not a faithful reproduction |
+| BPD | Not in frozen primary inventory; qualified post-confirmatory adaptation complete | Official Apache-2.0 trainer remains blocked by boundary/stride and target-selection conflicts; the completed local boundary-safe adaptation is not official-faithful |
 | BenchHAR SSL | Omitted | HAR-Bench and SimMTM audited revisions had no software license; 20 Hz/120-sample interface differs from the locked 50 Hz/128-sample benchmark |
 | FOCAL | Omitted | MIT upstream targets acoustic/seismic pairs; no validated smartphone-inertial adapter exists here |
 | Foundation-model linear probe/adaptation/fine-tune | Omitted | No compatible, licensed, frozen adapter or equal-budget source-only experiment exists |
-| Cross-source pretraining | Omitted as a result | UCI grouped reproduction is configured separately; exact all-cohort cross-source classification is scientifically blocked beyond sitting, with standing provisional and walking semantically incompatible |
+| Cross-source pretraining | Omitted as a result | UCI-native grouped reproduction completed separately but is not pretraining; exact all-cohort cross-source classification is scientifically blocked beyond sitting, with standing provisional and walking semantically incompatible |
 
 ## Feasibility and execution addendum — 2026-08-24
 
@@ -74,6 +74,13 @@ six-class, UCI-native source-development result. It did not refit a transferable
 encoder on all source participants, replace or adapt its classification head,
 or evaluate an InclusiveHAR participant. It therefore does not constitute
 cross-source pretraining evidence.
+
+The later qualified CCIL/BPD extension is also complete at
+`results/postconfirmatory/ccil_bpd_v1/ccil_bpd_postconfirmatory_aggregate.json`.
+CCIL obtained target mean/worst/lower-decile macro-F1 0.6896/0.2724/0.3459;
+BPD obtained 0.5710/0.2471/0.2751. Both are post-confirmatory local adaptations,
+not official-faithful baselines, and neither can enter or revise the frozen
+primary ranking.
 
 | Extension track | Gate status | Empirical status | Evidence-safe interpretation |
 |---|---|---|---|
@@ -98,6 +105,8 @@ Full paper/repository pins and reopening criteria are in
 `docs/baselines/THIRD_PARTY_BASELINE_AUDIT.md`. Missing baselines must stay visible
 in limitations and tables; they are not zero-valued results and must not be
 silently replaced by local proxies.
+
+Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
 
 ## Minimum evidence for adding a baseline
 

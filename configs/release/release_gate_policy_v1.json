@@ -2,6 +2,53 @@
   "schema_version": "1.0.0",
   "policy_kind": "final_release_gate_policy",
   "policy_id": "inclusive-shift-har-release-gate-v1",
+  "staged_index_scan": {
+    "required_before_release_candidate_commit": true,
+    "scan_scope": "exact_git_index"
+  },
+  "git_refs": {
+    "non_tag_refs_must_target_commits": true,
+    "tags_must_be_annotated_direct_to_commits": true,
+    "required_for_release_tags": [
+      "benchmark-v0.1.0",
+      "legacy-audit-v0.1.0",
+      "protocol-v1.0.0",
+      "protocol-v1.2.0"
+    ],
+    "pinned_annotated_tags": {
+      "legacy-audit-v0.1.0": {
+        "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
+        "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
+        "message": "Verified legacy archive and exploratory evidence audit",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
+      "protocol-v1.0.0": {
+        "object_id": "6b5ddbf9a4df488394f3d88882f44b23b404179d",
+        "target_commit": "e0066c065e47cafa2706a4a813fc5f511a700d18",
+        "message": "Locked participant-exclusive released-block protocol v1.2",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
+      "protocol-v1.2.0": {
+        "object_id": "76fb382c843cc0f30139448afe2ca0df1f09e768",
+        "target_commit": "7df2c17ddf37c5be2b04229743eb54fb4c1e3eb8",
+        "message": "Locked participant-exclusive released-block protocol and final source freeze",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      }
+    },
+    "permitted_candidate_tags": {
+      "benchmark-v0.1.0": {
+        "message": "InclusiveShift-HAR benchmark v0.1.0",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      }
+    },
+    "historical_notes": {
+      "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
+    }
+  },
   "maximum_blob_size_bytes": 16777216,
   "forbidden_path_prefixes": [
     ".audit/",
@@ -16,10 +63,37 @@
     "outputs/",
     "results/runs/"
   ],
+  "forbidden_basenames": [
+    ".env",
+    "credentials.json",
+    "secrets.json",
+    "secrets.yaml",
+    "secrets.yml"
+  ],
+  "forbidden_basename_prefixes": [
+    ".env."
+  ],
+  "allowed_sensitive_paths": [
+    ".env.example"
+  ],
   "forbidden_suffixes": [
+    ".7z",
+    ".bin",
+    ".bz2",
     ".ckpt",
+    ".db",
+    ".dill",
+    ".dll",
     ".docx",
+    ".exe",
+    ".feather",
+    ".gz",
+    ".h5",
+    ".hdf5",
+    ".jar",
+    ".joblib",
     ".key",
+    ".mat",
     ".npy",
     ".npz",
     ".onnx",
@@ -28,27 +102,67 @@
     ".pfx",
     ".pickle",
     ".pkl",
+    ".parquet",
     ".pt",
     ".pth",
+    ".rar",
+    ".safetensors",
+    ".so",
+    ".sqlite",
+    ".tar",
+    ".tflite",
+    ".tgz",
+    ".whl",
+    ".xz",
+    ".zst",
     ".zip"
   ],
   "disguised_binary_signatures": {
+    "7z": "377abcaf271c",
+    "bzip2": "425a68",
     "elf": "7f454c46",
+    "gzip": "1f8b08",
+    "hdf5": "894844460d0a1a0a",
     "numpy": "934e554d5059",
+    "parquet": "50415231",
     "pdf": "25504446",
     "pe": "4d5a",
     "pickle_protocol": "8002",
+    "pickle_protocol_3": "8003",
+    "pickle_protocol_4": "8004",
+    "pickle_protocol_5": "8005",
+    "rar": "526172211a0700",
+    "sqlite": "53514c69746520666f726d6174203300",
+    "xz": "fd377a585a00",
+    "zstd": "28b52ffd",
     "zip": "504b0304"
   },
   "allowed_signature_suffixes": {
     "pdf": [".pdf"]
   },
+  "allowed_binary_suffixes": [
+    ".pdf"
+  ],
   "gitleaks": {
     "version": "8.30.1",
+    "config_path": ".gitleaks.toml",
+    "config_sha256": "8206a38bd9fa89f4cbbad3f62a74b53d1e5b0656a354a57959b38ae01cf4222f",
+    "ignore_path": ".gitleaksignore",
+    "reviewed_ignore_entries": [
+      "e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:183",
+      "e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:190",
+      "e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:208"
+    ],
     "linux_x64_archive": "gitleaks_8.30.1_linux_x64.tar.gz",
     "linux_x64_archive_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+    "windows_x64_archive": "gitleaks_8.30.1_windows_x64.zip",
+    "windows_x64_archive_size_bytes": 8438883,
+    "windows_x64_archive_sha256": "d29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e",
+    "windows_x64_executable": "gitleaks.exe",
+    "windows_x64_executable_size_bytes": 22575104,
+    "windows_x64_executable_sha256": "17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c",
     "release_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
-    "required_scope": "complete_reachable_git_history"
+    "required_scope": "complete_commit_history_with_policy_pinned_tag_metadata"
   },
   "prohibited_license_tokens": [
     "affero general public license",
@@ -61,10 +175,10 @@
   ],
   "license_exceptions": [],
   "ci_action_pins": {
-    "actions/checkout": "11d5960a326750d5838078e36cf38b85af677262",
-    "actions/setup-python": "a26af69be951a213d495a4c3e4e4022e16d87065",
-    "actions/upload-artifact": "ea165f8d65b6e75b540449e92b4886f43607fa02",
-    "astral-sh/setup-uv": "d0cc045d04ccac9d8b7881df0226f9e82c39688e"
+    "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "actions/setup-python": "a309ff8b426b58ec0e2a45f0f869d46889d02405",
+    "actions/upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+    "astral-sh/setup-uv": "20cfd1bf945f4377ade1205e4dbc17946fc9a30d"
   },
   "external_attestation_root": ".audit/release-attestations",
   "external_release_asset_root": ".audit/release-assets"

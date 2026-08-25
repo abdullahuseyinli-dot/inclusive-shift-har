@@ -99,9 +99,11 @@ uv run inclusive-shift-har evaluate uci-source `
 
 ## Hash-pinned post-confirmatory primary cache
 
-Create this once if the SI, few-person, or stress operations require it. The
-command validates the already-consumed opening receipt/index and has no unlock
-argument.
+Status: complete and immutable. The externally pinned record file SHA-256 is
+`02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba`.
+The command below documents its create-only construction; do not rerun it into
+the existing destination. It validates the already-consumed opening
+receipt/index and has no unlock argument.
 
 ```powershell
 $cacheRoot = "data/cache"
@@ -140,10 +142,11 @@ replacement record later.
 
 ## Few-person inclusion curve v1.1
 
-The v1.1 manifest is ready but no scenario result is claimed here. It contains
-15 fold/k scenarios and 80 frozen neural model-seeds, hence 1,200 sequential
-CUDA runs. The v1 manifest is superseded and must not be regenerated or used.
-Substitute the externally recorded cache-record file hash below.
+Status: complete post-confirmatory secondary evidence. The v1.1 manifest
+contains 15 fold/k scenarios and 80 frozen neural model-seeds; all 1,200 sequential
+CUDA cells validated. The v1 manifest is superseded and must not be
+regenerated or used. The commands below document the completed create-only
+operation and must not be rerun into existing destinations.
 
 ```powershell
 $manifestPath = "results/protocol/few_person_inclusion_curve_v1_1.json"
@@ -208,21 +211,32 @@ The create-only `statistics` directory is preserved as failed attempt 1. Its
 `failure.json` records the pre-export Windows legacy-path rejection. Attempts 2
 and 3 are also preserved: recursive progress discovery initially interpreted
 that aggregation failure record as a failed training cell; attempt 3 captured
-the fail-closed message exactly. Attempt 4 must use both tested fixes and the
+the fail-closed message exactly. Attempt 4 used both tested fixes and the
 distinct `statistics_attempt_004` destination shown above. The scanner ignores
 only exact direct-child `statistics` and `statistics_attempt_NNN` namespaces;
 near-miss names remain errors.
 
 Each run rejects a supplied commit that is not the checkout's actual `HEAD`.
-Aggregation safely creates only the final `statistics` directory beneath the
-artifact root; its parent must already exist, and all exports remain create-only.
+The successful aggregate is
+`results/postconfirmatory/few_person_v1_1/statistics_attempt_004/few_person_v1_1_statistics.json`
+with record SHA-256
+`d14c4a071ee2460a2182fcab56ab6454be6d4cc3c6cc391445e56a368b776058`.
+It contains 64 model-k summaries and 80 paired comparisons. No paired
+comparison survived global Holm correction (minimum adjusted p = 0.15625); all
+models' k=4 means exceeded k=0, but only DeepConvLSTM and the static matched
+baseline were monotone across mean, worst-participant, and lower-decile
+endpoints. The aggregate contains no between-model significance tests, so
+per-k model leaders are descriptive ranks only. Its empty `preserved_failures`
+array means there were no scenario-cell failures; it does not erase aggregation
+failures in attempts 1-3.
 
 ## Disabled-cohort within-group cross-subject description
 
-This is post-confirmatory descriptive evidence, not the locked zero-shot
-endpoint. The immutable manifest fixes five subject-exclusive folds, three
-representative neural models, and five seeds: 75 sequential CUDA cells. The
-runner parses only participant shards, fits normalization on each fold's six
+Status: complete post-confirmatory descriptive evidence, not the locked
+zero-shot endpoint. The immutable manifest fixes five subject-exclusive folds,
+three representative neural models, and five seeds: all 75 sequential CUDA
+cells validated. The runner parses only participant shards, fits normalization
+on each fold's six
 training participants, freezes the fixed-last-epoch checkpoint before loading
 validation shards, and freezes validation-only calibration before loading the
 two evaluation participants. It has no raw-data, unlock, or target-opening
@@ -231,7 +245,7 @@ route. See `docs/DISABLED_WITHIN_GROUP_CROSS_SUBJECT.md` for the full contract.
 ```powershell
 $withinManifest = "results/protocol/inclusivehar_disabled_within_group_v1.json"
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
-$cacheRecordFileHash = "<EXTERNALLY_RECORDED_PRIMARY_CACHE_RECORD_FILE_SHA256>"
+$cacheRecordFileHash = "02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba"
 $withinRoot = "results/postconfirmatory/within_group_v1/cells"
 if (-not (Test-Path -LiteralPath $withinRoot -PathType Container)) {
   New-Item -ItemType Directory -Path $withinRoot -ErrorAction Stop | Out-Null
@@ -275,20 +289,34 @@ uv run inclusive-shift-har evaluate within-group-statistics `
   --primary-cache-record-file-sha256 $cacheRecordFileHash `
   --result-root $withinRoot `
   --artifact-root . `
-  --output-directory within_group_v1 `
+  --output-directory within_group_v1_1 `
   --output-root results/analysis `
   --code-commit $executionCommit --created-at-utc $timestamp
 ```
 
+The first aggregate destination, `results/analysis/within_group_v1`, is a
+preserved failed attempt with record SHA-256
+`f1bcc774db221830bd3b88ae26cd5d8471e4acd3818ae641dd49b98ffd3fe33c`.
+The successful create-only aggregate is
+`results/analysis/within_group_v1_1/summary.json`, record SHA-256
+`fbe81492df167e136c3ad14bccfdd94a4c82c12497b48c2042a50e25dc521180`.
+Compact ERM, MoRe-HAR backbone, and DeepConvLSTM obtained mean participant
+macro-F1 0.6067, 0.5626, and 0.4001, respectively.
+
 ## Secondary sensor-reliability stress
 
-This track is configured but not claimed as executed. It uses the existing
-clean target predictions; it must not rerun clean target inference or tune on
-target performance.
+Status: complete post-confirmatory secondary evidence. The run produced 120
+stressed result cells and the aggregate at
+`results/postconfirmatory/sensor_stress_v1/sensor_stress_aggregate.json`, record
+SHA-256
+`abe1aee172e9b680e2aca16848c84bf6788491d005964b3d18e597098a06df90`.
+It reused existing clean target predictions and did not rerun clean target
+inference or tune on target performance. The commands below are provenance for
+the completed create-only operation; do not rerun them into the existing paths.
 
 ```powershell
 $cacheRecord = "results/postconfirmatory/cache/primary_channels_opening1_v1.json"
-$cacheRecordFileHash = "<EXTERNALLY_RECORDED_PRIMARY_CACHE_RECORD_FILE_SHA256>"
+$cacheRecordFileHash = "02a2190e90615a8b9ad4c934a3240aa00de62314de9f0be98d45916d756a00ba"
 $timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
 uv run python -m inclusive_shift_har.experiments.postconfirmatory_sensor_stress `
   --stress-config configs/experiments/sensor_reliability_stress_v1.yaml `
@@ -316,14 +344,16 @@ partial condition records.
 
 ## Other isolated secondary operations
 
-- CUDA efficiency: `docs/POSTCONFIRMATORY_EFFICIENCY.md` (80 neural
-  model-seeds, 320 profile cells, zero-valued synthetic inputs, no target
-  signals).
-- SI acceleration-unit sensitivity: `docs/SI_UNIT_CONVERSION_SENSITIVITY.md`.
-- Raw/total-acceleration retraining: `docs/RAW_TOTAL_ACCELERATION_SENSITIVITY.md`.
+- CUDA efficiency: complete at
+  `results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate_attempt_002.json`
+  (80 neural model-seeds, 320 profile cells, 641 contention samples,
+  zero-filled synthetic inputs, no target signals).
+- SI acceleration-unit sensitivity: complete numerical-equivalence record; see
+  `docs/SI_UNIT_CONVERSION_SENSITIVITY.md`.
+- Raw/total-acceleration retraining: corrected v1.1 complete; failed v1 remains
+  preserved; see `docs/RAW_TOTAL_ACCELERATION_SENSITIVITY.md`.
 
-These are separate operations with separate create-only destinations. Their
-absence is not permission to relabel them complete. Cross-source pretraining,
-a BenchHAR SSL/foundation comparison, and a faithful CNN-HAR integration do not
-currently have executable, evidence-validated run paths; see
-`docs/baselines/BASELINE_COVERAGE_AND_OMISSIONS.md`.
+These are separate operations with separate create-only destinations and remain
+post-confirmatory.
+
+Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results. A faithful CNN-HAR integration likewise has no evidence-validated run path; see `docs/baselines/BASELINE_COVERAGE_AND_OMISSIONS.md`.

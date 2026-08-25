@@ -21,7 +21,11 @@
     "record_kind": {"const": "final_release_gate_report"},
     "mode": {"enum": ["tracked_precommit_report", "exact_candidate_attestation"]},
     "status": {"enum": ["pending", "pass", "fail"]},
-    "created_at_utc": {"type": "string", "format": "date-time"},
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+    },
     "repository": {
       "type": "object",
       "additionalProperties": false,
@@ -39,17 +43,53 @@
     },
     "policy": {"$ref": "#/$defs/file_reference"},
     "gates": {
+      "description": "Tracked reports retain a pending ci gate; exact-candidate reports bind the precommit staged-index scan and an explicitly limited ci_quality_proxy, while a ready inventory requires separate completed CI evidence.",
       "type": "object",
-      "additionalProperties": {"$ref": "#/$defs/gate"},
+      "additionalProperties": false,
       "propertyNames": {
         "enum": [
           "repository_scan", "secret_scan", "license_audit", "tests", "lint",
-          "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+          "format", "types", "manifests", "splits", "configuration", "artifacts", "ci",
+          "ci_quality_proxy", "staged_index_scan"
         ]
       },
-      "required": [
-        "repository_scan", "secret_scan", "license_audit", "tests", "lint",
-        "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+      "properties": {
+        "repository_scan": {"$ref": "#/$defs/gate"},
+        "secret_scan": {"$ref": "#/$defs/gate"},
+        "license_audit": {"$ref": "#/$defs/gate"},
+        "tests": {"$ref": "#/$defs/gate"},
+        "lint": {"$ref": "#/$defs/gate"},
+        "format": {"$ref": "#/$defs/gate"},
+        "types": {"$ref": "#/$defs/gate"},
+        "manifests": {"$ref": "#/$defs/gate"},
+        "splits": {"$ref": "#/$defs/gate"},
+        "configuration": {"$ref": "#/$defs/gate"},
+        "artifacts": {"$ref": "#/$defs/gate"},
+        "ci": {"$ref": "#/$defs/gate"},
+        "ci_quality_proxy": {"$ref": "#/$defs/gate"},
+        "staged_index_scan": {"$ref": "#/$defs/gate"}
+      },
+      "oneOf": [
+        {
+          "required": [
+            "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+            "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+          ],
+          "not": {
+            "anyOf": [
+              {"required": ["ci_quality_proxy"]},
+              {"required": ["staged_index_scan"]}
+            ]
+          }
+        },
+        {
+          "required": [
+            "staged_index_scan", "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+            "format", "types", "manifests", "splits", "configuration", "artifacts",
+            "ci_quality_proxy"
+          ],
+          "not": {"required": ["ci"]}
+        }
       ]
     },
     "external_candidate_attestation": {
@@ -69,12 +109,106 @@
     },
     "record_sha256": {"$ref": "#/$defs/sha256"}
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"mode": {"const": "tracked_precommit_report"}},
+        "required": ["mode"]
+      },
+      "then": {
+        "properties": {
+          "status": {"const": "pending"},
+          "repository": {
+            "properties": {
+              "content_commit": {"type": "null"},
+              "worktree_clean": {"const": false}
+            }
+          },
+          "gates": {
+            "properties": {
+              "repository_scan": {"$ref": "#/$defs/pending_gate"},
+              "secret_scan": {"$ref": "#/$defs/pending_gate"},
+              "license_audit": {"$ref": "#/$defs/pending_gate"},
+              "tests": {"$ref": "#/$defs/pending_gate"},
+              "lint": {"$ref": "#/$defs/pending_gate"},
+              "format": {"$ref": "#/$defs/pending_gate"},
+              "types": {"$ref": "#/$defs/pending_gate"},
+              "manifests": {"$ref": "#/$defs/pending_gate"},
+              "splits": {"$ref": "#/$defs/pending_gate"},
+              "configuration": {"$ref": "#/$defs/pending_gate"},
+              "artifacts": {"$ref": "#/$defs/pending_gate"},
+              "ci": {"$ref": "#/$defs/pending_gate"}
+            },
+            "required": [
+              "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+              "format", "types", "manifests", "splits", "configuration", "artifacts", "ci"
+            ],
+            "not": {
+              "anyOf": [
+                {"required": ["ci_quality_proxy"]},
+                {"required": ["staged_index_scan"]}
+              ]
+            }
+          },
+          "external_candidate_attestation": {
+            "properties": {
+              "status": {"const": "pending"},
+              "report_path": {"type": "null"}
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "status": {"const": "pass"},
+          "repository": {
+            "properties": {
+              "content_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+              "worktree_clean": {"const": true}
+            }
+          },
+          "gates": {
+            "properties": {
+              "staged_index_scan": {"$ref": "#/$defs/pass_gate"},
+              "repository_scan": {"$ref": "#/$defs/pass_gate"},
+              "secret_scan": {"$ref": "#/$defs/pass_gate"},
+              "license_audit": {"$ref": "#/$defs/pass_gate"},
+              "tests": {"$ref": "#/$defs/pass_gate"},
+              "lint": {"$ref": "#/$defs/pass_gate"},
+              "format": {"$ref": "#/$defs/pass_gate"},
+              "types": {"$ref": "#/$defs/pass_gate"},
+              "manifests": {"$ref": "#/$defs/pass_gate"},
+              "splits": {"$ref": "#/$defs/pass_gate"},
+              "configuration": {"$ref": "#/$defs/pass_gate"},
+              "artifacts": {"$ref": "#/$defs/pass_gate"},
+              "ci_quality_proxy": {"$ref": "#/$defs/pass_gate"}
+            },
+            "required": [
+              "staged_index_scan", "repository_scan", "secret_scan", "license_audit", "tests", "lint",
+              "format", "types", "manifests", "splits", "configuration", "artifacts",
+              "ci_quality_proxy"
+            ],
+            "not": {"required": ["ci"]}
+          },
+          "external_candidate_attestation": {
+            "properties": {
+              "status": {"const": "complete"},
+              "report_path": {
+                "type": "string",
+                "pattern": "^\\.audit/release-attestations/[0-9a-f]{40}/final_release_gate_report\\.json$"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "safe_relative_path": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^(?!/)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+      "pattern": "^(?!.*[\\u0000-\\u001f\\u007f])(?!.*\\/$)(?!/)(?!.*:)(?!.*//)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
     },
     "file_reference": {
       "type": "object",
@@ -98,6 +232,24 @@
             {"$ref": "#/$defs/file_reference"}
           ]
         }
+      }
+    },
+    "pending_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"const": "not_run"},
+        "evidence": {"type": "null"}
+      }
+    },
+    "pass_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": {"const": "pass"},
+        "evidence": {"$ref": "#/$defs/file_reference"}
       }
     }
   }

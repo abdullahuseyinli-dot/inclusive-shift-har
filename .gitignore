@@ -60,6 +60,32 @@ Thumbs.db
 *.npy
 *.npz
 *.docx
+*.7z
+*.bin
+*.bz2
+*.db
+*.dill
+*.dll
+*.exe
+*.feather
+*.gz
+*.h5
+*.hdf5
+*.jar
+*.joblib
+*.mat
+*.parquet
+*.pickle
+*.rar
+*.safetensors
+*.so
+*.sqlite
+*.tar
+*.tflite
+*.tgz
+*.whl
+*.xz
+*.zst
 
 # Source archives must remain outside normal Git history
 /legacy/source_archives/

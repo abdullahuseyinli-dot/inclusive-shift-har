@@ -1,5 +1,13 @@
 # Post-confirmatory CUDA efficiency runbook
 
+Status: **complete post-confirmatory secondary evidence**. Attempt 2 validated
+80 frozen checkpoints, all 320 model/seed/batch/precision profiles, and 641 GPU
+contention samples. The successful aggregate is
+`results/efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate_attempt_002.json`
+with record SHA-256
+`7c0fa71edcd0a368090df0513d6a418a35a6989b35f828734febd135f11530bb`.
+The initial profiling failure and first aggregation failure remain preserved.
+
 This secondary operation profiles the already-frozen neural inventory. It uses
 deterministic all-zero synthetic inputs of shape `[B, 128, 6]`; it does not load
 target signals, predictions, or metrics and cannot change model selection.
@@ -33,12 +41,36 @@ machine-readable timing-validity classification. This is a sampled process gate,
 not continuous utilization or thermal monitoring, and that limitation must remain
 attached to reported timing.
 
+## Completed measurements
+
+| Model | Parameters | Batch-1 FP32 mean latency (ms) | p50 (ms) | p95 (ms) |
+|---|---:|---:|---:|---:|
+| Compact ERM | 101,955 | 1.3561 | 1.1419 | 2.5594 |
+| Compact DANN | 112,043 | 1.4985 | 1.2110 | 2.8252 |
+| MoRe-HAR full | 138,396 | 2.0207 | 1.7864 | 3.4957 |
+| DeepConvLSTM | 200,867 | 11.7601 | 11.0670 | 16.6219 |
+| Legacy joint CNN/BiLSTM | 2,689,414 | 19.9391 | 18.7679 | 27.0822 |
+
+These are synthetic-zero, device-resident, forward-only measurements with no
+host-to-device transfer. They are not end-to-end application latency. Timing
+status is `valid_with_declared_allowlisted_ambient_system_processes`: the 641
+sampled snapshots found no unapproved compute process, while the predeclared
+`dwm.exe` and `explorer.exe` WDDM processes remained allowed.
+
+FP16 autocast was slower than FP32 for all 16 models at both batch sizes (all 32
+model-batch comparisons), although peak allocated VRAM was lower in 30 of 32
+comparisons. It is therefore a measured memory tradeoff here, not an acceleration
+result. The 60 recurrent profiles kept tensors on CUDA while using the
+configuration-locked cuDNN-disabled fallback. No result is a full-graph,
+end-to-end, mobile-device, or portable latency claim.
+
 The first create-only attempt is preserved at
 `results/efficiency/postconfirmatory-v1`. It stopped before timing because a
 checkpoint tuple and its semantically identical JSON list were compared using
 raw Python container equality after their canonical hash had already matched.
-The tested fix compares the canonical serialized configurations. From the
-repository root, supply a real UTC timestamp and run the new attempt once:
+The tested fix compares the canonical serialized configurations. The commands
+below document the completed create-only attempt; do not rerun them into the
+existing destination:
 
 ```powershell
 $profilerCommit = (git rev-parse --verify HEAD).Trim()
@@ -91,6 +123,11 @@ hard-coded `dwm.exe` as the only acceptable ambient process even though the
 locked configuration explicitly allowlisted both `dwm.exe` and `explorer.exe`.
 Attempt 2 validates membership in the exact configuration-derived allowlist;
 unknown processes and resolution mismatches still fail closed.
+
+The aggregate's timing classification is valid only under that declared
+allowlist and sampled-process scope. It is not continuous utilization or thermal
+monitoring, and it does not validate latency on another machine or software
+stack.
 
 Reported analytical MACs/FLOPs cover only the declared `Conv1d`, `Linear`, and
 `LSTM` operator subset. They are not full-graph operation counts.

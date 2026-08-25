@@ -1,6 +1,4 @@
-# InclusiveShift-HAR
-
-*An Auditable Participant-Exclusive Benchmark for Physical-Ability Generalization in Smartphone Activity Recognition*
+# InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Ability-Associated Population Shift in Smartphone Activity Recognition
 
 InclusiveShift-HAR studies how smartphone inertial HAR systems trained on conventional participant populations transfer to people whose activities may be physically realized differently, including users of assistive devices. The repository separates legacy coursework, source-only development, and a single locked target evaluation with immutable lineage.
 
@@ -16,20 +14,43 @@ The one-time zero-shot target evaluation is complete. It used 10 held-out target
 | Compact CORAL | 0.6808 | 0.2741 | 0.3670 |
 | MoRe-HAR full | 0.6353 | 0.2584 | 0.2660 |
 
-Compact DANN had the highest target mean, while the legacy joint CNN/BiLSTM had the highest worst-participant value (0.2943) and CORAL had the highest lower-decile value (0.3670). MoRe-HAR did not improve either the mean or the required lower-tail endpoints against the strongest eligible baselines. Its preregistered hypothesis is therefore **not supported**. This negative outcome is retained, and the auditable benchmark is the primary contribution.
+Compact DANN had the numerically highest locked-primary target mean, but its lead over compact CORAL was only 0.0000556; the two are effectively tied at the precision supported by these data. The legacy joint CNN/BiLSTM had the highest worst-participant value (0.2943), and CORAL had the highest lower-decile value (0.3670). MoRe-HAR did not improve either the mean or the required lower-tail endpoints against the strongest eligible baselines. Its preregistered hypothesis is therefore **not supported**. This negative outcome is retained, and the auditable benchmark is the primary contribution.
 
-The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. These results do not establish state of the art, fairness, clinical validity, or a causal disability effect.
+The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. A later descriptive comparison estimated a DANN source-minus-target gap of 0.1196 with interval [-0.0371, 0.2831], but the source estimate is one-seed grouped cross-validation while the target estimate averages five final-fit seeds. That regime mismatch prevents treating the gap as a controlled degradation estimate. These results do not establish state of the art, fairness, clinical validity, or a causal disability effect.
 
 ## Evidence classes
 
 | Evidence class | Meaning | Status |
 |---|---|---|
 | Legacy coursework | Saved UCI-HAR notebook outputs with random window validation and repeated official-test use. | Audited; permanently `legacy_exploratory_development_consumed`. |
-| Corrected reproduction / development | Subject-grouped source development, tuning, ablations, and debugging. | Complete for the InclusiveHAR source suite; UCI official-train-only reproduction is a separate corrected track. |
+| Corrected reproduction / development | Subject-grouped source development, tuning, ablations, and debugging. | Complete for the InclusiveHAR source suite and the separate 75-cell UCI official-train-only reproduction; the UCI official test was not opened. |
 | Locked confirmatory | Frozen source-only artifacts evaluated once on the sealed target cohort after all gates passed. | Opening 1 complete; no retry or second opening is permitted. |
-| Post-confirmatory secondary | Few-person inclusion, sensor stress, efficiency, and descriptive follow-up after the primary opening. | Explicitly separate from the zero-shot confirmatory claim. |
+| Post-confirmatory secondary | Few-person inclusion, disabled-cohort within-group evaluation, sensor stress, efficiency, signal sensitivity, and qualified CCIL/BPD adaptations. | Completed and explicitly separate from the zero-shot confirmatory claim. |
 
 The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](results/protocol/confirmatory_target_opening_1.json). The primary statistics record is [`participant_statistics.json`](results/confirmatory/zero_shot_v1/participant_statistics.json), and the human-readable table is [`model_summary_v1.md`](results/confirmatory/zero_shot_v1/model_summary_v1.md).
+
+## Post-confirmatory findings
+
+The few-person v1.1 curve completed all 1,200 CUDA cells. The descriptive numerical mean leader at each inclusion level was:
+
+| Included target-group participants | Descriptive mean leader | Mean participant macro-F1 | Worst | Lower decile |
+|---:|---|---:|---:|---:|
+| 0 | Compact DANN | 0.6808 | 0.2699 | 0.3559 |
+| 1 | Compact ERM | 0.6744 | 0.4802 | 0.5099 |
+| 2 | MoRe-HAR backbone | 0.7060 | 0.2970 | 0.4836 |
+| 4 | MoRe-HAR content | 0.7593 | 0.4203 | 0.5784 |
+
+No between-model significance tests were run, so those cross-model leaders are descriptive ranks only. Every model's k=4 mean exceeded its k=0 mean, but several models declined at k=1; only DeepConvLSTM and the static matched baseline were monotone across mean, worst-participant, and lower-decile endpoints. None of the 80 within-model paired k comparisons remained significant after global Holm correction (minimum adjusted p = 0.15625). Tail leaders also differed from mean leaders. These results are promising descriptive inclusion evidence, not proof of a monotonic or population-wide benefit. The complete 64 model-k summaries and comparisons are in [`few_person_v1_1_statistics.json`](results/postconfirmatory/few_person_v1_1/statistics_attempt_004/few_person_v1_1_statistics.json); three failed aggregation attempts remain preserved.
+
+Other completed secondary evidence includes:
+
+- disabled-cohort within-group evaluation: 75/75 CUDA cells; compact ERM mean/worst/lower-decile macro-F1 0.6067/0.2537/0.3000;
+- sensor reliability: 120 stressed result cells; linear drift and missing accelerometer-Z produced the largest target mean losses for both compact ERM and CORAL, with only two source-validation participants and uncalibrated severities;
+- CUDA efficiency: 80 checkpoints and 320 profiles with 641 contention samples; batch-1 FP32 mean device-resident forward latency was 1.356 ms for compact ERM, 1.498 ms for DANN, 2.021 ms for MoRe-HAR full, 11.760 ms for DeepConvLSTM, and 19.939 ms for the legacy joint model. FP16 autocast was slower for all 16 models at both measured batch sizes, although it reduced peak allocated VRAM in 30 of 32 model-batch pairs;
+- qualified post-confirmatory adaptations: CCIL mean 0.6896 but no mean-and-tail improvement and no Holm-adjusted significance; BPD mean 0.5710; neither is an official-faithful reproduction;
+- raw/total-acceleration and SI-unit sensitivities: raw acceleration did not robustly improve the primary interface, while g-to-m/s² conversion was algebraically cancelled by training-only z-scoring.
+
+Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
 
 ## Scientific scope
 
@@ -37,7 +58,7 @@ The research question is:
 
 > How reliably do smartphone HAR systems trained on conventional participant populations generalize to people whose activities are physically realized differently, including users of assistive devices?
 
-This is an observational ability-associated population-shift benchmark. Disability and assistive-device labels are not model inputs. The released `walking` activity for wheelchair users denotes manual propulsion and is preserved as a distinct physical realization within the functional mobility concept. Ramps are not relabelled as stairs, and jogging is not silently mapped to another locomotion class.
+This is an observational ability-associated population-shift benchmark. The released binary cohort metadata is not a direct measurement of physical ability. Disability and assistive-device labels are not model inputs. The released `walking` activity for wheelchair users denotes manual propulsion and is preserved as a distinct physical realization within the functional mobility concept. Ramps are not relabelled as stairs, and jogging is not silently mapped to another locomotion class.
 
 MoRe-HAR (Motion-Realization Factorized HAR) is a compact experimental hypothesis, not an assumed novelty claim. Its full objective combines classification, source-participant supervised contrastive alignment, clean/augmented consistency, measurable realization-descriptor prediction, cross-covariance factorization, and GroupDRO. The current evidence does not support the claim that this combination improves zero-shot ability-shift performance.
 

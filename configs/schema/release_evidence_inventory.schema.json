@@ -14,6 +14,7 @@
     "generation_spec",
     "repository",
     "confirmatory_state",
+    "exact_candidate_attestation",
     "required_roles",
     "artifacts",
     "gates",
@@ -26,9 +27,78 @@
     "inventory_kind": { "const": "final_release_evidence_inventory" },
     "delivery_mode": { "const": "external_release_asset" },
     "tracked": { "const": false },
-    "status": { "enum": ["draft", "blocked", "ready", "released"] },
-    "created_at_utc": { "type": "string", "format": "date-time" },
-    "generation_spec": { "$ref": "#/$defs/spec_reference" },
+    "status": { "enum": ["draft", "blocked", "ready"] },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+    },
+    "generation_spec": {
+      "description": "Ready records require the reviewed spec outside the repository; validators also require that exact spec and its cited files. Version 1.1.0 intentionally does not claim post-release state.",
+      "$ref": "#/$defs/spec_reference"
+    },
+    "exact_candidate_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "evidence_scope",
+        "evidence_path",
+        "evidence_sha256",
+        "record_sha256"
+      ],
+      "properties": {
+        "status": { "enum": ["not_run", "pass"] },
+        "evidence_scope": {
+          "oneOf": [
+            { "type": "null" },
+            { "const": "spec_root" }
+          ]
+        },
+        "evidence_path": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "string",
+              "pattern": "^\\.audit/release-attestations/[0-9a-f]{40}/final_release_gate_report\\.json$"
+            }
+          ]
+        },
+        "evidence_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        },
+        "record_sha256": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/sha256" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "pass" } } },
+          "then": {
+            "properties": {
+              "evidence_scope": { "const": "spec_root" },
+              "evidence_path": { "type": "string" },
+              "evidence_sha256": { "$ref": "#/$defs/sha256" },
+              "record_sha256": { "$ref": "#/$defs/sha256" }
+            }
+          },
+          "else": {
+            "properties": {
+              "evidence_scope": { "type": "null" },
+              "evidence_path": { "type": "null" },
+              "evidence_sha256": { "type": "null" },
+              "record_sha256": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
     "repository": {
       "type": "object",
       "additionalProperties": false,
@@ -36,6 +106,8 @@
         "code_commit",
         "worktree_clean",
         "protocol_tag",
+        "protocol_tag_object",
+        "protocol_tag_target",
         "remote_visibility",
         "remote_url",
         "remote_evidence_scope",
@@ -44,13 +116,15 @@
       ],
       "properties": {
         "code_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
-        "worktree_clean": { "type": "boolean" },
-        "protocol_tag": { "type": "string", "minLength": 1 },
+        "worktree_clean": { "const": true },
+        "protocol_tag": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$" },
+        "protocol_tag_object": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "protocol_tag_target": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "remote_visibility": { "enum": ["absent", "private", "public"] },
         "remote_url": {
           "oneOf": [
             { "type": "null" },
-            { "type": "string", "pattern": "^https://github\\.com/[^/]+/[^/]+$" }
+            { "type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?/(?!(?:\\.{1,2}|.*\\.git)$)(?!.*\\.\\.)[A-Za-z0-9._-]{1,100}$" }
           ]
         },
         "remote_evidence_path": {
@@ -122,6 +196,7 @@
       "items": { "$ref": "#/$defs/artifact" }
     },
     "gates": {
+      "description": "Runtime validation parses each cited record and verifies kind, status, self-hash, candidate binding, and gate coverage; ready evidence is spec_root-scoped.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -133,6 +208,7 @@
         "splits",
         "configuration",
         "artifacts",
+        "staged_index_scan",
         "tracked_file_scan",
         "secret_scan",
         "license_audit",
@@ -147,6 +223,7 @@
         "splits": { "$ref": "#/$defs/gate" },
         "configuration": { "$ref": "#/$defs/gate" },
         "artifacts": { "$ref": "#/$defs/gate" },
+        "staged_index_scan": { "$ref": "#/$defs/gate" },
         "tracked_file_scan": { "$ref": "#/$defs/gate" },
         "secret_scan": { "$ref": "#/$defs/gate" },
         "license_audit": { "$ref": "#/$defs/gate" },
@@ -180,12 +257,83 @@
     },
     "record_sha256": { "$ref": "#/$defs/sha256" }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"status": {"const": "ready"}},
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "generation_spec": {
+            "properties": {"scope": {"const": "external_spec"}},
+            "required": ["scope"]
+          },
+          "repository": {
+            "properties": {
+              "remote_visibility": {"enum": ["private", "public"]},
+              "remote_url": {
+                "type": "string",
+                "pattern": "^https://github\\.com/[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?/(?!(?:\\.{1,2}|.*\\.git)$)(?!.*\\.\\.)[A-Za-z0-9._-]{1,100}$"
+              },
+              "remote_evidence_scope": {"const": "spec_root"},
+              "remote_evidence_path": {"$ref": "#/$defs/safe_relative_path"},
+              "remote_evidence_sha256": {"$ref": "#/$defs/sha256"}
+            }
+          },
+          "gates": {
+            "properties": {
+              "tests": {"$ref": "#/$defs/ready_gate"},
+              "lint": {"$ref": "#/$defs/ready_gate"},
+              "format": {"$ref": "#/$defs/ready_gate"},
+              "types": {"$ref": "#/$defs/ready_gate"},
+              "manifests": {"$ref": "#/$defs/ready_gate"},
+              "splits": {"$ref": "#/$defs/ready_gate"},
+              "configuration": {"$ref": "#/$defs/ready_gate"},
+              "artifacts": {"$ref": "#/$defs/ready_gate"},
+              "staged_index_scan": {"$ref": "#/$defs/ready_gate"},
+              "tracked_file_scan": {"$ref": "#/$defs/ready_gate"},
+              "secret_scan": {"$ref": "#/$defs/ready_gate"},
+              "license_audit": {"$ref": "#/$defs/ready_gate"},
+              "ci": {"$ref": "#/$defs/ready_gate"}
+            }
+          },
+          "artifacts": {
+            "items": {
+              "allOf": [
+                {"$ref": "#/$defs/artifact"},
+                {
+                  "if": {
+                    "properties": {"required_for_release": {"const": true}},
+                    "required": ["required_for_release"]
+                  },
+                  "then": {
+                    "properties": {
+                      "validation_status": {"enum": ["pass", "conditional"]}
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "blockers": {
+            "items": {
+              "allOf": [
+                {"$ref": "#/$defs/blocker"},
+                {"properties": {"status": {"enum": ["resolved", "accepted_limitation"]}}}
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "safe_relative_path": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^(?!/)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+      "pattern": "^(?!.*[\\u0000-\\u001f\\u007f])(?!.*\\/$)(?!/)(?!.*:)(?!.*//)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
     },
     "file_reference": {
       "type": "object",
@@ -363,6 +511,16 @@
         }
       }
     },
+    "ready_gate": {
+      "type": "object",
+      "properties": {
+        "status": {"const": "pass"},
+        "evidence_scope": {"const": "spec_root"},
+        "evidence_path": {"$ref": "#/$defs/safe_relative_path"},
+        "evidence_sha256": {"$ref": "#/$defs/sha256"},
+        "tool_version": {"type": "string", "minLength": 1}
+      }
+    },
     "postconfirmatory_status": {
       "type": "object",
       "additionalProperties": false,
@@ -393,6 +551,22 @@
         },
         "note": { "type": "string", "minLength": 1 },
         "primary_claim_eligible": { "const": false }
+      }
+    },
+    "blocker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blocker_id", "status", "description", "evidence_role"],
+      "properties": {
+        "blocker_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "status": {"enum": ["open", "resolved", "accepted_limitation"]},
+        "description": {"type": "string", "minLength": 1},
+        "evidence_role": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1}
+          ]
+        }
       }
     }
   }

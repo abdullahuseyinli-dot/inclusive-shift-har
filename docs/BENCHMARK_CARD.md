@@ -2,7 +2,7 @@
 
 ## Summary
 
-InclusiveShift-HAR is an auditable participant-exclusive benchmark for measuring ability-associated population shift in smartphone inertial activity recognition. Models are trained and tuned using 10 InclusiveHAR v4 participants released with `disabled=0`, then evaluated once on 10 disjoint participants released with `disabled=1`. The metadata labels are used only to define cohorts; they are never inference features.
+InclusiveShift-HAR is an auditable participant-exclusive benchmark for measuring ability-associated population shift in smartphone inertial activity recognition. Models are trained and tuned using 10 InclusiveHAR v4 participants released with `disabled=0`, then evaluated once on 10 disjoint participants released with `disabled=1`. The metadata labels are used only to define cohorts; they are never inference features. The released binary label is not a direct measurement of physical ability and must not be interpreted as one.
 
 The primary result is observational. It does not estimate a causal disability effect, certify fairness, or establish clinical utility.
 
@@ -38,15 +38,28 @@ InclusiveHAR v4 provides no timestamps or trial/session/recording identifiers. H
 
 Primary endpoint: mean participant-level macro-F1 on target participants, with each participant equally weighted after averaging over five seeds.
 
-Additional endpoints include balanced accuracy, per-class recall, participant distribution, worst participant, lower decile, NLL, multiclass Brier score, secondary ECE, risk-coverage/AURC, parameter count, model size, latency, MACs/FLOPs, and peak VRAM where measured. Inference treats participants, never windows, as statistical units.
+Additional endpoints include balanced accuracy, per-class recall, participant distribution, worst participant, lower decile, NLL, multiclass Brier score, secondary ECE, risk-coverage/AURC, parameter count, model size, latency, MACs/FLOPs, and peak VRAM where measured. Inference treats participants, never windows, as statistical units. Completed efficiency measurements are secondary, device-resident forward-pass profiles rather than end-to-end application latency; MAC/FLOP counts cover only declared supported operators.
 
 The confirmatory analysis uses a 10,000-resample participant bootstrap, paired exact sign-flip tests, paired Wilcoxon tests, standardized/rank-biserial effects, and Holm correction for the predeclared MoRe-HAR comparison family.
 
 ## Locked outcome
 
-The one-time target opening evaluated 20 frozen configurations over seeds 11, 23, 47, 89, and 131. Compact DANN achieved the highest mean participant macro-F1 (0.6808; 95% participant-bootstrap CI [0.5391, 0.8093]). MoRe-HAR full achieved 0.6353 and did not improve the mean or both lower-tail endpoints against all eligible references. Its preregistered hypothesis is not supported.
+The one-time target opening evaluated 20 frozen configurations over seeds 11, 23, 47, 89, and 131. Compact DANN achieved the numerically highest mean participant macro-F1 (0.6808; 95% participant-bootstrap CI [0.5391, 0.8093]). Compact CORAL was only 0.0000556 lower and is effectively tied at the supported precision. MoRe-HAR full achieved 0.6353 and did not improve the mean or both lower-tail endpoints against all eligible references. Its preregistered hypothesis is not supported.
 
 The full, hash-validated table is `results/confirmatory/zero_shot_v1/model_summary_v1.md`.
+
+## Secondary evidence status
+
+All items below are post-confirmatory and cannot change the locked outcome:
+
+- Few-person v1.1 completed 1,200/1,200 CUDA cells. The descriptive numerical mean leaders at k=0,1,2,4 obtained 0.6808, 0.6744, 0.7060, and 0.7593, respectively; no between-model significance tests were run. Every model's k=4 mean exceeded k=0, but only DeepConvLSTM and the static matched baseline were monotone across all three participant endpoints. None of 80 within-model paired comparisons survived Holm correction (minimum adjusted p = 0.15625).
+- Disabled-cohort within-group evaluation completed 75/75 CUDA cells; compact ERM obtained mean/worst/lower-decile macro-F1 0.6067/0.2537/0.3000.
+- Sensor stress completed 120 result cells. Drift and missing accelerometer-Z produced the largest target mean losses, but source n=2 versus target n=10 and uncalibrated severities prevent strong interaction claims.
+- Qualified CCIL and BPD adaptations completed, but they are neither official-faithful reproductions nor locked-primary comparators.
+- CUDA efficiency completed 320 profiles over 80 checkpoints with 641 contention samples. Timing validity is qualified by declared allowlisted ambient WDDM processes. FP16 autocast was slower for every model at both measured batch sizes, although it usually reduced allocated VRAM; 60 recurrent profiles used CUDA with cuDNN disabled.
+- Raw/total-acceleration and SI-unit sensitivities completed; neither changes the primary signal-definition decision.
+
+Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
 
 ## Intended use
 

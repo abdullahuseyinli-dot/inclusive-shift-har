@@ -1,21 +1,34 @@
 # Third-party baseline provenance and integration audit
 
-Status: source/provenance audit, 2026-08-23. No model in this document has been
-trained on or evaluated against the locked InclusiveHAR target cohort. Repository
-inspection used preserved read-only clones under
+Status: source/provenance audit, 2026-08-23, with a later execution addendum.
+At the original audit gate, no model in this document had been trained on or
+evaluated against the locked InclusiveHAR target cohort. Repository inspection
+used preserved read-only clones under
 `.audit/baseline-source-audit-20260823/`; those clones are evidence, not vendored
 project code.
 
 Post-audit implementation addendum (2026-08-24): a source-only CCIL loss
-adaptation and a locally implemented boundary-safe BPD protocol adaptation now
-exist behind the post-confirmatory design in
-`configs/experiments/ccil_bpd_postconfirmatory_v1.yaml`; neither has been run on
-real InclusiveHAR data by that change. The implementation does not change this
-audit's `faithful local implementation = false` decision. It copies no BPD
-source, never uses the audited BPD trainer, selects and calibrates only on source
-participants, and can access target data only after a durable source-stage lock
-through consumed opening-1 cache lineage. See
-`docs/CCIL_BPD_POSTCONFIRMATORY.md` for the claim labels and run gates.
+adaptation and a locally implemented boundary-safe BPD protocol adaptation were
+added behind the post-confirmatory design in
+`configs/experiments/ccil_bpd_postconfirmatory_v1.yaml`. A later create-only CUDA
+execution and aggregate completed. This does not change the audit's
+`faithful local implementation = false` decision. The implementation copies no
+BPD source, never uses the audited BPD trainer, selects and calibrates only on
+source participants, and accesses target data only after a durable source-stage
+lock through consumed opening-1 cache lineage. See
+`docs/CCIL_BPD_POSTCONFIRMATORY.md` for the claim labels, completed results, and
+run gates.
+
+The completed post-confirmatory aggregate is
+`results/postconfirmatory/ccil_bpd_v1/ccil_bpd_postconfirmatory_aggregate.json`,
+record SHA-256
+`c7b27e2a6d5ddf94efcd2c2064cb84aecfc70dfe3d4f38539660c3479128c180`.
+The qualified CCIL adaptation obtained target mean/worst/lower-decile macro-F1
+0.6896/0.2724/0.3459. Its mean was 0.0119 above compact ERM, but both tails were
+slightly lower and both family-adjusted paired p-values were 0.2109. The
+qualified BPD adaptation obtained 0.5710/0.2471/0.2751. These are descriptive
+adaptation results, not official-faithful reproductions or additions to the
+locked primary ranking.
 
 This audit answers four separate questions for every requested baseline:
 
@@ -39,7 +52,7 @@ for a linked repository.
 | TinierHAR | [UbiComp/ISWC 2025 paper](https://doi.org/10.1145/3715071.3750410) | `zhaxidele/TinierHAR` at `f2f1bbd7305689c374fb38cbb7ce853e7cefbb3f` | `NOASSERTION` | Paper: all datasets, including 9-channel UCI, use 4 s / 2 s overlap; repo UCI config instead says 50 Hz and 2.56 s | Block source reuse; architecture/count ambiguity must be resolved before any clean-room adaptation |
 | HARMamba | [IEEE IoT Journal paper](https://doi.org/10.1109/JIOT.2024.3463405) | `dianoDouble/HARMamba` at `3afb0dced3c66702d698af354d7ec7e753e772ad` | Apache-2.0 | Paper UCI: 9 channels, 50 Hz, 128 samples, 50% overlap; code defaults: 9 channels and 512 samples | License-compatible, but blocked pending a protocol-safe, runtime-validated adapter |
 | CCIL | [AAAI 2025 paper](https://doi.org/10.1609/aaai.v39i1.32077) | No official repository located | No software release to license | Cross-person interfaces vary by dataset; cross-dataset interface is 6 channels and 50 samples | Equations 2–6 only are implemented as a paper-derived loss, never as official CCIL code |
-| BPD | [IMWUT 2022 paper](https://doi.org/10.1145/3517252) | `Jie-su/BPD` at `8b2338927c118d1daa5c602d48b6ae5156dd5966` | Apache-2.0 | Paper: 168 samples, 50% overlap, dataset-specific channels/rates; code default stride is 32 | Official trainer remains blocked; a post-audit local boundary-safe adaptation now exists but is unrun and not faithful |
+| BPD | [IMWUT 2022 paper](https://doi.org/10.1145/3517252) | `Jie-su/BPD` at `8b2338927c118d1daa5c602d48b6ae5156dd5966` | Apache-2.0 | Paper: 168 samples, 50% overlap, dataset-specific channels/rates; code default stride is 32 | Official trainer remains blocked; a post-audit local boundary-safe adaptation completed post-confirmatory but is not faithful |
 | CMD-HAR | [arXiv:2503.21843v4](https://arxiv.org/abs/2503.21843) | No official repository located | No software release to license | Paper table: UCI is 9 channels, 50 Hz, 128 samples | Related-work comparator only; do not invent an implementation |
 | BenchHAR | [arXiv:2605.08296](https://arxiv.org/abs/2605.08296) | `saiketa/HAR-Bench` at `358a377929b1b9c0a2cefc417c67f56d15d4d11c` | `NOASSERTION` | 6 s non-overlapping windows resampled to 20 Hz: 120×6 or accelerometer-only 120×3 | Block source/adapter reuse; use its findings only to predeclare SSL candidates |
 | SimMTM | [NeurIPS 2023 paper](https://arxiv.org/abs/2302.00861) | `thuml/SimMTM` at `169513bef74fb676e48d98a0e30f8823793f691c` | `NOASSERTION` | Generic time-series upstream; the 120×6 inertial interface is a BenchHAR adaptation | Block code reuse; record as the BenchHAR cross-subject candidate, not a completed local baseline |
@@ -179,9 +192,11 @@ Validation limits are material:
 - alpha and EMA weight remain unselected source-development hyperparameters. No
   default has been silently promoted to a locked value.
 
-Decision: the loss is available but disabled in configuration until grouped
-source-only tuning and checkpoint reconstruction pass. Every artifact must retain
-`paper_derived_not_official` provenance.
+Historical gate decision: the loss was initially disabled until grouped
+source-only tuning and checkpoint reconstruction passed. The later qualified
+post-confirmatory route passed those local gates and completed, while every
+artifact retained `paper_derived_not_official` provenance. This does not convert
+the adaptation into official CCIL code or a faithful reproduction.
 
 ## BPD and CMD-HAR disentanglement predecessors
 
@@ -207,11 +222,12 @@ locked protocol:
 - `Solver.test()` evaluates the held-out target each epoch and saves the model
   when target macro-F1 improves.
 
-Decision: do not run or port the official trainer. Apache components may be
-re-expressed behind the local safe-window and source-only trainer later, but the
-result must be called a BPD protocol adaptation. Direct comparison with MoRe-HAR
-must distinguish BPD's learned activity/redundant decomposition and MINE-based
-independence objective from MoRe-HAR's content/realization descriptor hypothesis.
+Decision: do not run or port the official trainer. The later local safe-window,
+source-only implementation completed post-confirmatory and is called a BPD
+protocol adaptation, never an official-faithful reproduction. Direct comparison
+with MoRe-HAR must distinguish BPD's learned activity/redundant decomposition and
+MINE-based independence objective from MoRe-HAR's content/realization descriptor
+hypothesis.
 
 ### CMD-HAR
 
@@ -305,6 +321,8 @@ comparisons were not evaluated. Their absence reflects the locked exact-label
 ontology and unresolved implementation, licensing, interface, and checkpoint
 gates; it is not evidence of empirical failure.” Any later target-side comparison
 is post-confirmatory because the locked target opening is already consumed.
+
+Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
 
 ## LITEWAY current-date addition
 

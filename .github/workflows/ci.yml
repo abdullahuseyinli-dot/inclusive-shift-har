@@ -2,6 +2,8 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -9,6 +11,7 @@ permissions:
   contents: read
 
 env:
+  GIT_NO_REPLACE_OBJECTS: "1"
   INCLUSIVE_SHIFT_HAR_OFFLINE: "1"
   HF_DATASETS_OFFLINE: "1"
   TRANSFORMERS_OFFLINE: "1"
@@ -31,18 +34,19 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
+          version: "0.11.29"
           enable-cache: true
           cache-dependency-glob: uv.lock
 
@@ -63,25 +67,27 @@ jobs:
 
   release-security:
     name: Complete-history release security
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: synthetic-validation
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Check out complete history without persisted credentials
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d
         with:
+          version: "0.11.29"
           enable-cache: true
           cache-dependency-glob: uv.lock
 
@@ -128,6 +134,7 @@ jobs:
           "${evidence}/gitleaks" git \
             --no-banner \
             --config .gitleaks.toml \
+            --exit-code 1 \
             --log-opts=--all \
             --report-format json \
             --report-path "${evidence}/gitleaks.json"
@@ -138,7 +145,10 @@ jobs:
             --report "${evidence}/gitleaks.json" \
             --candidate-commit "${GITHUB_SHA}" \
             --policy configs/release/release_gate_policy_v1.json \
+            --config .gitleaks.toml \
+            --ignore .gitleaksignore \
             --gitleaks-version 8.30.1 \
+            --gitleaks-exit-code "${gitleaks_exit}" \
             --created-at-utc "${now}" \
             --output "${evidence}/secret_scan.json"
           validation_exit=$?
@@ -169,7 +179,14 @@ jobs:
           run_gate() {
             gate="$1"
             shift
-            if "$@" > "${evidence}/${gate}.log" 2>&1; then
+            date -u +%Y-%m-%dT%H:%M:%SZ > "${evidence}/${gate}.started"
+            set +e
+            "$@" > "${evidence}/${gate}.log" 2>&1
+            gate_exit=$?
+            set -e
+            printf '%s\n' "${gate_exit}" > "${evidence}/${gate}.exit"
+            date -u +%Y-%m-%dT%H:%M:%SZ > "${evidence}/${gate}.completed"
+            if [ "${gate_exit}" -eq 0 ]; then
               printf 'pass\n' > "${evidence}/${gate}.status"
             else
               printf 'fail\n' > "${evidence}/${gate}.status"
@@ -191,7 +208,7 @@ jobs:
             --artifact-root results --require-artifacts --json
           exit "${failed}"
 
-      - name: Assemble exact-candidate gate evidence
+      - name: Assemble candidate-scoped CI quality proxy
         if: always()
         shell: bash
         run: |
@@ -199,6 +216,7 @@ jobs:
           import hashlib
           import json
           import os
+          import platform
           import subprocess
           from datetime import UTC, datetime
           from pathlib import Path
@@ -208,71 +226,93 @@ jobs:
           root = Path(".audit/release-attestations") / candidate
           generic_gates = [
               "tests", "lint", "format", "types", "manifests", "splits",
-              "configuration", "artifacts", "ci",
+              "configuration", "artifacts", "ci_quality_proxy",
           ]
-          statuses = {
-              gate: (root / f"{gate}.status").read_text(encoding="utf-8").strip()
-              for gate in generic_gates
-              if gate != "ci"
-          }
+          executed = [gate for gate in generic_gates if gate != "ci_quality_proxy"]
+          statuses = {}
+          gate_evidence = {}
+          for gate in executed:
+              status_path = root / f"{gate}.status"
+              exit_path = root / f"{gate}.exit"
+              log_path = root / f"{gate}.log"
+              started_path = root / f"{gate}.started"
+              completed_path = root / f"{gate}.completed"
+              status = (
+                  status_path.read_text(encoding="utf-8").strip()
+                  if status_path.is_file()
+                  else "fail"
+              )
+              statuses[gate] = status if status in {"pass", "fail"} else "fail"
+              exit_code = (
+                  int(exit_path.read_text(encoding="utf-8").strip())
+                  if exit_path.is_file()
+                  else -1
+              )
+              log_payload = log_path.read_bytes() if log_path.is_file() else b""
+              gate_evidence[gate] = {
+                  "exit_code": exit_code,
+                  "started_at_utc": (
+                      started_path.read_text(encoding="utf-8").strip()
+                      if started_path.is_file()
+                      else None
+                  ),
+                  "completed_at_utc": (
+                      completed_path.read_text(encoding="utf-8").strip()
+                      if completed_path.is_file()
+                      else None
+                  ),
+                  "log_path": log_path.as_posix(),
+                  "log_size_bytes": len(log_payload),
+                  "log_sha256": hashlib.sha256(log_payload).hexdigest(),
+              }
           quality_status = "pass" if all(
-              statuses.get(gate) == "pass" for gate in generic_gates if gate != "ci"
+              statuses.get(gate) == "pass" for gate in executed
           ) else "fail"
+          def version(*command: str) -> str:
+              result = subprocess.run(command, check=True, capture_output=True, text=True)
+              return (result.stdout or result.stderr).strip().splitlines()[0]
           quality = {
               "schema_version": "1.0.0",
               "record_kind": "ci_release_quality_gate_evidence",
               "status": quality_status,
               "candidate_commit": candidate,
+              "created_at_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
               "gates": generic_gates,
-              "gate_statuses": {**statuses, "ci": quality_status},
+              "gate_statuses": {**statuses, "ci_quality_proxy": quality_status},
               "scope": "upstream synthetic-validation matrix and preceding release-security steps",
+              "ci_evidence_scope": "within_job_quality_proxy_not_completed_workflow",
+              "external_completed_ci_required_for_release_inventory": True,
+              "gate_evidence": gate_evidence,
+              "tool_versions": {
+                  "python": platform.python_version(),
+                  "uv": version("uv", "--version"),
+                  "pytest": version("uv", "run", "pytest", "--version"),
+                  "ruff": version("uv", "run", "ruff", "--version"),
+                  "mypy": version("uv", "run", "mypy", "--version"),
+              },
+              "machine": {
+                  "runner_os": os.environ.get("RUNNER_OS"),
+                  "architecture": platform.machine(),
+                  "platform": platform.platform(),
+              },
           }
           quality["record_sha256"] = canonical_json_sha256(quality)
           quality_path = root / "quality_gates.json"
           quality_path.write_text(json.dumps(quality, sort_keys=True) + "\n", encoding="utf-8")
-          paths = {
-              "repository_scan": root / "repository_scan.json",
-              "secret_scan": root / "secret_scan.json",
-              "license_audit": root / "license_audit.json",
-              **{gate: quality_path for gate in generic_gates},
-          }
-          def reference(path: Path) -> dict[str, str]:
-              return {
-                  "status": "pass",
-                  "path": path.as_posix(),
-                  "expected_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-              }
-          parent = subprocess.run(
-              ["git", "rev-parse", f"{candidate}^"],
-              check=True,
-              capture_output=True,
-              text=True,
-          ).stdout.strip()
-          spec = {
-              "schema_version": "1.0.0",
-              "spec_kind": "final_release_gate_attestation_spec",
-              "created_at_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-              "candidate_commit": candidate,
-              "parent_commit": parent,
-              "worktree_clean": True,
-              "gates": {name: reference(path) for name, path in paths.items()},
-          }
-          (root / "attestation_spec.json").write_text(
-              json.dumps(spec, sort_keys=True) + "\n", encoding="utf-8"
-          )
           PY
+
+      - name: Validate candidate-scoped CI gate bundle
+        shell: bash
+        run: |
           now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           evidence=".audit/release-attestations/${GITHUB_SHA}"
-          uv run python -m inclusive_shift_har.artifacts.release_gate assemble \
+          uv run python -m inclusive_shift_har.artifacts.release_gate validate-ci-bundle \
             --repository-root . \
+            --candidate-commit "${GITHUB_SHA}" \
             --policy configs/release/release_gate_policy_v1.json \
-            --mode exact_candidate_attestation \
             --created-at-utc "${now}" \
-            --spec "${evidence}/attestation_spec.json" \
-            --output "${evidence}/final_release_gate_report.json"
-          uv run python -m inclusive_shift_har.artifacts.release_gate validate \
-            --report "${evidence}/final_release_gate_report.json" \
-            --repository-root .
+            --evidence-root "${evidence}" \
+            --output "${evidence}/ci_bundle_validation.json"
 
       - name: Validate tracked precommit report
         if: always()
@@ -283,7 +323,7 @@ jobs:
 
       - name: Upload sanitized release-security evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: release-security-${{ github.sha }}
           path: |
@@ -291,9 +331,12 @@ jobs:
             .audit/release-attestations/${{ github.sha }}/secret_scan.json
             .audit/release-attestations/${{ github.sha }}/license_audit.json
             .audit/release-attestations/${{ github.sha }}/quality_gates.json
-            .audit/release-attestations/${{ github.sha }}/attestation_spec.json
-            .audit/release-attestations/${{ github.sha }}/final_release_gate_report.json
+            .audit/release-attestations/${{ github.sha }}/ci_bundle_validation.json
             .audit/release-attestations/${{ github.sha }}/*.status
+            .audit/release-attestations/${{ github.sha }}/*.exit
+            .audit/release-attestations/${{ github.sha }}/*.started
+            .audit/release-attestations/${{ github.sha }}/*.completed
             .audit/release-attestations/${{ github.sha }}/*.log
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 30

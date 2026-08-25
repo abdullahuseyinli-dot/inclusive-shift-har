@@ -48,14 +48,17 @@ inclusive-shift-har = "inclusive_shift_har.cli:main"
 
 [dependency-groups]
 test = [
+  "jsonschema>=4.25,<5",
   "pytest>=8.3,<9",
   "pytest-cov>=6,<8",
+  "rfc3339-validator>=0.1.4,<1",
 ]
 lint = [
   "ruff>=0.12,<1",
 ]
 type = [
   "mypy>=1.15,<2",
+  "types-jsonschema>=4.25,<5",
   "types-pyyaml>=6.0.12.20250516,<7",
 ]
 dev = [
