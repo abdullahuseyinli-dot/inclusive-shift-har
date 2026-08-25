@@ -8,7 +8,7 @@ from importlib.metadata import PackageNotFoundError, version
 try:
     __version__ = version("inclusive-shift-har")
 except PackageNotFoundError:  # Source tree used without an installed distribution.
-    __version__ = "0.1.1a0"
+    __version__ = "0.1.2a0"
 
 __all__ = ["__version__", "main"]
 

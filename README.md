@@ -31,8 +31,10 @@ The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](r
 
 Release lineage is append-only. `benchmark-v0.1.0` remains attached to its
 original candidate after Actions run `32799146947` failed before tests because
-of conflicting `uv` frozen/locked options. The corrected patch candidate is
-`benchmark-v0.1.1`; neither the earlier tag nor its failure is rewritten.
+of conflicting `uv` frozen/locked options. `benchmark-v0.1.1` and run
+`32801378375` are also preserved: hosted `uv` rejected its empty environment
+override as a non-boolish value. The cross-platform correction is
+`benchmark-v0.1.2`; neither earlier tag nor failure is rewritten.
 
 ## Post-confirmatory findings
 
@@ -124,9 +126,18 @@ docs/                      audits, cards, protocol, literature, ethics, and stat
 paper/                     paper-ready outline and result narrative
 ```
 
-## Claim limits
+## Known evidence constraints
 
-This repository does not claim the first disability-related HAR study, the first HAR fairness study, the first disentangled HAR architecture, state-of-the-art performance, clinical validity, safety, causal disability effects, or publication acceptance. It does not treat a Transformer/Mamba swap or generic corruption benchmark as novelty. Failed runs, backend crashes, quarantines, deviations, and the unsupported MoRe-HAR hypothesis remain visible.
+InclusiveHAR v4 does not expose timestamps or trial/session identifiers, so the
+executed split is participant-exclusive and raw-row-disjoint but cannot verify
+trial-boundary safety. The locked target cohort contains ten participants, and
+the DANN interval [0.5391, 0.8093] is correspondingly wide. The released cohort
+flag is used to construct the source/target shift; it is not a measured physical
+ability score. Released `Walking` denotes manual wheelchair propulsion for some
+target participants, while ramps, stairs, and jogging remain separate concepts.
+The source/target gap analysis also mixes one-seed source cross-validation with
+five-seed target fits and is descriptive only. Failed runs, quarantines,
+deviations, and the unsupported MoRe-HAR result remain part of the record.
 
 ## Licensing and citation
 

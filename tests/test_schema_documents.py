@@ -42,7 +42,7 @@ def _references(value: Any) -> Iterator[str]:
             yield from _references(child)
 
 
-def test_ci_locked_sync_clears_global_uv_frozen_for_install_steps(
+def test_ci_locked_sync_disables_global_uv_frozen_for_install_steps(
     repository_root: Path,
 ) -> None:
     workflow = yaml.load(
@@ -60,7 +60,7 @@ def test_ci_locked_sync_clears_global_uv_frozen_for_install_steps(
         matches = [step for step in steps if step.get("name") == step_name]
         assert len(matches) == 1
         install = matches[0]
-        assert install["env"]["UV_FROZEN"] == ""
+        assert install["env"]["UV_FROZEN"] == "false"
         assert "uv sync --locked" in install["run"]
 
 

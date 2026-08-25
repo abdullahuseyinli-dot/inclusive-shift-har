@@ -52,9 +52,9 @@ jobs:
 
       - name: Install locked development environment
         env:
-          # --locked verifies pyproject.toml against uv.lock; clear the global
-          # frozen default only for this explicit synchronization command.
-          UV_FROZEN: ""
+          # --locked verifies pyproject.toml against uv.lock; explicitly
+          # disable the global frozen default for this synchronization only.
+          UV_FROZEN: "false"
         run: uv sync --locked --extra training-cpu --group research
 
       - name: Run synthetic tests
@@ -99,7 +99,7 @@ jobs:
         env:
           # Keep --locked as the freshness gate, then restore UV_FROZEN for
           # every subsequent uv invocation in the job.
-          UV_FROZEN: ""
+          UV_FROZEN: "false"
         run: uv sync --locked --extra training-cpu --group research --group release
 
       - name: Prepare candidate-scoped attestation directory

@@ -12,6 +12,7 @@
     "required_for_release_tags": [
       "benchmark-v0.1.0",
       "benchmark-v0.1.1",
+      "benchmark-v0.1.2",
       "legacy-audit-v0.1.0",
       "protocol-v1.0.0",
       "protocol-v1.2.0"
@@ -21,6 +22,13 @@
         "object_id": "691326d3dd373ce2a86ecbea246bbc03108e153d",
         "target_commit": "f0a589a0bb18f60862c80f7e56eac2a33027c358",
         "message": "InclusiveShift-HAR benchmark v0.1.0",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
+      "benchmark-v0.1.1": {
+        "object_id": "dfdbfa4c810afaeee8fb62257c6cf69f6fe80610",
+        "target_commit": "4ac9b7b5471c945389348a73b5c59387c2aae069",
+        "message": "InclusiveShift-HAR benchmark v0.1.1",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       },
@@ -47,14 +55,15 @@
       }
     },
     "permitted_candidate_tags": {
-      "benchmark-v0.1.1": {
-        "message": "InclusiveShift-HAR benchmark v0.1.1",
+      "benchmark-v0.1.2": {
+        "message": "InclusiveShift-HAR benchmark v0.1.2",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
     },
     "historical_notes": {
       "benchmark-v0.1.0": "Preserved failed release candidate. GitHub Actions run 32799146947 stopped before tests because UV_FROZEN and --locked were supplied together; the tag is immutable and superseded by benchmark-v0.1.1.",
+      "benchmark-v0.1.1": "Preserved failed patch candidate. GitHub Actions run 32801378375 stopped before tests because an empty UV_FROZEN override is not a valid boolish value on hosted runners; the tag is immutable and superseded by benchmark-v0.1.2.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },

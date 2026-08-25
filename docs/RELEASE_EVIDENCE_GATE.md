@@ -200,29 +200,30 @@ content commit afterward.
 
 ## 3. Create and validate the benchmark tag before release CI
 
-The release policy byte-pins all four historical annotated tags. This includes
-the immutable `benchmark-v0.1.0` candidate whose Actions run `32799146947`
-failed before tests because `UV_FROZEN` and `--locked` were supplied together,
-as well as the preserved `protocol-v1.0.0` name/message mismatch. The policy
-permits exactly one successor candidate tag with fixed metadata. Create it only
-after the pre-tag local gates pass:
+The release policy byte-pins all five historical annotated tags. This includes
+the immutable `benchmark-v0.1.0` and `benchmark-v0.1.1` candidates whose
+Actions runs `32799146947` and `32801378375` failed before tests because of,
+respectively, conflicting frozen/locked options and a hosted-runner rejection
+of an empty boolish override. It also retains the preserved `protocol-v1.0.0`
+name/message mismatch. The policy permits exactly one successor candidate tag
+with fixed metadata. Create it only after the pre-tag local gates pass:
 
 ```powershell
-git show-ref --verify --quiet refs/tags/benchmark-v0.1.1
+git show-ref --verify --quiet refs/tags/benchmark-v0.1.2
 $tagProbe = $LASTEXITCODE
 if ($tagProbe -eq 0) {
-  throw "benchmark-v0.1.1 already exists; inspect it and stop"
+  throw "benchmark-v0.1.2 already exists; inspect it and stop"
 }
 if ($tagProbe -ne 1) { throw "Unable to determine benchmark tag state" }
 if ((git config --get user.name).Trim() -ne 'Abdulla Huseyinli' -or
     (git config --get user.email).Trim() -ne 'abdullahuseyinli@gmail.com') {
   throw 'Git tagger identity differs from the release policy'
 }
-git tag -a benchmark-v0.1.1 $candidate `
-  -m "InclusiveShift-HAR benchmark v0.1.1"
+git tag -a benchmark-v0.1.2 $candidate `
+  -m "InclusiveShift-HAR benchmark v0.1.2"
 Assert-NativeSuccess 'benchmark tag creation'
-if ((git cat-file -t benchmark-v0.1.1).Trim() -ne 'tag') { throw "Tag is not annotated" }
-if ((git rev-parse 'benchmark-v0.1.1^{commit}').Trim() -ne $candidate) {
+if ((git cat-file -t benchmark-v0.1.2).Trim() -ne 'tag') { throw "Tag is not annotated" }
+if ((git rev-parse 'benchmark-v0.1.2^{commit}').Trim() -ne $candidate) {
   throw "Benchmark tag targets another commit"
 }
 ```
@@ -232,7 +233,7 @@ name, exact one-line message, exact tagger name/email, canonical headers, and
 candidate target. Gitleaks does not inspect annotated-tag payloads, so this
 independent byte-level policy is mandatory. For a later release, move this tag
 to the pinned historical set in a new policy and declare a new candidate tag;
-never retarget `benchmark-v0.1.0` or `benchmark-v0.1.1`.
+never retarget `benchmark-v0.1.0`, `benchmark-v0.1.1`, or `benchmark-v0.1.2`.
 
 Now create candidate-bound local repository, secret, and licence evidence in a
 fresh path. The repository scanner requires all policy-declared tags to exist,
@@ -314,7 +315,8 @@ git push --atomic -u origin `
   refs/tags/protocol-v1.0.0 `
   refs/tags/protocol-v1.2.0 `
   refs/tags/benchmark-v0.1.0 `
-  refs/tags/benchmark-v0.1.1
+  refs/tags/benchmark-v0.1.1 `
+  refs/tags/benchmark-v0.1.2
 Assert-NativeSuccess 'atomic main and tag push'
 $remoteRefLines = @(git ls-remote origin `
   refs/heads/main `
@@ -322,7 +324,8 @@ $remoteRefLines = @(git ls-remote origin `
   refs/tags/protocol-v1.0.0 'refs/tags/protocol-v1.0.0^{}' `
   refs/tags/protocol-v1.2.0 'refs/tags/protocol-v1.2.0^{}' `
   refs/tags/benchmark-v0.1.0 'refs/tags/benchmark-v0.1.0^{}' `
-  refs/tags/benchmark-v0.1.1 'refs/tags/benchmark-v0.1.1^{}' |
+  refs/tags/benchmark-v0.1.1 'refs/tags/benchmark-v0.1.1^{}' `
+  refs/tags/benchmark-v0.1.2 'refs/tags/benchmark-v0.1.2^{}' |
   Tee-Object -FilePath ".audit/local-candidate/$candidate/remote-refs.txt")
 Assert-NativeSuccess 'remote ref verification'
 $remoteRefs = @{}
@@ -337,7 +340,7 @@ $expectedRemoteRefs = @{
 }
 foreach ($tag in @(
   'legacy-audit-v0.1.0', 'protocol-v1.0.0', 'protocol-v1.2.0',
-  'benchmark-v0.1.0', 'benchmark-v0.1.1'
+  'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2'
 )) {
   $tagObject = (git rev-parse "refs/tags/$tag").Trim()
   Assert-NativeSuccess "resolve local tag object $tag"
@@ -620,12 +623,12 @@ uploading it.
 The benchmark tag already has its policy-required fixed message; do not recreate
 it to add asset hashes. Record inventory file/record hashes and the evidence
 bundle hash in the draft release notes instead. The package version is
-`0.1.1a0`, so this is a prerelease and must not be marked latest:
+`0.1.2a0`, so this is a prerelease and must not be marked latest:
 
 ```powershell
-gh release create benchmark-v0.1.1 `
+gh release create benchmark-v0.1.2 `
   --repo $repository --verify-tag --draft --prerelease --latest=false `
-  --title "InclusiveShift-HAR benchmark v0.1.1 prerelease" `
+  --title "InclusiveShift-HAR benchmark v0.1.2 prerelease" `
   --notes-file "$external/release-notes.md" `
   ".audit/release-assets/$candidate/final_release_evidence_inventory.json" `
   "$external/inclusive-shift-har-$candidate-evidence.zip"
@@ -638,7 +641,7 @@ inventory offline. Only then publish with `draft=false`, `prerelease=true`, and
 `latest=false`.
 
 Final checks must prove: repository still private; remote `main` equals the
-candidate; all five annotated tag objects and targets match policy; release is
+candidate; all six annotated tag objects and targets match policy; release is
 published as a private prerelease; assets are byte-identical; local worktree is
 clean; no DOI was minted. Keep the repository private until a separate public,
 licence, claim, and lineage audit authorizes disclosure.
