@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "dependency_license_exception_review",
+  "status": "approved_for_nonredistributed_transitive_runtime_only",
+  "review_date": "2026-08-25",
+  "retrieval_date": "2026-08-25",
+  "identity": "nvidia-nccl-cu12@2.31.2",
+  "package": {
+    "name": "nvidia-nccl-cu12",
+    "version": "2.31.2",
+    "source_registry": "https://pypi.org/simple",
+    "metadata_license_expression": "LicenseRef-NVIDIA-Proprietary"
+  },
+  "dependency": {
+    "required_by": "xgboost@3.2.0",
+    "marker": "sys_platform == 'linux' or (extra == 'extra-19-inclusive-shift-har-training-cpu' and extra == 'extra-19-inclusive-shift-har-training-cuda')"
+  },
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64"
+  },
+  "scope": "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed",
+  "distribution": {
+    "wheel": {
+      "filename": "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/0f/36/104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl",
+      "size_bytes": 342105414,
+      "sha256": "f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0"
+    },
+    "core_metadata": {
+      "url": "https://files.pythonhosted.org/packages/0f/36/104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl.metadata",
+      "size_bytes": 2097,
+      "sha256": "ac64882e612ff2e1c4674386c2a662e0e0b6cae12e85ebe789b1608fa7c3a5fd",
+      "license_expression": "LicenseRef-NVIDIA-Proprietary"
+    },
+    "embedded_license": {
+      "member": "nvidia_nccl_cu12-2.31.2.dist-info/licenses/License.txt",
+      "size_bytes": 1895,
+      "sha256": "0f0174a6b4e0b33ac26375bf729533075b32f4c51a5b6802a3d742d7dcdc9a76",
+      "classification": "BSD-3-Clause-text"
+    },
+    "wheel_member_count": 75
+  },
+  "official_terms": {
+    "nvidia_software_license_agreement": {
+      "url": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/sla/index.html",
+      "size_bytes": 95492,
+      "sha256": "77e3db074f479b97051023bb8d9c06e1212a88375827f948eb869c73873e9052",
+      "last_modified": "Thu, 13 Aug 2026 18:36:55 GMT",
+      "rendered_content_version": "2.29.2"
+    },
+    "nvidia_bsd_license": {
+      "url": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/bsd/index.html",
+      "size_bytes": 23224,
+      "sha256": "d6e509a646b74aa552a17d1e864ca2d00d1cf34d975be6567a40431d4f0ec297",
+      "last_modified": "Thu, 13 Aug 2026 18:37:05 GMT",
+      "rendered_content_version": "2.29.2"
+    }
+  },
+  "review_findings": [
+    "The PyPI core metadata declares LicenseRef-NVIDIA-Proprietary.",
+    "The wheel embeds BSD 3-Clause licence text; this review records the discrepancy without substituting that text for the metadata declaration.",
+    "XGBoost 3.2.0 introduces the dependency only through the exact marker recorded above in the candidate uv.lock.",
+    "The official nccl_2312 archive URLs render a 2.29.2 page label; their exact bytes are retained as supplementary terms evidence, not represented as distribution-specific 2.31.2 text."
+  ],
+  "controls": {
+    "repository_redistributes_wheel": false,
+    "release_assets_redistribute_wheel": false,
+    "container_images_may_vendor_wheel": false,
+    "third_party_terms_apply_to_local_installation": true,
+    "exception_changes_repository_code_license": false
+  },
+  "verification_method": {
+    "wheel": "PyPI JSON metadata plus exact wheel hash and size",
+    "core_metadata": "PEP 658 sidecar hash and size",
+    "embedded_license": "HTTP range retrieval of the exact wheel member and raw-deflate verification",
+    "official_terms": "exact versioned NVIDIA archive-page bytes with the nccl_2312 path and rendered 2.29.2 label both recorded"
+  },
+  "record_sha256": "989bf532680f4696485f807508ed49061092ab2a9308dceb635207523b8213d3"
+}

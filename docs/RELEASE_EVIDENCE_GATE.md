@@ -225,31 +225,33 @@ Do not create another content commit afterward.
 
 ## 3. Create and validate the benchmark tag before release CI
 
-The release policy byte-pins all six historical annotated tags. This includes
-the immutable `benchmark-v0.1.0`, `benchmark-v0.1.1`, and `benchmark-v0.1.2`
-candidates. Runs `32799146947` and `32801378375` failed before tests on invalid
-frozen-option combinations; run `32802922698` passed Ubuntu but exposed CRLF
-checkout conversion in six Windows byte-hash tests. The policy also retains the
-preserved `protocol-v1.0.0` name/message mismatch. It permits exactly one
+The release policy byte-pins all seven historical annotated tags. This includes
+the immutable `benchmark-v0.1.0` through `benchmark-v0.1.3` candidates. Runs
+`32799146947` and `32801378375` failed before tests on invalid frozen-option
+combinations; run `32802922698` passed Ubuntu but exposed CRLF checkout
+conversion in six Windows byte-hash tests; run `32811935288` passed both
+operating-system matrices before its Linux licence audit identified the
+XGBoost-transitive NCCL runtime. The policy also retains the preserved
+`protocol-v1.0.0` name/message mismatch. It permits exactly one
 successor candidate tag with fixed metadata. Create it only after the pre-tag
 local gates pass:
 
 ```powershell
-git show-ref --verify --quiet refs/tags/benchmark-v0.1.3
+git show-ref --verify --quiet refs/tags/benchmark-v0.1.4
 $tagProbe = $LASTEXITCODE
 if ($tagProbe -eq 0) {
-  throw "benchmark-v0.1.3 already exists; inspect it and stop"
+  throw "benchmark-v0.1.4 already exists; inspect it and stop"
 }
 if ($tagProbe -ne 1) { throw "Unable to determine benchmark tag state" }
 if ((git config --get user.name).Trim() -cne 'Abdulla Huseyinli' -or
     (git config --get user.email).Trim() -cne 'abdullahuseyinli@gmail.com') {
   throw 'Git tagger identity differs from the release policy'
 }
-git tag -a benchmark-v0.1.3 $candidate `
-  -m "InclusiveShift-HAR benchmark v0.1.3"
+git tag -a benchmark-v0.1.4 $candidate `
+  -m "InclusiveShift-HAR benchmark v0.1.4"
 Assert-NativeSuccess 'benchmark tag creation'
-if ((git cat-file -t benchmark-v0.1.3).Trim() -cne 'tag') { throw "Tag is not annotated" }
-if ((git rev-parse 'benchmark-v0.1.3^{commit}').Trim() -cne $candidate) {
+if ((git cat-file -t benchmark-v0.1.4).Trim() -cne 'tag') { throw "Tag is not annotated" }
+if ((git rev-parse 'benchmark-v0.1.4^{commit}').Trim() -cne $candidate) {
   throw "Benchmark tag targets another commit"
 }
 ```
@@ -313,6 +315,21 @@ uv run python -m inclusive_shift_har.artifacts.release_gate audit-licenses `
 Assert-NativeSuccess 'licence audit'
 ```
 
+On Linux x86-64, the audit expects XGBoost 3.2.0 and its exact
+`nvidia-nccl-cu12==2.31.2` edge. The exception is valid only when the candidate
+`uv.lock` hash, dependency marker, wheel URL/name/size/hash, PyPI metadata,
+embedded licence file, and archived NVIDIA page bytes reconstruct the tracked
+review in `docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json`. The audit record
+contains the complete normalized package/licence list so CI, inventory, and
+bundle validators can independently reproduce the exception and violations.
+Omitting either the XGBoost parent or NCCL package, changing platform or
+artifact provenance, or emitting an empty/fabricated exception application
+fails closed. The wheel remains a locally installed third-party runtime and is
+not included in repository history, release assets, or container images. The
+review records that the official `nccl_2312` archive paths render a 2.29.2 page
+label; those page bytes are supplementary and are not described as
+distribution-specific 2.31.2 licence text.
+
 The official Gitleaks 8.30.1 Linux x64 archive SHA-256 is
 `551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb`.
 The Windows archive and executable pins used above are also recorded in the
@@ -348,11 +365,11 @@ Assert-NativeSuccess 'remote main concurrency check'
 if ($remoteBase -cne $base) {
   throw "Remote main moved after review: expected $base, observed $remoteBase"
 }
-$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.3 `
-  'refs/tags/benchmark-v0.1.3^{}')
+$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.4 `
+  'refs/tags/benchmark-v0.1.4^{}')
 Assert-NativeSuccess 'remote candidate-tag absence check'
 if ($candidateTagProbe.Count -ne 0) {
-  throw 'Remote benchmark-v0.1.3 already exists; inspect it and stop'
+  throw 'Remote benchmark-v0.1.4 already exists; inspect it and stop'
 }
 ```
 
@@ -368,7 +385,8 @@ git push --atomic -u origin `
   refs/tags/benchmark-v0.1.0 `
   refs/tags/benchmark-v0.1.1 `
   refs/tags/benchmark-v0.1.2 `
-  refs/tags/benchmark-v0.1.3
+  refs/tags/benchmark-v0.1.3 `
+  refs/tags/benchmark-v0.1.4
 Assert-NativeSuccess 'atomic main and tag push'
 $remoteRefLines = @(git ls-remote origin `
   refs/heads/main `
@@ -378,7 +396,8 @@ $remoteRefLines = @(git ls-remote origin `
   refs/tags/benchmark-v0.1.0 'refs/tags/benchmark-v0.1.0^{}' `
   refs/tags/benchmark-v0.1.1 'refs/tags/benchmark-v0.1.1^{}' `
   refs/tags/benchmark-v0.1.2 'refs/tags/benchmark-v0.1.2^{}' `
-  refs/tags/benchmark-v0.1.3 'refs/tags/benchmark-v0.1.3^{}' |
+  refs/tags/benchmark-v0.1.3 'refs/tags/benchmark-v0.1.3^{}' `
+  refs/tags/benchmark-v0.1.4 'refs/tags/benchmark-v0.1.4^{}' |
   Tee-Object -FilePath ".audit/local-candidate/$candidate/remote-refs.txt")
 Assert-NativeSuccess 'remote ref verification'
 $remoteRefs = [System.Collections.Generic.Dictionary[string,string]]::new(
@@ -396,7 +415,8 @@ $expectedRemoteRefs = [System.Collections.Generic.Dictionary[string,string]]::ne
 $expectedRemoteRefs.Add('refs/heads/main', $candidate)
 foreach ($tag in @(
   'legacy-audit-v0.1.0', 'protocol-v1.0.0', 'protocol-v1.2.0',
-  'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2', 'benchmark-v0.1.3'
+  'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2', 'benchmark-v0.1.3',
+  'benchmark-v0.1.4'
 )) {
   $tagObject = (git rev-parse "refs/tags/$tag").Trim()
   Assert-NativeSuccess "resolve local tag object $tag"
@@ -416,7 +436,7 @@ foreach ($name in $expectedRemoteRefs.Keys) {
 }
 ```
 
-Verify remote `main` and all seven tag objects/peeled targets with `git
+Verify remote `main` and all eight tag objects/peeled targets with `git
 ls-remote`; preserve the output. The successful exact-main CI repository scan
 then independently validates the policy-pinned tag objects fetched from the
 remote and binds their normalized ref digest. The `release-security` job runs only for a `push` to
@@ -742,16 +762,16 @@ review evidence and are not retroactively inserted into the already-built ZIP.
 The benchmark tag already has its policy-required fixed message; do not recreate
 it to add asset hashes. Record inventory file/record hashes and the evidence
 bundle hash in the draft release notes instead. The package version is
-`0.1.3a0`, so this is a prerelease and must not be marked latest:
+`0.1.4a0`, so this is a prerelease and must not be marked latest:
 
 ```powershell
-$releaseTitle = "InclusiveShift-HAR benchmark v0.1.3 prerelease"
+$releaseTitle = "InclusiveShift-HAR benchmark v0.1.4 prerelease"
 $releaseNotesPath = "$external/release-notes.md"
 $releaseNotesBody = [System.IO.File]::ReadAllText(
   (Resolve-Path -LiteralPath $releaseNotesPath).Path,
   [System.Text.UTF8Encoding]::new($false)
 )
-gh release create benchmark-v0.1.3 `
+gh release create benchmark-v0.1.4 `
   --repo $repository --verify-tag --draft --prerelease --latest=false `
   --title $releaseTitle --notes-file $releaseNotesPath `
   $externalInventory $bundle
@@ -767,7 +787,7 @@ extraction root before publication:
 $draftApi = "$external/draft-release-api.json"
 Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi
 $draftMatches = @((Get-Content -Raw -LiteralPath $draftApi | ConvertFrom-Json) |
-  Where-Object { $_.tag_name -ceq 'benchmark-v0.1.3' })
+  Where-Object { $_.tag_name -ceq 'benchmark-v0.1.4' })
 if ($draftMatches.Count -ne 1) { throw 'Expected exactly one draft release' }
 $draft = $draftMatches[0]
 if (-not $draft.draft -or -not $draft.prerelease -or $draft.assets.Count -ne 2) {
@@ -796,7 +816,7 @@ foreach ($asset in $draft.assets) {
 $draftDownload = "$external-draft-download"
 if (Test-Path -LiteralPath $draftDownload) { throw 'Draft download path exists' }
 New-Item -ItemType Directory -Path $draftDownload -ErrorAction Stop | Out-Null
-gh release download benchmark-v0.1.3 --repo $repository --dir $draftDownload
+gh release download benchmark-v0.1.4 --repo $repository --dir $draftDownload
 Assert-NativeSuccess 'draft asset download'
 foreach ($name in $expectedAssets.Keys) {
   $downloaded = Join-Path $draftDownload $name
@@ -816,15 +836,15 @@ uv run python -m inclusive_shift_har.artifacts.release_bundle validate `
   --output $downloadValidation --allowed-output-root $external
 Assert-NativeSuccess 'downloaded draft bundle validation'
 
-gh release edit benchmark-v0.1.3 --repo $repository `
+gh release edit benchmark-v0.1.4 --repo $repository `
   --draft=false --prerelease --latest=false
 Assert-NativeSuccess 'private prerelease publication'
 
 $publishedApi = "$external/published-release-api.json"
-Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.3" $publishedApi
+Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.4" $publishedApi
 $published = Get-Content -Raw -LiteralPath $publishedApi | ConvertFrom-Json
 if ($published.draft -or -not $published.prerelease -or
-    $published.tag_name -cne 'benchmark-v0.1.3' -or
+    $published.tag_name -cne 'benchmark-v0.1.4' -or
     $published.assets.Count -ne 2) {
   throw 'Published prerelease state differs from the reviewed draft'
 }
@@ -857,7 +877,7 @@ foreach ($asset in $published.assets) {
 $publishedDownload = "$external-published-download"
 if (Test-Path -LiteralPath $publishedDownload) { throw 'Published download path exists' }
 New-Item -ItemType Directory -Path $publishedDownload -ErrorAction Stop | Out-Null
-gh release download benchmark-v0.1.3 --repo $repository --dir $publishedDownload
+gh release download benchmark-v0.1.4 --repo $repository --dir $publishedDownload
 Assert-NativeSuccess 'published asset download'
 foreach ($name in $expectedAssets.Keys) {
   $downloaded = Join-Path $publishedDownload $name
@@ -880,6 +900,7 @@ if ($finalMain.object.type -cne 'commit' -or $finalMain.object.sha -cne $candida
 }
 $requiredTags = @(
   'benchmark-v0.1.0','benchmark-v0.1.1','benchmark-v0.1.2','benchmark-v0.1.3',
+  'benchmark-v0.1.4',
   'legacy-audit-v0.1.0','protocol-v1.0.0','protocol-v1.2.0'
 )
 foreach ($tag in $requiredTags) {
@@ -892,7 +913,7 @@ foreach ($tag in $requiredTags) {
       $localTarget -cne $expectedRemoteRefs["refs/tags/$tag^{}"]) {
     throw "Local annotated tag moved after the policy-validated pre-push snapshot: $tag"
   }
-  if ($tag -ceq 'benchmark-v0.1.3' -and $localTarget -cne $candidate) {
+  if ($tag -ceq 'benchmark-v0.1.4' -and $localTarget -cne $candidate) {
     throw 'Candidate benchmark tag no longer targets the candidate'
   }
   $remoteRows = @(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
@@ -922,14 +943,14 @@ uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository `
   --repository-root . --candidate-commit $candidate `
   --policy configs/release/release_gate_policy_v1.json `
   --created-at-utc $now --output $finalPolicyScan
-Assert-NativeSuccess 'final seven-tag policy scan'
+Assert-NativeSuccess 'final eight-tag policy scan'
 if (git status --porcelain=v1 --untracked-files=all) {
   throw 'Final local worktree is not clean'
 }
 ```
 
 Final checks must prove: repository still private; remote `main` equals the
-candidate; all seven annotated tag objects and targets match policy; release is
+candidate; all eight annotated tag objects and targets match policy; release is
 published as a private prerelease; assets are byte-identical; local worktree is
 clean; no DOI was minted. Keep the repository private until a separate public,
 licence, claim, and lineage audit authorizes disclosure.

@@ -18,7 +18,7 @@ This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gat
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | Private remote created; byte-preserving patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, and `benchmark-v0.1.2`/`32802922698` preserved; intended successor is pending as `benchmark-v0.1.3`; no DOI |
+| 10 - release | Private remote created; licence-evidence patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, `benchmark-v0.1.2`/`32802922698`, and `benchmark-v0.1.3`/`32811935288` preserved; intended successor is pending as `benchmark-v0.1.4`; no DOI |
 
 ## Confirmatory outcome
 
@@ -84,10 +84,18 @@ treating it as false. Neither tag was moved or deleted. Patch candidate
 synthetic-validation job passed tests, lint, format, and types, but Windows
 checkout converted LF evidence/config files to CRLF. Six exact-hash tests
 failed and the release-security job did not run in run `32802922698`. Patch candidate
-`benchmark-v0.1.3` additionally disables Git end-of-line conversion for every
-tracked path through `.gitattributes`, disables Windows `core.autocrlf` before
-checkout, and retains the explicit boolish sync override. All three failed tags
-and runs remain visible and immutable.
+`benchmark-v0.1.3` additionally disabled Git end-of-line conversion for every
+tracked path through `.gitattributes`, disabled Windows `core.autocrlf` before
+checkout, and retained the explicit boolish sync override. Run `32811935288`
+passed both operating-system matrices, then failed the release-security bundle
+because Linux XGBoost 3.2.0 installed `nvidia-nccl-cu12==2.31.2`, whose PyPI
+metadata reports `LicenseRef-NVIDIA-Proprietary`. Candidate
+`benchmark-v0.1.4` records the exact Linux x86-64 wheel, dependency marker,
+metadata sidecar, embedded BSD 3-Clause text, and archived NVIDIA pages whose
+`nccl_2312` path renders a 2.29.2 label, and
+limits the exception to a locally installed transitive runtime that is not
+vendored into repository files, release assets, or container images. All four
+failed tags and runs remain visible and immutable.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

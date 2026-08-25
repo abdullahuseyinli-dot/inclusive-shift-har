@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import subprocess
 import zipfile
 from collections.abc import Callable
@@ -35,6 +36,8 @@ from inclusive_shift_har.artifacts.release_inventory import (
     validate_release_evidence_inventory_file,
 )
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256
+
+from .test_release_gate import _exception_repository
 
 
 @dataclass(frozen=True)
@@ -177,6 +180,22 @@ def _build_workspace(
             "license_exceptions": [],
         },
     )
+    exception_repository, _exception_commit, exception_policy_path = _exception_repository(
+        tmp_path / "license-exception-source"
+    )
+    shutil.copyfile(exception_repository / "uv.lock", repository / "uv.lock")
+    review_relative = Path("docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json")
+    (repository / review_relative).parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(exception_repository / review_relative, repository / review_relative)
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    exception_policy = json.loads(exception_policy_path.read_text(encoding="utf-8"))
+    for key in (
+        "prohibited_license_tokens",
+        "license_exceptions",
+        "license_exception_records",
+    ):
+        policy[key] = exception_policy[key]
+    _write_json(policy_path, policy)
     (repository / "README.md").write_text("# Synthetic release fixture\n", encoding="utf-8")
     _git(repository, "add", ".")
     _git(repository, "commit", "-m", "synthetic base")

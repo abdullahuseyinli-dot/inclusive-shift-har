@@ -27,7 +27,7 @@ from inclusive_shift_har.artifacts.release_bundle import (
 from inclusive_shift_har.artifacts.release_gate import scan_index
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256
 
-from .test_release_gate import _git, _policy, _repository
+from .test_release_gate import _exception_repository, _git
 
 
 def _write(path: Path, payload: bytes) -> None:
@@ -127,11 +127,10 @@ def _build(tmp_path: Path) -> tuple[Path, Path, Path, str]:
 
 
 def _standard_workspace(tmp_path: Path) -> tuple[Path, Path, str]:
-    repository, _initial = _repository(tmp_path / "repository")
+    repository, _initial, tracked_policy = _exception_repository(tmp_path / "repository")
     fake_executable = tmp_path / "gitleaks.exe"
     fake_executable.write_bytes(b"synthetic-gitleaks")
-    policy_source = _policy(tmp_path / "policy.json")
-    policy = json.loads(policy_source.read_text(encoding="utf-8"))
+    policy = json.loads(tracked_policy.read_text(encoding="utf-8"))
     policy["gitleaks"].update(
         {
             "windows_x64_executable": "gitleaks.exe",
@@ -141,7 +140,6 @@ def _standard_workspace(tmp_path: Path) -> tuple[Path, Path, str]:
             ).hexdigest(),
         }
     )
-    tracked_policy = repository / "configs" / "release" / "release_gate_policy_v1.json"
     _write_json(tracked_policy, policy)
     _git(repository, "add", ".")
     _git(repository, "commit", "-m", "add release policy")
@@ -315,8 +313,18 @@ def _standard_workspace(tmp_path: Path) -> tuple[Path, Path, str]:
                 "size_bytes": len(inventory_payload),
                 "file_sha256": hashlib.sha256(inventory_payload).hexdigest(),
             },
+            audit_environment={"system": "Windows", "machine": "AMD64"},
+            packages=[
+                {
+                    "identity": "safe@1",
+                    "package": "safe",
+                    "version": "1",
+                    "license": "MIT",
+                }
+            ],
             package_count=1,
             normalized_inventory_sha256=hashlib.sha256(b"safe\t1\tMIT\n").hexdigest(),
+            exceptions_applied=[],
             violations=[],
         ),
     )

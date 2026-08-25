@@ -14,6 +14,7 @@
       "benchmark-v0.1.1",
       "benchmark-v0.1.2",
       "benchmark-v0.1.3",
+      "benchmark-v0.1.4",
       "legacy-audit-v0.1.0",
       "protocol-v1.0.0",
       "protocol-v1.2.0"
@@ -40,6 +41,13 @@
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       },
+      "benchmark-v0.1.3": {
+        "object_id": "2d81f27e377ffe32aef0207a577cd66c62c371b7",
+        "target_commit": "b61b95655c66cb52a27d53c95771e02226776937",
+        "message": "InclusiveShift-HAR benchmark v0.1.3",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
       "legacy-audit-v0.1.0": {
         "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
         "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
@@ -63,8 +71,8 @@
       }
     },
     "permitted_candidate_tags": {
-      "benchmark-v0.1.3": {
-        "message": "InclusiveShift-HAR benchmark v0.1.3",
+      "benchmark-v0.1.4": {
+        "message": "InclusiveShift-HAR benchmark v0.1.4",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
@@ -73,6 +81,7 @@
       "benchmark-v0.1.0": "Preserved failed release candidate. GitHub Actions run 32799146947 stopped before tests because UV_FROZEN and --locked were supplied together; the tag is immutable and superseded by benchmark-v0.1.1.",
       "benchmark-v0.1.1": "Preserved failed patch candidate. GitHub Actions run 32801378375 stopped before tests because an empty UV_FROZEN override is not a valid boolish value on hosted runners; the tag is immutable and superseded by benchmark-v0.1.2.",
       "benchmark-v0.1.2": "Preserved failed patch candidate. GitHub Actions run 32802922698 passed Ubuntu but failed six Windows byte-hash integrity tests after CRLF checkout conversion; the tag is immutable and superseded by benchmark-v0.1.3.",
+      "benchmark-v0.1.3": "Preserved failed patch candidate. GitHub Actions run 32811935288 passed both operating-system test matrices but the release-security bundle rejected the Linux licence audit for the XGBoost-transitive nvidia-nccl-cu12 2.31.2 runtime; the tag is immutable and superseded by benchmark-v0.1.4.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },
@@ -200,7 +209,40 @@
     "proprietary",
     "unknown"
   ],
-  "license_exceptions": [],
+  "license_exceptions": [
+    "nvidia-nccl-cu12@2.31.2"
+  ],
+  "license_exception_records": {
+    "nvidia-nccl-cu12@2.31.2": {
+      "license_expression": "LicenseRef-NVIDIA-Proprietary",
+      "required_by": "xgboost@3.2.0",
+      "dependency_marker": "sys_platform == 'linux' or (extra == 'extra-19-inclusive-shift-har-training-cpu' and extra == 'extra-19-inclusive-shift-har-training-cuda')",
+      "platform_system": "Linux",
+      "platform_machine": "x86_64",
+      "scope": "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed",
+      "lock_path": "uv.lock",
+      "lock_sha256": "49819ee7c5602b5438dcd0746203cdc274c1d066104880efcfc53f63741e06c7",
+      "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
+      "review_sha256": "ac91805bae85ad7cde3c9eef3a95cf83411e8367854f9ce3422f92f2168dad5c",
+      "review_record_sha256": "989bf532680f4696485f807508ed49061092ab2a9308dceb635207523b8213d3",
+      "wheel_filename": "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl",
+      "wheel_url": "https://files.pythonhosted.org/packages/0f/36/104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl",
+      "wheel_size_bytes": 342105414,
+      "wheel_sha256": "f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0",
+      "metadata_url": "https://files.pythonhosted.org/packages/0f/36/104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl.metadata",
+      "metadata_size_bytes": 2097,
+      "metadata_sha256": "ac64882e612ff2e1c4674386c2a662e0e0b6cae12e85ebe789b1608fa7c3a5fd",
+      "embedded_license_member": "nvidia_nccl_cu12-2.31.2.dist-info/licenses/License.txt",
+      "embedded_license_size_bytes": 1895,
+      "embedded_license_sha256": "0f0174a6b4e0b33ac26375bf729533075b32f4c51a5b6802a3d742d7dcdc9a76",
+      "terms_sla_url": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/sla/index.html",
+      "terms_sla_size_bytes": 95492,
+      "terms_sla_sha256": "77e3db074f479b97051023bb8d9c06e1212a88375827f948eb869c73873e9052",
+      "terms_bsd_url": "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/bsd/index.html",
+      "terms_bsd_size_bytes": 23224,
+      "terms_bsd_sha256": "d6e509a646b74aa552a17d1e864ca2d00d1cf34d975be6567a40431d4f0ec297"
+    }
+  },
   "ci_action_pins": {
     "actions/checkout": "3d3c42e5aac5ba805825da76410c181273ba90b1",
     "actions/setup-python": "a309ff8b426b58ec0e2a45f0f869d46889d02405",

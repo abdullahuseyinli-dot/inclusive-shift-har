@@ -28,6 +28,7 @@ from inclusive_shift_har.artifacts.release_gate import (
     scan_index,
     scan_repository,
     validate_ci_gate_bundle,
+    validate_license_audit_semantics,
     validate_report,
     validate_secret_scan,
 )
@@ -87,7 +88,15 @@ def _policy(path: Path) -> Path:
             "reviewed_ignore_entries": [],
             "required_scope": "complete_commit_history_with_policy_pinned_tag_metadata",
         },
-        "prohibited_license_tokens": ["gpl", "unknown", "proprietary"],
+        "prohibited_license_tokens": [
+            "affero general public license",
+            "agpl",
+            "commercial",
+            "general public license",
+            "gpl",
+            "proprietary",
+            "unknown",
+        ],
         "license_exceptions": [],
     }
     _write_json(path, value)
@@ -106,6 +115,119 @@ def _repository(path: Path) -> tuple[Path, str]:
     _git(path, "add", ".")
     _git(path, "commit", "-m", "safe")
     return path, _git(path, "rev-parse", "HEAD")
+
+
+EXCEPTION_MARKER = (
+    "sys_platform == 'linux' or (extra == 'extra-19-inclusive-shift-har-training-cpu' "
+    "and extra == 'extra-19-inclusive-shift-har-training-cuda')"
+)
+
+
+def _exception_repository(
+    path: Path,
+    *,
+    lock_mutator: Callable[[str], str] | None = None,
+    review_mutator: Callable[[dict[str, Any]], None] | None = None,
+    policy_mutator: Callable[[dict[str, Any]], None] | None = None,
+) -> tuple[Path, str, Path]:
+    repository, _initial = _repository(path)
+    source_review = (
+        Path(__file__).resolve().parents[1] / "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json"
+    )
+    approved_review = json.loads(source_review.read_text(encoding="utf-8"))
+    review = deepcopy(approved_review)
+    if review_mutator is not None:
+        review_mutator(review)
+    review.pop("record_sha256", None)
+    review["record_sha256"] = canonical_json_sha256(review)
+    review_path = repository / "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json"
+    _write_json(review_path, review)
+
+    wheel = approved_review["distribution"]["wheel"]
+    lock_text = f'''version = 1
+revision = 3
+requires-python = ">=3.11,<3.12"
+
+[[package]]
+name = "nvidia-nccl-cu12"
+version = "2.31.2"
+source = {{ registry = "https://pypi.org/simple" }}
+wheels = [
+    {{ url = "https://files.pythonhosted.org/packages/37/85/b073e54c993cd9f79faa955d7c9bd7356da408935483aebc3cbb53a922ec/nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_aarch64.whl", hash = "sha256:f208de397e431631eab0eca946444404a495d43a007535baa333d7de9e510ca2", size = 342026203, upload-time = "2026-08-11T23:23:40.509Z" }},
+    {{ url = "{wheel["url"]}", hash = "sha256:{wheel["sha256"]}", size = {wheel["size_bytes"]}, upload-time = "2026-08-11T23:24:24.167Z" }},
+]
+
+[[package]]
+name = "xgboost"
+version = "3.2.0"
+source = {{ registry = "https://pypi.org/simple" }}
+dependencies = [
+    {{ name = "nvidia-nccl-cu12", marker = "{EXCEPTION_MARKER}" }},
+]
+'''
+    if lock_mutator is not None:
+        lock_text = lock_mutator(lock_text)
+    lock_path = repository / "uv.lock"
+    lock_path.write_text(lock_text, encoding="utf-8", newline="\n")
+
+    policy_path = _policy(repository / "configs/release/release_gate_policy_v1.json")
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    policy["maximum_blob_size_bytes"] = 8192
+    metadata = approved_review["distribution"]["core_metadata"]
+    embedded = approved_review["distribution"]["embedded_license"]
+    sla = approved_review["official_terms"]["nvidia_software_license_agreement"]
+    bsd = approved_review["official_terms"]["nvidia_bsd_license"]
+    policy["license_exceptions"] = ["nvidia-nccl-cu12@2.31.2"]
+    policy["license_exception_records"] = {
+        "nvidia-nccl-cu12@2.31.2": {
+            "license_expression": "LicenseRef-NVIDIA-Proprietary",
+            "required_by": "xgboost@3.2.0",
+            "dependency_marker": EXCEPTION_MARKER,
+            "platform_system": "Linux",
+            "platform_machine": "x86_64",
+            "scope": ("transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed"),
+            "lock_path": "uv.lock",
+            "lock_sha256": hashlib.sha256(lock_text.encode()).hexdigest(),
+            "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
+            "review_sha256": hashlib.sha256(review_path.read_bytes()).hexdigest(),
+            "review_record_sha256": review["record_sha256"],
+            "wheel_filename": wheel["filename"],
+            "wheel_url": wheel["url"],
+            "wheel_size_bytes": wheel["size_bytes"],
+            "wheel_sha256": wheel["sha256"],
+            "metadata_url": metadata["url"],
+            "metadata_size_bytes": metadata["size_bytes"],
+            "metadata_sha256": metadata["sha256"],
+            "embedded_license_member": embedded["member"],
+            "embedded_license_size_bytes": embedded["size_bytes"],
+            "embedded_license_sha256": embedded["sha256"],
+            "terms_sla_url": sla["url"],
+            "terms_sla_size_bytes": sla["size_bytes"],
+            "terms_sla_sha256": sla["sha256"],
+            "terms_bsd_url": bsd["url"],
+            "terms_bsd_size_bytes": bsd["size_bytes"],
+            "terms_bsd_sha256": bsd["sha256"],
+        }
+    }
+    if policy_mutator is not None:
+        policy_mutator(policy)
+    _write_json(policy_path, policy)
+    _git(repository, "add", ".")
+    _git(repository, "commit", "-m", "candidate exception evidence")
+    return repository, _git(repository, "rev-parse", "HEAD"), policy_path
+
+
+def _exception_inventory(
+    path: Path, *, nccl_license: str = "LicenseRef-NVIDIA-Proprietary"
+) -> Path:
+    _write_json(
+        path,
+        [
+            {"Name": "xgboost", "Version": "3.2.0", "License": "Apache-2.0"},
+            {"Name": "nvidia-nccl-cu12", "Version": "2.31.2", "License": nccl_license},
+        ],
+    )
+    return path
 
 
 def test_git_object_scan_passes_safe_tree_and_binds_complete_history(tmp_path: Path) -> None:
@@ -656,30 +778,626 @@ def test_secret_and_license_attestations_are_version_and_candidate_bound(tmp_pat
             created_at_utc="2026-08-24T12:00:00Z",
         )
 
+    license_repository, license_commit, license_policy = _exception_repository(
+        tmp_path / "license-repository"
+    )
     licenses = tmp_path / "licenses.json"
     _write_json(licenses, [{"Name": "safe", "Version": "1", "License": "MIT"}])
     audit = audit_licenses(
-        repository_root=repository,
+        repository_root=license_repository,
         inventory_path=licenses,
-        candidate_commit=commit,
-        policy_path=policy,
+        candidate_commit=license_commit,
+        policy_path=license_policy,
         pip_licenses_version="5.5.5",
         created_at_utc="2026-08-24T12:00:00Z",
     )
     assert audit["record_kind"] == LICENSE_KIND
     assert audit["status"] == "pass"
+    assert audit["exceptions_applied"] == []
     _write_json(licenses, [{"Name": "unsafe", "Version": "1", "License": "UNKNOWN"}])
     assert (
         audit_licenses(
-            repository_root=repository,
+            repository_root=license_repository,
             inventory_path=licenses,
-            candidate_commit=commit,
-            policy_path=policy,
+            candidate_commit=license_commit,
+            policy_path=license_policy,
             pip_licenses_version="5.5.5",
             created_at_utc="2026-08-24T12:00:00Z",
         )["status"]
         == "fail"
     )
+
+
+def test_nvidia_nccl_exception_is_lock_bound_and_fully_reconstructable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, candidate, policy = _exception_repository(tmp_path / "repository")
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+
+    audit = audit_licenses(
+        repository_root=repository,
+        inventory_path=inventory,
+        candidate_commit=candidate,
+        policy_path=policy,
+        pip_licenses_version="5.5.5",
+        created_at_utc="2026-08-25T12:00:00Z",
+    )
+
+    assert audit["status"] == "pass"
+    assert audit["package_count"] == 2
+    assert [item["identity"] for item in audit["packages"]] == [
+        "nvidia-nccl-cu12@2.31.2",
+        "xgboost@3.2.0",
+    ]
+    assert audit["violations"] == []
+    assert len(audit["exceptions_applied"]) == 1
+    application = audit["exceptions_applied"][0]
+    assert application["required_by"] == "xgboost@3.2.0"
+    assert application["dependency_marker"] == EXCEPTION_MARKER
+    assert application["platform_system"] == "Linux"
+    assert application["platform_machine"] == "x86_64"
+    assert application["wheel_sha256"] == (
+        "f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0"
+    )
+    assert application["metadata_sha256"] == (
+        "ac64882e612ff2e1c4674386c2a662e0e0b6cae12e85ebe789b1608fa7c3a5fd"
+    )
+    validate_license_audit_semantics(
+        audit,
+        root=repository,
+        candidate=candidate,
+        policy=json.loads(policy.read_text(encoding="utf-8")),
+    )
+
+    for applications in ([], [application, application]):
+        fabricated = deepcopy(audit)
+        fabricated["exceptions_applied"] = applications
+        fabricated.pop("record_sha256")
+        fabricated["record_sha256"] = canonical_json_sha256(fabricated)
+        with pytest.raises(ReleaseGateError):
+            validate_license_audit_semantics(
+                fabricated,
+                root=repository,
+                candidate=candidate,
+                policy=json.loads(policy.read_text(encoding="utf-8")),
+            )
+
+    dropped = deepcopy(audit)
+    dropped["packages"] = [
+        {"identity": "safe@1", "package": "safe", "version": "1", "license": "MIT"}
+    ]
+    dropped["package_count"] = 1
+    dropped["normalized_inventory_sha256"] = hashlib.sha256(b"safe\t1\tMIT\n").hexdigest()
+    dropped["exceptions_applied"] = []
+    dropped["violations"] = []
+    dropped["status"] = "pass"
+    dropped.pop("record_sha256")
+    dropped["record_sha256"] = canonical_json_sha256(dropped)
+    with pytest.raises(ReleaseGateError, match="both be inventoried"):
+        validate_license_audit_semantics(
+            dropped,
+            root=repository,
+            candidate=candidate,
+            policy=json.loads(policy.read_text(encoding="utf-8")),
+        )
+
+
+def test_nvidia_nccl_exception_rejects_duplicate_missing_parent_and_wrong_license(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, candidate, policy = _exception_repository(tmp_path / "repository")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    duplicate = tmp_path / "duplicate.json"
+    package = {
+        "Name": "nvidia-nccl-cu12",
+        "Version": "2.31.2",
+        "License": "LicenseRef-NVIDIA-Proprietary",
+    }
+    _write_json(
+        duplicate,
+        [
+            {"Name": "xgboost", "Version": "3.2.0", "License": "Apache-2.0"},
+            package,
+            package,
+        ],
+    )
+    with pytest.raises(ReleaseGateError, match="duplicated"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=duplicate,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+    missing_parent = tmp_path / "missing-parent.json"
+    _write_json(missing_parent, [package])
+    with pytest.raises(ReleaseGateError, match="both be inventoried"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=missing_parent,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+    wrong_license = _exception_inventory(
+        tmp_path / "wrong-license.json", nccl_license="LicenseRef-Other-Proprietary"
+    )
+    with pytest.raises(ReleaseGateError, match="licence differs"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=wrong_license,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_does_not_apply_on_another_architecture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    repository, candidate, policy = _exception_repository(tmp_path / "repository")
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "aarch64"
+    )
+
+    audit = audit_licenses(
+        repository_root=repository,
+        inventory_path=inventory,
+        candidate_commit=candidate,
+        policy_path=policy,
+        pip_licenses_version="5.5.5",
+        created_at_utc="2026-08-25T12:00:00Z",
+    )
+
+    assert audit["status"] == "fail"
+    assert audit["exceptions_applied"] == []
+    assert audit["violations"] == [
+        {
+            "package": "nvidia-nccl-cu12",
+            "version": "2.31.2",
+            "license": "LicenseRef-NVIDIA-Proprietary",
+        }
+    ]
+
+
+@pytest.mark.parametrize(
+    ("needle", "replacement"),
+    [
+        ("sys_platform == 'linux'", "sys_platform == 'darwin'"),
+        (
+            "f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0",
+            "0" * 64,
+        ),
+        ("size = 342105414", "size = 342105413"),
+        ("size = 342105414", "size = 342105414.0"),
+        ("size = 342026203", "size = 342026203.0"),
+        ("https://files.pythonhosted.org/packages/", "https://example.invalid/packages/"),
+        ('version = "3.2.0"', 'version = "3.2.1"'),
+        (
+            'name = "xgboost"\nversion = "3.2.0"\nsource = { registry = '
+            '"https://pypi.org/simple" }',
+            'name = "xgboost"\nversion = "3.2.0"\nsource = { registry = '
+            '"https://example.invalid/simple" }',
+        ),
+    ],
+)
+def test_nvidia_nccl_exception_rejects_mutated_candidate_lock(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    needle: str,
+    replacement: str,
+) -> None:
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository",
+        lock_mutator=lambda text: text.replace(needle, replacement, 1),
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_additional_compatible_wheel(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extra_wheel = (
+        '    { url = "https://files.pythonhosted.org/packages/00/00/'
+        'nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl", '
+        'hash = "sha256:' + "0" * 64 + '", size = 342105415, '
+        'upload-time = "2026-08-12T00:00:00Z" },\n'
+    )
+
+    def mutate_lock(text: str) -> str:
+        boundary = ']\n\n[[package]]\nname = "xgboost"'
+        return text.replace(boundary, f"{extra_wheel}{boundary}", 1)
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", lock_mutator=mutate_lock
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="exact reviewed package stanza"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+@pytest.mark.parametrize(
+    "additional_package",
+    [
+        """
+[[package]]
+name = "inclusive-shift-har"
+version = "0.1.4a0"
+source = { editable = "." }
+dependencies = [
+    { name = "nvidia_nccl.cu12" },
+]
+""",
+        """
+[[package]]
+name = "other-parent"
+version = "1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "nvidia-nccl-cu12" },
+]
+""",
+    ],
+)
+def test_nvidia_nccl_exception_rejects_additional_inbound_edge(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    additional_package: str,
+) -> None:
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", lock_mutator=lambda text: text + additional_package
+    )
+    inventory = tmp_path / "licenses.json"
+    _write_json(
+        inventory,
+        [
+            {"Name": "xgboost", "Version": "3.2.0", "License": "Apache-2.0"},
+            {
+                "Name": "nvidia-nccl-cu12",
+                "Version": "2.31.2",
+                "License": "LicenseRef-NVIDIA-Proprietary",
+            },
+            {"Name": "other-parent", "Version": "1", "License": "MIT"},
+        ],
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="reviewed exception edge"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+@pytest.mark.parametrize(
+    ("path", "replacement"),
+    [
+        (("distribution", "core_metadata", "sha256"), "1" * 64),
+        (("distribution", "embedded_license", "sha256"), "2" * 64),
+        (
+            ("official_terms", "nvidia_software_license_agreement", "url"),
+            "https://example.invalid/nccl/sla.html",
+        ),
+        (("distribution", "wheel", "filename"), "unreviewed.whl"),
+        (("controls", "repository_redistributes_wheel"), 0),
+    ],
+)
+def test_nvidia_nccl_exception_rejects_rehashed_review_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    path: tuple[str, ...],
+    replacement: Any,
+) -> None:
+    def mutate_review(review: dict[str, Any]) -> None:
+        target: dict[str, Any] = review
+        for key in path[:-1]:
+            target = target[key]
+        target[path[-1]] = replacement
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", review_mutator=mutate_review
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="provenance differs"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_rehashed_review_identity_substitution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def mutate_review(review: dict[str, Any]) -> None:
+        review["identity"] = "other-package@9"
+        review["package"]["name"] = "other-package"
+        review["package"]["version"] = "9"
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", review_mutator=mutate_review
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="provenance differs"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_coordinated_identity_substitution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def mutate_review(review: dict[str, Any]) -> None:
+        review["identity"] = "other-package@9"
+        review["package"]["name"] = "other-package"
+        review["package"]["version"] = "9"
+
+    def mutate_policy(policy: dict[str, Any]) -> None:
+        records = policy["license_exception_records"]
+        records["other-package@9"] = records.pop("nvidia-nccl-cu12@2.31.2")
+        policy["license_exceptions"] = ["other-package@9"]
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository",
+        lock_mutator=lambda text: text.replace("nvidia-nccl-cu12", "other-package"),
+        review_mutator=mutate_review,
+        policy_mutator=mutate_policy,
+    )
+    inventory = tmp_path / "licenses.json"
+    _write_json(
+        inventory,
+        [
+            {"Name": "xgboost", "Version": "3.2.0", "License": "Apache-2.0"},
+            {
+                "Name": "other-package",
+                "Version": "9",
+                "License": "LicenseRef-NVIDIA-Proprietary",
+            },
+        ],
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="exact reviewed NCCL exception"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_coordinated_parent_and_marker_substitution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    replacement_marker = "sys_platform == 'linux'"
+
+    def mutate_review(review: dict[str, Any]) -> None:
+        review["dependency"]["required_by"] = "other-parent@1"
+        review["dependency"]["marker"] = replacement_marker
+
+    def mutate_policy(policy: dict[str, Any]) -> None:
+        record = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]
+        record["required_by"] = "other-parent@1"
+        record["dependency_marker"] = replacement_marker
+
+    def mutate_lock(text: str) -> str:
+        return (
+            text.replace('name = "xgboost"', 'name = "other-parent"')
+            .replace('version = "3.2.0"', 'version = "1"')
+            .replace(EXCEPTION_MARKER, replacement_marker)
+        )
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository",
+        lock_mutator=mutate_lock,
+        review_mutator=mutate_review,
+        policy_mutator=mutate_policy,
+    )
+    inventory = tmp_path / "licenses.json"
+    _write_json(
+        inventory,
+        [
+            {"Name": "other-parent", "Version": "1", "License": "Apache-2.0"},
+            {
+                "Name": "nvidia-nccl-cu12",
+                "Version": "2.31.2",
+                "License": "LicenseRef-NVIDIA-Proprietary",
+            },
+        ],
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="exact reviewed NCCL exception"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_removal_with_weakened_license_tokens(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def mutate_policy(policy: dict[str, Any]) -> None:
+        policy["license_exceptions"] = []
+        policy["license_exception_records"] = {}
+        policy["prohibited_license_tokens"].remove("proprietary")
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", policy_mutator=mutate_policy
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="exact reviewed NCCL exception"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+def test_nvidia_nccl_exception_rejects_weakened_license_tokens_alone(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def mutate_policy(policy: dict[str, Any]) -> None:
+        policy["prohibited_license_tokens"].remove("proprietary")
+
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", policy_mutator=mutate_policy
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError, match="exact reviewed set"):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
+
+
+@pytest.mark.parametrize(
+    "policy_mutator",
+    [
+        lambda value: value["license_exception_records"]["nvidia-nccl-cu12@2.31.2"].pop(
+            "review_path"
+        ),
+        lambda value: value["license_exception_records"]["nvidia-nccl-cu12@2.31.2"].update(
+            {"platform_machine": "aarch64"}
+        ),
+        lambda value: value["license_exception_records"]["nvidia-nccl-cu12@2.31.2"].update(
+            {"terms_bsd_url": "https://example.invalid/bsd.html"}
+        ),
+    ],
+)
+def test_nvidia_nccl_exception_rejects_broadened_or_incomplete_policy(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    policy_mutator: Callable[[dict[str, Any]], None],
+) -> None:
+    repository, candidate, policy = _exception_repository(
+        tmp_path / "repository", policy_mutator=policy_mutator
+    )
+    inventory = _exception_inventory(tmp_path / "licenses.json")
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    with pytest.raises(ReleaseGateError):
+        audit_licenses(
+            repository_root=repository,
+            inventory_path=inventory,
+            candidate_commit=candidate,
+            policy_path=policy,
+            pip_licenses_version="5.5.5",
+            created_at_utc="2026-08-25T12:00:00Z",
+        )
 
 
 def test_tracked_report_is_truthfully_pending_and_rejects_self_rehashed_overclaim(
@@ -733,16 +1451,24 @@ def test_tracked_report_is_truthfully_pending_and_rejects_self_rehashed_overclai
     assert "overstates" in validation["errors"][0]
 
 
-def test_exact_candidate_attestation_revalidates_every_pinned_gate(tmp_path: Path) -> None:
-    repository, parent = _repository(tmp_path / "repository")
-    policy = _policy(repository / "configs/release/release_gate_policy_v1.json")
-    _git(repository, "add", "configs/release/release_gate_policy_v1.json")
+def test_exact_candidate_attestation_revalidates_every_pinned_gate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: "Linux"
+    )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: "x86_64"
+    )
+    repository, parent, policy = _exception_repository(tmp_path / "repository")
+    (repository / "README.md").write_text("# release candidate\n", encoding="utf-8")
+    _git(repository, "add", "README.md")
     staged = scan_index(
         repository_root=repository,
         policy_path=policy,
         created_at_utc="2026-08-24T11:59:00Z",
     )
-    _git(repository, "commit", "-m", "release policy")
+    _git(repository, "commit", "-m", "release candidate")
     candidate = _git(repository, "rev-parse", "HEAD")
     evidence_root = repository / ".audit/release-attestations" / candidate
     evidence_root.mkdir(parents=True)
@@ -818,7 +1544,7 @@ def test_exact_candidate_attestation_revalidates_every_pinned_gate(tmp_path: Pat
         ),
     )
     raw_licenses = evidence_root / "licenses.json"
-    _write_json(raw_licenses, [{"Name": "safe", "Version": "1", "License": "MIT"}])
+    _exception_inventory(raw_licenses)
     license_path = evidence_root / "license_audit.json"
     _write_json(
         license_path,
@@ -848,7 +1574,7 @@ def test_exact_candidate_attestation_revalidates_every_pinned_gate(tmp_path: Pat
             evidence_root=evidence_root,
             created_at_utc="2026-08-24T12:00:03Z",
         )
-    (repository / "README.md").write_text("# safe\n", encoding="utf-8")
+    (repository / "README.md").write_text("# release candidate\n", encoding="utf-8")
 
     evidence_paths = {
         "staged_index_scan": staged_path,

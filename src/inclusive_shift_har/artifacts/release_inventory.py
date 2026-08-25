@@ -24,6 +24,7 @@ from inclusive_shift_har.artifacts.release_gate import (
     SECRET_SCAN_SCOPE,
     ReleaseGateError,
     inspect_git_ref_state,
+    validate_license_audit_semantics,
 )
 from inclusive_shift_har.manifests.canonical import (
     atomic_write_json_new,
@@ -229,8 +230,11 @@ NON_CI_GATE_RECORD_KEYS = {
         "pip_licenses_version",
         "policy",
         "inventory",
+        "audit_environment",
+        "packages",
         "package_count",
         "normalized_inventory_sha256",
+        "exceptions_applied",
         "violations",
         "record_sha256",
     },
@@ -1716,6 +1720,17 @@ def _validate_non_ci_gate_record(
             record.get("normalized_inventory_sha256"),
             name="license_audit normalized_inventory_sha256",
         )
+        try:
+            validate_license_audit_semantics(
+                record,
+                root=repository_root,
+                candidate=commit,
+                policy=policy,
+            )
+        except ReleaseGateError as exc:
+            raise ReleaseEvidenceError(
+                "license_audit exceptions differ from the release policy"
+            ) from exc
     return expected_kind, record_hash
 
 

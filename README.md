@@ -35,9 +35,14 @@ of conflicting `uv` frozen/locked options. `benchmark-v0.1.1` and run
 `32801378375` are also preserved: hosted `uv` rejected its empty environment
 override as a non-boolish value. `benchmark-v0.1.2` and run `32802922698` are
 preserved after its Ubuntu validation job passed but Windows exposed CRLF
-conversion in six byte-hash integrity tests. The pending byte-preserving
-cross-platform candidate is `benchmark-v0.1.3`; no earlier tag or failure is
-rewritten.
+conversion in six byte-hash integrity tests. `benchmark-v0.1.3` and run
+`32811935288` are preserved after both operating-system matrices passed and the
+release-security job identified the Linux XGBoost-transitive
+`nvidia-nccl-cu12==2.31.2` licence declaration. The pending
+`benchmark-v0.1.4` candidate binds that one dependency to the exact Linux
+x86-64 wheel, XGBoost edge, `uv.lock`, PyPI metadata, embedded licence file,
+and the archived NVIDIA pages with their path/content version discrepancy;
+no earlier tag or failure is rewritten.
 
 ## Post-confirmatory findings
 
@@ -102,6 +107,8 @@ Raw third-party data, the coursework ZIP, secrets, and large checkpoints are exc
 ## Environment and commands
 
 The project targets CPython 3.11 and uses `uv`. Neural training and inference in the reported suite used an NVIDIA RTX PRO 3000 Blackwell Laptop GPU with PyTorch 2.12.0+cu132. Recurrent models retained CUDA tensors while disabling cuDNN after preserved Windows cuDNN crash records; neural CPU fallback was not used. Classical scikit-learn models use their native CPU implementations, and XGBoost training used CUDA.
+
+On Linux, XGBoost 3.2.0 resolves `nvidia-nccl-cu12==2.31.2`. PyPI metadata declares `LicenseRef-NVIDIA-Proprietary`, while the wheel contains BSD 3-Clause text. The repository records both observations without replacing one with the other. The exception permits only a local, transitive runtime install: repository files, release assets, and container images do not vendor or redistribute the wheel. The exact wheel, metadata, and embedded-licence hashes are in [`docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json`](docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json). That review also records that NVIDIA's `nccl_2312` archive URLs render a 2.29.2 page label, so those page bytes are supplementary rather than represented as distribution-specific 2.31.2 text.
 
 ```powershell
 uv sync --extra training-cuda --group research

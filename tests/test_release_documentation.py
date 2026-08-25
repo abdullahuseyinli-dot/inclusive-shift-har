@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -9,6 +10,7 @@ from inclusive_shift_har.artifacts.release_inventory import (
     POSTCONFIRMATORY_TRACKS,
     REQUIRED_ROLES,
 )
+from inclusive_shift_har.manifests.canonical import canonical_json_sha256
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -75,7 +77,7 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         "outer-bundle offline reconstruction",
         "Outer-bundle Gitleaks scan failed",
         "assets.Count -ne 2",
-        "gh release edit benchmark-v0.1.3",
+        "gh release edit benchmark-v0.1.4",
         "--draft=false --prerelease --latest=false",
         "published-release-api.json",
         "Published downloaded asset differs",
@@ -85,11 +87,49 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         assert expected in text
     assert 'Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi' in text
     assert (
-        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.3" $publishedApi'
+        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.4" $publishedApi'
         in text
     )
     assert "Set-Content -LiteralPath $draftApi" not in text
     assert "Set-Content -LiteralPath $publishedApi" not in text
+
+
+def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_root: Path) -> None:
+    review_path = repository_root / "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json"
+    review = _load(review_path)
+    record_hash = review.pop("record_sha256")
+    assert record_hash == canonical_json_sha256(review)
+    assert review["review_date"] == "2026-08-25"
+    assert "reviewed_at_utc" not in review
+    assert all(type(value) is bool for value in review["controls"].values())
+    assert {item["rendered_content_version"] for item in review["official_terms"].values()} == {
+        "2.29.2"
+    }
+    assert any("supplementary terms evidence" in item for item in review["review_findings"])
+
+    policy = _load(repository_root / "configs/release/release_gate_policy_v1.json")
+    exception = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]
+    assert exception["review_record_sha256"] == record_hash
+    assert exception["review_sha256"] == hashlib.sha256(review_path.read_bytes()).hexdigest()
+    assert (
+        exception["lock_sha256"]
+        == hashlib.sha256((repository_root / "uv.lock").read_bytes()).hexdigest()
+    )
+
+
+def test_prominent_documents_use_evidence_status_instead_of_generic_disclaimers(
+    repository_root: Path,
+) -> None:
+    generic_heading = "## Claim " + "limits"
+    for relative in (
+        "README.md",
+        "docs/PROJECT_STATUS.md",
+        "docs/BENCHMARK_CARD.md",
+        "docs/MODEL_CARD_MORE_HAR.md",
+        "paper/OUTLINE.md",
+    ):
+        text = (repository_root / relative).read_text(encoding="utf-8")
+        assert generic_heading not in text
 
 
 def test_data_acquisition_runbook_pins_official_layout(repository_root: Path) -> None:

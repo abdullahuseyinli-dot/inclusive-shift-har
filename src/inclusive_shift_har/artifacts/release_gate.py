@@ -11,9 +11,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import platform
 import re
 import subprocess
 import sys
+import tomllib
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
@@ -35,6 +37,89 @@ COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
 TAG_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
+PACKAGE_IDENTITY_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*@[a-z0-9][a-z0-9.+_-]*$")
+LICENSE_EXCEPTION_SCOPE = (
+    "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed"
+)
+LICENSE_REVIEW_KIND = "dependency_license_exception_review"
+LICENSE_REVIEW_STATUS = "approved_for_nonredistributed_transitive_runtime_only"
+NCCL_EXCEPTION_IDENTITY = "nvidia-nccl-cu12@2.31.2"
+NCCL_EXCEPTION_REQUIRED_BY = "xgboost@3.2.0"
+NCCL_EXCEPTION_LICENSE = "LicenseRef-NVIDIA-Proprietary"
+NCCL_EXCEPTION_MARKER = (
+    "sys_platform == 'linux' or (extra == 'extra-19-inclusive-shift-har-training-cpu' "
+    "and extra == 'extra-19-inclusive-shift-har-training-cuda')"
+)
+PROHIBITED_LICENSE_TOKENS_V1 = (
+    "affero general public license",
+    "agpl",
+    "commercial",
+    "general public license",
+    "gpl",
+    "proprietary",
+    "unknown",
+)
+NCCL_EXCEPTION_V1_POLICY_VALUES: dict[str, str | int] = {
+    "license_expression": NCCL_EXCEPTION_LICENSE,
+    "required_by": NCCL_EXCEPTION_REQUIRED_BY,
+    "dependency_marker": NCCL_EXCEPTION_MARKER,
+    "platform_system": "Linux",
+    "platform_machine": "x86_64",
+    "scope": LICENSE_EXCEPTION_SCOPE,
+    "lock_path": "uv.lock",
+    "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
+    "wheel_filename": "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl",
+    "wheel_url": (
+        "https://files.pythonhosted.org/packages/0f/36/"
+        "104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/"
+        "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl"
+    ),
+    "wheel_size_bytes": 342105414,
+    "wheel_sha256": "f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0",
+    "metadata_url": (
+        "https://files.pythonhosted.org/packages/0f/36/"
+        "104de52d6368f5b7f886e8fd252e0a438fe73a215e59b1b47f93a80ae2ea/"
+        "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_x86_64.whl.metadata"
+    ),
+    "metadata_size_bytes": 2097,
+    "metadata_sha256": "ac64882e612ff2e1c4674386c2a662e0e0b6cae12e85ebe789b1608fa7c3a5fd",
+    "embedded_license_member": "nvidia_nccl_cu12-2.31.2.dist-info/licenses/License.txt",
+    "embedded_license_size_bytes": 1895,
+    "embedded_license_sha256": ("0f0174a6b4e0b33ac26375bf729533075b32f4c51a5b6802a3d742d7dcdc9a76"),
+    "terms_sla_url": (
+        "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/sla/index.html"
+    ),
+    "terms_sla_size_bytes": 95492,
+    "terms_sla_sha256": "77e3db074f479b97051023bb8d9c06e1212a88375827f948eb869c73873e9052",
+    "terms_bsd_url": (
+        "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/bsd/index.html"
+    ),
+    "terms_bsd_size_bytes": 23224,
+    "terms_bsd_sha256": "d6e509a646b74aa552a17d1e864ca2d00d1cf34d975be6567a40431d4f0ec297",
+}
+NCCL_EXCEPTION_V1_LOCK_PACKAGE: dict[str, Any] = {
+    "name": "nvidia-nccl-cu12",
+    "version": "2.31.2",
+    "source": {"registry": "https://pypi.org/simple"},
+    "wheels": [
+        {
+            "url": (
+                "https://files.pythonhosted.org/packages/37/85/"
+                "b073e54c993cd9f79faa955d7c9bd7356da408935483aebc3cbb53a922ec/"
+                "nvidia_nccl_cu12-2.31.2-py3-none-manylinux_2_18_aarch64.whl"
+            ),
+            "hash": "sha256:f208de397e431631eab0eca946444404a495d43a007535baa333d7de9e510ca2",
+            "size": 342026203,
+            "upload-time": "2026-08-11T23:23:40.509Z",
+        },
+        {
+            "url": NCCL_EXCEPTION_V1_POLICY_VALUES["wheel_url"],
+            "hash": f"sha256:{NCCL_EXCEPTION_V1_POLICY_VALUES['wheel_sha256']}",
+            "size": NCCL_EXCEPTION_V1_POLICY_VALUES["wheel_size_bytes"],
+            "upload-time": "2026-08-11T23:24:24.167Z",
+        },
+    ],
+}
 MAX_EVIDENCE_BYTES = 16 * 1024 * 1024
 MAX_TAG_OBJECT_BYTES = 64 * 1024
 TRACKED_GATE_NAMES = (
@@ -108,6 +193,24 @@ def _exact_keys(value: Mapping[str, Any], expected: set[str], *, name: str) -> N
         )
 
 
+def _exact_typed_structure(value: Any, expected: Any) -> bool:
+    """Compare nested release-policy values without Python's bool/int/float coercions."""
+
+    if type(value) is not type(expected):
+        return False
+    if isinstance(expected, dict):
+        return set(value) == set(expected) and all(
+            _exact_typed_structure(value[key], expected_value)
+            for key, expected_value in expected.items()
+        )
+    if isinstance(expected, list):
+        return len(value) == len(expected) and all(
+            _exact_typed_structure(observed, pinned)
+            for observed, pinned in zip(value, expected, strict=True)
+        )
+    return bool(value == expected)
+
+
 def _array(value: Any, *, name: str) -> list[Any]:
     if not isinstance(value, list):
         raise ReleaseGateError(f"{name} must be an array")
@@ -118,6 +221,12 @@ def _text(value: Any, *, name: str) -> str:
     if not isinstance(value, str) or not value:
         raise ReleaseGateError(f"{name} must be a non-empty string")
     return value
+
+
+def _canonical_package_name(value: Any, *, name: str) -> str:
+    """Return the PEP 503 comparison form for a validated package name."""
+
+    return re.sub(r"[-_.]+", "-", _text(value, name=name)).casefold()
 
 
 def _commit(value: Any, *, name: str = "commit") -> str:
@@ -132,6 +241,834 @@ def _sha256(value: Any, *, name: str) -> str:
     if SHA256_RE.fullmatch(result) is None:
         raise ReleaseGateError(f"{name} must be a lowercase SHA-256")
     return result
+
+
+def license_exception_policy(policy: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    """Return exact, candidate-verifiable dependency-licence exception records."""
+
+    identities: list[str] = []
+    for index, raw_identity in enumerate(
+        _array(policy.get("license_exceptions"), name="license exceptions")
+    ):
+        identity = _text(raw_identity, name=f"license exception[{index}]")
+        if identity != identity.casefold() or PACKAGE_IDENTITY_RE.fullmatch(identity) is None:
+            raise ReleaseGateError(
+                "license exceptions must be canonical lowercase package@version IDs"
+            )
+        identities.append(identity)
+    if len(identities) != len(set(identities)):
+        raise ReleaseGateError("license exceptions contain duplicates")
+    if identities != [NCCL_EXCEPTION_IDENTITY]:
+        raise ReleaseGateError("release policy v1 permits only the exact reviewed NCCL exception")
+
+    raw_records = policy.get("license_exception_records")
+    if raw_records is None:
+        if identities:
+            raise ReleaseGateError("every license exception requires a documented policy record")
+        return {}
+    records: dict[str, dict[str, Any]] = {}
+    for raw_identity, raw_record in _mapping(raw_records, name="license exception records").items():
+        identity = _text(raw_identity, name="license exception record identity")
+        if identity != identity.casefold() or PACKAGE_IDENTITY_RE.fullmatch(identity) is None:
+            raise ReleaseGateError(
+                "license exception record keys must be canonical lowercase package@version IDs"
+            )
+        record = _mapping(raw_record, name=f"license exception record {identity}")
+        _exact_keys(
+            record,
+            {
+                "license_expression",
+                "required_by",
+                "dependency_marker",
+                "platform_system",
+                "platform_machine",
+                "scope",
+                "lock_path",
+                "lock_sha256",
+                "review_path",
+                "review_sha256",
+                "review_record_sha256",
+                "wheel_filename",
+                "wheel_url",
+                "wheel_size_bytes",
+                "wheel_sha256",
+                "metadata_url",
+                "metadata_size_bytes",
+                "metadata_sha256",
+                "embedded_license_member",
+                "embedded_license_size_bytes",
+                "embedded_license_sha256",
+                "terms_sla_url",
+                "terms_sla_size_bytes",
+                "terms_sla_sha256",
+                "terms_bsd_url",
+                "terms_bsd_size_bytes",
+                "terms_bsd_sha256",
+            },
+            name=f"license exception record {identity}",
+        )
+        required_by = _text(
+            record.get("required_by"), name=f"license exception record {identity} required_by"
+        )
+        dependency_marker = _text(
+            record.get("dependency_marker"),
+            name=f"license exception record {identity} dependency_marker",
+        )
+        platform_system = _text(
+            record.get("platform_system"),
+            name=f"license exception record {identity} platform_system",
+        )
+        platform_machine = _text(
+            record.get("platform_machine"),
+            name=f"license exception record {identity} platform_machine",
+        )
+        scope = _text(record.get("scope"), name=f"license exception record {identity} scope")
+        lock_path = _safe_relative(
+            record.get("lock_path"), name=f"license exception record {identity} lock_path"
+        )
+        review_path = _safe_relative(
+            record.get("review_path"), name=f"license exception record {identity} review_path"
+        )
+        if (
+            required_by != required_by.casefold()
+            or PACKAGE_IDENTITY_RE.fullmatch(required_by) is None
+            or platform_system != "Linux"
+            or platform_machine != "x86_64"
+            or scope != LICENSE_EXCEPTION_SCOPE
+            or lock_path != "uv.lock"
+            or not review_path.startswith("docs/release/")
+            or any(
+                ord(character) < 32 or ord(character) == 127
+                for value in (dependency_marker, scope)
+                for character in value
+            )
+        ):
+            raise ReleaseGateError(f"license exception record {identity} is not narrowly scoped")
+        records[identity] = {
+            "license_expression": _text(
+                record.get("license_expression"),
+                name=f"license exception record {identity} license_expression",
+            ),
+            "required_by": required_by,
+            "dependency_marker": dependency_marker,
+            "platform_system": platform_system,
+            "platform_machine": platform_machine,
+            "scope": scope,
+            "lock_path": lock_path,
+            "lock_sha256": _sha256(
+                record.get("lock_sha256"),
+                name=f"license exception record {identity} lock_sha256",
+            ),
+            "review_path": review_path,
+            "review_sha256": _sha256(
+                record.get("review_sha256"),
+                name=f"license exception record {identity} review_sha256",
+            ),
+            "review_record_sha256": _sha256(
+                record.get("review_record_sha256"),
+                name=f"license exception record {identity} review_record_sha256",
+            ),
+            "wheel_filename": _text(
+                record.get("wheel_filename"),
+                name=f"license exception record {identity} wheel_filename",
+            ),
+            "wheel_url": _text(
+                record.get("wheel_url"),
+                name=f"license exception record {identity} wheel_url",
+            ),
+            "wheel_size_bytes": _exact_integer(
+                record.get("wheel_size_bytes"),
+                name=f"license exception record {identity} wheel_size_bytes",
+                minimum=1,
+            ),
+            "wheel_sha256": _sha256(
+                record.get("wheel_sha256"),
+                name=f"license exception record {identity} wheel_sha256",
+            ),
+            "metadata_url": _text(
+                record.get("metadata_url"),
+                name=f"license exception record {identity} metadata_url",
+            ),
+            "metadata_size_bytes": _exact_integer(
+                record.get("metadata_size_bytes"),
+                name=f"license exception record {identity} metadata_size_bytes",
+                minimum=1,
+            ),
+            "metadata_sha256": _sha256(
+                record.get("metadata_sha256"),
+                name=f"license exception record {identity} metadata_sha256",
+            ),
+            "embedded_license_member": _safe_relative(
+                record.get("embedded_license_member"),
+                name=f"license exception record {identity} embedded_license_member",
+            ),
+            "embedded_license_size_bytes": _exact_integer(
+                record.get("embedded_license_size_bytes"),
+                name=f"license exception record {identity} embedded_license_size_bytes",
+                minimum=1,
+            ),
+            "embedded_license_sha256": _sha256(
+                record.get("embedded_license_sha256"),
+                name=f"license exception record {identity} embedded_license_sha256",
+            ),
+            "terms_sla_url": _text(
+                record.get("terms_sla_url"),
+                name=f"license exception record {identity} terms_sla_url",
+            ),
+            "terms_sla_size_bytes": _exact_integer(
+                record.get("terms_sla_size_bytes"),
+                name=f"license exception record {identity} terms_sla_size_bytes",
+                minimum=1,
+            ),
+            "terms_sla_sha256": _sha256(
+                record.get("terms_sla_sha256"),
+                name=f"license exception record {identity} terms_sla_sha256",
+            ),
+            "terms_bsd_url": _text(
+                record.get("terms_bsd_url"),
+                name=f"license exception record {identity} terms_bsd_url",
+            ),
+            "terms_bsd_size_bytes": _exact_integer(
+                record.get("terms_bsd_size_bytes"),
+                name=f"license exception record {identity} terms_bsd_size_bytes",
+                minimum=1,
+            ),
+            "terms_bsd_sha256": _sha256(
+                record.get("terms_bsd_sha256"),
+                name=f"license exception record {identity} terms_bsd_sha256",
+            ),
+        }
+        bound = records[identity]
+        if (
+            identity != NCCL_EXCEPTION_IDENTITY
+            or any(
+                bound.get(key) != expected
+                for key, expected in NCCL_EXCEPTION_V1_POLICY_VALUES.items()
+            )
+            or not str(bound["wheel_url"]).startswith("https://files.pythonhosted.org/packages/")
+            or str(bound["wheel_url"]).rsplit("/", 1)[-1] != bound["wheel_filename"]
+            or bound["metadata_url"] != f"{bound['wheel_url']}.metadata"
+            or bound["terms_sla_url"]
+            != "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/sla/index.html"
+            or bound["terms_bsd_url"]
+            != "https://docs.nvidia.com/deeplearning/nccl/archives/nccl_2312/bsd/index.html"
+        ):
+            raise ReleaseGateError(
+                f"license exception record {identity} does not match the exact reviewed NCCL exception"
+            )
+    if set(records) != set(identities):
+        raise ReleaseGateError("license exception IDs and documented records differ")
+    return records
+
+
+def _candidate_blob_with_sha256(
+    root: Path, candidate: str, *, path: str, digest: str, name: str
+) -> bytes:
+    return _git_blob_payload(
+        root,
+        candidate,
+        {"path": path, "size_bytes": 0, "file_sha256": digest},
+        name=name,
+    )
+
+
+def _validated_license_review(
+    value: Mapping[str, Any], *, expected_identity: str, exception: Mapping[str, Any]
+) -> dict[str, Any]:
+    _exact_keys(
+        value,
+        {
+            "schema_version",
+            "record_kind",
+            "status",
+            "review_date",
+            "retrieval_date",
+            "identity",
+            "package",
+            "dependency",
+            "platform",
+            "scope",
+            "distribution",
+            "official_terms",
+            "review_findings",
+            "controls",
+            "verification_method",
+            "record_sha256",
+        },
+        name="dependency licence exception review",
+    )
+    record_sha256 = _verify_self_hash(value, name="dependency licence exception review")
+    package = _mapping(value.get("package"), name="licence review package")
+    dependency = _mapping(value.get("dependency"), name="licence review dependency")
+    reviewed_platform = _mapping(value.get("platform"), name="licence review platform")
+    distribution = _mapping(value.get("distribution"), name="licence review distribution")
+    wheel = _mapping(distribution.get("wheel"), name="licence review wheel")
+    metadata = _mapping(distribution.get("core_metadata"), name="licence review metadata")
+    embedded = _mapping(
+        distribution.get("embedded_license"), name="licence review embedded licence"
+    )
+    terms = _mapping(value.get("official_terms"), name="licence review official terms")
+    sla = _mapping(terms.get("nvidia_software_license_agreement"), name="licence review NVIDIA SLA")
+    bsd = _mapping(terms.get("nvidia_bsd_license"), name="licence review NVIDIA BSD terms")
+    controls = _mapping(value.get("controls"), name="licence review controls")
+    method = _mapping(value.get("verification_method"), name="licence review method")
+    for item, expected_keys, item_name in (
+        (
+            package,
+            {"name", "version", "source_registry", "metadata_license_expression"},
+            "licence review package",
+        ),
+        (dependency, {"required_by", "marker"}, "licence review dependency"),
+        (reviewed_platform, {"system", "machine"}, "licence review platform"),
+        (wheel, {"filename", "url", "size_bytes", "sha256"}, "licence review wheel"),
+        (
+            metadata,
+            {"url", "size_bytes", "sha256", "license_expression"},
+            "licence review metadata",
+        ),
+        (
+            embedded,
+            {"member", "size_bytes", "sha256", "classification"},
+            "licence review embedded licence",
+        ),
+        (
+            sla,
+            {"url", "size_bytes", "sha256", "last_modified", "rendered_content_version"},
+            "licence review NVIDIA SLA",
+        ),
+        (
+            bsd,
+            {"url", "size_bytes", "sha256", "last_modified", "rendered_content_version"},
+            "licence review NVIDIA BSD terms",
+        ),
+    ):
+        _exact_keys(item, expected_keys, name=item_name)
+    _exact_keys(
+        distribution,
+        {"wheel", "core_metadata", "embedded_license", "wheel_member_count"},
+        name="licence review distribution",
+    )
+    _exact_keys(
+        terms,
+        {"nvidia_software_license_agreement", "nvidia_bsd_license"},
+        name="licence review official terms",
+    )
+    expected_controls = {
+        "repository_redistributes_wheel": False,
+        "release_assets_redistribute_wheel": False,
+        "container_images_may_vendor_wheel": False,
+        "third_party_terms_apply_to_local_installation": True,
+        "exception_changes_repository_code_license": False,
+    }
+    _exact_keys(controls, set(expected_controls), name="licence review controls")
+    _exact_keys(
+        method,
+        {"wheel", "core_metadata", "embedded_license", "official_terms"},
+        name="licence review method",
+    )
+    identity = _text(value.get("identity"), name="licence review identity")
+    package_name, package_version = identity.rsplit("@", 1)
+    wheel_filename = _text(wheel.get("filename"), name="licence review wheel filename")
+    wheel_url = _text(wheel.get("url"), name="licence review wheel URL")
+    metadata_url = _text(metadata.get("url"), name="licence review metadata URL")
+    sla_url = _text(sla.get("url"), name="licence review NVIDIA SLA URL")
+    bsd_url = _text(bsd.get("url"), name="licence review NVIDIA BSD URL")
+    findings = [
+        _text(item, name=f"licence review finding[{index}]")
+        for index, item in enumerate(
+            _array(value.get("review_findings"), name="licence review findings")
+        )
+    ]
+    if (
+        value.get("schema_version") != SCHEMA_VERSION
+        or value.get("record_kind") != LICENSE_REVIEW_KIND
+        or value.get("status") != LICENSE_REVIEW_STATUS
+        or identity != expected_identity
+        or identity != f"{package_name}@{package_version}".casefold()
+        or package.get("name") != package_name
+        or package.get("version") != package_version
+        or package.get("source_registry") != "https://pypi.org/simple"
+        or package.get("metadata_license_expression") != exception["license_expression"]
+        or dependency.get("required_by") != exception["required_by"]
+        or dependency.get("marker") != exception["dependency_marker"]
+        or reviewed_platform.get("system") != exception["platform_system"]
+        or reviewed_platform.get("machine") != exception["platform_machine"]
+        or value.get("scope") != exception["scope"]
+        or controls != expected_controls
+        or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(value.get("review_date")))
+        or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(value.get("retrieval_date")))
+        or len(findings) != 4
+        or any(not isinstance(item, str) or not item for item in method.values())
+        or wheel_filename != exception["wheel_filename"]
+        or not wheel_url.startswith("https://files.pythonhosted.org/packages/")
+        or wheel_url.rsplit("/", 1)[-1] != wheel_filename
+        or wheel_url != exception["wheel_url"]
+        or wheel.get("size_bytes") != exception["wheel_size_bytes"]
+        or wheel.get("sha256") != exception["wheel_sha256"]
+        or metadata_url != f"{wheel_url}.metadata"
+        or metadata_url != exception["metadata_url"]
+        or metadata.get("size_bytes") != exception["metadata_size_bytes"]
+        or metadata.get("sha256") != exception["metadata_sha256"]
+        or metadata.get("license_expression") != exception["license_expression"]
+        or embedded.get("member") != exception["embedded_license_member"]
+        or embedded.get("size_bytes") != exception["embedded_license_size_bytes"]
+        or embedded.get("sha256") != exception["embedded_license_sha256"]
+        or embedded.get("classification") != "BSD-3-Clause-text"
+        or sla_url != exception["terms_sla_url"]
+        or sla.get("size_bytes") != exception["terms_sla_size_bytes"]
+        or sla.get("sha256") != exception["terms_sla_sha256"]
+        or bsd_url != exception["terms_bsd_url"]
+        or bsd.get("size_bytes") != exception["terms_bsd_size_bytes"]
+        or bsd.get("sha256") != exception["terms_bsd_sha256"]
+        or sla.get("rendered_content_version") != "2.29.2"
+        or bsd.get("rendered_content_version") != "2.29.2"
+        or "/archives/nccl_2312/" not in sla_url
+        or "/archives/nccl_2312/" not in bsd_url
+        or any(controls.get(key) is not expected for key, expected in expected_controls.items())
+    ):
+        raise ReleaseGateError("dependency licence review scope or provenance differs")
+    for item_name, item in (
+        ("wheel", wheel),
+        ("metadata", metadata),
+        ("embedded licence", embedded),
+        ("NVIDIA SLA", sla),
+        ("NVIDIA BSD terms", bsd),
+    ):
+        _exact_integer(item.get("size_bytes"), name=f"licence review {item_name} size", minimum=1)
+        _sha256(item.get("sha256"), name=f"licence review {item_name} SHA-256")
+    _exact_integer(
+        distribution.get("wheel_member_count"),
+        name="licence review wheel member count",
+        expected=75,
+    )
+    return {
+        "review_record_sha256": record_sha256,
+        "wheel_filename": wheel_filename,
+        "wheel_url": wheel_url,
+        "wheel_size_bytes": wheel["size_bytes"],
+        "wheel_sha256": wheel["sha256"],
+        "metadata_sha256": metadata["sha256"],
+        "embedded_license_sha256": embedded["sha256"],
+        "terms_sla_sha256": sla["sha256"],
+        "terms_bsd_sha256": bsd["sha256"],
+    }
+
+
+def validate_license_exception_candidate_binding(
+    root: Path, candidate: str, policy: Mapping[str, Any]
+) -> dict[str, dict[str, Any]]:
+    """Bind every exception to exact candidate Git blobs and one uv resolution edge."""
+
+    bindings: dict[str, dict[str, Any]] = {}
+    for identity, exception in license_exception_policy(policy).items():
+        lock_payload = _candidate_blob_with_sha256(
+            root,
+            candidate,
+            path=exception["lock_path"],
+            digest=exception["lock_sha256"],
+            name=f"license exception {identity} lockfile",
+        )
+        try:
+            lock = tomllib.loads(lock_payload.decode("utf-8"))
+        except (UnicodeError, tomllib.TOMLDecodeError) as exc:
+            raise ReleaseGateError("candidate uv.lock is not canonical UTF-8 TOML") from exc
+        raw_packages = _array(lock.get("package"), name="candidate uv.lock packages")
+        package_name, package_version = identity.rsplit("@", 1)
+        required_name, required_version = exception["required_by"].rsplit("@", 1)
+        locked_package_matches: list[Mapping[str, Any]] = []
+        parent_matches: list[Mapping[str, Any]] = []
+        inbound_edges: list[dict[str, Any]] = []
+        canonical_package_name = _canonical_package_name(
+            package_name, name="license exception package name"
+        )
+        for index, raw_package in enumerate(raw_packages):
+            locked_package = _mapping(raw_package, name=f"candidate uv.lock package[{index}]")
+            owner_name = _text(
+                locked_package.get("name"), name=f"candidate uv.lock package[{index}] name"
+            )
+            owner_version = _text(
+                locked_package.get("version"),
+                name=f"candidate uv.lock package[{index}] version",
+            )
+            if owner_name == package_name and owner_version == package_version:
+                locked_package_matches.append(locked_package)
+            if owner_name == required_name and owner_version == required_version:
+                parent_matches.append(locked_package)
+            for section in ("dependencies", "optional-dependencies", "dev-dependencies"):
+                raw_container = locked_package.get(section)
+                if raw_container is None:
+                    continue
+                groups: list[tuple[str | None, list[Any]]]
+                if section == "dependencies":
+                    groups = [
+                        (
+                            None,
+                            _array(
+                                raw_container,
+                                name=f"candidate uv.lock package[{index}] {section}",
+                            ),
+                        )
+                    ]
+                else:
+                    grouped = _mapping(
+                        raw_container,
+                        name=f"candidate uv.lock package[{index}] {section}",
+                    )
+                    groups = [
+                        (
+                            _text(group, name=f"candidate uv.lock package[{index}] group"),
+                            _array(
+                                values,
+                                name=f"candidate uv.lock package[{index}] {section}.{group}",
+                            ),
+                        )
+                        for group, values in grouped.items()
+                    ]
+                for group, raw_edges in groups:
+                    for edge_index, raw_edge in enumerate(raw_edges):
+                        edge = _mapping(
+                            raw_edge,
+                            name=(
+                                f"candidate uv.lock package[{index}] {section} edge[{edge_index}]"
+                            ),
+                        )
+                        edge_name = _canonical_package_name(
+                            edge.get("name"),
+                            name=(
+                                f"candidate uv.lock package[{index}] {section}"
+                                f" edge[{edge_index}] name"
+                            ),
+                        )
+                        if edge_name == canonical_package_name:
+                            inbound_edges.append(
+                                {
+                                    "owner_name": owner_name,
+                                    "owner_version": owner_version,
+                                    "section": section,
+                                    "group": group,
+                                    "edge": edge,
+                                }
+                            )
+        if len(locked_package_matches) != 1 or len(parent_matches) != 1:
+            raise ReleaseGateError(
+                "license exception package or required parent is not uniquely locked"
+            )
+        locked_package = locked_package_matches[0]
+        if not _exact_typed_structure(locked_package, NCCL_EXCEPTION_V1_LOCK_PACKAGE):
+            raise ReleaseGateError(
+                "candidate uv.lock exception package differs from the exact reviewed package stanza"
+            )
+        source = _mapping(locked_package.get("source"), name="exception package lock source")
+        _exact_keys(source, {"registry"}, name="exception package lock source")
+        review_payload = _candidate_blob_with_sha256(
+            root,
+            candidate,
+            path=exception["review_path"],
+            digest=exception["review_sha256"],
+            name=f"license exception {identity} review",
+        )
+        review = _strict_json_bytes(review_payload, name=f"license exception {identity} review")
+        reviewed = _validated_license_review(
+            review,
+            expected_identity=identity,
+            exception=exception,
+        )
+        if reviewed["review_record_sha256"] != exception["review_record_sha256"]:
+            raise ReleaseGateError("license exception review self-hash differs from policy")
+        matching_wheels = []
+        for raw_wheel in _array(locked_package.get("wheels"), name="exception package wheels"):
+            wheel = _mapping(raw_wheel, name="exception package wheel")
+            if wheel.get("url") == reviewed["wheel_url"]:
+                matching_wheels.append(wheel)
+        if len(matching_wheels) != 1:
+            raise ReleaseGateError("reviewed exception wheel is not uniquely locked")
+        locked_wheel = matching_wheels[0]
+        parent = parent_matches[0]
+        parent_source = _mapping(parent.get("source"), name="required parent lock source")
+        _exact_keys(parent_source, {"registry"}, name="required parent lock source")
+        expected_edge = {"name": package_name, "marker": exception["dependency_marker"]}
+        if (
+            source != {"registry": "https://pypi.org/simple"}
+            or parent_source != {"registry": "https://pypi.org/simple"}
+            or len(inbound_edges) != 1
+            or inbound_edges[0]["owner_name"] != required_name
+            or inbound_edges[0]["owner_version"] != required_version
+            or inbound_edges[0]["section"] != "dependencies"
+            or inbound_edges[0]["group"] is not None
+            or not _exact_typed_structure(inbound_edges[0]["edge"], expected_edge)
+            or locked_wheel.get("hash") != f"sha256:{reviewed['wheel_sha256']}"
+            or locked_wheel.get("size") != reviewed["wheel_size_bytes"]
+            or reviewed["wheel_filename"] != reviewed["wheel_url"].rsplit("/", 1)[-1]
+        ):
+            raise ReleaseGateError("candidate uv.lock differs from the reviewed exception edge")
+        bindings[identity] = {**exception, **reviewed}
+    return bindings
+
+
+LICENSE_APPLICATION_KEYS = {
+    "identity",
+    "package",
+    "version",
+    "license",
+    "required_by",
+    "dependency_marker",
+    "platform_system",
+    "platform_machine",
+    "scope",
+    "lock_path",
+    "lock_sha256",
+    "review_path",
+    "review_sha256",
+    "review_record_sha256",
+    "wheel_filename",
+    "wheel_url",
+    "wheel_size_bytes",
+    "wheel_sha256",
+    "metadata_url",
+    "metadata_size_bytes",
+    "metadata_sha256",
+    "embedded_license_member",
+    "embedded_license_size_bytes",
+    "embedded_license_sha256",
+    "terms_sla_url",
+    "terms_sla_size_bytes",
+    "terms_sla_sha256",
+    "terms_bsd_url",
+    "terms_bsd_size_bytes",
+    "terms_bsd_sha256",
+}
+
+
+def _license_exception_application(
+    package: Mapping[str, str], binding: Mapping[str, Any]
+) -> dict[str, Any]:
+    return {
+        "identity": package["identity"],
+        "package": package["package"],
+        "version": package["version"],
+        "license": package["license"],
+        **{key: binding[key] for key in LICENSE_APPLICATION_KEYS - set(package)},
+    }
+
+
+def validate_license_exception_applications(
+    value: Any,
+    *,
+    policy: Mapping[str, Any],
+    bindings: Mapping[str, Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Validate full exception provenance; empty or fabricated applications fail closed."""
+
+    records = license_exception_policy(policy)
+    applications: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, raw_application in enumerate(_array(value, name="license exceptions applied")):
+        application = _mapping(raw_application, name=f"license exceptions applied[{index}]")
+        _exact_keys(
+            application,
+            LICENSE_APPLICATION_KEYS,
+            name=f"license exceptions applied[{index}]",
+        )
+        identity = _text(
+            application.get("identity"), name=f"license exceptions applied[{index}].identity"
+        )
+        package = _text(
+            application.get("package"), name=f"license exceptions applied[{index}].package"
+        )
+        version = _text(
+            application.get("version"), name=f"license exceptions applied[{index}].version"
+        )
+        license_name = _text(
+            application.get("license"), name=f"license exceptions applied[{index}].license"
+        )
+        record = records.get(identity)
+        binding = bindings.get(identity)
+        expected = (
+            _license_exception_application(
+                {
+                    "identity": identity,
+                    "package": package,
+                    "version": version,
+                    "license": license_name,
+                },
+                binding,
+            )
+            if binding is not None
+            else None
+        )
+        if (
+            identity != f"{package}@{version}".casefold()
+            or identity in seen
+            or record is None
+            or binding is None
+            or license_name != record["license_expression"]
+            or dict(application) != expected
+        ):
+            raise ReleaseGateError("applied license exception differs from candidate provenance")
+        seen.add(identity)
+        applications.append(dict(application))
+    if applications != sorted(applications, key=lambda item: str(item["identity"])):
+        raise ReleaseGateError("applied license exceptions are not canonically ordered")
+    return applications
+
+
+def _normalized_license_packages(value: Any) -> list[dict[str, str]]:
+    packages: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for index, raw_package in enumerate(_array(value, name="normalised licence packages")):
+        package = _mapping(raw_package, name=f"normalised licence package[{index}]")
+        _exact_keys(
+            package,
+            {"identity", "package", "version", "license"},
+            name=f"normalised licence package[{index}]",
+        )
+        name = _text(package.get("package"), name=f"normalised package[{index}].package")
+        version = _text(package.get("version"), name=f"normalised package[{index}].version")
+        license_name = _text(package.get("license"), name=f"normalised package[{index}].license")
+        identity = _text(package.get("identity"), name=f"normalised package[{index}].identity")
+        expected_identity = f"{name}@{version}".casefold()
+        if (
+            identity != expected_identity
+            or PACKAGE_IDENTITY_RE.fullmatch(identity) is None
+            or identity in seen
+            or any(
+                character in "\t\r\n" or ord(character) < 32 or ord(character) == 127
+                for field in (name, version, license_name)
+                for character in field
+            )
+        ):
+            raise ReleaseGateError("normalised licence package identity is invalid or duplicated")
+        seen.add(identity)
+        packages.append(
+            {"identity": identity, "package": name, "version": version, "license": license_name}
+        )
+    if packages != sorted(packages, key=lambda item: item["identity"]):
+        raise ReleaseGateError("normalised licence packages are not canonically ordered")
+    return packages
+
+
+def _license_inventory_digest(packages: Sequence[Mapping[str, str]]) -> str:
+    rows = [f"{item['package']}\t{item['version']}\t{item['license']}" for item in packages]
+    return hashlib.sha256(("\n".join(sorted(rows, key=str.casefold)) + "\n").encode()).hexdigest()
+
+
+def _license_outcomes(
+    packages: Sequence[Mapping[str, str]],
+    *,
+    environment: Mapping[str, str],
+    policy: Mapping[str, Any],
+    bindings: Mapping[str, Mapping[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    prohibited = tuple(
+        _text(value, name="prohibited license token").casefold()
+        for value in _array(policy.get("prohibited_license_tokens"), name="license tokens")
+    )
+    if prohibited != PROHIBITED_LICENSE_TOKENS_V1:
+        raise ReleaseGateError(
+            "release policy v1 prohibited licence tokens do not match the exact reviewed set"
+        )
+    by_identity = {item["identity"]: item for item in packages}
+    for identity, binding in bindings.items():
+        platform_matches = (
+            environment["system"] == binding["platform_system"]
+            and environment["machine"] == binding["platform_machine"]
+        )
+        if not platform_matches:
+            continue
+        package_present = identity in by_identity
+        parent_present = binding["required_by"] in by_identity
+        if not package_present or not parent_present:
+            raise ReleaseGateError("exception package and reviewed parent must both be inventoried")
+        if package_present and by_identity[identity]["license"] != binding["license_expression"]:
+            raise ReleaseGateError("exception package licence differs from its reviewed metadata")
+
+    applications: list[dict[str, Any]] = []
+    violations: list[dict[str, str]] = []
+    for package in packages:
+        license_name = package["license"]
+        if not any(token in license_name.casefold() for token in prohibited):
+            continue
+        candidate_binding = bindings.get(package["identity"])
+        if (
+            candidate_binding is not None
+            and environment["system"] == candidate_binding["platform_system"]
+            and environment["machine"] == candidate_binding["platform_machine"]
+            and license_name == candidate_binding["license_expression"]
+            and candidate_binding["required_by"] in by_identity
+        ):
+            applications.append(_license_exception_application(package, candidate_binding))
+        else:
+            violations.append(
+                {
+                    "package": package["package"],
+                    "version": package["version"],
+                    "license": license_name,
+                }
+            )
+    return (
+        sorted(applications, key=lambda item: str(item["identity"])),
+        sorted(violations, key=lambda item: (item["package"].casefold(), item["version"])),
+    )
+
+
+def validate_license_audit_semantics(
+    value: Mapping[str, Any],
+    *,
+    root: Path,
+    candidate: str,
+    policy: Mapping[str, Any],
+) -> None:
+    """Reconstruct a licence audit from its complete normalised package inventory."""
+
+    environment = _mapping(value.get("audit_environment"), name="licence audit environment")
+    _exact_keys(environment, {"system", "machine"}, name="licence audit environment")
+    normalized_environment = {
+        "system": _text(environment.get("system"), name="licence audit environment system"),
+        "machine": _text(environment.get("machine"), name="licence audit environment machine"),
+    }
+    packages = _normalized_license_packages(value.get("packages"))
+    bindings = validate_license_exception_candidate_binding(root, candidate, policy)
+    expected_applications, expected_violations = _license_outcomes(
+        packages,
+        environment=normalized_environment,
+        policy=policy,
+        bindings=bindings,
+    )
+    observed_applications = validate_license_exception_applications(
+        value.get("exceptions_applied"), policy=policy, bindings=bindings
+    )
+    observed_violations: list[dict[str, str]] = []
+    for index, raw_violation in enumerate(
+        _array(value.get("violations"), name="licence audit violations")
+    ):
+        violation = _mapping(raw_violation, name=f"licence audit violation[{index}]")
+        _exact_keys(
+            violation,
+            {"package", "version", "license"},
+            name=f"licence audit violation[{index}]",
+        )
+        observed_violations.append(
+            {
+                "package": _text(
+                    violation.get("package"), name=f"licence audit violation[{index}].package"
+                ),
+                "version": _text(
+                    violation.get("version"), name=f"licence audit violation[{index}].version"
+                ),
+                "license": _text(
+                    violation.get("license"), name=f"licence audit violation[{index}].license"
+                ),
+            }
+        )
+    expected_status = "pass" if not expected_violations else "fail"
+    if (
+        value.get("package_count") != len(packages)
+        or value.get("normalized_inventory_sha256") != _license_inventory_digest(packages)
+        or observed_applications != expected_applications
+        or observed_violations != expected_violations
+        or value.get("status") != expected_status
+    ):
+        raise ReleaseGateError("licence audit cannot be reconstructed from its package inventory")
 
 
 def _exact_integer(
@@ -1401,27 +2338,27 @@ def audit_licenses(
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise ReleaseGateError("license inventory is not UTF-8 JSON") from exc
     values = _array(packages, name="license inventory")
-    prohibited = tuple(
-        _text(value, name="prohibited license token").casefold()
-        for value in _array(policy.get("prohibited_license_tokens"), name="license tokens")
-    )
-    exceptions = {
-        _text(value, name="license exception").casefold()
-        for value in _array(policy.get("license_exceptions"), name="license exceptions")
-    }
-    violations: list[dict[str, str]] = []
-    normalized: list[str] = []
+    normalized_packages: list[dict[str, str]] = []
     for index, raw_package in enumerate(values):
         package = _mapping(raw_package, name=f"license inventory[{index}]")
         name = _text(package.get("Name"), name=f"license inventory[{index}].Name")
         version = _text(package.get("Version"), name=f"license inventory[{index}].Version")
         license_name = _text(package.get("License"), name=f"license inventory[{index}].License")
         identity = f"{name}@{version}".casefold()
-        normalized.append(f"{name}\t{version}\t{license_name}")
-        if identity not in exceptions and any(
-            token in license_name.casefold() for token in prohibited
-        ):
-            violations.append({"package": name, "version": version, "license": license_name})
+        normalized_packages.append(
+            {"identity": identity, "package": name, "version": version, "license": license_name}
+        )
+    normalized_packages = _normalized_license_packages(
+        sorted(normalized_packages, key=lambda item: item["identity"])
+    )
+    audit_environment = {"system": platform.system(), "machine": platform.machine()}
+    bindings = validate_license_exception_candidate_binding(root, candidate, policy)
+    exceptions_applied, violations = _license_outcomes(
+        normalized_packages,
+        environment=audit_environment,
+        policy=policy,
+        bindings=bindings,
+    )
     body = {
         "schema_version": SCHEMA_VERSION,
         "record_kind": LICENSE_KIND,
@@ -1435,13 +2372,21 @@ def audit_licenses(
             "size_bytes": len(payload),
             "file_sha256": hashlib.sha256(payload).hexdigest(),
         },
-        "package_count": len(values),
-        "normalized_inventory_sha256": hashlib.sha256(
-            ("\n".join(sorted(normalized, key=str.casefold)) + "\n").encode()
-        ).hexdigest(),
-        "violations": sorted(violations, key=lambda item: item["package"].casefold()),
+        "audit_environment": audit_environment,
+        "packages": normalized_packages,
+        "package_count": len(normalized_packages),
+        "normalized_inventory_sha256": _license_inventory_digest(normalized_packages),
+        "exceptions_applied": exceptions_applied,
+        "violations": violations,
     }
-    return _self_hash(body)
+    record = _self_hash(body)
+    validate_license_audit_semantics(
+        record,
+        root=root,
+        candidate=candidate,
+        policy=policy,
+    )
+    return record
 
 
 def _evidence_snapshot(
@@ -1607,7 +2552,7 @@ def validate_ci_gate_bundle(
         raise ReleaseGateError("CI bundle candidate has no resolvable first parent")
     assert isinstance(parent_result.stdout, str)
     parent = _commit(parent_result.stdout.strip(), name="candidate first parent")
-    _policy_value, policy_reference = _policy(policy_path)
+    policy_value, policy_reference = _policy(policy_path)
     bundle_root = Path(evidence_root)
     if bundle_root.is_symlink():
         raise ReleaseGateError("CI evidence root may not be a symlink")
@@ -1648,6 +2593,7 @@ def validate_ci_gate_bundle(
             evidence=evidence,
             candidate=candidate,
             parent=parent,
+            policy=policy_value,
             policy_reference=policy_reference,
         )
         references[gate_name] = reference
@@ -1674,6 +2620,7 @@ def _validate_exact_gate_evidence(
     evidence: Mapping[str, Any],
     candidate: str,
     parent: str,
+    policy: Mapping[str, Any],
     policy_reference: Mapping[str, Any],
 ) -> None:
     """Fail closed on the semantics of one exact-candidate gate record."""
@@ -2075,8 +3022,11 @@ def _validate_exact_gate_evidence(
                 "pip_licenses_version",
                 "policy",
                 "inventory",
+                "audit_environment",
+                "packages",
                 "package_count",
                 "normalized_inventory_sha256",
+                "exceptions_applied",
                 "violations",
                 "record_sha256",
             },
@@ -2109,10 +3059,17 @@ def _validate_exact_gate_evidence(
             evidence.get("normalized_inventory_sha256"),
             name="license_audit normalized_inventory_sha256",
         )
+        validate_license_audit_semantics(
+            evidence,
+            root=root,
+            candidate=candidate,
+            policy=policy,
+        )
         if (
             evidence.get("record_kind") != LICENSE_KIND
             or evidence.get("policy") != policy_reference
             or evidence.get("pip_licenses_version") != "5.5.5"
+            or evidence.get("audit_environment") != {"system": "Linux", "machine": "x86_64"}
             or not isinstance(package_count, int)
             or isinstance(package_count, bool)
             or package_count < 1
@@ -2216,6 +3173,7 @@ def assemble_report(
             evidence=evidence,
             candidate=candidate,
             parent=parent,
+            policy=_policy_value,
             policy_reference=policy_reference,
         )
         gates[name] = {"status": "pass", "evidence": reference}
@@ -2354,6 +3312,10 @@ def validate_report(
                 raise ReleaseGateError("policy reference size differs")
             if mode == "exact_candidate_attestation":
                 assert content is not None
+                candidate_policy = _strict_json_bytes(
+                    _git_blob_payload(root, content, policy_ref, name="policy"),
+                    name="candidate release gate policy",
+                )
                 parent_result = _git(root, ("rev-parse", f"{content}^"), check=False)
                 if parent_result.returncode != 0:
                     raise ReleaseGateError("exact candidate first parent cannot be resolved")
@@ -2383,6 +3345,7 @@ def validate_report(
                         evidence=evidence,
                         candidate=content,
                         parent=actual_parent,
+                        policy=candidate_policy,
                         policy_reference=policy_ref,
                     )
         return {

@@ -26,6 +26,10 @@ from typing import Any
 from uuid import uuid4
 
 from inclusive_shift_har.artifacts.github_evidence import EXPECTED_ARTIFACT_FILES
+from inclusive_shift_har.artifacts.release_gate import (
+    ReleaseGateError,
+    validate_license_audit_semantics,
+)
 from inclusive_shift_har.artifacts.release_inventory import (
     validate_release_evidence_inventory_file,
 )
@@ -223,8 +227,11 @@ LICENSE_RECORD_KEYS = {
     "pip_licenses_version",
     "policy",
     "inventory",
+    "audit_environment",
+    "packages",
     "package_count",
     "normalized_inventory_sha256",
+    "exceptions_applied",
     "violations",
     "record_sha256",
 }
@@ -830,6 +837,15 @@ def _validate_standard_candidate_evidence(
         license_record.get("normalized_inventory_sha256"),
         name="local licence normalized inventory digest",
     )
+    try:
+        validate_license_audit_semantics(
+            license_record,
+            root=root,
+            candidate=candidate,
+            policy=policy,
+        )
+    except ReleaseGateError as exc:
+        raise ReleaseBundleError("local licence exceptions differ from policy") from exc
     if (
         license_record.get("schema_version") != SCHEMA_VERSION
         or license_record.get("record_kind") != "python_license_audit"
@@ -1491,7 +1507,7 @@ def write_release_notes(
     archive_payload = archive_source.read_bytes()
     archive_reference = _payload_reference(archive_payload)
     notes = (
-        "# InclusiveShift-HAR benchmark v0.1.3 prerelease\n\n"
+        "# InclusiveShift-HAR benchmark v0.1.4 prerelease\n\n"
         f"Candidate commit: `{candidate}`\n\n"
         "This private prerelease preserves the validated benchmark code and its exact "
         "release-evidence assets. The locked target was opened once; no target rerun was "
