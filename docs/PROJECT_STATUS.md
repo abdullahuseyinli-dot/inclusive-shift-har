@@ -18,7 +18,7 @@ This is a superseding status snapshot dated 2026-08-24. Earlier manifests, gates
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | Local release preparation in progress | private GitHub push/tag follows final post-confirmatory validation; no DOI |
+| 10 - release | Private remote created; corrected patch candidate in progress | `benchmark-v0.1.0` and failed Actions run `32799146947` preserved; `benchmark-v0.1.1` supersedes it; no DOI |
 
 ## Confirmatory outcome
 
@@ -71,6 +71,14 @@ Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exac
 - Active protocol tag: `protocol-v1.2.0`
 
 ## Preserved limitations and deviations
+
+The immutable `benchmark-v0.1.0` tag points to commit
+`f0a589a0bb18f60862c80f7e56eac2a33027c358`. Its first GitHub Actions run,
+`32799146947`, failed before test execution on both operating systems because
+the workflow combined `UV_FROZEN=1` with the mutually exclusive `uv sync
+--locked` option. The tag was not moved or deleted. Patch candidate
+`benchmark-v0.1.1` clears `UV_FROZEN` only for the two explicit locked-sync
+steps and preserves frozen behavior for all later `uv` commands.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

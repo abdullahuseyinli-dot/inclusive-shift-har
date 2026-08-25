@@ -29,6 +29,11 @@ The complete table, participant values, calibration metrics, AURC, per-class rec
 
 The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](results/protocol/confirmatory_target_opening_1.json). The primary statistics record is [`participant_statistics.json`](results/confirmatory/zero_shot_v1/participant_statistics.json), and the human-readable table is [`model_summary_v1.md`](results/confirmatory/zero_shot_v1/model_summary_v1.md).
 
+Release lineage is append-only. `benchmark-v0.1.0` remains attached to its
+original candidate after Actions run `32799146947` failed before tests because
+of conflicting `uv` frozen/locked options. The corrected patch candidate is
+`benchmark-v0.1.1`; neither the earlier tag nor its failure is rewritten.
+
 ## Post-confirmatory findings
 
 The few-person v1.1 curve completed all 1,200 CUDA cells. The descriptive numerical mean leader at each inclusion level was:

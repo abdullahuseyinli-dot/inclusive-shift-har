@@ -51,6 +51,10 @@ jobs:
           cache-dependency-glob: uv.lock
 
       - name: Install locked development environment
+        env:
+          # --locked verifies pyproject.toml against uv.lock; clear the global
+          # frozen default only for this explicit synchronization command.
+          UV_FROZEN: ""
         run: uv sync --locked --extra training-cpu --group research
 
       - name: Run synthetic tests
@@ -92,6 +96,10 @@ jobs:
           cache-dependency-glob: uv.lock
 
       - name: Install locked release environment
+        env:
+          # Keep --locked as the freshness gate, then restore UV_FROZEN for
+          # every subsequent uv invocation in the job.
+          UV_FROZEN: ""
         run: uv sync --locked --extra training-cpu --group research --group release
 
       - name: Prepare candidate-scoped attestation directory

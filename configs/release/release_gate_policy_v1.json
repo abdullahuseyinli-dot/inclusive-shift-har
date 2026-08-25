@@ -11,11 +11,19 @@
     "tags_must_be_annotated_direct_to_commits": true,
     "required_for_release_tags": [
       "benchmark-v0.1.0",
+      "benchmark-v0.1.1",
       "legacy-audit-v0.1.0",
       "protocol-v1.0.0",
       "protocol-v1.2.0"
     ],
     "pinned_annotated_tags": {
+      "benchmark-v0.1.0": {
+        "object_id": "691326d3dd373ce2a86ecbea246bbc03108e153d",
+        "target_commit": "f0a589a0bb18f60862c80f7e56eac2a33027c358",
+        "message": "InclusiveShift-HAR benchmark v0.1.0",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
       "legacy-audit-v0.1.0": {
         "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
         "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
@@ -39,13 +47,14 @@
       }
     },
     "permitted_candidate_tags": {
-      "benchmark-v0.1.0": {
-        "message": "InclusiveShift-HAR benchmark v0.1.0",
+      "benchmark-v0.1.1": {
+        "message": "InclusiveShift-HAR benchmark v0.1.1",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
     },
     "historical_notes": {
+      "benchmark-v0.1.0": "Preserved failed release candidate. GitHub Actions run 32799146947 stopped before tests because UV_FROZEN and --locked were supplied together; the tag is immutable and superseded by benchmark-v0.1.1.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },

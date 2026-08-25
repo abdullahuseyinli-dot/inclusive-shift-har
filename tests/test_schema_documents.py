@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 
@@ -39,6 +40,28 @@ def _references(value: Any) -> Iterator[str]:
     elif isinstance(value, list):
         for child in value:
             yield from _references(child)
+
+
+def test_ci_locked_sync_clears_global_uv_frozen_for_install_steps(
+    repository_root: Path,
+) -> None:
+    workflow = yaml.load(
+        (repository_root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    assert isinstance(workflow, dict)
+    assert workflow["env"]["UV_FROZEN"] == "1"
+    expected = {
+        "synthetic-validation": "Install locked development environment",
+        "release-security": "Install locked release environment",
+    }
+    for job_name, step_name in expected.items():
+        steps = workflow["jobs"][job_name]["steps"]
+        matches = [step for step in steps if step.get("name") == step_name]
+        assert len(matches) == 1
+        install = matches[0]
+        assert install["env"]["UV_FROZEN"] == ""
+        assert "uv sync --locked" in install["run"]
 
 
 def test_schema_documents_are_valid_json_with_only_local_references(
