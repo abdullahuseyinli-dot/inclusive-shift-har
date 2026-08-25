@@ -1,0 +1,3 @@
+# Evidence includes intentional LF and CRLF blobs whose byte hashes are pinned.
+# Disable Git end-of-line conversion for every tracked path on every platform.
+* -text

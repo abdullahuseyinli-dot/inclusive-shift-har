@@ -6,7 +6,7 @@ title: >-
   InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for
   Ability-Associated Population Shift in Smartphone Activity Recognition
 type: software
-version: 0.1.2a0
+version: 0.1.3a0
 authors:
   - family-names: Huseyinli
     given-names: Abdulla
@@ -15,9 +15,9 @@ abstract: >-
   evaluation of ability-associated population shift in smartphone inertial
   human activity recognition. The released cohort label is not a direct measure
   of physical ability, and InclusiveHAR v4 trial boundaries are unrecoverable.
-  The locked benchmark retains an unsupported MoRe-HAR model hypothesis and
-  does not assert fairness, clinical validity, causal disability effects,
-  state-of-the-art performance, or publication status.
+  The locked ten-participant target evaluation found compact DANN and CORAL
+  effectively tied, while the full MoRe-HAR configuration scored lower on both
+  mean and lower-tail participant macro-F1.
 keywords:
   - human activity recognition
   - wearable sensing

@@ -16,7 +16,7 @@ The source manifest and hashes are in `manifests/datasets/inclusivehar_v4.json`.
 
 InclusiveHAR is the target dataset for descriptive and, only after all protocol gates pass, participant-exclusive ability-associated population-shift evaluation. Disability status, assistive-device information, participant identity, GPS/location, labels, timestamps, and row/order proxies are never inference features.
 
-This dataset does not establish fairness, causal disability effects, clinical validity, or generalization to all disabilities or devices.
+The release contains ten target participants, sparse assistive-device subgroups, no measured physical-ability score, and no clinical outcome. Results therefore describe this released cohort and sensing protocol.
 
 ## Participants and activities
 

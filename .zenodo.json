@@ -1,13 +1,13 @@
 {
   "title": "InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Ability-Associated Population Shift in Smartphone Activity Recognition",
-  "description": "Research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. The released cohort label is not a direct measure of physical ability. InclusiveHAR v4 trial boundaries are unrecoverable, so this is not claimed to be trial-safe. The locked benchmark retains an unsupported MoRe-HAR model hypothesis and makes no fairness, clinical-validity, causal-disability, state-of-the-art, publication-acceptance, or minted-DOI claim.",
+  "description": "Research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. The released cohort label is not a direct measure of physical ability, and InclusiveHAR v4 omits timestamps and trial identifiers. In the locked ten-participant target evaluation, compact DANN and CORAL were effectively tied; the full MoRe-HAR configuration scored lower on mean and lower-tail participant macro-F1.",
   "upload_type": "software",
   "creators": [
     {
       "name": "Huseyinli, Abdulla"
     }
   ],
-  "version": "0.1.2a0",
+  "version": "0.1.3a0",
   "license": "Apache-2.0",
   "keywords": [
     "human activity recognition",

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import re
+import subprocess
+import tomllib
 from collections.abc import Iterator
 from copy import deepcopy
 from pathlib import Path
@@ -62,6 +65,68 @@ def test_ci_locked_sync_disables_global_uv_frozen_for_install_steps(
         install = matches[0]
         assert install["env"]["UV_FROZEN"] == "false"
         assert "uv sync --locked" in install["run"]
+
+
+def test_release_version_is_consistent_across_package_metadata(repository_root: Path) -> None:
+    project = tomllib.loads((repository_root / "pyproject.toml").read_text(encoding="utf-8"))
+    lock = tomllib.loads((repository_root / "uv.lock").read_text(encoding="utf-8"))
+    citation = yaml.safe_load((repository_root / "CITATION.cff").read_text(encoding="utf-8"))
+    zenodo = _load(repository_root / ".zenodo.json")
+    version = project["project"]["version"]
+    locked_package = [
+        package for package in lock["package"] if package["name"] == "inclusive-shift-har"
+    ]
+    fallback = re.search(
+        r'^\s*__version__\s*=\s*"([^"]+)"\s*$',
+        (repository_root / "src" / "inclusive_shift_har" / "__init__.py").read_text(
+            encoding="utf-8"
+        ),
+        flags=re.MULTILINE,
+    )
+    assert len(locked_package) == 1
+    assert fallback is not None
+    assert {
+        locked_package[0]["version"],
+        citation["version"],
+        zenodo["version"],
+        fallback.group(1),
+    } == {version}
+
+
+def test_ci_and_gitattributes_preserve_hash_bound_files_on_windows(
+    repository_root: Path,
+) -> None:
+    workflow = yaml.load(
+        (repository_root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    steps = workflow["jobs"]["synthetic-validation"]["steps"]
+    assert steps[0] == {
+        "name": "Preserve Git blob line endings on Windows",
+        "if": "runner.os == 'Windows'",
+        "shell": "pwsh",
+        "run": "git config --global core.autocrlf false",
+    }
+    assert steps[1]["name"] == "Check out repository"
+    attributes = (repository_root / ".gitattributes").read_text(encoding="utf-8").splitlines()
+    assert attributes[-1] == "* -text"
+    tracked = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    checked = subprocess.run(
+        ["git", "check-attr", "-z", "--stdin", "text"],
+        cwd=repository_root,
+        input=tracked,
+        check=True,
+        capture_output=True,
+    ).stdout.split(b"\0")
+    assert checked.pop() == b""
+    triplets = list(zip(checked[0::3], checked[1::3], checked[2::3], strict=True))
+    assert triplets
+    assert all(attribute == b"text" and value == b"unset" for _, attribute, value in triplets)
 
 
 def test_schema_documents_are_valid_json_with_only_local_references(

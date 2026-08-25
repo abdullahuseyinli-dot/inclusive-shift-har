@@ -34,7 +34,7 @@
       "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
     },
     "generation_spec": {
-      "description": "Ready records require the reviewed spec outside the repository; validators also require that exact spec and its cited files. Version 1.1.0 intentionally does not claim post-release state.",
+      "description": "Ready records require the reviewed spec outside the repository; validators also require that exact spec and its cited files. Version 1.1.0 records the validated pre-publication state.",
       "$ref": "#/$defs/spec_reference"
     },
     "exact_candidate_attestation": {

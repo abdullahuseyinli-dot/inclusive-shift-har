@@ -1,6 +1,6 @@
 # Project status and evidence gates
 
-This is a superseding status snapshot dated 2026-08-24. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
 
 | Stage | Status | Evidence |
 |---|---|---|
@@ -18,7 +18,7 @@ This is a superseding status snapshot dated 2026-08-24. Earlier manifests, gates
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | Private remote created; second patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947` and `benchmark-v0.1.1`/`32801378375` preserved; `benchmark-v0.1.2` supersedes them; no DOI |
+| 10 - release | Private remote created; byte-preserving patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, and `benchmark-v0.1.2`/`32802922698` preserved; intended successor is pending as `benchmark-v0.1.3`; no DOI |
 
 ## Confirmatory outcome
 
@@ -80,8 +80,14 @@ the workflow combined `UV_FROZEN=1` with the mutually exclusive `uv sync
 `4ac9b7b5471c945389348a73b5c59387c2aae069`; run `32801378375` also stopped
 before tests because hosted `uv` rejects an empty `UV_FROZEN` value rather than
 treating it as false. Neither tag was moved or deleted. Patch candidate
-`benchmark-v0.1.2` uses the explicit boolish value `false` only for the two
-locked-sync steps and preserves frozen behavior for all later `uv` commands.
+`benchmark-v0.1.2` used the explicit boolish value `false`; its Ubuntu
+synthetic-validation job passed tests, lint, format, and types, but Windows
+checkout converted LF evidence/config files to CRLF. Six exact-hash tests
+failed and the release-security job did not run in run `32802922698`. Patch candidate
+`benchmark-v0.1.3` additionally disables Git end-of-line conversion for every
+tracked path through `.gitattributes`, disables Windows `core.autocrlf` before
+checkout, and retains the explicit boolish sync override. All three failed tags
+and runs remain visible and immutable.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

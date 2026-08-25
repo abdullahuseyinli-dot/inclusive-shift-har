@@ -136,7 +136,7 @@ gh release download v8.30.1 --repo gitleaks/gitleaks `
 Assert-NativeSuccess 'Gitleaks archive download'
 $archive = Join-Path $toolRoot 'gitleaks_8.30.1_windows_x64.zip'
 if ((Get-Item -LiteralPath $archive).Length -ne 8438883 -or
-    (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant() -ne
+    (Get-FileHash -Algorithm SHA256 -LiteralPath $archive).Hash.ToLowerInvariant() -cne
       'd29144deff3a68aa93ced33dddf84b7fdc26070add4aa0f4513094c8332afc4e') {
   throw 'Gitleaks Windows archive pin differs'
 }
@@ -145,11 +145,11 @@ New-Item -ItemType Directory -Path $expanded -ErrorAction Stop | Out-Null
 Expand-Archive -LiteralPath $archive -DestinationPath $expanded -ErrorAction Stop
 $gitleaks = Join-Path $expanded 'gitleaks.exe'
 if ((Get-Item -LiteralPath $gitleaks).Length -ne 22575104 -or
-    (Get-FileHash -Algorithm SHA256 -LiteralPath $gitleaks).Hash.ToLowerInvariant() -ne
+    (Get-FileHash -Algorithm SHA256 -LiteralPath $gitleaks).Hash.ToLowerInvariant() -cne
       '17157e2ee8b76fc8b1d8bee607a250e34b8a8023c8bc81822d4b5ee4d78fcb7c') {
   throw 'Gitleaks Windows executable pin differs'
 }
-if ((& $gitleaks version).Trim() -ne '8.30.1') { throw 'Gitleaks version differs' }
+if ((& $gitleaks version).Trim() -cne '8.30.1') { throw 'Gitleaks version differs' }
 ```
 
 Immediately recheck the cached diff, then commit once:
@@ -176,7 +176,7 @@ $firstIndex = Get-Content -Raw ".audit/release-precommit/$review/staged_index_sc
 $secondIndex = Get-Content -Raw $recheckPath | ConvertFrom-Json
 foreach ($field in @('head_commit','index_entry_count','staged_change_count',
     'unique_blob_count','index_entry_index_sha256')) {
-  if ($firstIndex.$field -ne $secondIndex.$field) {
+  if ($firstIndex.$field -cne $secondIndex.$field) {
     throw "Reviewed index changed before commit: $field"
   }
 }
@@ -187,43 +187,69 @@ if (git diff --name-only) { throw "Tracked worktree changed after index review" 
 git commit -m "Prepare benchmark release candidate"
 Assert-NativeSuccess 'release-candidate commit'
 $candidate = (git rev-parse HEAD).Trim()
-if ((git rev-parse "$candidate^").Trim() -ne $base) { throw "Candidate parent changed" }
+if ((git rev-parse "$candidate^").Trim() -cne $base) { throw "Candidate parent changed" }
 if (git status --porcelain=v1 --untracked-files=all) { throw "Candidate is not clean" }
-if ((git branch --show-current).Trim() -ne 'main') { throw "Candidate is not on main" }
+if ((git branch --show-current).Trim() -cne 'main') { throw "Candidate is not on main" }
 uv run python -m inclusive_shift_har.artifacts.release_gate validate `
   --report results/release/final_release_gate_report.json --repository-root .
 Assert-NativeSuccess 'candidate-bound tracked pending-report validation'
 ```
 
-Rerun all Section 1 gates against this clean candidate. Do not create another
-content commit afterward.
+Rerun all Section 1 gates against this clean candidate through the candidate-
+bound capture command below. It executes the full tests, static checks,
+manifests, splits, configuration, artifacts, Git integrity, and an actual CUDA
+allocation without invoking the confirmatory evaluator. Raw logs remain ignored
+local evidence; the self-hashed record cites sanitized copies for the release
+bundle. Also bind the already-completed staged Gitleaks report to the reviewed
+index and new candidate:
+
+```powershell
+$local = ".audit/local-candidate/$candidate"
+uv run python -m inclusive_shift_har.artifacts.release_local_evidence `
+  capture-local-gates --repository-root . --candidate-commit $candidate `
+  --output-root $local
+Assert-NativeSuccess 'candidate-bound local CUDA gates'
+
+$now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+uv run python -m inclusive_shift_har.artifacts.release_local_evidence `
+  attest-staged-gitleaks --repository-root . --candidate-commit $candidate `
+  --policy configs/release/release_gate_policy_v1.json `
+  --staged-index ".audit/release-precommit/$review/staged_index_scan.json" `
+  --raw-report $stagedSecretReport --gitleaks-executable $gitleaks `
+  --gitleaks-exit-code $stagedGitleaksExit --created-at-utc $now `
+  --output "$local/staged_secret_scan.json" --allowed-output-root $local
+Assert-NativeSuccess 'staged Gitleaks attestation'
+```
+
+Do not create another content commit afterward.
 
 ## 3. Create and validate the benchmark tag before release CI
 
-The release policy byte-pins all five historical annotated tags. This includes
-the immutable `benchmark-v0.1.0` and `benchmark-v0.1.1` candidates whose
-Actions runs `32799146947` and `32801378375` failed before tests because of,
-respectively, conflicting frozen/locked options and a hosted-runner rejection
-of an empty boolish override. It also retains the preserved `protocol-v1.0.0`
-name/message mismatch. The policy permits exactly one successor candidate tag
-with fixed metadata. Create it only after the pre-tag local gates pass:
+The release policy byte-pins all six historical annotated tags. This includes
+the immutable `benchmark-v0.1.0`, `benchmark-v0.1.1`, and `benchmark-v0.1.2`
+candidates. Runs `32799146947` and `32801378375` failed before tests on invalid
+frozen-option combinations; run `32802922698` passed Ubuntu but exposed CRLF
+checkout conversion in six Windows byte-hash tests. The policy also retains the
+preserved `protocol-v1.0.0` name/message mismatch. It permits exactly one
+successor candidate tag with fixed metadata. Create it only after the pre-tag
+local gates pass:
 
 ```powershell
-git show-ref --verify --quiet refs/tags/benchmark-v0.1.2
+git show-ref --verify --quiet refs/tags/benchmark-v0.1.3
 $tagProbe = $LASTEXITCODE
 if ($tagProbe -eq 0) {
-  throw "benchmark-v0.1.2 already exists; inspect it and stop"
+  throw "benchmark-v0.1.3 already exists; inspect it and stop"
 }
 if ($tagProbe -ne 1) { throw "Unable to determine benchmark tag state" }
-if ((git config --get user.name).Trim() -ne 'Abdulla Huseyinli' -or
-    (git config --get user.email).Trim() -ne 'abdullahuseyinli@gmail.com') {
+if ((git config --get user.name).Trim() -cne 'Abdulla Huseyinli' -or
+    (git config --get user.email).Trim() -cne 'abdullahuseyinli@gmail.com') {
   throw 'Git tagger identity differs from the release policy'
 }
-git tag -a benchmark-v0.1.2 $candidate `
-  -m "InclusiveShift-HAR benchmark v0.1.2"
+git tag -a benchmark-v0.1.3 $candidate `
+  -m "InclusiveShift-HAR benchmark v0.1.3"
 Assert-NativeSuccess 'benchmark tag creation'
-if ((git cat-file -t benchmark-v0.1.2).Trim() -ne 'tag') { throw "Tag is not annotated" }
-if ((git rev-parse 'benchmark-v0.1.2^{commit}').Trim() -ne $candidate) {
+if ((git cat-file -t benchmark-v0.1.3).Trim() -cne 'tag') { throw "Tag is not annotated" }
+if ((git rev-parse 'benchmark-v0.1.3^{commit}').Trim() -cne $candidate) {
   throw "Benchmark tag targets another commit"
 }
 ```
@@ -233,7 +259,8 @@ name, exact one-line message, exact tagger name/email, canonical headers, and
 candidate target. Gitleaks does not inspect annotated-tag payloads, so this
 independent byte-level policy is mandatory. For a later release, move this tag
 to the pinned historical set in a new policy and declare a new candidate tag;
-never retarget `benchmark-v0.1.0`, `benchmark-v0.1.1`, or `benchmark-v0.1.2`.
+never retarget `benchmark-v0.1.0`, `benchmark-v0.1.1`, `benchmark-v0.1.2`, or
+`benchmark-v0.1.3`.
 
 Now create candidate-bound local repository, secret, and licence evidence in a
 fresh path. The repository scanner requires all policy-declared tags to exist,
@@ -244,7 +271,17 @@ submodules, unsupported binaries, and blobs over 16 MiB.
 ```powershell
 $now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 $local = ".audit/local-candidate/$candidate"
-if (Test-Path -LiteralPath $local) { throw "$local already exists; inspect and stop" }
+if (-not (Test-Path -LiteralPath $local -PathType Container) -or
+    -not (Test-Path -LiteralPath "$local/local_cuda_gate.json" -PathType Leaf) -or
+    -not (Test-Path -LiteralPath "$local/staged_secret_scan.json" -PathType Leaf)) {
+  throw 'Candidate-bound local gate or staged-secret evidence is missing'
+}
+foreach ($newEvidence in @('repository_scan.json','gitleaks.json',
+    'secret_scan.json','python_licenses.json','license_audit.json')) {
+  if (Test-Path -LiteralPath "$local/$newEvidence") {
+    throw "Create-only local evidence already exists: $newEvidence"
+  }
+}
 
 uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository `
   --repository-root . --candidate-commit $candidate `
@@ -281,10 +318,12 @@ The official Gitleaks 8.30.1 Linux x64 archive SHA-256 is
 The Windows archive and executable pins used above are also recorded in the
 versioned release policy.
 
-## 4. Create the private remote and push atomically
+## 4. Validate the existing private remote and push atomically
 
-Check authentication and require a genuine 404 before creating anything. If
-the repository exists, stop and inspect it; never overwrite it.
+The private repository was created during the preserved v0.1.0 release attempt.
+Fail closed unless the authenticated owner, configured origin, repository
+visibility, and default branch are exactly the expected existing remote. Never
+recreate, transfer, rename, or overwrite it.
 
 ```powershell
 gh auth status
@@ -292,16 +331,28 @@ Assert-NativeSuccess 'GitHub authentication'
 $owner = (gh api user --jq .login).Trim()
 Assert-NativeSuccess 'authenticated GitHub owner lookup'
 $repository = "$owner/inclusive-shift-har"
-$probe = gh api "repos/$repository" 2>&1
-if ($LASTEXITCODE -eq 0) { throw "$repository already exists; stop for inspection" }
-if ($probe -notmatch 'HTTP 404|Not Found') { throw "Absence was not proven by HTTP 404" }
-
-gh repo create $repository --private --source . --remote origin
-Assert-NativeSuccess 'private GitHub repository creation'
 $remoteState = gh api "repos/$repository" | ConvertFrom-Json
-Assert-NativeSuccess 'created repository lookup'
-if (-not $remoteState.private -or $remoteState.full_name -ne $repository) {
-  throw "Created remote is not the intended private repository"
+Assert-NativeSuccess 'existing repository lookup'
+if (-not $remoteState.private -or $remoteState.full_name -cne $repository -or
+    $remoteState.default_branch -cne 'main') {
+  throw "Existing remote is not the intended private main repository"
+}
+$expectedOrigin = "https://github.com/$repository.git"
+$actualOrigin = (git remote get-url origin).Trim()
+Assert-NativeSuccess 'origin lookup'
+if ($actualOrigin -cne $expectedOrigin) {
+  throw "Origin differs from authenticated private repository: $actualOrigin"
+}
+$remoteBase = (git ls-remote origin refs/heads/main).Split("`t")[0].Trim()
+Assert-NativeSuccess 'remote main concurrency check'
+if ($remoteBase -cne $base) {
+  throw "Remote main moved after review: expected $base, observed $remoteBase"
+}
+$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.3 `
+  'refs/tags/benchmark-v0.1.3^{}')
+Assert-NativeSuccess 'remote candidate-tag absence check'
+if ($candidateTagProbe.Count -ne 0) {
+  throw 'Remote benchmark-v0.1.3 already exists; inspect it and stop'
 }
 ```
 
@@ -316,7 +367,8 @@ git push --atomic -u origin `
   refs/tags/protocol-v1.2.0 `
   refs/tags/benchmark-v0.1.0 `
   refs/tags/benchmark-v0.1.1 `
-  refs/tags/benchmark-v0.1.2
+  refs/tags/benchmark-v0.1.2 `
+  refs/tags/benchmark-v0.1.3
 Assert-NativeSuccess 'atomic main and tag push'
 $remoteRefLines = @(git ls-remote origin `
   refs/heads/main `
@@ -325,22 +377,26 @@ $remoteRefLines = @(git ls-remote origin `
   refs/tags/protocol-v1.2.0 'refs/tags/protocol-v1.2.0^{}' `
   refs/tags/benchmark-v0.1.0 'refs/tags/benchmark-v0.1.0^{}' `
   refs/tags/benchmark-v0.1.1 'refs/tags/benchmark-v0.1.1^{}' `
-  refs/tags/benchmark-v0.1.2 'refs/tags/benchmark-v0.1.2^{}' |
+  refs/tags/benchmark-v0.1.2 'refs/tags/benchmark-v0.1.2^{}' `
+  refs/tags/benchmark-v0.1.3 'refs/tags/benchmark-v0.1.3^{}' |
   Tee-Object -FilePath ".audit/local-candidate/$candidate/remote-refs.txt")
 Assert-NativeSuccess 'remote ref verification'
-$remoteRefs = @{}
+$remoteRefs = [System.Collections.Generic.Dictionary[string,string]]::new(
+  [System.StringComparer]::Ordinal
+)
 foreach ($line in $remoteRefLines) {
   if ($line -notmatch '^([0-9a-f]{40})\s+(.+)$' -or $remoteRefs.ContainsKey($Matches[2])) {
     throw "Malformed or duplicate remote-ref row: $line"
   }
   $remoteRefs[$Matches[2]] = $Matches[1]
 }
-$expectedRemoteRefs = @{
-  'refs/heads/main' = $candidate
-}
+$expectedRemoteRefs = [System.Collections.Generic.Dictionary[string,string]]::new(
+  [System.StringComparer]::Ordinal
+)
+$expectedRemoteRefs.Add('refs/heads/main', $candidate)
 foreach ($tag in @(
   'legacy-audit-v0.1.0', 'protocol-v1.0.0', 'protocol-v1.2.0',
-  'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2'
+  'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2', 'benchmark-v0.1.3'
 )) {
   $tagObject = (git rev-parse "refs/tags/$tag").Trim()
   Assert-NativeSuccess "resolve local tag object $tag"
@@ -354,13 +410,13 @@ if ($remoteRefs.Count -ne $expectedRemoteRefs.Count) {
 }
 foreach ($name in $expectedRemoteRefs.Keys) {
   if (-not $remoteRefs.ContainsKey($name) -or
-      $remoteRefs[$name] -ne $expectedRemoteRefs[$name]) {
+      $remoteRefs[$name] -cne $expectedRemoteRefs[$name]) {
     throw "Remote ref differs: $name"
   }
 }
 ```
 
-Verify remote `main` and all four tag objects/peeled targets with `git
+Verify remote `main` and all seven tag objects/peeled targets with `git
 ls-remote`; preserve the output. The successful exact-main CI repository scan
 then independently validates the policy-pinned tag objects fetched from the
 remote and binds their normalized ref digest. The `release-security` job runs only for a `push` to
@@ -423,8 +479,8 @@ $runs = gh run list --repo $repository --workflow ci.yml --branch main `
   --json databaseId,status,conclusion,headSha,event,headBranch | ConvertFrom-Json
 Assert-NativeSuccess 'candidate workflow-run selection'
 $matches = @($runs | Where-Object {
-  $_.status -eq 'completed' -and $_.conclusion -eq 'success' -and
-  $_.headSha -eq $candidate -and $_.event -eq 'push' -and $_.headBranch -eq 'main'
+  $_.status -ceq 'completed' -and $_.conclusion -ceq 'success' -and
+  $_.headSha -ceq $candidate -and $_.event -ceq 'push' -and $_.headBranch -ceq 'main'
 })
 if ($matches.Count -ne 1) { throw 'Exactly one completed successful candidate run is required' }
 $runId = $matches[0].databaseId
@@ -604,44 +660,276 @@ reconstructs it from candidate Git blobs, exact external bytes, semantic record
 shapes, tag/ref state, completed CI, remote state, canonical roles, and the
 one-opening/no-rerun state.
 
-## 8. Assemble assets and publish a private prerelease
+## 8. Assemble exact assets and publish a private prerelease
 
-Build a create-only evidence bundle outside the repository containing:
+The final outer ZIP is fail-closed. Its standard member spec enumerates exactly
+the 45 validated Actions members, saved GitHub API responses, original Actions
+ZIP, candidate attestation, inventory/spec, staged-index and staged-secret
+attestations, local licence audit, candidate-bound CUDA record, and only the
+sanitized logs cited by that record. The builder rejects raw/checkpoint/model
+paths, raw Gitleaks reports, raw dependency inventories, nested archives other
+than the pinned Actions ZIP, symlinks, path/case collisions, absolute user
+paths, unsafe compression, changed bytes, and any unmanifested outer member.
 
-- exact inventory and exact external release spec;
-- every cited external record and sanitized quality log, preserving paths;
-- the original downloaded Actions ZIP referenced and reconstructed by `ci.json`;
-- exact ignored candidate report and its attestation spec;
-- staged-index and staged-secret review evidence;
-- sanitized local CUDA gate/tool/machine records.
+Copy the create-only inventory and reviewed local evidence into the external
+spec root. Preserve raw local logs in `.audit`; copy only `.log` files that are
+not `.raw.log`:
 
-Exclude raw data, checkpoints, the source ZIP, raw Gitleaks findings, secrets,
-absolute workstation paths, and unreviewed logs. Extract the completed bundle
-into a new directory and rerun offline inventory/report validation before
-uploading it.
+```powershell
+$inventory = ".audit/release-assets/$candidate/final_release_evidence_inventory.json"
+$externalInventory = "$external/final_release_evidence_inventory.json"
+$externalLocal = "$external/local"
+if ((Test-Path -LiteralPath $externalInventory) -or
+    (Test-Path -LiteralPath $externalLocal)) {
+  throw 'External bundle preparation paths already exist'
+}
+Copy-Item -LiteralPath $inventory -Destination $externalInventory
+New-Item -ItemType Directory -Path $externalLocal -ErrorAction Stop | Out-Null
+Copy-Item -LiteralPath "$local/staged_secret_scan.json" `
+  -Destination "$externalLocal/staged_secret_scan.json"
+Copy-Item -LiteralPath "$local/local_cuda_gate.json" `
+  -Destination "$externalLocal/local_cuda_gate.json"
+Copy-Item -LiteralPath "$local/license_audit.json" `
+  -Destination "$externalLocal/license_audit.json"
+$sanitizedLogs = @(Get-ChildItem -LiteralPath $local -File -Filter '*.log' |
+  Where-Object { $_.Name -notlike '*.raw.log' })
+if ($sanitizedLogs.Count -lt 1) { throw 'No sanitized local logs found' }
+foreach ($log in $sanitizedLogs) {
+  Copy-Item -LiteralPath $log.FullName -Destination "$externalLocal/$($log.Name)"
+}
+
+$now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$bundleSpec = "$external/release-bundle-spec.json"
+$bundleManifest = "$external/release-bundle-manifest.json"
+$bundle = "$external/inclusive-shift-har-$candidate-evidence.zip"
+uv run python -m inclusive_shift_har.artifacts.release_bundle standard-spec `
+  --source-root $external --repository-root . --candidate-commit $candidate `
+  --created-at-utc $now `
+  --output $bundleSpec --allowed-output-root $external
+Assert-NativeSuccess 'outer-bundle exact spec assembly'
+uv run python -m inclusive_shift_har.artifacts.release_bundle manifest `
+  --spec $bundleSpec --source-root $external --created-at-utc $now `
+  --output $bundleManifest --allowed-output-root $external
+Assert-NativeSuccess 'outer-bundle manifest assembly'
+uv run python -m inclusive_shift_har.artifacts.release_bundle build `
+  --spec $bundleSpec --manifest $bundleManifest --source-root $external `
+  --output $bundle --allowed-output-root $external
+Assert-NativeSuccess 'outer-bundle build'
+uv run python -m inclusive_shift_har.artifacts.release_bundle notes `
+  --inventory $externalInventory --manifest $bundleManifest --archive $bundle `
+  --candidate-commit $candidate --output "$external/release-notes.md" `
+  --allowed-output-root $external
+Assert-NativeSuccess 'candidate-bound release-notes assembly'
+
+$preuploadExtract = "$external-preupload-extract"
+$preuploadValidation = "$external/bundle-validation-preupload.json"
+uv run python -m inclusive_shift_har.artifacts.release_bundle validate `
+  --archive $bundle --spec $bundleSpec --manifest $bundleManifest `
+  --candidate-commit $candidate --repository-root . `
+  --extraction-root $preuploadExtract --created-at-utc $now `
+  --output $preuploadValidation --allowed-output-root $external
+Assert-NativeSuccess 'outer-bundle offline reconstruction'
+
+$bundleGitleaks = "$external/bundle-gitleaks.json"
+& $gitleaks dir $preuploadExtract --no-banner --config .gitleaks.toml `
+  --exit-code 1 --report-format json --report-path $bundleGitleaks
+if ($LASTEXITCODE -ne 0) { throw 'Outer-bundle Gitleaks scan failed' }
+```
+
+The raw outer-bundle Gitleaks report and pre-upload validation remain external
+review evidence and are not retroactively inserted into the already-built ZIP.
 
 The benchmark tag already has its policy-required fixed message; do not recreate
 it to add asset hashes. Record inventory file/record hashes and the evidence
 bundle hash in the draft release notes instead. The package version is
-`0.1.2a0`, so this is a prerelease and must not be marked latest:
+`0.1.3a0`, so this is a prerelease and must not be marked latest:
 
 ```powershell
-gh release create benchmark-v0.1.2 `
+$releaseTitle = "InclusiveShift-HAR benchmark v0.1.3 prerelease"
+$releaseNotesPath = "$external/release-notes.md"
+$releaseNotesBody = [System.IO.File]::ReadAllText(
+  (Resolve-Path -LiteralPath $releaseNotesPath).Path,
+  [System.Text.UTF8Encoding]::new($false)
+)
+gh release create benchmark-v0.1.3 `
   --repo $repository --verify-tag --draft --prerelease --latest=false `
-  --title "InclusiveShift-HAR benchmark v0.1.2 prerelease" `
-  --notes-file "$external/release-notes.md" `
-  ".audit/release-assets/$candidate/final_release_evidence_inventory.json" `
-  "$external/inclusive-shift-har-$candidate-evidence.zip"
+  --title $releaseTitle --notes-file $releaseNotesPath `
+  $externalInventory $bundle
 Assert-NativeSuccess 'private draft prerelease creation'
 ```
 
-Download both draft assets into a fresh directory, compare names, byte sizes,
-GitHub digests, and local SHA-256 values, extract the bundle, and reconstruct the
-inventory offline. Only then publish with `draft=false`, `prerelease=true`, and
-`latest=false`.
+Capture the draft REST object, require exactly the two expected assets, compare
+GitHub names, sizes, and `sha256:` digests with local bytes, then download both
+assets into a fresh directory. Revalidate the downloaded bundle with a new
+extraction root before publication:
+
+```powershell
+$draftApi = "$external/draft-release-api.json"
+Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi
+$draftMatches = @((Get-Content -Raw -LiteralPath $draftApi | ConvertFrom-Json) |
+  Where-Object { $_.tag_name -ceq 'benchmark-v0.1.3' })
+if ($draftMatches.Count -ne 1) { throw 'Expected exactly one draft release' }
+$draft = $draftMatches[0]
+if (-not $draft.draft -or -not $draft.prerelease -or $draft.assets.Count -ne 2) {
+  throw 'Draft release state or exact asset count differs'
+}
+if ($draft.name -cne $releaseTitle -or $draft.body -cne $releaseNotesBody) {
+  throw 'Draft release title or notes differ from generated metadata'
+}
+$expectedAssets = [System.Collections.Generic.Dictionary[string,string]]::new(
+  [System.StringComparer]::Ordinal
+)
+$expectedAssets.Add((Split-Path -Leaf $externalInventory), $externalInventory)
+$expectedAssets.Add((Split-Path -Leaf $bundle), $bundle)
+foreach ($asset in $draft.assets) {
+  if (-not $expectedAssets.ContainsKey($asset.name)) {
+    throw "Unexpected draft asset: $($asset.name)"
+  }
+  $source = $expectedAssets[$asset.name]
+  $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $source).Hash.ToLowerInvariant()
+  if ($asset.size -ne (Get-Item -LiteralPath $source).Length -or
+      $asset.digest -cne "sha256:$hash") {
+    throw "Draft asset metadata differs: $($asset.name)"
+  }
+}
+
+$draftDownload = "$external-draft-download"
+if (Test-Path -LiteralPath $draftDownload) { throw 'Draft download path exists' }
+New-Item -ItemType Directory -Path $draftDownload -ErrorAction Stop | Out-Null
+gh release download benchmark-v0.1.3 --repo $repository --dir $draftDownload
+Assert-NativeSuccess 'draft asset download'
+foreach ($name in $expectedAssets.Keys) {
+  $downloaded = Join-Path $draftDownload $name
+  if (-not (Test-Path -LiteralPath $downloaded -PathType Leaf) -or
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $downloaded).Hash -cne
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $expectedAssets[$name]).Hash) {
+    throw "Downloaded draft asset differs: $name"
+  }
+}
+$downloadExtract = "$external-draft-extract"
+$downloadValidation = "$external/bundle-validation-draft-download.json"
+$now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+uv run python -m inclusive_shift_har.artifacts.release_bundle validate `
+  --archive (Join-Path $draftDownload (Split-Path -Leaf $bundle)) `
+  --spec $bundleSpec --manifest $bundleManifest --candidate-commit $candidate `
+  --repository-root . --extraction-root $downloadExtract --created-at-utc $now `
+  --output $downloadValidation --allowed-output-root $external
+Assert-NativeSuccess 'downloaded draft bundle validation'
+
+gh release edit benchmark-v0.1.3 --repo $repository `
+  --draft=false --prerelease --latest=false
+Assert-NativeSuccess 'private prerelease publication'
+
+$publishedApi = "$external/published-release-api.json"
+Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.3" $publishedApi
+$published = Get-Content -Raw -LiteralPath $publishedApi | ConvertFrom-Json
+if ($published.draft -or -not $published.prerelease -or
+    $published.tag_name -cne 'benchmark-v0.1.3' -or
+    $published.assets.Count -ne 2) {
+  throw 'Published prerelease state differs from the reviewed draft'
+}
+if ($published.id -ne $draft.id) { throw 'Published release ID differs from reviewed draft' }
+if ($published.name -cne $releaseTitle -or $published.body -cne $releaseNotesBody -or
+    $published.name -cne $draft.name -or $published.body -cne $draft.body) {
+  throw 'Published release title or notes differ from the reviewed draft'
+}
+$draftAssetsByName = [System.Collections.Generic.Dictionary[string,object]]::new(
+  [System.StringComparer]::Ordinal
+)
+foreach ($asset in $draft.assets) { $draftAssetsByName[$asset.name] = $asset }
+foreach ($asset in $published.assets) {
+  if (-not $draftAssetsByName.ContainsKey($asset.name)) {
+    throw "Published asset name differs: $($asset.name)"
+  }
+  $draftAsset = $draftAssetsByName[$asset.name]
+  if ($asset.id -ne $draftAsset.id -or $asset.size -ne $draftAsset.size -or
+      $asset.digest -cne $draftAsset.digest) {
+    throw "Published asset identity differs from reviewed draft: $($asset.name)"
+  }
+  $source = $expectedAssets[$asset.name]
+  $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $source).Hash.ToLowerInvariant()
+  if ($asset.size -ne (Get-Item -LiteralPath $source).Length -or
+      $asset.digest -cne "sha256:$hash") {
+    throw "Published asset bytes differ: $($asset.name)"
+  }
+}
+
+$publishedDownload = "$external-published-download"
+if (Test-Path -LiteralPath $publishedDownload) { throw 'Published download path exists' }
+New-Item -ItemType Directory -Path $publishedDownload -ErrorAction Stop | Out-Null
+gh release download benchmark-v0.1.3 --repo $repository --dir $publishedDownload
+Assert-NativeSuccess 'published asset download'
+foreach ($name in $expectedAssets.Keys) {
+  $downloaded = Join-Path $publishedDownload $name
+  if (-not (Test-Path -LiteralPath $downloaded -PathType Leaf) -or
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $downloaded).Hash -cne
+      (Get-FileHash -Algorithm SHA256 -LiteralPath $expectedAssets[$name]).Hash) {
+    throw "Published downloaded asset differs: $name"
+  }
+}
+
+$finalRepositoryApi = "$external/final-repository-api.json"
+$finalMainApi = "$external/final-main-ref-api.json"
+Save-GhApiResponse "repos/$repository" $finalRepositoryApi
+Save-GhApiResponse "repos/$repository/git/refs/heads/main" $finalMainApi
+$finalRepository = Get-Content -Raw -LiteralPath $finalRepositoryApi | ConvertFrom-Json
+$finalMain = Get-Content -Raw -LiteralPath $finalMainApi | ConvertFrom-Json
+if (-not $finalRepository.private) { throw 'Repository is no longer private' }
+if ($finalMain.object.type -cne 'commit' -or $finalMain.object.sha -cne $candidate) {
+  throw 'Remote main no longer equals the release candidate'
+}
+$requiredTags = @(
+  'benchmark-v0.1.0','benchmark-v0.1.1','benchmark-v0.1.2','benchmark-v0.1.3',
+  'legacy-audit-v0.1.0','protocol-v1.0.0','protocol-v1.2.0'
+)
+foreach ($tag in $requiredTags) {
+  if ((git cat-file -t "refs/tags/$tag").Trim() -cne 'tag') {
+    throw "Local tag is not annotated: $tag"
+  }
+  $localObject = (git rev-parse "refs/tags/$tag").Trim()
+  $localTarget = (git rev-parse "refs/tags/$tag^{}").Trim()
+  if ($localObject -cne $expectedRemoteRefs["refs/tags/$tag"] -or
+      $localTarget -cne $expectedRemoteRefs["refs/tags/$tag^{}"]) {
+    throw "Local annotated tag moved after the policy-validated pre-push snapshot: $tag"
+  }
+  if ($tag -ceq 'benchmark-v0.1.3' -and $localTarget -cne $candidate) {
+    throw 'Candidate benchmark tag no longer targets the candidate'
+  }
+  $remoteRows = @(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
+  Assert-NativeSuccess "remote tag query $tag"
+  $remoteTagRefs = [System.Collections.Generic.Dictionary[string,string]]::new(
+    [System.StringComparer]::Ordinal
+  )
+  foreach ($row in $remoteRows) {
+    if ($row -notmatch '^([0-9a-f]{40})\s+(.+)$' -or
+        $remoteTagRefs.ContainsKey($Matches[2])) {
+      throw "Malformed or duplicate final remote tag row: $row"
+    }
+    $remoteTagRefs[$Matches[2]] = $Matches[1]
+  }
+  if ($remoteTagRefs.Count -ne 2 -or
+      $remoteTagRefs["refs/tags/$tag"] -cne $expectedRemoteRefs["refs/tags/$tag"] -or
+      $remoteTagRefs["refs/tags/$tag^{}"] -cne $expectedRemoteRefs["refs/tags/$tag^{}"]) {
+    throw "Remote annotated tag identity differs: $tag"
+  }
+}
+$finalPolicyScan = ".audit/local-candidate/$candidate/final_repository_scan.json"
+if (Test-Path -LiteralPath $finalPolicyScan) {
+  throw 'Final policy scan destination already exists'
+}
+$now = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository `
+  --repository-root . --candidate-commit $candidate `
+  --policy configs/release/release_gate_policy_v1.json `
+  --created-at-utc $now --output $finalPolicyScan
+Assert-NativeSuccess 'final seven-tag policy scan'
+if (git status --porcelain=v1 --untracked-files=all) {
+  throw 'Final local worktree is not clean'
+}
+```
 
 Final checks must prove: repository still private; remote `main` equals the
-candidate; all six annotated tag objects and targets match policy; release is
+candidate; all seven annotated tag objects and targets match policy; release is
 published as a private prerelease; assets are byte-identical; local worktree is
 clean; no DOI was minted. Keep the repository private until a separate public,
 licence, claim, and lineage audit authorizes disclosure.

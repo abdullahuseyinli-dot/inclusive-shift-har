@@ -203,12 +203,12 @@ uv run inclusive-shift-har build-source-windows --split-manifest results/protoco
 
 The build command is create-only and refuses to replace existing evidence. Use a new versioned destination for any authorized future revision.
 
-## Remaining risks and claim limits
+## Remaining protocol risks
 
 - Hidden joins are unrecoverable; the unconditional contamination bound is 100%.
 - Sampling rate and 2.56-second duration are provider-declared, not timestamp-verified.
 - Per-block remainder dropping is deterministic but may introduce tail-selection effects.
 - Activity order is perfectly group-aligned in the released file; row/order features are prohibited.
 - Activity realizations and semantics differ across participants and assistive-device use.
-- Small target subgroups do not support causal disability, fairness, or clinical-validity claims.
-- This protocol does not establish publishability, novelty, state of the art, or a positive MoRe-HAR result.
+- The ten-person target cohort yields wide participant-bootstrap intervals, and assistive-device subgroups are too small for stable subgroup estimates.
+- Compact DANN and CORAL are effectively tied on mean participant macro-F1; the full MoRe-HAR configuration is lower on both mean and lower-tail performance.

@@ -16,7 +16,7 @@ The one-time zero-shot target evaluation is complete. It used 10 held-out target
 
 Compact DANN had the numerically highest locked-primary target mean, but its lead over compact CORAL was only 0.0000556; the two are effectively tied at the precision supported by these data. The legacy joint CNN/BiLSTM had the highest worst-participant value (0.2943), and CORAL had the highest lower-decile value (0.3670). MoRe-HAR did not improve either the mean or the required lower-tail endpoints against the strongest eligible baselines. Its preregistered hypothesis is therefore **not supported**. This negative outcome is retained, and the auditable benchmark is the primary contribution.
 
-The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. A later descriptive comparison estimated a DANN source-minus-target gap of 0.1196 with interval [-0.0371, 0.2831], but the source estimate is one-seed grouped cross-validation while the target estimate averages five final-fit seeds. That regime mismatch prevents treating the gap as a controlled degradation estimate. These results do not establish state of the art, fairness, clinical validity, or a causal disability effect.
+The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. A later descriptive comparison estimated a DANN source-minus-target gap of 0.1196 with interval [-0.0371, 0.2831], but the source estimate is one-seed grouped cross-validation while the target estimate averages five final-fit seeds. The two cohorts are unpaired and were evaluated under different training regimes, so that gap is reported only as a cohort-specific descriptive comparison.
 
 ## Evidence classes
 
@@ -33,8 +33,11 @@ Release lineage is append-only. `benchmark-v0.1.0` remains attached to its
 original candidate after Actions run `32799146947` failed before tests because
 of conflicting `uv` frozen/locked options. `benchmark-v0.1.1` and run
 `32801378375` are also preserved: hosted `uv` rejected its empty environment
-override as a non-boolish value. The cross-platform correction is
-`benchmark-v0.1.2`; neither earlier tag nor failure is rewritten.
+override as a non-boolish value. `benchmark-v0.1.2` and run `32802922698` are
+preserved after its Ubuntu validation job passed but Windows exposed CRLF
+conversion in six byte-hash integrity tests. The pending byte-preserving
+cross-platform candidate is `benchmark-v0.1.3`; no earlier tag or failure is
+rewritten.
 
 ## Post-confirmatory findings
 

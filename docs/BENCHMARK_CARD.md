@@ -4,7 +4,7 @@
 
 InclusiveShift-HAR is an auditable participant-exclusive benchmark for measuring ability-associated population shift in smartphone inertial activity recognition. Models are trained and tuned using 10 InclusiveHAR v4 participants released with `disabled=0`, then evaluated once on 10 disjoint participants released with `disabled=1`. The metadata labels are used only to define cohorts; they are never inference features. The released binary label is not a direct measurement of physical ability and must not be interpreted as one.
 
-The primary result is observational. It does not estimate a causal disability effect, certify fairness, or establish clinical utility.
+The primary result compares participant-level recognition performance between the released source and target cohorts. The cohort flag is not a measured physical-ability variable, the groups are unpaired, and the dataset contains no clinical outcomes.
 
 ## Dataset and licence
 

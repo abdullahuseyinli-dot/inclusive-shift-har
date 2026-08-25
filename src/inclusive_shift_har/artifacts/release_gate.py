@@ -537,7 +537,8 @@ def inspect_git_ref_state(
     assert isinstance(listing.stdout, str)
     violations: list[dict[str, str]] = []
     ref_rows: list[str] = []
-    release_main_observed = False
+    local_main_state: tuple[str, str, str | None] | None = None
+    remote_main_state: tuple[str, str, str | None] | None = None
     observed_tags: set[str] = set()
     tag_ref_count = 0
     validated_tag_count = 0
@@ -557,18 +558,10 @@ def inspect_git_ref_state(
             peeled = _commit(peeled_result.stdout.strip(), name=f"{refname} commit target")
         is_tag_ref = refname.startswith("refs/tags/")
         if not is_tag_ref:
-            if refname in {"refs/heads/main", "refs/remotes/origin/main"}:
-                if object_type == "commit" and object_id == candidate and peeled == candidate:
-                    release_main_observed = True
-                else:
-                    violations.append(
-                        {
-                            "code": "release_main_ref_mismatch",
-                            "commit": candidate,
-                            "path": refname,
-                            "detail": f"{object_type}:{object_id}",
-                        }
-                    )
+            if refname == "refs/heads/main":
+                local_main_state = (object_type, object_id, peeled)
+            elif refname == "refs/remotes/origin/main":
+                remote_main_state = (object_type, object_id, peeled)
             else:
                 ref_rows.append(
                     f"ref-target\t{refname}\t{object_type}\t{object_id}\t{peeled or '-'}"
@@ -732,13 +725,31 @@ def inspect_git_ref_state(
                 "detail": "required by git_refs policy",
             }
         )
-    if not release_main_observed:
+    # A local release commit necessarily precedes its push, so a cached
+    # origin/main may truthfully lag. Prefer local main when it exists and use
+    # the remote-tracking ref only in checkouts that do not create local main.
+    release_main_ref = "refs/heads/main"
+    release_main_state = local_main_state
+    if release_main_state is None:
+        release_main_ref = "refs/remotes/origin/main"
+        release_main_state = remote_main_state
+    if release_main_state is None:
         violations.append(
             {
                 "code": "release_main_ref_missing",
                 "commit": candidate,
                 "path": "refs/heads/main|refs/remotes/origin/main",
                 "detail": "no canonical main ref targets candidate_commit",
+            }
+        )
+    elif release_main_state != ("commit", candidate, candidate):
+        object_type, object_id, _peeled = release_main_state
+        violations.append(
+            {
+                "code": "release_main_ref_mismatch",
+                "commit": candidate,
+                "path": release_main_ref,
+                "detail": f"{object_type}:{object_id}",
             }
         )
     else:

@@ -59,6 +59,39 @@ def test_release_inventory_runbook_uses_create_only_generator(repository_root: P
     assert "Neither operation loads sensor arrays or raw target recordings" in text
 
 
+def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
+    repository_root: Path,
+) -> None:
+    text = (repository_root / "docs/RELEASE_EVIDENCE_GATE.md").read_text(encoding="utf-8")
+    for expected in (
+        "inclusive_shift_har.artifacts.release_local_evidence",
+        "capture-local-gates",
+        "attest-staged-gitleaks",
+        "inclusive_shift_har.artifacts.release_bundle",
+        "standard-spec",
+        "candidate-bound release-notes assembly",
+        "outer-bundle manifest assembly",
+        "outer-bundle build",
+        "outer-bundle offline reconstruction",
+        "Outer-bundle Gitleaks scan failed",
+        "assets.Count -ne 2",
+        "gh release edit benchmark-v0.1.3",
+        "--draft=false --prerelease --latest=false",
+        "published-release-api.json",
+        "Published downloaded asset differs",
+        "Repository is no longer private",
+        "Remote annotated tag identity differs",
+    ):
+        assert expected in text
+    assert 'Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi' in text
+    assert (
+        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.3" $publishedApi'
+        in text
+    )
+    assert "Set-Content -LiteralPath $draftApi" not in text
+    assert "Set-Content -LiteralPath $publishedApi" not in text
+
+
 def test_data_acquisition_runbook_pins_official_layout(repository_root: Path) -> None:
     text = (repository_root / "docs/DATA_ACQUISITION_RUNBOOK.md").read_text(encoding="utf-8")
     for expected in (

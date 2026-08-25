@@ -131,6 +131,69 @@ def test_git_object_scan_passes_safe_tree_and_binds_complete_history(tmp_path: P
     assert body.pop("record_sha256") == canonical_json_sha256(body)
 
 
+def test_repository_scan_allows_lagging_remote_tracking_ref_before_push(
+    tmp_path: Path,
+) -> None:
+    repository, previous = _repository(tmp_path / "repository")
+    policy = _policy(tmp_path / "policy.json")
+    (repository / "README.md").write_text("# candidate\n", encoding="utf-8")
+    _git(repository, "add", "README.md")
+    _git(repository, "commit", "-m", "candidate")
+    candidate = _git(repository, "rev-parse", "HEAD")
+    _git(repository, "update-ref", "refs/remotes/origin/main", previous)
+
+    report = scan_repository(
+        repository_root=repository,
+        candidate_commit=candidate,
+        policy_path=policy,
+        created_at_utc="2026-08-25T12:00:00Z",
+    )
+
+    assert report["status"] == "pass"
+    assert not {
+        "release_main_ref_mismatch",
+        "release_main_ref_missing",
+    } & {item["code"] for item in report["violations"]}
+
+    _git(repository, "checkout", "--detach", candidate)
+    _git(repository, "branch", "-D", "main")
+    _git(repository, "update-ref", "refs/remotes/origin/main", candidate)
+    remote_only_report = scan_repository(
+        repository_root=repository,
+        candidate_commit=candidate,
+        policy_path=policy,
+        created_at_utc="2026-08-25T12:00:01Z",
+    )
+
+    assert remote_only_report["status"] == "pass"
+    assert remote_only_report["ref_metadata_index_sha256"] == report["ref_metadata_index_sha256"]
+
+
+def test_repository_scan_prefers_local_main_over_remote_tracking_ref(
+    tmp_path: Path,
+) -> None:
+    repository, candidate = _repository(tmp_path / "repository")
+    policy = _policy(tmp_path / "policy.json")
+    _git(repository, "update-ref", "refs/remotes/origin/main", candidate)
+    (repository / "README.md").write_text("# later local main\n", encoding="utf-8")
+    _git(repository, "add", "README.md")
+    _git(repository, "commit", "-m", "later local main")
+    _git(repository, "checkout", "--detach", candidate)
+
+    report = scan_repository(
+        repository_root=repository,
+        candidate_commit=candidate,
+        policy_path=policy,
+        created_at_utc="2026-08-25T12:00:00Z",
+    )
+
+    assert report["status"] == "fail"
+    mismatches = [
+        item for item in report["violations"] if item["code"] == "release_main_ref_mismatch"
+    ]
+    assert [item["path"] for item in mismatches] == ["refs/heads/main"]
+
+
 def test_release_gate_rejects_nested_repository_root(tmp_path: Path) -> None:
     repository, commit = _repository(tmp_path / "repository")
     nested = repository / "nested"

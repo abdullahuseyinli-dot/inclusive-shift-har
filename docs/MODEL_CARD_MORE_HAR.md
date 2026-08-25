@@ -2,7 +2,7 @@
 
 ## Model status
 
-MoRe-HAR (Motion-Realization Factorized HAR) is a compact research hypothesis evaluated within InclusiveShift-HAR. It is not presented as state of the art, clinical technology, a fairness intervention, or proof of architectural novelty. The full model's preregistered zero-shot hypothesis was **not supported**.
+MoRe-HAR (Motion-Realization Factorized HAR) is a compact research hypothesis evaluated within InclusiveShift-HAR. The full configuration reached 0.6353 mean target-participant macro-F1 and 0.2660 lower-decile performance, below the strongest compact baselines on both endpoints. Its preregistered zero-shot hypothesis was **not supported**.
 
 ## Intended task
 
