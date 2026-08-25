@@ -225,8 +225,8 @@ Do not create another content commit afterward.
 
 ## 3. Create and validate the benchmark tag before release CI
 
-The release policy byte-pins all eight historical annotated tags. This includes
-the immutable `benchmark-v0.1.0` through `benchmark-v0.1.4` candidates. Runs
+The release policy byte-pins all nine historical annotated tags. This includes
+the immutable `benchmark-v0.1.0` through `benchmark-v0.1.5` candidates. Runs
 `32799146947` and `32801378375` failed before tests on invalid frozen-option
 combinations; run `32802922698` passed Ubuntu but exposed CRLF checkout
 conversion in six Windows byte-hash tests; run `32811935288` passed both
@@ -234,27 +234,36 @@ operating-system matrices before its Linux licence audit identified the
 XGBoost-transitive NCCL runtime; run `32829208254` exposed a Linux-only
 synthetic-fixture mismatch after that licence gate was hardened. Its Windows
 matrix passed tests, lint, formatting, and mypy, while release-security was
-skipped because Ubuntu failed. The policy also retains the preserved
+skipped because Ubuntu failed. Run `32836567358` then passed Ubuntu, Windows,
+and complete-history release-security, but the preserved external release
+attempt stopped before draft creation: its pre-upload outer-bundle Gitleaks
+scan found an unfiltered authenticated repository response containing a
+credential-bearing `temp_clone_token` field, plus two deterministic SHA-256
+evidence values in `ci.json` keyed `secret_scan` and `secret_scan.json`. No
+GitHub release was created and no assets were uploaded. The `benchmark-v0.1.5`
+tag object `df8e681ced4cee4cdcdae67eb18f1aaa835410cb`, targeting
+`eaa30d18ca60b3c123d1ccf9b095d8d78a03469d`, and its external failure
+evidence remain immutable. The policy also retains the preserved
 `protocol-v1.0.0` name/message mismatch. It permits exactly one
 successor candidate tag with fixed metadata. Create it only after the pre-tag
 local gates pass:
 
 ```powershell
-git show-ref --verify --quiet refs/tags/benchmark-v0.1.5
+git show-ref --verify --quiet refs/tags/benchmark-v0.1.6
 $tagProbe = $LASTEXITCODE
 if ($tagProbe -eq 0) {
-  throw "benchmark-v0.1.5 already exists; inspect it and stop"
+  throw "benchmark-v0.1.6 already exists; inspect it and stop"
 }
 if ($tagProbe -ne 1) { throw "Unable to determine benchmark tag state" }
 if ((git config --get user.name).Trim() -cne 'Abdulla Huseyinli' -or
     (git config --get user.email).Trim() -cne 'abdullahuseyinli@gmail.com') {
   throw 'Git tagger identity differs from the release policy'
 }
-git tag -a benchmark-v0.1.5 $candidate `
-  -m "InclusiveShift-HAR benchmark v0.1.5"
+git tag -a benchmark-v0.1.6 $candidate `
+  -m "InclusiveShift-HAR benchmark v0.1.6"
 Assert-NativeSuccess 'benchmark tag creation'
-if ((git cat-file -t benchmark-v0.1.5).Trim() -cne 'tag') { throw "Tag is not annotated" }
-if ((git rev-parse 'benchmark-v0.1.5^{commit}').Trim() -cne $candidate) {
+if ((git cat-file -t benchmark-v0.1.6).Trim() -cne 'tag') { throw "Tag is not annotated" }
+if ((git rev-parse 'benchmark-v0.1.6^{commit}').Trim() -cne $candidate) {
   throw "Benchmark tag targets another commit"
 }
 ```
@@ -265,7 +274,7 @@ candidate target. Gitleaks does not inspect annotated-tag payloads, so this
 independent byte-level policy is mandatory. For a later release, move this tag
 to the pinned historical set in a new policy and declare a new candidate tag;
 never retarget `benchmark-v0.1.0`, `benchmark-v0.1.1`, `benchmark-v0.1.2`,
-`benchmark-v0.1.3`, or `benchmark-v0.1.4`.
+`benchmark-v0.1.3`, `benchmark-v0.1.4`, or `benchmark-v0.1.5`.
 
 Now create candidate-bound local repository, secret, and licence evidence in a
 fresh path. The repository scanner requires all policy-declared tags to exist,
@@ -368,11 +377,11 @@ Assert-NativeSuccess 'remote main concurrency check'
 if ($remoteBase -cne $base) {
   throw "Remote main moved after review: expected $base, observed $remoteBase"
 }
-$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.5 `
-  'refs/tags/benchmark-v0.1.5^{}')
+$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.6 `
+  'refs/tags/benchmark-v0.1.6^{}')
 Assert-NativeSuccess 'remote candidate-tag absence check'
 if ($candidateTagProbe.Count -ne 0) {
-  throw 'Remote benchmark-v0.1.5 already exists; inspect it and stop'
+  throw 'Remote benchmark-v0.1.6 already exists; inspect it and stop'
 }
 ```
 
@@ -390,7 +399,8 @@ git push --atomic -u origin `
   refs/tags/benchmark-v0.1.2 `
   refs/tags/benchmark-v0.1.3 `
   refs/tags/benchmark-v0.1.4 `
-  refs/tags/benchmark-v0.1.5
+  refs/tags/benchmark-v0.1.5 `
+  refs/tags/benchmark-v0.1.6
 Assert-NativeSuccess 'atomic main and tag push'
 $remoteRefLines = @(git ls-remote origin `
   refs/heads/main `
@@ -402,7 +412,8 @@ $remoteRefLines = @(git ls-remote origin `
   refs/tags/benchmark-v0.1.2 'refs/tags/benchmark-v0.1.2^{}' `
   refs/tags/benchmark-v0.1.3 'refs/tags/benchmark-v0.1.3^{}' `
   refs/tags/benchmark-v0.1.4 'refs/tags/benchmark-v0.1.4^{}' `
-  refs/tags/benchmark-v0.1.5 'refs/tags/benchmark-v0.1.5^{}' |
+  refs/tags/benchmark-v0.1.5 'refs/tags/benchmark-v0.1.5^{}' `
+  refs/tags/benchmark-v0.1.6 'refs/tags/benchmark-v0.1.6^{}' |
   Tee-Object -FilePath ".audit/local-candidate/$candidate/remote-refs.txt")
 Assert-NativeSuccess 'remote ref verification'
 $remoteRefs = [System.Collections.Generic.Dictionary[string,string]]::new(
@@ -421,7 +432,7 @@ $expectedRemoteRefs.Add('refs/heads/main', $candidate)
 foreach ($tag in @(
   'legacy-audit-v0.1.0', 'protocol-v1.0.0', 'protocol-v1.2.0',
   'benchmark-v0.1.0', 'benchmark-v0.1.1', 'benchmark-v0.1.2', 'benchmark-v0.1.3',
-  'benchmark-v0.1.4', 'benchmark-v0.1.5'
+  'benchmark-v0.1.4', 'benchmark-v0.1.5', 'benchmark-v0.1.6'
 )) {
   $tagObject = (git rev-parse "refs/tags/$tag").Trim()
   Assert-NativeSuccess "resolve local tag object $tag"
@@ -441,7 +452,7 @@ foreach ($name in $expectedRemoteRefs.Keys) {
 }
 ```
 
-Verify remote `main` and all nine tag objects/peeled targets with `git
+Verify remote `main` and all ten tag objects/peeled targets with `git
 ls-remote`; preserve the output. The successful exact-main CI repository scan
 then independently validates the policy-pinned tag objects fetched from the
 remote and binds their normalized ref digest. The `release-security` job runs only for a `push` to
@@ -471,11 +482,14 @@ The CI artifact contains only:
 CI does **not** produce a final exact report, a completed-workflow record, or an
 inventory spec. Download the artifact promptly; retention is 30 days.
 
-Save the exact repository, main-ref, workflow-run, and run-artifacts API
-responses. The run-artifacts response must have `total_count: 1` and exactly
-one matching item. Download the artifact ZIP without PowerShell 5 text
-redirection. The following helper redirects the native process handle directly
-to a create-only file and checks its exit status:
+Save the exact sanitized repository response plus the exact main-ref,
+workflow-run, and run-artifacts API responses. The authenticated repository
+request must apply `--jq del(.temp_clone_token)` inside `gh` before stdout is
+redirected; an unfiltered private-repository response must never be written.
+The run-artifacts response must have `total_count: 1` and exactly one matching
+item. Download the artifact ZIP without PowerShell 5 text redirection. The
+following helpers redirect the native process handle directly to a create-only
+file and check its exit status:
 Then use the create-only capture module. It validates API identity, artifact
 digest, ZIP paths, duplicates, encryption, symlinks, size caps, exact file set,
 run/attempt/event/branch/SHA, and mirrors only sanitized files:
@@ -499,6 +513,36 @@ function Save-GhApiResponse([string]$Endpoint, [string]$Destination) {
   }
 }
 
+function Save-SanitizedRepositoryApiResponse(
+  [string]$Endpoint,
+  [string]$Destination
+) {
+  if (Test-Path -LiteralPath $Destination) {
+    throw "Refusing to overwrite sanitized repository API evidence: $Destination"
+  }
+  $stderr = "$Destination.stderr"
+  if (Test-Path -LiteralPath $stderr) {
+    throw "Refusing to overwrite repository API stderr evidence: $stderr"
+  }
+  $process = Start-Process -FilePath (Get-Command gh).Source `
+    -ArgumentList @('api', $Endpoint, '--jq', 'del(.temp_clone_token)') `
+    -NoNewWindow -Wait -PassThru -RedirectStandardOutput $Destination `
+    -RedirectStandardError $stderr
+  if ($process.ExitCode -ne 0 -or
+      -not (Test-Path -LiteralPath $Destination -PathType Leaf) -or
+      (Get-Item -LiteralPath $Destination).Length -eq 0) {
+    throw "sanitized gh api failed for $Endpoint; preserve $stderr"
+  }
+  $sanitized = [System.IO.File]::ReadAllText(
+    (Resolve-Path -LiteralPath $Destination).Path,
+    [System.Text.UTF8Encoding]::new($false)
+  )
+  if ($sanitized -cmatch '"temp_clone_token"\s*:') {
+    throw 'Sanitized repository API evidence still contains temp_clone_token'
+  }
+  $null = $sanitized | ConvertFrom-Json
+}
+
 $runs = gh run list --repo $repository --workflow ci.yml --branch main `
   --event push --commit $candidate --limit 20 `
   --json databaseId,status,conclusion,headSha,event,headBranch | ConvertFrom-Json
@@ -510,7 +554,8 @@ $matches = @($runs | Where-Object {
 if ($matches.Count -ne 1) { throw 'Exactly one completed successful candidate run is required' }
 $runId = $matches[0].databaseId
 
-Save-GhApiResponse "repos/$repository" "$external/repository-api.json"
+Save-SanitizedRepositoryApiResponse "repos/$repository" `
+  "$external/repository-api.json"
 Save-GhApiResponse "repos/$repository/git/refs/heads/main" `
   "$external/main-ref-api.json"
 Save-GhApiResponse "repos/$repository/actions/runs/$runId" `
@@ -755,28 +800,123 @@ uv run python -m inclusive_shift_har.artifacts.release_bundle validate `
   --output $preuploadValidation --allowed-output-root $external
 Assert-NativeSuccess 'outer-bundle offline reconstruction'
 
+$bundleBaselineConfig = "$external/bundle-gitleaks-default-only.toml"
+$bundleBaselineIgnore = "$external/bundle-gitleaks-empty.ignore"
+$bundleGitleaksUnreviewed = "$external/bundle-gitleaks-unreviewed.json"
 $bundleGitleaks = "$external/bundle-gitleaks.json"
+foreach ($path in @(
+  $bundleBaselineConfig, $bundleBaselineIgnore,
+  $bundleGitleaksUnreviewed, $bundleGitleaks
+)) {
+  if (Test-Path -LiteralPath $path) {
+    throw "Refusing to overwrite outer-bundle scan evidence: $path"
+  }
+}
+
+# First preserve and inspect a default-rule result with no allowlist. Gitleaks
+# 8.30.1 must report exactly the two deterministic ci.json hashes reviewed below.
+$defaultOnlyConfig = @'
+title = "InclusiveShift-HAR external default-only control scan"
+
+[extend]
+useDefault = true
+'@
+$utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+[System.IO.File]::WriteAllText($bundleBaselineConfig, $defaultOnlyConfig, $utf8NoBom)
+[System.IO.File]::WriteAllText($bundleBaselineIgnore, '', $utf8NoBom)
+& $gitleaks dir $preuploadExtract --no-banner --config $bundleBaselineConfig `
+  --gitleaks-ignore-path $bundleBaselineIgnore `
+  --exit-code 1 --report-format json --report-path $bundleGitleaksUnreviewed
+$bundleUnreviewedExit = $LASTEXITCODE
+if ($bundleUnreviewedExit -ne 1 -or
+    -not (Test-Path -LiteralPath $bundleGitleaksUnreviewed -PathType Leaf)) {
+  throw 'Unallowlisted outer-bundle scan did not produce the expected review state'
+}
+$bundleFindings = Get-Content -Raw -LiteralPath $bundleGitleaksUnreviewed |
+  ConvertFrom-Json
+if (@($bundleFindings).Count -ne 2) {
+  throw 'Unallowlisted outer-bundle scan must contain exactly two reviewed findings'
+}
+
+$ciPath = (Resolve-Path -LiteralPath (Join-Path $preuploadExtract 'ci.json')).Path
+$secretScanPath = Join-Path $preuploadExtract `
+  ".audit/release-attestations/$candidate/secret_scan.json"
+if (-not (Test-Path -LiteralPath $secretScanPath -PathType Leaf)) {
+  throw 'Mirrored CI secret-scan attestation is missing from the reconstructed bundle'
+}
+$expectedSecretHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $secretScanPath).Hash.ToLowerInvariant()
+$expectedCiMatches = [System.Collections.Generic.HashSet[string]]::new(
+  [System.StringComparer]::Ordinal
+)
+[void]$expectedCiMatches.Add('secret_scan.json":"' + $expectedSecretHash + '"')
+[void]$expectedCiMatches.Add('secret_scan":"' + $expectedSecretHash + '"')
+$observedCiMatches = [System.Collections.Generic.HashSet[string]]::new(
+  [System.StringComparer]::Ordinal
+)
+$pathComparer = [System.StringComparer]::OrdinalIgnoreCase
+foreach ($finding in @($bundleFindings)) {
+  $findingFile = [System.IO.Path]::GetFullPath(([string]$finding.File).Replace('/', '\'))
+  $match = [string]$finding.Match
+  if (-not $pathComparer.Equals($findingFile, $ciPath) -or
+      [string]$finding.RuleID -cne 'generic-api-key' -or
+      [int]$finding.StartLine -ne 1 -or [int]$finding.EndLine -ne 1 -or
+      [string]$finding.Secret -cne $expectedSecretHash -or
+      -not $expectedCiMatches.Contains($match) -or
+      -not $observedCiMatches.Add($match)) {
+    throw 'Outer-bundle finding differs from the two reviewed deterministic ci.json hashes'
+  }
+}
+if (-not $expectedCiMatches.SetEquals($observedCiMatches)) {
+  throw 'Reviewed ci.json finding set differs'
+}
+
+# The authoritative publication scan uses the candidate's policy-pinned,
+# reviewed configuration. It must allow only those two validated hash fields
+# and leave an empty report; no dynamic fingerprint ignore is used.
 & $gitleaks dir $preuploadExtract --no-banner --config .gitleaks.toml `
-  --exit-code 1 --report-format json --report-path $bundleGitleaks
-if ($LASTEXITCODE -ne 0) { throw 'Outer-bundle Gitleaks scan failed' }
+  --gitleaks-ignore-path $bundleBaselineIgnore --exit-code 1 `
+  --report-format json --report-path $bundleGitleaks
+$bundleReviewedExit = $LASTEXITCODE
+if ($bundleReviewedExit -ne 0 -or
+    -not (Test-Path -LiteralPath $bundleGitleaks -PathType Leaf)) {
+  throw 'Outer-bundle Gitleaks scan failed after the exact reviewed ci.json allowance'
+}
+$remainingBundleFindings = Get-Content -Raw -LiteralPath $bundleGitleaks |
+  ConvertFrom-Json
+if (@($remainingBundleFindings).Count -ne 0) {
+  throw 'Outer-bundle Gitleaks report is non-empty after the exact reviewed allowance'
+}
 ```
 
-The raw outer-bundle Gitleaks report and pre-upload validation remain external
-review evidence and are not retroactively inserted into the already-built ZIP.
+The two `ci.json` matches are hashes of the mirrored `secret_scan.json`
+attestation. The preceding offline bundle and inventory validation independently
+recomputes those SHA-256 fields. A fresh external default-only control scan must
+recover exactly both matches; this proves they remain the only suppressed
+findings. Both scans use the same fresh empty ignore file, so only their
+configuration differs. The authoritative rescan then uses the policy-pinned tracked
+`.gitleaks.toml`, whose rule-local `AND` allowance requires both the exact
+`ci.json` path and one of the two exact canonical hash-field shapes. It does not
+permit a dynamic fingerprint, another key, a non-hex or differently sized
+value, another path, or another rule. The saved repository response is filtered
+inside authenticated `gh api` before redirection, and the remote-evidence
+validator independently rejects any `temp_clone_token` field. The default-only
+config, empty baseline ignore, unallowlisted report, final empty authoritative
+report, and pre-upload validation remain external review evidence and are not
+retroactively inserted into the already-built ZIP.
 
 The benchmark tag already has its policy-required fixed message; do not recreate
 it to add asset hashes. Record inventory file/record hashes and the evidence
 bundle hash in the draft release notes instead. The package version is
-`0.1.5a0`, so this is a prerelease and must not be marked latest:
+`0.1.6a0`, so this is a prerelease and must not be marked latest:
 
 ```powershell
-$releaseTitle = "InclusiveShift-HAR benchmark v0.1.5 prerelease"
+$releaseTitle = "InclusiveShift-HAR benchmark v0.1.6 prerelease"
 $releaseNotesPath = "$external/release-notes.md"
 $releaseNotesBody = [System.IO.File]::ReadAllText(
   (Resolve-Path -LiteralPath $releaseNotesPath).Path,
   [System.Text.UTF8Encoding]::new($false)
 )
-gh release create benchmark-v0.1.5 `
+gh release create benchmark-v0.1.6 `
   --repo $repository --verify-tag --draft --prerelease --latest=false `
   --title $releaseTitle --notes-file $releaseNotesPath `
   $externalInventory $bundle
@@ -792,7 +932,7 @@ extraction root before publication:
 $draftApi = "$external/draft-release-api.json"
 Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi
 $draftMatches = @((Get-Content -Raw -LiteralPath $draftApi | ConvertFrom-Json) |
-  Where-Object { $_.tag_name -ceq 'benchmark-v0.1.5' })
+  Where-Object { $_.tag_name -ceq 'benchmark-v0.1.6' })
 if ($draftMatches.Count -ne 1) { throw 'Expected exactly one draft release' }
 $draft = $draftMatches[0]
 if (-not $draft.draft -or -not $draft.prerelease -or $draft.assets.Count -ne 2) {
@@ -821,7 +961,7 @@ foreach ($asset in $draft.assets) {
 $draftDownload = "$external-draft-download"
 if (Test-Path -LiteralPath $draftDownload) { throw 'Draft download path exists' }
 New-Item -ItemType Directory -Path $draftDownload -ErrorAction Stop | Out-Null
-gh release download benchmark-v0.1.5 --repo $repository --dir $draftDownload
+gh release download benchmark-v0.1.6 --repo $repository --dir $draftDownload
 Assert-NativeSuccess 'draft asset download'
 foreach ($name in $expectedAssets.Keys) {
   $downloaded = Join-Path $draftDownload $name
@@ -841,15 +981,15 @@ uv run python -m inclusive_shift_har.artifacts.release_bundle validate `
   --output $downloadValidation --allowed-output-root $external
 Assert-NativeSuccess 'downloaded draft bundle validation'
 
-gh release edit benchmark-v0.1.5 --repo $repository `
+gh release edit benchmark-v0.1.6 --repo $repository `
   --draft=false --prerelease --latest=false
 Assert-NativeSuccess 'private prerelease publication'
 
 $publishedApi = "$external/published-release-api.json"
-Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.5" $publishedApi
+Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.6" $publishedApi
 $published = Get-Content -Raw -LiteralPath $publishedApi | ConvertFrom-Json
 if ($published.draft -or -not $published.prerelease -or
-    $published.tag_name -cne 'benchmark-v0.1.5' -or
+    $published.tag_name -cne 'benchmark-v0.1.6' -or
     $published.assets.Count -ne 2) {
   throw 'Published prerelease state differs from the reviewed draft'
 }
@@ -882,7 +1022,7 @@ foreach ($asset in $published.assets) {
 $publishedDownload = "$external-published-download"
 if (Test-Path -LiteralPath $publishedDownload) { throw 'Published download path exists' }
 New-Item -ItemType Directory -Path $publishedDownload -ErrorAction Stop | Out-Null
-gh release download benchmark-v0.1.5 --repo $repository --dir $publishedDownload
+gh release download benchmark-v0.1.6 --repo $repository --dir $publishedDownload
 Assert-NativeSuccess 'published asset download'
 foreach ($name in $expectedAssets.Keys) {
   $downloaded = Join-Path $publishedDownload $name
@@ -895,7 +1035,7 @@ foreach ($name in $expectedAssets.Keys) {
 
 $finalRepositoryApi = "$external/final-repository-api.json"
 $finalMainApi = "$external/final-main-ref-api.json"
-Save-GhApiResponse "repos/$repository" $finalRepositoryApi
+Save-SanitizedRepositoryApiResponse "repos/$repository" $finalRepositoryApi
 Save-GhApiResponse "repos/$repository/git/refs/heads/main" $finalMainApi
 $finalRepository = Get-Content -Raw -LiteralPath $finalRepositoryApi | ConvertFrom-Json
 $finalMain = Get-Content -Raw -LiteralPath $finalMainApi | ConvertFrom-Json
@@ -905,7 +1045,7 @@ if ($finalMain.object.type -cne 'commit' -or $finalMain.object.sha -cne $candida
 }
 $requiredTags = @(
   'benchmark-v0.1.0','benchmark-v0.1.1','benchmark-v0.1.2','benchmark-v0.1.3',
-  'benchmark-v0.1.4','benchmark-v0.1.5',
+  'benchmark-v0.1.4','benchmark-v0.1.5','benchmark-v0.1.6',
   'legacy-audit-v0.1.0','protocol-v1.0.0','protocol-v1.2.0'
 )
 foreach ($tag in $requiredTags) {
@@ -918,7 +1058,7 @@ foreach ($tag in $requiredTags) {
       $localTarget -cne $expectedRemoteRefs["refs/tags/$tag^{}"]) {
     throw "Local annotated tag moved after the policy-validated pre-push snapshot: $tag"
   }
-  if ($tag -ceq 'benchmark-v0.1.5' -and $localTarget -cne $candidate) {
+  if ($tag -ceq 'benchmark-v0.1.6' -and $localTarget -cne $candidate) {
     throw 'Candidate benchmark tag no longer targets the candidate'
   }
   $remoteRows = @(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")
@@ -948,14 +1088,14 @@ uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository `
   --repository-root . --candidate-commit $candidate `
   --policy configs/release/release_gate_policy_v1.json `
   --created-at-utc $now --output $finalPolicyScan
-Assert-NativeSuccess 'final nine-tag policy scan'
+Assert-NativeSuccess 'final ten-tag policy scan'
 if (git status --porcelain=v1 --untracked-files=all) {
   throw 'Final local worktree is not clean'
 }
 ```
 
 Final checks must prove: repository still private; remote `main` equals the
-candidate; all nine annotated tag objects and targets match policy; release is
+candidate; all ten annotated tag objects and targets match policy; release is
 published as a private prerelease; assets are byte-identical; local worktree is
 clean; no DOI was minted. Keep the repository private until a separate public,
 licence, claim, and lineage audit authorizes disclosure.

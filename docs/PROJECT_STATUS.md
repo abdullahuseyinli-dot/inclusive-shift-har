@@ -18,7 +18,7 @@ This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gat
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | Private remote created; cross-platform fixture patch candidate in progress | failed candidates/runs `benchmark-v0.1.0`/`32799146947`, `benchmark-v0.1.1`/`32801378375`, `benchmark-v0.1.2`/`32802922698`, `benchmark-v0.1.3`/`32811935288`, and `benchmark-v0.1.4`/`32829208254` preserved; intended successor is pending as `benchmark-v0.1.5`; no DOI |
+| 10 - release | v0.1.6 security-remediated successor prepared for the create-only gate | five earlier CI failures and the v0.1.5 post-CI bundle failure remain preserved; repository metadata is sanitized before capture and independently rejected if the prohibited field survives; no DOI |
 
 ## Confirmatory outcome
 
@@ -96,11 +96,27 @@ metadata sidecar, embedded BSD 3-Clause text, and archived NVIDIA pages whose
 Ubuntu synthetic release-fixture tests after 511 passed and 3 skipped: generic
 fixtures inventoried only `safe@1` while the hardened Linux gate correctly
 required the reviewed XGBoost/NCCL pair. Windows passed tests, lint, formatting,
-and mypy, and the dependent release-security job was skipped. Successor
-`benchmark-v0.1.5` retains
-the production gate and dependency evidence and makes those fixtures explicitly
-platform-deterministic; it does not alter any research result or reopen the
-target. All five failed tags and runs remain visible and immutable.
+and mypy, and the dependent release-security job was skipped. Candidate
+`benchmark-v0.1.5` retained the production gate and dependency evidence and made
+those fixtures explicitly platform-deterministic. Its run `32836567358` passed
+both synthetic-validation matrices and complete-history release security. The
+subsequent external release-bundle Gitleaks scan failed on three sanitized
+findings: one actual-risk `temp_clone_token` field and two deterministic
+`secret_scan` hash false positives. The bundle, raw scanner report, and
+supporting evidence are quarantined outside Git and were not committed. No
+release was created and no assets were uploaded; v0.1.5 is not released. The
+sanitized record is
+[`benchmark-v0.1.5-bundle-gitleaks.json`](../results/release/failures/benchmark-v0.1.5-bundle-gitleaks.json).
+The five earlier failed tags/runs and this post-CI bundle-scan failure remain
+visible; no research result changed and the target was not reopened.
+
+The v0.1.6 successor filters authenticated repository metadata inside `gh`
+before stdout is redirected, rejects any retained `temp_clone_token` field in
+both capture and offline inventory validation, and restricts the Gitleaks
+allowance to the two canonical SHA-256 evidence fields in `ci.json`. The
+create-only release gate still requires complete local validation, an immutable
+successor tag, exact green CI, an empty authoritative bundle scan, and
+byte-identical uploaded assets.
 
 The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
 

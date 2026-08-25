@@ -4,6 +4,7 @@ import hashlib
 import json
 import re
 import subprocess
+import tomllib
 from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
@@ -1078,7 +1079,7 @@ def test_nvidia_nccl_exception_rejects_additional_compatible_wheel(
         """
 [[package]]
 name = "inclusive-shift-har"
-version = "0.1.5a0"
+version = "0.1.6a0"
 source = { editable = "." }
 dependencies = [
     { name = "nvidia_nccl.cu12" },
@@ -1765,6 +1766,69 @@ def test_release_policy_pins_supply_chain_and_forbids_model_payloads(
         "actions/upload-artifact": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
         "astral-sh/setup-uv": "20cfd1bf945f4377ade1205e4dbc17946fc9a30d",
     }
+
+
+def test_gitleaks_allowlist_is_rule_path_and_exact_field_scoped(repository_root: Path) -> None:
+    config_path = repository_root / ".gitleaks.toml"
+    config_payload = config_path.read_bytes()
+    policy = json.loads(
+        (repository_root / "configs/release/release_gate_policy_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert policy["gitleaks"]["config_sha256"] == hashlib.sha256(config_payload).hexdigest()
+    config = tomllib.loads(config_payload.decode("utf-8"))
+    assert set(config) == {"title", "extend", "rules"}
+    assert config["extend"] == {"useDefault": True}
+    rules = config.get("rules")
+    assert isinstance(rules, list)
+    assert len(rules) == 1
+    rule = rules[0]
+    assert isinstance(rule, dict)
+    assert set(rule) == {"id", "allowlists"}
+    assert rule["id"] == "generic-api-key"
+    allowlists = rule["allowlists"]
+    assert isinstance(allowlists, list)
+    assert len(allowlists) == 1
+    allowlist = allowlists[0]
+    assert isinstance(allowlist, dict)
+    assert set(allowlist) == {
+        "description",
+        "condition",
+        "regexTarget",
+        "paths",
+        "regexes",
+    }
+    assert allowlist["condition"] == "AND"
+    assert allowlist["regexTarget"] == "match"
+    assert allowlist["paths"] == [r"(?:^|[/\\])ci\.json$"]
+    assert allowlist["regexes"] == [
+        r'^secret_scan":"[0-9a-f]{64}"$',
+        r'^secret_scan\.json":"[0-9a-f]{64}"$',
+    ]
+
+    path_pattern = re.compile(allowlist["paths"][0])
+    assert path_pattern.search("ci.json")
+    assert path_pattern.search("C:/validated-release/ci.json")
+    assert not path_pattern.search("repository-api.json")
+    assert not path_pattern.search("ci.json.backup")
+
+    digest = hashlib.sha256(b"synthetic release evidence").hexdigest()
+    content_patterns = [re.compile(value) for value in allowlist["regexes"]]
+    allowed_matches = {
+        f'secret_scan":"{digest}"',
+        f'secret_scan.json":"{digest}"',
+    }
+    assert all(
+        any(pattern.fullmatch(value) for pattern in content_patterns) for value in allowed_matches
+    )
+    for rejected in (
+        f'other_secret":"{digest}"',
+        f'temp_clone_token":"{digest}"',
+        f'secret_scan":"{digest.upper()}"',
+        'secret_scan":"not-a-sha256"',
+    ):
+        assert not any(pattern.fullmatch(rejected) for pattern in content_patterns)
 
 
 def test_global_ignore_policy_covers_release_forbidden_payloads(repository_root: Path) -> None:

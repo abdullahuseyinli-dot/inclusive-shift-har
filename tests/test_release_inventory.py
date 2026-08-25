@@ -1270,6 +1270,33 @@ def test_ready_rejects_rehashed_wrong_repository_api_response(tmp_path: Path) ->
         _generate(workspace)
 
 
+def test_ready_rejects_rehashed_repository_api_temp_clone_token_field(tmp_path: Path) -> None:
+    workspace = _build_workspace(tmp_path, requested_status="ready")
+    spec_root = workspace.spec_path.parent
+    raw_path = spec_root / "repository-api.json"
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    raw["temp_clone_token"] = None
+    _write_json(raw_path, raw)
+
+    remote_item = workspace.spec["remote"]
+    evidence_path = spec_root / remote_item["evidence_path"]
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    evidence["api_response_files"]["repository"].update(
+        {
+            "size_bytes": raw_path.stat().st_size,
+            "file_sha256": _file_sha256(raw_path),
+        }
+    )
+    evidence.pop("record_sha256")
+    evidence["record_sha256"] = canonical_json_sha256(evidence)
+    _write_json(evidence_path, evidence)
+    remote_item["expected_sha256"] = _file_sha256(evidence_path)
+    _write_json(workspace.spec_path, workspace.spec)
+
+    with pytest.raises(ReleaseEvidenceError, match="forbidden temp_clone_token field"):
+        _generate(workspace)
+
+
 @pytest.mark.parametrize(
     "mutate",
     [

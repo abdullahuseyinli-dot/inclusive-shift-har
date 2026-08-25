@@ -121,6 +121,44 @@ def test_capture_remote_evidence_rejects_noncanonical_repository(tmp_path: Path)
         )
 
 
+def test_capture_remote_evidence_rejects_temp_clone_token_field(tmp_path: Path) -> None:
+    repository_response = tmp_path / "repository.json"
+    ref_response = tmp_path / "main-ref.json"
+    output_root = tmp_path / "output"
+    output_root.mkdir()
+    _write_json(
+        repository_response,
+        {
+            "full_name": REPOSITORY,
+            "html_url": f"https://github.com/{REPOSITORY}",
+            "url": f"https://api.github.com/repos/{REPOSITORY}",
+            "private": True,
+            "visibility": "private",
+            "default_branch": "main",
+            "temp_clone_token": None,
+        },
+    )
+    _write_json(
+        ref_response,
+        {
+            "ref": "refs/heads/main",
+            "url": f"https://api.github.com/repos/{REPOSITORY}/git/refs/heads/main",
+            "object": {"type": "commit", "sha": CANDIDATE},
+        },
+    )
+
+    with pytest.raises(GitHubEvidenceError, match="forbidden temp_clone_token field"):
+        capture_remote_evidence(
+            repository_response_path=repository_response,
+            main_ref_response_path=ref_response,
+            candidate_commit=CANDIDATE,
+            queried_at_utc="2026-08-25T12:00:00Z",
+            output_path="remote.json",
+            allowed_output_root=output_root,
+        )
+    assert not (output_root / "remote.json").exists()
+
+
 def _ci_inputs(tmp_path: Path, *, unsafe_member: str | None = None) -> tuple[Path, Path, Path]:
     run_response = tmp_path / "run.json"
     artifact_response = tmp_path / "artifact.json"

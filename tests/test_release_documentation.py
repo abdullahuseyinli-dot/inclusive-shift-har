@@ -75,23 +75,58 @@ def test_release_runbook_fail_closes_outer_bundle_and_draft_publication(
         "outer-bundle manifest assembly",
         "outer-bundle build",
         "outer-bundle offline reconstruction",
+        "bundle-gitleaks-default-only.toml",
+        "bundle-gitleaks-empty.ignore",
+        "bundle-gitleaks-unreviewed.json",
+        "--config $bundleBaselineConfig",
+        "@($bundleFindings).Count -ne 2",
+        "$expectedCiMatches.SetEquals($observedCiMatches)",
+        "--gitleaks-ignore-path $bundleBaselineIgnore",
+        "no dynamic fingerprint ignore is used",
         "Outer-bundle Gitleaks scan failed",
+        "@($remainingBundleFindings).Count -ne 0",
         "assets.Count -ne 2",
-        "gh release edit benchmark-v0.1.5",
+        "git tag -a benchmark-v0.1.6 $candidate",
+        "gh release create benchmark-v0.1.6",
+        "gh release edit benchmark-v0.1.6",
         "--draft=false --prerelease --latest=false",
         "published-release-api.json",
         "Published downloaded asset differs",
         "Repository is no longer private",
         "Remote annotated tag identity differs",
+        "32836567358",
+        "df8e681ced4cee4cdcdae67eb18f1aaa835410cb",
+        "eaa30d18ca60b3c123d1ccf9b095d8d78a03469d",
+        "all ten tag objects/peeled targets",
     ):
         assert expected in text
     assert 'Save-GhApiResponse "repos/$repository/releases?per_page=100" $draftApi' in text
     assert (
-        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.5" $publishedApi'
+        'Save-GhApiResponse "repos/$repository/releases/tags/benchmark-v0.1.6" $publishedApi'
         in text
     )
+    assert "-ArgumentList @('api', $Endpoint, '--jq', 'del(.temp_clone_token)')" in text
+    assert text.count('Save-SanitizedRepositoryApiResponse "repos/$repository"') == 2
+    assert 'Save-GhApiResponse "repos/$repository" "$external/repository-api.json"' not in text
+    assert 'Save-GhApiResponse "repos/$repository" $finalRepositoryApi' not in text
+    assert "[string]$finding.Secret -cne $expectedSecretHash" in text
+    assert "$bundleFindings = @(" not in text
+    assert "$remainingBundleFindings = @(" not in text
+    assert "rule-local `AND` allowance" in text
+    assert "'benchmark-v0.1.4', 'benchmark-v0.1.5', 'benchmark-v0.1.6'" in text
+    for obsolete_candidate_operation in (
+        "git show-ref --verify --quiet refs/tags/benchmark-v0.1.5",
+        "git tag -a benchmark-v0.1.5 $candidate",
+        "$candidateTagProbe = @(git ls-remote origin refs/tags/benchmark-v0.1.5",
+        "gh release create benchmark-v0.1.5",
+        "gh release download benchmark-v0.1.5",
+        "gh release edit benchmark-v0.1.5",
+        "releases/tags/benchmark-v0.1.5",
+        "$tag -ceq 'benchmark-v0.1.5' -and $localTarget -cne $candidate",
+    ):
+        assert obsolete_candidate_operation not in text
     assert '$toolRoot = ".audit/tools/$review/gitleaks-8.30.1-windows-x64"' in text
-    assert "final nine-tag policy scan" in text
+    assert "final ten-tag policy scan" in text
     assert "Set-Content -LiteralPath $draftApi" not in text
     assert "Set-Content -LiteralPath $publishedApi" not in text
 
@@ -111,22 +146,22 @@ def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_r
 
     policy = _load(repository_root / "configs/release/release_gate_policy_v1.json")
     refs = policy["git_refs"]
-    assert len(refs["required_for_release_tags"]) == 9
-    assert refs["pinned_annotated_tags"]["benchmark-v0.1.4"] == {
-        "object_id": "a31c61c9299177a017d1f60134e88ffcdd55b420",
-        "target_commit": "1e2d78698bfa87641508e037c583bf863be543ed",
-        "message": "InclusiveShift-HAR benchmark v0.1.4",
+    assert len(refs["required_for_release_tags"]) == 10
+    assert refs["pinned_annotated_tags"]["benchmark-v0.1.5"] == {
+        "object_id": "df8e681ced4cee4cdcdae67eb18f1aaa835410cb",
+        "target_commit": "eaa30d18ca60b3c123d1ccf9b095d8d78a03469d",
+        "message": "InclusiveShift-HAR benchmark v0.1.5",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com",
     }
     assert refs["permitted_candidate_tags"] == {
-        "benchmark-v0.1.5": {
-            "message": "InclusiveShift-HAR benchmark v0.1.5",
+        "benchmark-v0.1.6": {
+            "message": "InclusiveShift-HAR benchmark v0.1.6",
             "tagger_name": "Abdulla Huseyinli",
             "tagger_email": "abdullahuseyinli@gmail.com",
         }
     }
-    assert "32829208254" in refs["historical_notes"]["benchmark-v0.1.4"]
+    assert "32836567358" in refs["historical_notes"]["benchmark-v0.1.5"]
     exception = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]
     assert exception["review_record_sha256"] == record_hash
     assert exception["review_sha256"] == hashlib.sha256(review_path.read_bytes()).hexdigest()

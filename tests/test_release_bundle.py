@@ -644,6 +644,7 @@ def test_release_notes_are_candidate_bound_and_create_only(tmp_path: Path) -> No
 
     assert result["status"] == "pass"
     text = notes.read_text(encoding="utf-8")
+    assert text.startswith("# InclusiveShift-HAR benchmark v0.1.6 prerelease\n")
     assert candidate in text
     assert "opened once" in text
     assert "No DOI was minted" in text

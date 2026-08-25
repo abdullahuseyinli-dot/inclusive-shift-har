@@ -3,5 +3,18 @@ title = "InclusiveShift-HAR complete-history secret scan"
 [extend]
 useDefault = true
 
-# Reviewed false positives are pinned by finding fingerprint in .gitleaksignore.
-# Do not add broad path, regex, commit, or rule allowlists here.
+# Reviewed historical false positives are pinned by finding fingerprint in
+# .gitleaksignore. This rule-local AND allowlist covers only the two canonical
+# SHA-256 evidence fields in the validated, generated release ci.json record.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Validated secret-scan SHA-256 evidence fields in release ci.json"
+condition = "AND"
+regexTarget = "match"
+paths = ['''(?:^|[/\\])ci\.json$''']
+regexes = [
+  '''^secret_scan":"[0-9a-f]{64}"$''',
+  '''^secret_scan\.json":"[0-9a-f]{64}"$''',
+]

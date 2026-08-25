@@ -43,10 +43,21 @@ release-security job identified the Linux XGBoost-transitive
 synthetic release fixtures: they inventoried only `safe@1` even though the
 hardened Linux gate requires the reviewed XGBoost/NCCL pair. Windows passed
 tests, lint, formatting, and mypy; the dependent release-security job was
-skipped. The pending
-`benchmark-v0.1.5` candidate makes those fixtures deterministic on every host;
-it does not alter the production licence gate, research results, target
-opening, or dependency review. No earlier tag or failure is rewritten.
+skipped. `benchmark-v0.1.5` is preserved at commit
+`eaa30d18ca60b3c123d1ccf9b095d8d78a03469d`; CI run `32836567358` passed both
+synthetic-validation matrices and complete-history release security. The later
+external release-bundle Gitleaks scan failed on three sanitized findings: one
+actual-risk `temp_clone_token` field and two deterministic `secret_scan` hash
+false positives. The bundle, raw report, and supporting evidence remain
+quarantined outside Git. No release was created and no assets were uploaded;
+v0.1.5 is not released. The machine-readable failure record is
+[`results/release/failures/benchmark-v0.1.5-bundle-gitleaks.json`](results/release/failures/benchmark-v0.1.5-bundle-gitleaks.json).
+The v0.1.6 successor removes that release-evidence defect: authenticated
+repository metadata is filtered before file creation, both online capture and
+offline inventory validation reject any retained `temp_clone_token` field, and
+the scanner allowance is limited to the two canonical SHA-256 evidence fields
+in `ci.json`. It does not change an experiment, result, or target-opening
+record. No earlier tag or failure is rewritten.
 
 ## Post-confirmatory findings
 

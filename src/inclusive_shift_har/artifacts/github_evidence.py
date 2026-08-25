@@ -230,6 +230,10 @@ def capture_remote_evidence(
         repository_response_path, name="repository API response"
     )
     ref_response, ref_input = _load_api(main_ref_response_path, name="main-ref API response")
+    if "temp_clone_token" in repository_response:
+        raise GitHubEvidenceError(
+            "repository API response contains forbidden temp_clone_token field"
+        )
     repository = _repository(repository_response.get("full_name"), name="repository full_name")
     remote_url = f"https://github.com/{repository}"
     expected_api_url = f"https://api.github.com/repos/{repository}"

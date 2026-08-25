@@ -217,7 +217,7 @@ wheels = [
 
 [[package]]
 name = "inclusive-shift-har"
-version = "0.1.5a0"
+version = "0.1.6a0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },

@@ -16,6 +16,7 @@
       "benchmark-v0.1.3",
       "benchmark-v0.1.4",
       "benchmark-v0.1.5",
+      "benchmark-v0.1.6",
       "legacy-audit-v0.1.0",
       "protocol-v1.0.0",
       "protocol-v1.2.0"
@@ -56,6 +57,13 @@
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       },
+      "benchmark-v0.1.5": {
+        "object_id": "df8e681ced4cee4cdcdae67eb18f1aaa835410cb",
+        "target_commit": "eaa30d18ca60b3c123d1ccf9b095d8d78a03469d",
+        "message": "InclusiveShift-HAR benchmark v0.1.5",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
       "legacy-audit-v0.1.0": {
         "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
         "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
@@ -79,8 +87,8 @@
       }
     },
     "permitted_candidate_tags": {
-      "benchmark-v0.1.5": {
-        "message": "InclusiveShift-HAR benchmark v0.1.5",
+      "benchmark-v0.1.6": {
+        "message": "InclusiveShift-HAR benchmark v0.1.6",
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
@@ -91,6 +99,7 @@
       "benchmark-v0.1.2": "Preserved failed patch candidate. GitHub Actions run 32802922698 passed Ubuntu but failed six Windows byte-hash integrity tests after CRLF checkout conversion; the tag is immutable and superseded by benchmark-v0.1.3.",
       "benchmark-v0.1.3": "Preserved failed patch candidate. GitHub Actions run 32811935288 passed both operating-system test matrices but the release-security bundle rejected the Linux licence audit for the XGBoost-transitive nvidia-nccl-cu12 2.31.2 runtime; the tag is immutable and superseded by benchmark-v0.1.4.",
       "benchmark-v0.1.4": "Preserved failed patch candidate. GitHub Actions run 32829208254 failed the Ubuntu matrix with 49 synthetic release-fixture tests after 511 passed and 3 skipped: the hardened Linux x86-64 licence gate correctly required the reviewed XGBoost and NCCL packages, while generic fixtures still inventoried only safe@1. The Windows matrix passed tests, lint, formatting, and mypy; the dependent release-security job was skipped. The production licence gate was not weakened; the tag is immutable and superseded by benchmark-v0.1.5.",
+      "benchmark-v0.1.5": "Preserved failed release-bundle candidate. GitHub Actions run 32836567358 passed Ubuntu, Windows, and complete-history release-security. The external bundle reconstructed exactly, but its pinned Gitleaks directory scan reported one credential-bearing temp_clone_token field from the authenticated repository API response and two deterministic SHA-256 evidence values keyed secret_scan or secret_scan.json. No GitHub release was created and no assets were uploaded. Raw failure evidence remains quarantined outside Git; the tag is immutable and superseded by benchmark-v0.1.6.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },
@@ -191,7 +200,7 @@
   "gitleaks": {
     "version": "8.30.1",
     "config_path": ".gitleaks.toml",
-    "config_sha256": "8206a38bd9fa89f4cbbad3f62a74b53d1e5b0656a354a57959b38ae01cf4222f",
+    "config_sha256": "50b6a69a79810b9c061e6de7f3a1bdb8edab42fb0e604e2edda558bf080275d3",
     "ignore_path": ".gitleaksignore",
     "reviewed_ignore_entries": [
       "e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:183",
@@ -230,7 +239,7 @@
       "platform_machine": "x86_64",
       "scope": "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed",
       "lock_path": "uv.lock",
-      "lock_sha256": "f5344d0a2e8a7385004af6510cad3d227db3b300be5180c74a553eee1019369c",
+      "lock_sha256": "da8425edb32b7dd3c6864ca57afdf7c10796db9ebe27537d1b13beb6f72d3abf",
       "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
       "review_sha256": "ac91805bae85ad7cde3c9eef3a95cf83411e8367854f9ce3422f92f2168dad5c",
       "review_record_sha256": "989bf532680f4696485f807508ed49061092ab2a9308dceb635207523b8213d3",

@@ -2599,6 +2599,10 @@ def _validate_remote_record(
         name="remote API response files",
     )
     repository_response = api_responses["repository"]
+    if "temp_clone_token" in repository_response:
+        raise ReleaseEvidenceError(
+            "retained repository API response contains forbidden temp_clone_token field"
+        )
     private = repository_response.get("private")
     api_visibility = repository_response.get("visibility")
     if private is True and api_visibility in {None, "private"}:
