@@ -1,0 +1,134 @@
+{
+  "schema_version": "1.0.0",
+  "manifest_kind": "dataset",
+  "dataset_id": "daghar_v2",
+  "title": "DAGHAR: A Benchmark for Domain Adaptation and Generalization in Smartphone-Based Human Activity Recognition",
+  "record_status": "locked_starter",
+  "release": {
+    "version": "2",
+    "doi": "10.5281/zenodo.13987073",
+    "published_date": "2024-10-24",
+    "landing_url": "https://zenodo.org/records/13987073"
+  },
+  "provenance": {
+    "official_repository_url": "https://github.com/H-IAAC/DAGHAR",
+    "official_repository_commit": "5dd56f647c44f1de12f22f224c31fe0f71609675",
+    "metadata_endpoint": "https://zenodo.org/api/records/13987073",
+    "metadata_verified_date": "2026-09-03",
+    "retrieved_at_utc": "2026-09-03T19:21:58.6902203Z",
+    "retrieval_transport": "official_zenodo_https"
+  },
+  "license": {
+    "status": "clear",
+    "notices": [
+      {
+        "source": "Zenodo DAGHAR version 2 record",
+        "identifier": "CC-BY-4.0",
+        "name": "Creative Commons Attribution 4.0 International",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+      }
+    ],
+    "redistribution_policy": "do_not_redistribute_raw"
+  },
+  "artifacts": [
+    {
+      "artifact_id": "daghar_v2_standardized_view_zip",
+      "role": "external_domain_generalization_proxy",
+      "provider_filename": "standardized_view.zip",
+      "download_url": "https://zenodo.org/api/records/13987073/files/standardized_view.zip/content",
+      "storage_path": "external/daghar/v2/standardized_view.zip",
+      "media_type": "application/zip",
+      "expected_size_bytes": 191454525,
+      "provider_md5": "385837c498b3fd2a8b72785c6b2946c6",
+      "expected_sha256": "e018334c57c4fed0913591e68c3007e85b13767a37b2db3ae0d79978363831e8",
+      "hash_provenance": "locally_observed_official_https",
+      "git_policy": "exclude_raw_from_git"
+    }
+  ],
+  "expected_data": {
+    "sampling_rate_hz": 20,
+    "window_length_samples": 60,
+    "window_duration_seconds": 3,
+    "gravity_removal": "third_order_butterworth_high_pass_0.3_hz_by_provider",
+    "accelerometer_unit": "m/s^2",
+    "gyroscope_unit": "rad/s",
+    "participant_partitioning": "provider_user_disjoint_train_validation_test",
+    "standard_activity_code": {
+      "0": "sit",
+      "1": "stand",
+      "2": "walk",
+      "3": "stair_up",
+      "4": "stair_down",
+      "5": "run"
+    },
+    "functional_core_mapping": {
+      "0": "sitting",
+      "1": "standing",
+      "2": "mobility",
+      "3": "excluded",
+      "4": "excluded",
+      "5": "excluded"
+    },
+    "domains": [
+      "KuHar",
+      "MotionSense",
+      "RealWorld_thigh",
+      "RealWorld_waist",
+      "UCI",
+      "WISDM"
+    ]
+  },
+  "external_evaluation_partition": {
+    "ordering_rule": "ascending_sha256_of_inclusive-shift-har|daghar-v2|external-domain-order|domain",
+    "development_domains": [
+      "RealWorld_thigh",
+      "RealWorld_waist",
+      "UCI"
+    ],
+    "sealed_evaluation_domains": [
+      "MotionSense",
+      "KuHar",
+      "WISDM"
+    ],
+    "sealed_domain_signals_labels_predictions_or_metrics_may_select_methods": false,
+    "opening_rule": "open_once_after_source_and_development-domain_method_freeze"
+  },
+  "feature_policy": {
+    "model_input_policy": "exact_allowlist_only",
+    "primary_six_channel_allowlist": [
+      "accel-x",
+      "accel-y",
+      "accel-z",
+      "gyro-x",
+      "gyro-y",
+      "gyro-z"
+    ],
+    "sensitive_and_non_model_exclusions": {
+      "exact_names": [
+        "user",
+        "index",
+        "window",
+        "serial",
+        "activity code",
+        "standard activity code",
+        "position",
+        "csv",
+        "UserID",
+        "disabled",
+        "disability",
+        "assistive_device"
+      ],
+      "casefold_prefixes": [
+        "timestamp",
+        "gps",
+        "location"
+      ]
+    }
+  },
+  "gate_policy": {
+    "raw_data_read_requires": "raw_data_read_access_approved",
+    "split_build_requires": "data_audit_pass",
+    "training_requires": "split_audit_pass",
+    "confirmatory_evaluation_requires": "final_evaluation_unlock"
+  }
+}

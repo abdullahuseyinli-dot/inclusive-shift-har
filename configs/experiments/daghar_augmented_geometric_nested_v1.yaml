@@ -1,0 +1,41 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-daghar-augmented-geometric-nested-v1"
+declared_on: "2026-09-03"
+status: "post_analysis_source_nested_external_development_only_target_sealed"
+method_origin: "Geometric Spectral Pyramid with domain-participant-class balanced external development support."
+inclusivehar:
+  sampling_rate_hz: 50
+  acceleration_conversion_to_m_per_s2: 9.80665
+  target_participants_allowed: false
+daghar:
+  manifest: manifests/datasets/daghar_v2.json
+  archive_sha256: e018334c57c4fed0913591e68c3007e85b13767a37b2db3ae0d79978363831e8
+  sampling_rate_hz: 20
+  development_domains: [RealWorld_thigh, RealWorld_waist, UCI]
+  allowed_partitions: [train]
+  sealed_evaluation_domains_allowed: false
+  deterministic_max_windows_per_domain_participant_class: 20
+weighting: "equal domain, then equal participant-class cell within domain"
+selection:
+  unit: inclusivehar_inner_participant
+  primary: inner_mean_participant_macro_f1
+  tie_breakers: [inner_lower_30_percent_participant_macro_f1, complexity_rank, candidate_id]
+  outer_labels_used: false
+seed: 11
+n_jobs: 4
+forest:
+  n_estimators: 192
+  max_features: sqrt
+  min_samples_leaf_values: [3, 1]
+  class_weight: null
+candidates:
+  - {id: source_extra_trees_leaf3, complexity_rank: 1, external_training: false, hierarchy: false, participant_class_weighted: true}
+  - {id: source_extra_trees_leaf1, complexity_rank: 2, external_training: false, hierarchy: false, participant_class_weighted: true}
+  - {id: source_hierarchy_leaf3, complexity_rank: 3, external_training: false, hierarchy: true, participant_class_weighted: true}
+  - {id: external_extra_trees_leaf3, complexity_rank: 4, external_training: true, hierarchy: false, participant_class_weighted: true}
+  - {id: external_extra_trees_leaf1, complexity_rank: 5, external_training: true, hierarchy: false, participant_class_weighted: true}
+  - {id: external_hierarchy_leaf3, complexity_rank: 6, external_training: true, hierarchy: true, participant_class_weighted: true}
+claim_policy:
+  confirmatory_claim_allowed: false
+  daghar_development_domains_are_not_confirmatory: true
+  independent_external_or_new_cohort_validation_required: true

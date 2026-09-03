@@ -1,0 +1,36 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-robust-multiscale-residual-pyramid-nested-v1"
+declared_on: "2026-09-03"
+status: "post_corruption_analysis_source_development_target_sealed"
+method_origin: "Invented after the fixed source-corruption audit identified additive-noise and low-frequency-drift sensitivity; target records remained sealed."
+signal_views:
+  base: original_six_channel_window
+  denoised: savitzky_golay_order_2_span_seconds_0_20
+  residual: original_minus_savitzky_golay_order_2_span_seconds_1_00
+  base_denoised: concatenate_base_and_denoised_features
+  tri_view: concatenate_base_denoised_and_residual_features
+feature_contract:
+  base_extractor: geometric_spectral_pyramid_v1
+  sampling_rate_hz: 50
+  learned_filter_parameters: false
+  forbidden_inputs: [participant_id, disability, assistive_device, timestamp, location, released_block_position]
+selection:
+  unit: participant
+  primary: inner_mean_participant_macro_f1
+  tie_breakers: [inner_lower_30_percent_participant_macro_f1, complexity_rank, candidate_id]
+  outer_labels_used: false
+seed: 11
+n_jobs: 4
+candidates:
+  - {id: base_extra_trees_leaf1, view: base, estimator: extra_trees_leaf1, complexity_rank: 1, participant_class_weighted: true}
+  - {id: base_participant_jackknife_leaf3, view: base, estimator: participant_jackknife_leaf3, complexity_rank: 2, participant_class_weighted: true}
+  - {id: denoised_extra_trees_leaf1, view: denoised, estimator: extra_trees_leaf1, complexity_rank: 3, participant_class_weighted: true}
+  - {id: residual_extra_trees_leaf1, view: residual, estimator: extra_trees_leaf1, complexity_rank: 4, participant_class_weighted: true}
+  - {id: base_denoised_extra_trees_leaf3, view: base_denoised, estimator: extra_trees_leaf3, complexity_rank: 5, participant_class_weighted: true}
+  - {id: tri_view_extra_trees_leaf3, view: tri_view, estimator: extra_trees_leaf3, complexity_rank: 6, participant_class_weighted: true}
+  - {id: tri_view_participant_jackknife_leaf3, view: tri_view, estimator: participant_jackknife_leaf3, complexity_rank: 7, participant_class_weighted: true}
+claim_policy:
+  post_corruption_method_development: true
+  corruption_result_reuse_for_selection: false
+  confirmatory_claim_allowed: false
+  independent_external_or_new_cohort_validation_required: true

@@ -1,0 +1,29 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-geometric-spectral-pyramid-nested-v1"
+declared_on: "2026-09-03"
+status: "post_analysis_source_development_target_sealed"
+method_origin: "Designed from source-only failure analysis and external primary literature; no target records used."
+feature_contract:
+  input_channels: [motionUserAccelerationX, motionUserAccelerationY, motionUserAccelerationZ, motionRotationRateX, motionRotationRateY, motionRotationRateZ]
+  sampling_rate_hz: 50
+  learned_feature_parameters: false
+  families: [raw_axis, so3_scalar_invariant, covariance_geometry, canonical_principal_frame, physical_frequency, normalized_frequency, haar_energy, temporal_pyramid]
+  forbidden_inputs: [participant_id, disability, assistive_device, timestamp, location, released_block_position]
+selection:
+  unit: participant
+  primary: inner_mean_participant_macro_f1
+  tie_breakers: [inner_lower_30_percent_participant_macro_f1, complexity_rank, candidate_id]
+  outer_labels_used: false
+seed: 11
+n_jobs: 4
+candidates:
+  - {id: extra_trees_leaf3, complexity_rank: 1, participant_class_weighted: true}
+  - {id: extra_trees_leaf1, complexity_rank: 2, participant_class_weighted: true}
+  - {id: hierarchical_forest_leaf3, complexity_rank: 3, participant_class_weighted: true}
+  - {id: participant_jackknife_leaf3, complexity_rank: 4, participant_class_weighted: true}
+  - {id: histogram_gradient, complexity_rank: 5, participant_class_weighted: true}
+  - {id: xgboost_depth3, complexity_rank: 6, participant_class_weighted: true}
+  - {id: rotation_forest, complexity_rank: 7, participant_class_weighted: false}
+claim_policy:
+  confirmatory_claim_allowed: false
+  independent_external_or_new_cohort_validation_required: true

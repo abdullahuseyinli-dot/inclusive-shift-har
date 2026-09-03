@@ -1,0 +1,49 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-fuse-reframe-heterogeneous-router-v2"
+declared_on: "2026-09-03"
+status: "prospective_source_nested_development_target_sealed"
+outer_folds: [source_cv_01, source_cv_02, source_cv_03, source_cv_04, source_cv_05]
+seeds: [11, 23, 47, 89, 131]
+gate:
+  fit_examples: "inner out-of-fold rows where exactly one base prediction is correct"
+  features: "base probabilities, uncertainty/disagreement, and identity-free sensor-health features"
+  forbidden_features: [participant_id, disability, assistive_device, timestamp, location, label]
+  estimator: "standard_scaler_plus_logistic_regression"
+  regularization_c: 1.0
+  class_weight: balanced
+  threshold: 0.5
+  controls: [base_a, base_b, fixed_mean, max_confidence, learned_hard, learned_soft]
+  outer_label_use: "reporting_only_after_gate_and_bases_are_frozen"
+defaults:
+  epochs: 80
+  batch_size: 256
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 12
+  minimum_epochs: 8
+  hidden_channels: 96
+  embedding_dim: 96
+  dropout: 0.1
+  hierarchical: false
+  fusion_mode: raw
+  normalization: batch
+  balanced_sampler: false
+  use_physical_augmentation: false
+  augmented_classification_weight: 0.5
+  consistency_weight: 0.1
+  reconstruction_weight: 0.0
+  participant_cvar_weight: 0.0
+  branch_supervision_weight: 0.0
+  gate_supervision_weight: 0.0
+  vicreg_weight: 0.0
+  weight_averaging: none
+  mixed_precision: true
+candidates:
+  - id: compact_residual_dann
+    backbone: compact_residual
+    domain_adversarial_weight: 0.1
+    domain_grl_max_strength: 1.0
+    domain_grl_warmup_epochs: 10
+  - id: inception_erm
+    backbone: inception
+    domain_adversarial_weight: 0.0

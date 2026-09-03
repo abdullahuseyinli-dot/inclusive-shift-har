@@ -288,6 +288,7 @@ def test_locked_starter_manifest_directory_validates(repository_root: Path) -> N
     report = validate_manifest_directory(repository_root / "manifests" / "datasets")
     assert report.valid, report.to_dict()
     assert {result.dataset_id for result in report.results} == {
+        "daghar_v2",
         "inclusivehar_v4",
         "uci_har_v1",
     }

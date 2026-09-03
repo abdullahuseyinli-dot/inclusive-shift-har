@@ -8,6 +8,7 @@ import torch
 from inclusive_shift_har.training.engine import (
     TrainingConfig,
     TrainingLineage,
+    _accumulate_training_losses,
     _advance_scheduler_after_optimizer_updates,
     reconstruct_checkpoint,
     train_source_model,
@@ -145,3 +146,15 @@ def test_scheduler_does_not_advance_when_grad_scaler_skips_every_update() -> Non
     assert scheduler.calls == 0
     assert _advance_scheduler_after_optimizer_updates(scheduler, 1) is True
     assert scheduler.calls == 1
+
+
+def test_training_loss_accumulator_does_not_double_count_named_total() -> None:
+    totals: dict[str, float] = {}
+    total = torch.tensor(1.25)
+    _accumulate_training_losses(
+        totals,
+        total_loss=total,
+        component_losses={"total": total, "classification": torch.tensor(0.75)},
+        batch_size=4,
+    )
+    assert totals == {"total": 5.0, "classification": 3.0}

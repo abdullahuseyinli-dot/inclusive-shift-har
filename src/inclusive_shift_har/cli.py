@@ -40,6 +40,26 @@ EXIT_GATE_CLOSED = 3
 
 _TRAIN_TRACKS: dict[str, str] = {
     "inclusivehar-source": "run one participant-exclusive InclusiveHAR source-development job",
+    "fuse-reframe-source": "run one target-sealed FuSE-ReFrame v2 source-development job",
+    "fuse-reframe-nested": "run one target-sealed nested FuSE-ReFrame outer source fold",
+    "fuse-reframe-corruptions": "diagnose one FuSE-ReFrame checkpoint on source corruptions",
+    "fuse-reframe-router": "run one target-sealed nested heterogeneous OOF router fold",
+    "fuse-reframe-committee": "reanalyze frozen inner checkpoints as an equal-weight committee",
+    "multirocket-source": "run the fixed target-sealed MultiRocket grouped source control",
+    "spectral-shape-nested": "run deterministic nested SpectralShape source development",
+    "crossfit-expert-stack": "cross-fit frozen SpectralShape and neural committee experts",
+    "aeon-source-control": "run one fixed target-sealed modern time-series control",
+    "geometric-pyramid-nested": "run nested Geometric Spectral Pyramid source development",
+    "geometric-pyramid-corruptions": "replay frozen geometric models on source corruptions",
+    "geometric-pyramid-seed-ensemble": "evaluate the fixed five-seed geometric probability ensemble",
+    "robust-multiscale-nested": "run nested Robust Multiscale Residual Pyramid development",
+    "robust-multiscale-corruptions": "replay frozen robust multiscale models on corruptions",
+    "gravity-anchored-nested": "run nested gravity sensor-sufficiency development",
+    "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
+    "fixed-oof-fusion": "evaluate fixed pooling of frozen target-sealed OOF experts",
+    "daghar-augmented-nested": "run nested source selection with DAGHAR development support",
+    "daghar-external-freeze": "freeze one source candidate before held-out DAGHAR evaluation",
+    "daghar-external-evaluate": "consume the one held-out DAGHAR performance opening",
     "final-source-suite": "run the predeclared final source-only model/seed suite sequentially",
     "uci-source-fold": "run one official-train-only grouped UCI-HAR fold",
     "few-person": "build or run a post-confirmatory few-person scenario",
@@ -447,6 +467,101 @@ def _workflow_entrypoint(
             from inclusive_shift_har.experiments.inclusivehar_source import main as entrypoint
 
             return entrypoint, (), False
+        if track == "fuse-reframe-source":
+            from inclusive_shift_har.experiments.fuse_reframe_source import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "fuse-reframe-nested":
+            from inclusive_shift_har.experiments.fuse_reframe_nested import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "fuse-reframe-corruptions":
+            from inclusive_shift_har.experiments.fuse_reframe_corruptions import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "fuse-reframe-router":
+            from inclusive_shift_har.experiments.fuse_reframe_router import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "fuse-reframe-committee":
+            from inclusive_shift_har.experiments.fuse_reframe_committee import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "multirocket-source":
+            from inclusive_shift_har.experiments.multirocket_source import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "spectral-shape-nested":
+            from inclusive_shift_har.experiments.spectral_shape_nested import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "crossfit-expert-stack":
+            from inclusive_shift_har.experiments.crossfit_expert_stack import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "aeon-source-control":
+            from inclusive_shift_har.experiments.aeon_source_controls import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "geometric-pyramid-nested":
+            from inclusive_shift_har.experiments.geometric_spectral_pyramid_nested import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "geometric-pyramid-corruptions":
+            from inclusive_shift_har.experiments.geometric_pyramid_corruptions import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "geometric-pyramid-seed-ensemble":
+            from inclusive_shift_har.experiments.geometric_pyramid_seed_ensemble import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "robust-multiscale-nested":
+            from inclusive_shift_har.experiments.robust_multiscale_residual_nested import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "robust-multiscale-corruptions":
+            from inclusive_shift_har.experiments.robust_multiscale_corruptions import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "gravity-anchored-nested":
+            from inclusive_shift_har.experiments.gravity_anchored_geometric_nested import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "semantic-anchor-reconciliation":
+            from inclusive_shift_har.experiments.semantic_anchor_reconciliation import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "fixed-oof-fusion":
+            from inclusive_shift_har.experiments.fixed_oof_fusion import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "daghar-augmented-nested":
+            from inclusive_shift_har.experiments.daghar_augmented_geometric_nested import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track in {"daghar-external-freeze", "daghar-external-evaluate"}:
+            from inclusive_shift_har.experiments.daghar_external_evaluation import (
+                main as entrypoint,
+            )
+
+            command = "freeze" if track.endswith("freeze") else "evaluate"
+            return entrypoint, (command,), False
         if track == "final-source-suite":
             from inclusive_shift_har.experiments.final_source_suite import main as entrypoint
 

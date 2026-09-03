@@ -116,6 +116,9 @@
     "expected_data": {
       "type": "object"
     },
+    "external_evaluation_partition": {
+      "$ref": "#/$defs/external_evaluation_partition"
+    },
     "feature_policy": {
       "$ref": "#/$defs/feature_policy"
     },
@@ -153,6 +156,48 @@
       "type": "string",
       "minLength": 1,
       "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*\\\\).+$"
+    },
+    "external_evaluation_partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ordering_rule",
+        "development_domains",
+        "sealed_evaluation_domains",
+        "sealed_domain_signals_labels_predictions_or_metrics_may_select_methods",
+        "opening_rule"
+      ],
+      "properties": {
+        "ordering_rule": {
+          "type": "string",
+          "minLength": 1
+        },
+        "development_domains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sealed_evaluation_domains": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "sealed_domain_signals_labels_predictions_or_metrics_may_select_methods": {
+          "const": false
+        },
+        "opening_rule": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     },
     "provider_artifact": {
       "type": "object",

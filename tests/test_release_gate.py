@@ -107,6 +107,9 @@ def _policy(path: Path) -> Path:
 def _repository(path: Path) -> tuple[Path, str]:
     path.mkdir()
     _git(path, "init", "-b", "main")
+    # Byte-bound release evidence must not depend on the caller's global Git
+    # setting. In particular, Windows installations commonly enable autocrlf.
+    _git(path, "config", "core.autocrlf", "false")
     _git(path, "config", "user.email", "release@example.invalid")
     _git(path, "config", "user.name", "Release Gate Test")
     (path / ".gitignore").write_text(".audit/\n", encoding="utf-8")

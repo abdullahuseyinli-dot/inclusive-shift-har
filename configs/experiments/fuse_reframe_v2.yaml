@@ -1,0 +1,219 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-fuse-reframe-v2"
+status: "prospective_source_and_external_development_target_sealed"
+declared_on: "2026-09-03"
+base_commit: "2c3d2262d9698b60f06a1291173389392feab50b"
+base_tag: "benchmark-v0.1.7"
+protocol: "configs/protocols/inclusivehar_released_block_v1_2.yaml"
+source_window_manifest: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+ontology_track: functional_core
+information_policy:
+  allowed_inclusivehar_participants: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  existing_target_participants_allowed: false
+  target_predictions_or_metrics_allowed_for_selection: false
+  disability_device_identity_time_location_inputs_allowed: false
+  external_data_requires_record_level_licence_and_provenance: true
+endpoints:
+  primary: mean_participant_macro_f1
+  tail: lower_30_percent_participant_macro_f1
+  class_guardrails: [mobility_recall, sitting_recall, standing_recall]
+  diagnostics: [balanced_accuracy, nll, brier, ece, aurc, parameters, peak_memory, latency]
+selection_design:
+  outer_folds: [source_cv_01, source_cv_02, source_cv_03, source_cv_04, source_cv_05]
+  inner_folds_from_source_manifest: true
+  participant_partition_before_windows: true
+  preprocessing_fit_on_each_training_partition_only: true
+  outer_test_used_for_training_or_early_stopping: false
+  initial_screen_seed: 11
+  shortlist_seeds: [11, 23, 47, 89, 131]
+  batch_sizes: [32, 64]
+  learning_rates: [0.0001, 0.0003, 0.001]
+  weight_decays: [0.0001, 0.001]
+  normalizations: [group, layer]
+  maximum_epochs: 80
+  early_stopping_patience: 12
+  minimum_epochs: 12
+  tie_breakers:
+    - lower_30_percent_participant_macro_f1
+    - lower_parameter_count
+    - lower_learning_rate
+engineering_advance_gate:
+  minimum_mean_participant_macro_f1_gain: 0.015
+  minimum_lower_30_percent_gain: 0.020
+  maximum_any_class_recall_harm: 0.020
+  same_sign_required_in_majority_of_folds_and_seeds: true
+  external_proxy_noninferiority_count: 2
+stages:
+  - id: repair
+    controls: [native_unit_augmentation, groupnorm, layernorm, batch_32, batch_64, participant_class_sampler, best, ema, swa, swad]
+  - id: backbone_controls
+    controls: [multirocket, inceptiontime_or_cnn_har, tinyhar, compact_erm, compact_coral, compact_dann]
+  - id: pretraining
+    controls: [from_scratch, biobankssl_frozen, biobankssl_gradual, daghar, masked_reconstruction, vicreg_or_focal]
+  - id: fuse
+    controls: [flat, hierarchy, exact_labels, partial_labels, har_pmd_without_manual_wheelchair, har_pmd_with_manual_wheelchair]
+  - id: reframe
+    controls: [raw, invariant, static, gated, corruption_suite]
+  - id: combination
+    controls: [individually_passing_components_only, swad, seed_ensemble]
+  - id: adaptation_separate
+    controls: [zero_shot, causal_unlabelled, labelled_calibration]
+external_functional_mapping:
+  walking: [mobility]
+  crutches: [mobility]
+  walker: [mobility]
+  manual_wheelchair_active: [mobility]
+  still: [sitting, standing]
+  electric_or_passive_wheelchair_primary: excluded
+claim_policy:
+  - "One exploratory smoke run made before this declaration is engineering evidence only."
+  - "A source-development score is not a zero-shot target score."
+  - "No high score is promised; failed components are retained and removed from the candidate."
+  - "A new independent cohort is required for a new confirmatory breakthrough claim."
+prospective_amendments:
+  - amendment_id: source-screen-batch-256
+    declared_on: "2026-09-03"
+    status: exploratory_engineering_only
+    reason: "CPU screens used full-ish batches to make architecture triage tractable."
+    consequence: "Those screens cannot serve as preregistered nested-CV evidence."
+  - amendment_id: fixed-multirocket-control
+    declared_on: "2026-09-03"
+    status: declared_before_grouped_control_run
+    implementation: aeon_1_5_0_multirocket_classifier
+    input: source_training_standardized_raw_six_channel_windows
+    n_kernels: 10000
+    max_dilations_per_kernel: 32
+    n_features_per_kernel: 4
+    ridge_estimator: aeon_default
+    folds: [source_cv_01, source_cv_02, source_cv_03, source_cv_04, source_cv_05]
+    tuning: none
+    calibration_claim_allowed: false
+  - amendment_id: heterogeneous-oof-router
+    declared_on: "2026-09-03"
+    status: declared_before_nested_router_runs
+    candidate_file: configs/experiments/fuse_reframe_router_v2.yaml
+    bases: [compact_residual_dann, inception_erm]
+    gate_training: inner_participant_out_of_fold_predictions_only
+    gate_features: identity_free_probabilities_uncertainty_disagreement_and_sensor_health
+    forbidden_gate_features: [participant_id, disability, assistive_device, timestamp, location]
+    fixed_controls: [base_a, base_b, equal_probability_mean, maximum_confidence]
+    learned_outputs: [hard_router, soft_probability_mixture]
+    outer_labels_allowed_for_selection: false
+  - amendment_id: cross-fold-checkpoint-committee
+    declared_on: "2026-09-03"
+    status: post_analysis_source_development
+    trigger: "Nested fixed-epoch refits were unstable on already-open source outer folds."
+    rule: equal_probability_mean_of_four_frozen_inner_selected_checkpoints
+    fitted_committee_weights: false
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: deterministic-spectral-shape-family
+    declared_on: "2026-09-03"
+    status: post_analysis_source_development
+    config: configs/experiments/spectral_shape_nested_v1.yaml
+    trigger: "Investigate whether permitted-channel posture cues are lost by unstable neural fitting."
+    outer_selection: nested_participant_exclusive
+    epoch_or_checkpoint_selection: none
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: crossfit-expert-stack
+    declared_on: "2026-09-03"
+    status: post_analysis_source_development
+    config: configs/experiments/crossfit_expert_stack_v1.yaml
+    trigger: "A selection-prohibited oracle showed complementary frozen-expert errors."
+    meta_evaluation: leave_one_source_pair_out
+    participant_identity_feature_used: false
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: fixed-modern-time-series-controls
+    declared_on: "2026-09-03"
+    status: post_analysis_fixed_source_controls
+    config: configs/experiments/aeon_time_series_controls_v1.yaml
+    algorithms: [quant, hydra, multirocket_hydra, rist_budgeted]
+    outer_selection: none_every_algorithm_reported
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: geometric-spectral-pyramid
+    declared_on: "2026-09-03"
+    status: post_analysis_nested_source_development
+    config: configs/experiments/geometric_spectral_pyramid_nested_v1.yaml
+    trigger: "SpectralShape success plus source-only posture and representation failure analysis."
+    outer_selection: nested_participant_exclusive
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: spectral-rist-fixed-fusion
+    declared_on: "2026-09-03"
+    status: post_analysis_fixed_source_fusion
+    config: configs/experiments/spectral_rist_fixed_fusion_v1.yaml
+    learned_or_tuned_weights: false
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: daghar-augmented-geometric-pyramid
+    declared_on: "2026-09-03"
+    status: declared_before_external_development_training
+    config: configs/experiments/daghar_augmented_geometric_nested_v1.yaml
+    external_domains_allowed: [RealWorld_thigh, RealWorld_waist, UCI]
+    external_evaluation_domains_allowed: false
+    outer_selection: nested_participant_exclusive
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: geometric-pyramid-source-corruptions
+    declared_on: "2026-09-03"
+    status: declared_after_nested_selection_before_first_corruption_run
+    config: configs/experiments/geometric_spectral_pyramid_corruptions_v1.yaml
+    role: post_selection_diagnostic_prohibited_from_model_selection
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: gravity-anchored-geometric-pyramid
+    declared_on: "2026-09-03"
+    status: declared_before_first_gravity_anchored_result
+    config: configs/experiments/gravity_anchored_geometric_pyramid_nested_v1.yaml
+    role: secondary_sensor_sufficiency_not_primary_six_channel_claim
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: semantic-anchor-reconciliation
+    declared_on: "2026-09-03"
+    status: declared_before_first_labelled_personalization_result
+    config: configs/experiments/semantic_anchor_reconciliation_v1.yaml
+    role: labelled_personalization_separate_from_zero_shot
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: geometric-pyramid-fixed-seed-ensemble
+    declared_on: "2026-09-03"
+    status: declared_before_first_seed_ensemble_result
+    config: configs/experiments/geometric_spectral_pyramid_seed_ensemble_v1.yaml
+    seeds: [11, 23, 47, 89, 131]
+    architecture_choice: frozen_per_outer_fold_from_prior_nested_result
+    aggregation: equal_arithmetic_probability_mean
+    fitted_weights: false
+    outer_or_target_labels_used_for_selection: false
+    independent_validation_required: true
+  - amendment_id: robust-multiscale-residual-pyramid
+    declared_on: "2026-09-03"
+    status: declared_before_first_robust_multiscale_result
+    config: configs/experiments/robust_multiscale_residual_pyramid_nested_v1.yaml
+    trigger: "The fixed source-corruption audit identified noise and drift as the dominant GSP weaknesses."
+    views: [base, denoised, residual, base_denoised, tri_view]
+    learned_filter_parameters: false
+    corruption_result_reused_for_training_or_selection: false
+    outer_or_target_labels_used_for_selection: false
+    independent_validation_required: true
+  - amendment_id: robust-multiscale-source-corruptions
+    declared_on: "2026-09-03"
+    status: declared_after_nested_selection_before_first_corruption_run
+    config: configs/experiments/robust_multiscale_residual_corruptions_v1.yaml
+    role: post_selection_diagnostic_prohibited_from_model_selection
+    target_data_used: false
+    independent_validation_required: true
+  - amendment_id: daghar-heldout-external-evaluation
+    declared_on: "2026-09-03"
+    status: declared_before_external_evaluation_domain_opening
+    config: configs/experiments/daghar_external_evaluation_v1.yaml
+    candidate: robust_multiscale_denoised_extra_trees_leaf1_seed_11
+    development_domains_already_accessed: [RealWorld_thigh, RealWorld_waist, UCI]
+    sealed_evaluation_domains: [MotionSense, KuHar, WISDM]
+    earlier_schema_headers_and_first_row_probe_disclosed: true
+    sealed_domain_labels_predictions_or_metrics_accessed_before_freeze: false
+    evidence_status: heldout_performance_after_schema_probe_not_pristine_confirmatory
+    evaluation_metrics_may_change_candidate: false
+    independent_inclusivehar_or_equivalent_ability_cohort_still_required: true

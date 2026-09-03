@@ -1,0 +1,12 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-spectral-rist-fixed-fusion-v1"
+declared_on: "2026-09-03"
+status: "post_analysis_fixed_source_fusion_target_sealed"
+trigger: "SpectralShape led source mean while fixed RIST led source lower-tail robustness."
+experts: [spectral_shape_nested, rist_budgeted_fixed]
+methods: [equal_arithmetic_pool, equal_logarithmic_pool]
+learned_or_tuned_weights: false
+outer_labels_used_to_choose_weights: false
+claim_policy:
+  confirmatory_claim_allowed: false
+  independent_external_or_new_cohort_validation_required: true

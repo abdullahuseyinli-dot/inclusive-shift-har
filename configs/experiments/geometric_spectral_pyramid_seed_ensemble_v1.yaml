@@ -1,0 +1,26 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-geometric-spectral-pyramid-seed-ensemble-v1"
+declared_on: "2026-09-03"
+status: "post_analysis_source_development_target_sealed"
+method_origin: "The five seeds were predeclared in fuse_reframe_v2 before the first Geometric Spectral Pyramid result."
+base_result_contract:
+  record_kind: geometric_spectral_pyramid_nested_source_aggregate
+  status: complete_target_sealed
+  reuse_selected_candidate_per_outer_fold: true
+  repeat_inner_selection: false
+feature_contract:
+  sampling_rate_hz: 50
+  forbidden_inputs: [participant_id, disability, assistive_device, timestamp, location, released_block_position]
+ensemble:
+  seeds: [11, 23, 47, 89, 131]
+  frozen_base_seed: 11
+  aggregation: equal_arithmetic_probability_mean
+  fitted_weights: false
+  every_seed_reported: true
+selection:
+  outer_labels_used: false
+  target_data_used: false
+  winner_selection_from_this_run_allowed: false
+claim_policy:
+  confirmatory_claim_allowed: false
+  independent_external_or_new_cohort_validation_required: true

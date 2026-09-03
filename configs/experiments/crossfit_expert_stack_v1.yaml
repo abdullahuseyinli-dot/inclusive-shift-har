@@ -1,0 +1,28 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-crossfit-expert-stack-v1"
+declared_on: "2026-09-03"
+status: "post_analysis_cross_fitted_source_development_target_sealed"
+method_origin: "Introduced after a selection-prohibited oracle headroom diagnostic."
+base_predictions:
+  - spectral_shape_nested
+  - compact_residual_dann_cross_fold_committee
+  - inception_erm_cross_fold_committee
+meta_folds: [source_cv_01, source_cv_02, source_cv_03, source_cv_04, source_cv_05]
+meta_train_rule: "For each pair, fit only on OOF predictions from the other four pairs."
+features: [base_probabilities, confidence, margin, entropy, pairwise_absolute_differences, pairwise_disagreement]
+forbidden_features: [participant_id, disability, assistive_device, timestamp, location, label]
+regularization_c: 1.0
+class_weight: balanced
+threshold: 0.5
+outputs:
+  - multinomial_stack
+  - binary_expert_hard
+  - binary_expert_soft
+  - correctness_expert_hard
+controls:
+  - spectral_shape
+  - neural_committee_mean
+  - equal_three_expert_mean
+claim_policy:
+  confirmatory_claim_allowed: false
+  independent_external_or_new_cohort_validation_required: true

@@ -1,0 +1,45 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-robust-multiscale-daghar-heldout-v1"
+declared_on: "2026-09-03"
+status: "declared_before_external_evaluation_domain_opening"
+evidence_status: "heldout_performance_after_schema_probe_not_pristine_confirmatory"
+disclosures:
+  schema_headers_and_first_raw_row_probed_before_domain_partition_declaration: true
+  sealed_domain_labels_predictions_or_metrics_accessed_before_freeze: false
+  development_domains_previously_accessed: [RealWorld_thigh, RealWorld_waist, UCI]
+candidate:
+  source_nested_record_kind: robust_multiscale_residual_nested_source_aggregate
+  required_unanimous_selected_view: denoised
+  required_unanimous_estimator: extra_trees_leaf1
+  final_training_participants: all_source_participants
+  seed: 11
+  n_estimators: 500
+  max_features: sqrt
+  min_samples_leaf: 1
+  class_weight: balanced
+  participant_class_weighted: true
+  target_data_used: false
+unit_bridge:
+  inclusivehar_acceleration_input_unit: g
+  daghar_acceleration_input_unit: m_per_s2
+  inclusivehar_acceleration_multiplier: 9.80665
+  gyroscope_unit_both: rad_per_s
+external_evaluation:
+  manifest: manifests/datasets/daghar_v2.json
+  archive_sha256: e018334c57c4fed0913591e68c3007e85b13767a37b2db3ae0d79978363831e8
+  domains_in_frozen_order: [MotionSense, KuHar, WISDM]
+  provider_partitions: [train, validation, test]
+  sampling_rate_hz: 20
+  train_on_evaluation_domains: false
+  one_opening_only: true
+reporting:
+  primary: equal_domain_mean_of_participant_macro_f1
+  secondary: [all_participant_mean_macro_f1, worst_domain_mean_participant_macro_f1, per_domain_participant_macro_f1, class_recall, calibration]
+  participant_is_inferential_unit: true
+  window_metrics_diagnostic_only: true
+selection:
+  evaluation_metrics_may_change_candidate: false
+  target_data_allowed: false
+claim_policy:
+  confirmatory_claim_allowed: false
+  independent_inclusivehar_or_equivalent_ability_cohort_still_required: true

@@ -378,6 +378,29 @@ def _dann_grl_strength(
     return config.dann_grl_max_strength * warmup_fraction
 
 
+def _accumulate_training_losses(
+    totals: dict[str, float],
+    *,
+    total_loss: Tensor,
+    component_losses: dict[str, Tensor],
+    batch_size: int,
+) -> None:
+    """Accumulate one batch without double-counting a component named ``total``.
+
+    Historical v1 MoRe-HAR artifacts include a reporting-only defect: the
+    optimized total was accumulated directly and then accumulated a second time
+    from ``more_har_objective()["total"]``. The optimized tensor and model
+    weights were unaffected. This helper is prospective; preserved v1 records
+    are intentionally not rewritten.
+    """
+
+    totals["total"] = totals.get("total", 0.0) + float(total_loss.detach()) * batch_size
+    for name, value in component_losses.items():
+        if name == "total":
+            continue
+        totals[name] = totals.get(name, 0.0) + float(value.detach()) * batch_size
+
+
 def _train_epoch(
     model: nn.Module,
     loader: DataLoader[tuple[Tensor, Tensor, Tensor]],
@@ -495,9 +518,12 @@ def _train_epoch(
         batch_size = labels.numel()
         examples += batch_size
         dann_strength_total += dann_strength * batch_size
-        totals["total"] = totals.get("total", 0.0) + float(total_loss.detach()) * batch_size
-        for name, value in component_losses.items():
-            totals[name] = totals.get(name, 0.0) + float(value.detach()) * batch_size
+        _accumulate_training_losses(
+            totals,
+            total_loss=total_loss,
+            component_losses=component_losses,
+            batch_size=batch_size,
+        )
     averaged = {name: value / examples for name, value in totals.items()}
     if config.model_name == "dann_compact_residual_96":
         averaged["grl_strength_mean"] = dann_strength_total / examples

@@ -1,0 +1,30 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-robust-multiscale-residual-corruptions-v1"
+declared_on: "2026-09-03"
+status: "declared_after_nested_model_selection_before_first_corruption_run"
+role: "source-only robustness diagnostic of the frozen robust multiscale model; prohibited from model selection"
+sampling_rate_hz: 50
+clipping_quantile: 0.999
+seed: 19031
+suite:
+  - {name: clean, severity: 0.0}
+  - {name: rotation, severity: 0.25}
+  - {name: rotation, severity: 0.50}
+  - {name: gain, severity: 0.20}
+  - {name: gain, severity: 0.50}
+  - {name: noise, severity: 0.10}
+  - {name: noise, severity: 0.30}
+  - {name: bias, severity: 0.20}
+  - {name: bias, severity: 0.50}
+  - {name: drift, severity: 0.20}
+  - {name: drift, severity: 0.50}
+  - {name: channel_dropout, severity: 0.16666666666666666}
+  - {name: channel_dropout, severity: 0.3333333333333333}
+  - {name: temporal_gap, severity: 0.125}
+  - {name: temporal_gap, severity: 0.25}
+  - {name: clipping, severity: 0.25}
+  - {name: clipping, severity: 0.50}
+  - {name: time_warp, severity: 0.10}
+  - {name: time_warp, severity: 0.25}
+selection_use_prohibited: true
+target_data_allowed: false

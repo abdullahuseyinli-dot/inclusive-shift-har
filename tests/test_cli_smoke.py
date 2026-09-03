@@ -119,7 +119,7 @@ def test_validate_manifests_cli_passes_locked_starters(
     payload = _json_stdout(completed)
     assert completed.returncode == 0, payload
     assert payload["status"] == "pass"
-    assert payload["report"]["manifest_count"] == 2
+    assert payload["report"]["manifest_count"] == 3
 
 
 def test_audit_data_cli_dry_run_reads_no_raw_data(

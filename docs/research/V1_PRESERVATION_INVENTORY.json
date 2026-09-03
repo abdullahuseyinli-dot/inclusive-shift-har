@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "prospective_v2_v1_preservation_inventory",
+  "created_on": "2026-09-03",
+  "status": "v1_preserved_target_permanently_consumed",
+  "repository_commit": "2c3d2262d9698b60f06a1291173389392feab50b",
+  "repository_tag": "benchmark-v0.1.7",
+  "tag_resolves_to_repository_commit": true,
+  "target_opened_at_utc": "2026-08-24T01:20:11.5974574Z",
+  "target_opening_number": 1,
+  "target_may_be_used_for_v2_selection": false,
+  "files": [
+    {
+      "path": "configs/ontologies/inclusivehar_v1_1.yaml",
+      "size_bytes": 2531,
+      "sha256": "c1d532caf873a2e580be9fa5ed897d2d408f4fc6f67434188057c5c333d340d9"
+    },
+    {
+      "path": "configs/protocols/inclusivehar_released_block_v1_2.yaml",
+      "size_bytes": 5409,
+      "sha256": "639bd19a4c5da503c56e3ddc93eba77e07e35cdcb7c12e737d8d10829f2916df"
+    },
+    {
+      "path": "docs/LOCKED_PROTOCOL.md",
+      "size_bytes": 15309,
+      "sha256": "bbe5373f2873ff007182d3cd6e17512ab46b14c8b7f08a06096778146f32f9eb"
+    },
+    {
+      "path": "docs/LOCKED_TARGET_EVALUATION.md",
+      "size_bytes": 1841,
+      "sha256": "7740672fa93dcde915a7d0bf34f107d288b870098ca73b12567e81212182f694"
+    },
+    {
+      "path": "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json",
+      "size_bytes": 60187,
+      "sha256": "ae0daace937bc275bce2edd895f1c05eb540f61d1554eda471c9d2f27bf60e49"
+    },
+    {
+      "path": "results/confirmatory/zero_shot_v1/model_summary_v1.md",
+      "size_bytes": 2829,
+      "sha256": "2d39974dd500801e52687247fb4f913cab12a332d23d1d9017acff3ad245a8b1"
+    },
+    {
+      "path": "results/confirmatory/zero_shot_v1/publication_report_v1.json",
+      "size_bytes": 31738,
+      "sha256": "615e688aaf8db5155bbcfd8c261c4a26d83753c2271c1f72dd86cbd7e02c0a1f"
+    },
+    {
+      "path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+      "size_bytes": 815930,
+      "sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+      "embedded_canonical_record_sha256": "1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522"
+    }
+  ],
+  "preservation_policy": {
+    "old_files_rewritten": false,
+    "old_results_relabelled": false,
+    "future_target_free_development_sources": [
+      "InclusiveHAR participant IDs 1-10",
+      "licence-cleared external datasets"
+    ],
+    "current_target_allowed_use": "one optional frozen post-confirmatory historical check only"
+  }
+}

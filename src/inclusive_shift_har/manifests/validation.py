@@ -41,6 +41,14 @@ PRIMARY_SIX_CHANNEL_ALLOWLISTS: dict[str, list[str]] = {
         "body_gyro_y",
         "body_gyro_z",
     ],
+    "daghar_v2": [
+        "accel-x",
+        "accel-y",
+        "accel-z",
+        "gyro-x",
+        "gyro-y",
+        "gyro-z",
+    ],
 }
 
 
@@ -395,6 +403,59 @@ def validate_manifest(manifest: Any, *, path: str | None = None) -> ManifestVali
                 )
 
     _mapping(manifest.get("expected_data"), location="$.expected_data", errors=errors)
+    external_partition_value = manifest.get("external_evaluation_partition")
+    if external_partition_value is not None:
+        external_partition = _mapping(
+            external_partition_value,
+            location="$.external_evaluation_partition",
+            errors=errors,
+        )
+        if external_partition is not None:
+            _non_empty_string(
+                external_partition.get("ordering_rule"),
+                location="$.external_evaluation_partition.ordering_rule",
+                errors=errors,
+            )
+            development_domains = _string_list(
+                external_partition.get("development_domains"),
+                location="$.external_evaluation_partition.development_domains",
+                errors=errors,
+            )
+            sealed_domains = _string_list(
+                external_partition.get("sealed_evaluation_domains"),
+                location="$.external_evaluation_partition.sealed_evaluation_domains",
+                errors=errors,
+            )
+            if (
+                development_domains is not None
+                and sealed_domains is not None
+                and set(development_domains) & set(sealed_domains)
+            ):
+                errors.append(
+                    ValidationIssue(
+                        "EXTERNAL_DOMAIN_OVERLAP",
+                        "development and sealed external domains must be disjoint",
+                        "$.external_evaluation_partition",
+                    )
+                )
+            if (
+                external_partition.get(
+                    "sealed_domain_signals_labels_predictions_or_metrics_may_select_methods"
+                )
+                is not False
+            ):
+                errors.append(
+                    ValidationIssue(
+                        "EXTERNAL_SELECTION_POLICY",
+                        "sealed external domains must be forbidden from method selection",
+                        "$.external_evaluation_partition.sealed_domain_signals_labels_predictions_or_metrics_may_select_methods",
+                    )
+                )
+            _non_empty_string(
+                external_partition.get("opening_rule"),
+                location="$.external_evaluation_partition.opening_rule",
+                errors=errors,
+            )
     feature_policy = _mapping(
         manifest.get("feature_policy"), location="$.feature_policy", errors=errors
     )
