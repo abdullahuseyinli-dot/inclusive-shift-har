@@ -18,6 +18,14 @@ Compact DANN had the numerically highest locked-primary target mean, but its lea
 
 The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. A later descriptive comparison estimated a DANN source-minus-target gap of 0.1196 with interval [-0.0371, 0.2831], but the source estimate is one-seed grouped cross-validation while the target estimate averages five final-fit seeds. The two cohorts are unpaired and were evaluated under different training regimes, so that gap is reported only as a cohort-specific descriptive comparison.
 
+## FuSE/ReFrame v2 source-development extension
+
+The post-analysis v2 research suite invented a deterministic Robust Multiscale Residual Pyramid (RMRP) for the same smartphone IMU task. Strict 5-by-4 participant-exclusive nested source cross-validation improved mean/worst-participant macro-F1 from 0.8292/0.4985 with the Geometric Spectral Pyramid to 0.8379/0.5494 with RMRP. The lower decile declined from 0.7373 to 0.7284, the paired mean gain was not statistically decisive, and the +0.015 recorded engineering threshold was not met. This is a useful robustness result, not a confirmed breakthrough or a replacement for the locked v1 target result.
+
+RMRP improved the 18-corruption mean from 0.7507 to 0.7581 and was materially better under additive noise and two-channel dropout, while performing worse under temporal gaps and essentially tying under severe drift. A separate sparse-labelled semantic-anchor branch reached 0.8654 with one sitting and one standing anchor per participant, but that result is labelled personalization, not zero-shot. A frozen RMRP candidate obtained an equal-domain mean of 0.6196 on held-out DAGHAR domains after a disclosed schema probe, with large variation from MotionSense (0.7985) to KuHar (0.3679).
+
+The number 0.7514 belongs to a v1 few-person experiment in which four target-group participants entered training; it is not the predecessor of the v2 source-only 0.8379 result. The full method, comparisons, external evaluation, failures, hashes, and publication assessment are in [`docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md`](docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md), with a self-hashed compact ledger in [`results/development/fuse_reframe_v2/research_summary_v1.json`](results/development/fuse_reframe_v2/research_summary_v1.json).
+
 ## Evidence classes
 
 | Evidence class | Meaning | Status |
@@ -26,6 +34,7 @@ The complete table, participant values, calibration metrics, AURC, per-class rec
 | Corrected reproduction / development | Subject-grouped source development, tuning, ablations, and debugging. | Complete for the InclusiveHAR source suite and the separate 75-cell UCI official-train-only reproduction; the UCI official test was not opened. |
 | Locked confirmatory | Frozen source-only artifacts evaluated once on the sealed target cohort after all gates passed. | Opening 1 complete; no retry or second opening is permitted. |
 | Post-confirmatory secondary | Few-person inclusion, disabled-cohort within-group evaluation, sensor stress, efficiency, signal sensitivity, and qualified CCIL/BPD adaptations. | Completed and explicitly separate from the zero-shot confirmatory claim. |
+| v2 source/external development | Nested source-participant models, fixed corruptions, labelled anchors, and frozen DAGHAR held-out evaluation. | Complete as post-analysis development; no new InclusiveHAR target opening and no confirmatory breakthrough claim. |
 
 The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](results/protocol/confirmatory_target_opening_1.json). The primary statistics record is [`participant_statistics.json`](results/confirmatory/zero_shot_v1/participant_statistics.json), and the human-readable table is [`model_summary_v1.md`](results/confirmatory/zero_shot_v1/model_summary_v1.md).
 

@@ -1,6 +1,12 @@
 # Project status and evidence gates
 
-This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+This is a superseding status snapshot updated 2026-09-03. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+
+## 2026-09-03 FuSE/ReFrame v2 addendum
+
+The smartphone/wearable IMU repository now includes a completed post-analysis source-development suite. The invented Robust Multiscale Residual Pyramid reached mean/lower-decile/worst participant macro-F1 0.8379/0.7284/0.5494 in strict nested source cross-validation, versus 0.8292/0.7373/0.4985 for its Geometric Spectral Pyramid predecessor. The mean gain (+0.0087) did not meet the recorded +0.015 engineering threshold and was not statistically decisive. The primary supported advance is improved weakest-participant and additive-noise performance, with explicit temporal-gap and drift limitations.
+
+Sparse labelled Semantic Anchor Reconciliation reached 0.8654 mean and 0.7677 worst with one anchor per posture class on the remaining source windows. It is labelled personalization, not zero-shot. Frozen external evaluation produced a 0.6196 equal-domain mean over MotionSense, KuHar, and WISDM after a disclosed earlier schema probe; domain means 0.7985, 0.3679, and 0.6923 show that transfer remains heterogeneous. InclusiveHAR target participants 11--20 were not reopened. See `docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md` and `results/development/fuse_reframe_v2/research_summary_v1.json`.
 
 | Stage | Status | Evidence |
 |---|---|---|
@@ -15,10 +21,11 @@ This is a superseding status snapshot updated 2026-08-25. Earlier manifests, gat
 | 4D - few-person inclusion | Complete post-confirmatory secondary evidence | 1,200/1,200 CUDA cells; 64 model-k summaries; 80 paired comparisons; failed aggregate attempts 1-3 preserved |
 | 4E - cross-source and SSL/foundation | Not evaluated | exact-label classification blocked beyond sitting; adapted transfer not implemented; licence/interface/checkpoint gates unresolved |
 | 4F - sensor reliability | Complete post-confirmatory secondary evidence | 120 stressed cells; compact ERM/CORAL; severity calibration limitation retained |
+| 4G - FuSE/ReFrame v2 | Source-development and external held-out evaluation complete; not confirmatory | RMRP nested source result, corruption audit, sparse labelled anchors, and one consumed DAGHAR held-out opening; no v2 target access |
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | v0.1.7 UTF-8-safe successor prepared for the create-only gate | five earlier CI failures, the v0.1.5 bundle failure, and the unpublished v0.1.6 draft-validation failure remain preserved; repository metadata sanitization and strict saved-JSON decoding are independently validated; no DOI |
+| 10 - release | v0.1.7 metadata predates the v2 research scope; Git remote exists | final release version/scope, metadata, committed-candidate attestation, remote CI, tag, and Zenodo deposition remain outstanding; no DOI |
 
 ## Confirmatory outcome
 

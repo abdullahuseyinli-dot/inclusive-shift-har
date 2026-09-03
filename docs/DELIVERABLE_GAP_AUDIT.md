@@ -1,6 +1,6 @@
 # Staged deliverable gap audit
 
-Snapshot basis: repository records and worktree observed on 2026-08-24. This is a
+Snapshot basis: repository records and worktree observed on 2026-09-03. This is a
 conformance audit, not a new acceptance gate. “Complete” below means evidence is
 present for the stated scope; it does not erase recorded limitations. Ongoing
 uncommitted work must be reassessed before release.
@@ -22,8 +22,9 @@ uncommitted work must be reassessed before release.
 | 7 — hardware/training | Observed 12 GB CUDA machine record, actual CUDA allocation, mixed precision, deterministic seeds, sequential final runs and preserved recurrent backend failures | Recurrent success required CUDA tensors with cuDNN disabled. Do not generalize timing/compatibility beyond the recorded machine |
 | 8 — metrics/statistics | Participant macro-F1, tails, calibration, AURC, per-class recall, clustered bootstrap, paired tests/effect sizes/multiplicity, model sizes, and completed 320-profile CUDA efficiency evidence | Efficiency timing is device-resident forward-only with allowlisted WDDM ambient processes; analytical MAC/FLOP coverage includes only Conv1d/Linear/LSTM, not every graph operator |
 | 8S — signal sensitivities | Completed SI-unit equivalence record and corrected raw/total-acceleration v1.1 CUDA analysis | SI conversion is a preprocessing equivalence result, not accuracy evidence; raw/total acceleration is not UCI body acceleration and did not robustly improve the primary interface |
+| 8V2 — FuSE/ReFrame v2 | Strict nested source CV, modern controls, invented GSP/RMRP feature families, corruption diagnostics, sparse labelled anchors, DAGHAR augmentation control, and one frozen external-domain evaluation | RMRP misses the joint engineering gate; external transfer is heterogeneous; HAR-PMD was not run; a new independent ability-relevant cohort is still required |
 | 9 — evidence gates | Historical pre-opening gate, immutable split/freeze/opening/index lineage, extensive synthetic tests | All tests/lint/format/types/manifests/splits/config/artifact scans must be rerun after current changes; historical 190-test evidence does not validate this worktree |
-| 10 — release | README/cards, CITATION.cff, Zenodo metadata, paper-ready outline, legacy/protocol tags | No Git remote is configured, no private repository link or benchmark tag exists, and no DOI is claimed. Final release inventory/gate and successful remote CI remain outstanding |
+| 10 — release | README/cards, CITATION.cff, Zenodo metadata, paper-ready outline, v2 report/addendum, legacy/protocol tags, and configured GitHub remote | `0.1.7a0` metadata does not yet define the v2 release scope. A clean committed candidate, final inventory/attestation, successful remote CI, immutable release tag, and Zenodo deposition remain outstanding; no DOI is claimed |
 
 ## Deliverable-level conclusion
 
@@ -38,8 +39,10 @@ over with renamed local models.
 
 Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
 
-A full manuscript is not present; `paper/OUTLINE.md` is a paper-ready outline and
-evidence narrative. A private GitHub release must wait for the new gate described
-in `docs/RELEASE_EVIDENCE_GATE.md`. Post-confirmatory completions may extend the
-release, but none may change the consumed zero-shot decision or be presented as
-predeclared confirmatory evidence.
+A full manuscript is not present; `paper/OUTLINE.md` is a paper-ready v1 outline,
+while `paper/FUSE_REFRAME_V2_ADDENDUM.md` and
+`docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md` document the new extension.
+The GitHub remote is configured, correcting the earlier snapshot, but a release
+must still wait for the gate in `docs/RELEASE_EVIDENCE_GATE.md`. Post-confirmatory
+completions may extend the release, but none may change the consumed zero-shot
+decision or be presented as predeclared confirmatory evidence.

@@ -217,3 +217,12 @@ prospective_amendments:
     evidence_status: heldout_performance_after_schema_probe_not_pristine_confirmatory
     evaluation_metrics_may_change_candidate: false
     independent_inclusivehar_or_equivalent_ability_cohort_still_required: true
+  - amendment_id: robust-semantic-anchor-reconciliation
+    declared_on: "2026-09-03"
+    status: declared_before_first_robust_labelled_personalization_result
+    config: configs/experiments/semantic_anchor_reconciliation_robust_v1.yaml
+    method_parameters: identical_to_preexisting_semantic_anchor_reconciliation_v1
+    role: labelled_personalization_separate_from_zero_shot
+    target_data_used: false
+    all_budgets_reported_without_selection: true
+    independent_validation_required: true
