@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "cage_har_fully_nested_retrospective_source_protocol",
+  "status": "locked_before_fully_nested_retrospective_source_run",
+  "declared_on": "2026-09-04",
+  "evidence_status": "retrospective_reused_source_development_not_independent_validation",
+  "method_freeze": {
+    "tag": "cage-har-implementation-v1",
+    "commit": "3d1e8ae444b9976c7d532b39142ae58d4fe41aad",
+    "parameters_changed_after_preliminary_probe": false
+  },
+  "protocol_document": {
+    "path": "docs/research/CAGE_HAR_RETROSPECTIVE_V1_PROTOCOL.md",
+    "sha256": "9ac6389db2d9eb91a0940d5c99158158a11d382525261f7d243c0ed4bddba3e6"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/cage_har_retrospective_v1.yaml",
+    "sha256": "391a75b48a3cf6f91cdb7bc2084cf67ed1b6a064d04d3d48035564a06d6ca421"
+  },
+  "implementation": {
+    "path": "src/inclusive_shift_har/experiments/cage_har_retrospective.py",
+    "sha256": "8a61c10e05827dd91ae81d8252ff0e59f6a957a013b09ba94dcc236e160a7167"
+  },
+  "focused_test": {
+    "path": "tests/test_cage_har_retrospective.py",
+    "sha256": "00dec0471ffb6714a147a7afee7d5b5699eecda051edc183fec9b58ca48b21a0"
+  },
+  "fixed_inputs": {
+    "source_manifest_sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+    "dataset_manifest_sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29",
+    "raw_source_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+    "ctgr_config_sha256": "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa",
+    "ctgr_selection_sha256": "f7475bc7ec43bf02ccdfe3b8eb6ed9c6a333b51781b638a63f2d257341a37180"
+  },
+  "fixed_seeds": [11, 23, 47, 89, 131],
+  "nested_design": {
+    "outer_fold_count": 5,
+    "inner_fold_count_per_outer": 4,
+    "inner_oof_regenerated_inside_each_outer_training_partition": true,
+    "repair_and_router_fit_on_inner_oof_only": true,
+    "outer_test_labels_used_for_training_or_selection": false,
+    "participant_is_inference_unit": true
+  },
+  "preliminary_probe": {
+    "disclosed": true,
+    "fully_nested": false,
+    "approximate_cage_har_mean_macro_f1": 0.8293,
+    "approximate_global_trust_blend_mean_macro_f1": 0.8612,
+    "publication_evidence": false,
+    "method_or_hyperparameter_change_after_probe": false
+  },
+  "evidence_boundary": {
+    "source_participants_1_through_10_reused": true,
+    "participants_11_through_20_loaded": false,
+    "daghar_loaded": false,
+    "independent_validation_claim_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false,
+    "new_cohort_still_required": true
+  },
+  "record_sha256": "bb18154a65aa9fe1e4d5e3b0b12e68dd756c8ca0cc04b6bdcc7f5c0ba24be483"
+}

@@ -57,3 +57,20 @@ def test_cage_implementation_summary_is_self_hashed_and_claim_safe() -> None:
     assert smoke["real_har_performance_claim_allowed"] is False
     assert record["human_data_result_status"]["new_cage_har_score_available"] is False
     assert record["claim_boundary"]["state_of_the_art_claim_allowed"] is False
+
+
+def test_cage_retrospective_protocol_is_self_hashed_and_lineage_locked() -> None:
+    path = Path("results/protocol/cage_har_retrospective_v1.json")
+    record: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    claimed = record.pop("record_sha256")
+    assert claimed == canonical_json_sha256(record)
+    for key in ("protocol_document", "experiment_config", "implementation", "focused_test"):
+        reference = record[key]
+        assert sha256_file(Path(reference["path"])) == reference["sha256"]
+    assert record["preliminary_probe"]["disclosed"] is True
+    assert record["preliminary_probe"]["publication_evidence"] is False
+    assert record["nested_design"]["outer_test_labels_used_for_training_or_selection"] is False
+    assert record["evidence_boundary"]["source_participants_1_through_10_reused"] is True
+    assert record["evidence_boundary"]["participants_11_through_20_loaded"] is False
+    assert record["evidence_boundary"]["daghar_loaded"] is False
+    assert record["evidence_boundary"]["confirmatory_claim_allowed"] is False

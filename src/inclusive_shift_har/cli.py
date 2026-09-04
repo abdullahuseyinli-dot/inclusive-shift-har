@@ -62,6 +62,7 @@ _TRAIN_TRACKS: dict[str, str] = {
     "ctgr-evaluate": "evaluate frozen confidence-triggered gravity residual candidates",
     "cage-har-development": "run CAGE-HAR on a guarded new-development OOF bundle",
     "cage-har-synthetic-smoke": "exercise CAGE-HAR on non-scientific synthetic data",
+    "cage-har-retrospective": "run frozen CAGE-HAR as nested reused-source development",
     "active-semantic-sentinel": "evaluate active labelled posture-semantic personalization",
     "provenance-mask-robustness": "replay RMRP with explicit validity-mask reconstruction",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
@@ -575,6 +576,10 @@ def _workflow_entrypoint(
 
             command = "run" if track.endswith("development") else "synthetic-smoke"
             return entrypoint, (command,), False
+        if track == "cage-har-retrospective":
+            from inclusive_shift_har.experiments.cage_har_retrospective import main as entrypoint
+
+            return entrypoint, (), False
         if track == "active-semantic-sentinel":
             from inclusive_shift_har.experiments.active_semantic_gauge_sentinel import (
                 main as entrypoint,

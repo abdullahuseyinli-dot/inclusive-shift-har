@@ -1,0 +1,76 @@
+schema_version: "1.0.0"
+experiment_id: "cage-har-retrospective-source-v1"
+declared_on: "2026-09-04"
+status: "locked_before_fully_nested_retrospective_source_run"
+evidence_status: "retrospective_reused_source_development_not_independent_validation"
+
+method_freeze:
+  tag: "cage-har-implementation-v1"
+  commit: "3d1e8ae444b9976c7d532b39142ae58d4fe41aad"
+  method_config:
+    path: "configs/experiments/cage_har_v1.yaml"
+    sha256: "3c8c3214e7e5aff3b278e2c9bae510631828d5a3b809a1a732e2f5c8b973fa43"
+  parameters_may_change_after_preliminary_probe: false
+
+inputs:
+  source_manifest:
+    path: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+    sha256: "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+  dataset_manifest:
+    path: "manifests/datasets/inclusivehar_v4.json"
+    sha256: "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  raw_source:
+    path: "data/raw/inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+    sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+  ctgr_config:
+    path: "configs/experiments/confidence_triggered_gravity_residual_v1.yaml"
+    sha256: "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa"
+  ctgr_selection:
+    path: ".audit/v3/max-rnd/ctgr-selection-001/selection.json"
+    sha256: "f7475bc7ec43bf02ccdfe3b8eb6ed9c6a333b51781b638a63f2d257341a37180"
+  ctgr_evaluation_record_pattern: ".audit/v3/max-rnd/ctgr-evaluation-seed-{seed}-001/result.json"
+
+fixed_seeds: [11, 23, 47, 89, 131]
+participant_ids: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+outer_fold_count: 5
+inner_fold_count_per_outer: 4
+
+nesting_contract:
+  frozen_ctgr_candidate_map_reused: true
+  base_and_expert_inner_oof_regenerated_inside_each_outer_training_partition: true
+  decision_repair_fit_on_inner_oof_only: true
+  advantage_router_fit_on_inner_oof_only: true
+  participant_jackknife_inside_outer_training_partition: true
+  preserved_outer_ctgr_probabilities_used_for_evaluation: true
+  outer_labels_used_for_training_selection_or_repair: false
+  context_channel_scale: "outer_training_median_absolute_clipped_at_1e-6"
+  inner_base_seed_formula: "seed + inner_index"
+  inner_expert_seed_formula: "seed + 101*view_index + 17*estimator_index + inner_index"
+  participant_is_inference_unit: true
+
+methods:
+  - base_uncalibrated
+  - base_decision_repaired
+  - global_trust_blend
+  - confidence_trust_gate
+  - disagreement_trust_gate
+  - cage_har
+  - frozen_ctgr
+
+preliminary_probe_disclosure:
+  performed_before_this_fully_nested_protocol: true
+  design: "global preserved OOF predictions followed by leave-one-participant-out router"
+  limitation: "meta-training predictions were not regenerated inside the held router participant partition"
+  approximate_cage_har_mean_macro_f1: 0.8293
+  approximate_global_trust_blend_mean_macro_f1: 0.8612
+  method_or_hyperparameters_changed_after_probe: false
+  probe_is_publication_evidence: false
+
+claim_policy:
+  participants_11_through_20_may_be_loaded: false
+  daghar_may_be_loaded: false
+  independent_validation_claim_allowed: false
+  confirmatory_claim_allowed: false
+  state_of_the_art_claim_allowed: false
+  comparison_with_rmrp_and_ctgr_is_matched_retrospective_source_development: true
+  future_new_development_and_independent_confirmation_still_required: true
