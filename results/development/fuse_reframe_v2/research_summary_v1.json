@@ -20,6 +20,7 @@
   "geometric_spectral_pyramid": {
     "evidence_status": "post_analysis_nested_source_development",
     "mean_participant_macro_f1": 0.8291627649027061,
+    "bottom_30_percent_participant_macro_f1": 0.6771299839589092,
     "lower_decile_participant_macro_f1": 0.737258199318475,
     "worst_participant_macro_f1": 0.4985047026940858,
     "participant_bootstrap_95": [0.7429357445881136, 0.8924467586875796],
@@ -33,7 +34,11 @@
   "robust_multiscale_residual_pyramid": {
     "evidence_status": "post_corruption_analysis_nested_source_development",
     "selected_candidate_all_outer_folds": "denoised_extra_trees_leaf1",
+    "publication_method_description": "denoised_geometric_spectral_pyramid_selected_from_rmrp_family",
+    "residual_only_ranked_last_all_outer_folds": true,
+    "residual_containing_candidate_selected_any_outer_fold": false,
     "mean_participant_macro_f1": 0.8379032940215063,
+    "bottom_30_percent_participant_macro_f1": 0.6942572354745962,
     "lower_decile_participant_macro_f1": 0.7283629339356893,
     "worst_participant_macro_f1": 0.5493636050911592,
     "participant_bootstrap_95": [0.7595408318544289, 0.898514633667892],
@@ -59,6 +64,7 @@
   "paired_gsp_to_rmrp": {
     "mean_participant_macro_f1_delta": 0.008740529118800206,
     "median_participant_macro_f1_delta": 0.008028734754156774,
+    "bottom_30_percent_participant_macro_f1_delta": 0.017127251515686948,
     "lower_decile_participant_macro_f1_delta": -0.0088952653827857,
     "worst_participant_macro_f1_delta": 0.0508589023970734,
     "exact_sign_flip_p": 0.24609375,
@@ -153,9 +159,9 @@
     "rmrp_corruptions": {"record_sha256": "5bd8ba33e9edc082bf97a0dc93afe7a27c4cd9e25d2a3aa8227615ed987c3084", "file_sha256": "98aa38489bb58688ed0530848269bc4eda26bf82875ac92f62a828fe2d141479"},
     "gsp_semantic_anchors": {"record_sha256": "4b9bedff7c66ca7f34bfd70c7bb50b48f9f6b4f06d5439846f1b7d4886542b6e", "file_sha256": "a2d8f77b1139273d8e36bcab813d6198f10c780eb195e8a5b3cbd1664050688c"},
     "rmrp_semantic_anchors": {"record_sha256": "248d4d2aabc54495050987e9a31e16b8996136f0231662e453886e14039be139", "file_sha256": "bbacf8573c592e64b8e1bd9d6657fc55a74b3b210cbafe88e3a064bc918889e0"},
-    "daghar_freeze": {"record_sha256": "ad90b062f6d884508080e798c4b1126c65c30551b7375b9890524ad8dd0a181c", "file_sha256": "debb2417b253e450ce1eee9c526a8162e5e4651c5491c3506d82b30bab3bb1a5"},
-    "daghar_opening": {"record_sha256": "234498ae3448e5215990979b009175492932470e0175dd188584486b8c60f03e", "file_sha256": "04d44628f03e1df231ded7caefeed8054e9c9f76f9665283bd2f6864559c89c5"},
+    "daghar_freeze": {"record_sha256": "ad90b062907d4291b002fe97eeae9aa3a2a01f0afce3045f22604cfba63d3b69", "file_sha256": "debb2417b253e450ce1eee9c526a8162e5e4651c5491c3506d82b30bab3bb1a5"},
+    "daghar_opening": {"record_sha256": "234498aeafaed95d3d8cfd83b89addfc0d548f27512227b4d28600efa3033585", "file_sha256": "04d44628f03e1df231ded7caefeed8054e9c9f76f9665283bd2f6864559c89c5"},
     "daghar_heldout": {"record_sha256": "21f99368d68c3d1104e75483dbe00cf82e9ca806ae18992ba47aa8727b884d7f", "file_sha256": "e842338136f1baf7ae904ba793b2ae461a951f8cb4a086f431a5315b4831f655"}
   },
-  "record_sha256": "957ad211ae5ca5eee2a4615bf34713ec57f74ab896e91e81323bc7ae474c2695"
+  "record_sha256": "bc04c27a95f50636b8b2d6deccd1dce2ec986ac664a6aebf42cc8dbef0355c76"
 }

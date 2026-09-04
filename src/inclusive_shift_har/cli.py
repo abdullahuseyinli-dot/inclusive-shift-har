@@ -55,6 +55,8 @@ _TRAIN_TRACKS: dict[str, str] = {
     "robust-multiscale-nested": "run nested Robust Multiscale Residual Pyramid development",
     "robust-multiscale-corruptions": "replay frozen robust multiscale models on corruptions",
     "gravity-anchored-nested": "run nested gravity sensor-sufficiency development",
+    "microstate-posture-select": "freeze MPG-RMRP candidates using nested inner participants",
+    "microstate-posture-evaluate": "evaluate frozen MPG-RMRP candidates at one locked seed",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
     "fixed-oof-fusion": "evaluate fixed pooling of frozen target-sealed OOF experts",
     "daghar-augmented-nested": "run nested source selection with DAGHAR development support",
@@ -79,6 +81,7 @@ _EVALUATE_TRACKS: dict[str, str] = {
     "efficiency": "aggregate frozen post-confirmatory efficiency profiles",
     "sensor-stress": "aggregate frozen post-confirmatory sensor-stress evidence",
     "raw-total-statistics": "aggregate raw/total-acceleration sensitivity evidence",
+    "microstate-posture-summary": "aggregate the frozen five-seed MPG-RMRP evaluation",
 }
 
 _INCLUSIVEHAR_NATIVE_CPU_MODELS = frozenset({"random_forest", "svm_rbf", "logistic_regression"})
@@ -539,6 +542,13 @@ def _workflow_entrypoint(
             )
 
             return entrypoint, (), False
+        if track in {"microstate-posture-select", "microstate-posture-evaluate"}:
+            from inclusive_shift_har.experiments.microstate_posture_graph_nested import (
+                main as entrypoint,
+            )
+
+            command = "select" if track.endswith("select") else "evaluate"
+            return entrypoint, (command,), False
         if track == "semantic-anchor-reconciliation":
             from inclusive_shift_har.experiments.semantic_anchor_reconciliation import (
                 main as entrypoint,
@@ -601,6 +611,12 @@ def _workflow_entrypoint(
             from inclusive_shift_har.evaluation.raw_total_reporting import main as entrypoint
 
             return entrypoint, (), False
+        if track == "microstate-posture-summary":
+            from inclusive_shift_har.experiments.microstate_posture_graph_nested import (
+                main as entrypoint,
+            )
+
+            return entrypoint, ("summarize",), False
     raise KeyError(track)
 
 

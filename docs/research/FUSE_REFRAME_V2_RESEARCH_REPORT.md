@@ -12,7 +12,7 @@ The original InclusiveHAR target participants 11--20 were consumed once by the v
 
 The new work produced a credible engineering advance, but not a confirmed breakthrough.
 
-The invented **Robust Multiscale Residual Pyramid (RMRP)** reached mean participant macro-F1 0.8379 in strict 5-by-4 nested source-participant cross-validation. Its predecessor, the **Geometric Spectral Pyramid (GSP)**, reached 0.8292. The paired mean improvement is +0.0087, below the prospectively recorded +0.015 engineering threshold; the exact paired sign-flip p-value is 0.2461 and the Wilcoxon p-value is 0.1641. The worst participant improved substantially, from 0.4985 to 0.5494, but the lower decile declined from 0.7373 to 0.7284. This is promising robustness evidence, not proof of general superiority.
+The invented **Robust Multiscale Residual Pyramid (RMRP)** reached mean participant macro-F1 0.8379 in strict 5-by-4 nested source-participant cross-validation. Its predecessor, the **Geometric Spectral Pyramid (GSP)**, reached 0.8292. The paired mean improvement is +0.0087, below the prospectively recorded +0.015 engineering threshold; the exact paired sign-flip p-value is 0.2461 and the Wilcoxon p-value is 0.1641. The prospectively gated bottom-30% mean improved from 0.6771 to 0.6943 (+0.0171), but remained below its required +0.020 gain. The descriptive lower decile declined from 0.7373 to 0.7284, while the worst participant improved substantially from 0.4985 to 0.5494. This is promising robustness evidence, not proof of general superiority.
 
 The often-cited 0.7514 number is from the v1 few-person k=4 setting, where four target-cohort participants enter training. It is not the previous score for this source-only nested experiment. Subtracting 0.7514 from 0.8379 would therefore create an invalid comparison.
 
@@ -23,7 +23,7 @@ The often-cited 0.7514 number is from the v1 few-person k=4 setting, where four 
 - Inner participant folds select candidates; outer participants are not used for selection or early stopping.
 - The inferential unit is the participant, not the window.
 - Primary endpoint: mean participant macro-F1.
-- Tail endpoints: lower-decile and worst-participant macro-F1.
+- Prospectively gated tail endpoint: bottom-30% participant macro-F1. Lower-decile and worst-participant macro-F1 are additional descriptive endpoints.
 - Ten-thousand-resample participant-cluster bootstrap intervals are reported.
 - Participant ID, cohort/disability/device metadata, time, location, and released-block position are forbidden model inputs.
 - No v2 target participant record, prediction, or metric was accessed.
@@ -44,7 +44,7 @@ RMRP was invented after the source-only corruption audit exposed noise and drift
 2. a second-order Savitzky--Golay denoised view with a 0.20-second span; and
 3. a residual obtained by subtracting a second-order 1.00-second trend.
 
-The candidate set included each view and fixed concatenations. No filter parameter was learned from an outer fold or target data. All five outer folds independently selected the denoised view with participant/class-weighted Extra Trees, 500 trees, square-root feature sampling, and minimum leaf size one.
+The candidate set included each view and fixed concatenations. No filter parameter was learned from an outer fold or target data. All five outer folds independently selected the denoised view with participant/class-weighted Extra Trees, 500 trees, square-root feature sampling, and minimum leaf size one. The residual-only candidate ranked last in every fold, and no residual-containing concatenation was selected. The evidence therefore supports describing the selected method precisely as **denoised GSP**, while retaining RMRP as the name of the evaluated candidate family.
 
 ### Controls and rejected ideas
 
@@ -74,6 +74,7 @@ Neural committee development averaged 0.6968. Direct outer-fold early-stopping n
 | Strict source-development endpoint | GSP before | RMRP after | Change |
 |---|---:|---:|---:|
 | Mean participant macro-F1 | 0.8292 | **0.8379** | +0.0087 |
+| Bottom-30% participant macro-F1 (prospective gate) | 0.6771 | **0.6943** | +0.0171 |
 | Lower-decile participant macro-F1 | **0.7373** | 0.7284 | -0.0089 |
 | Worst-participant macro-F1 | 0.4985 | **0.5494** | +0.0509 |
 | Window accuracy, diagnostic only | 0.8345 | **0.8441** | +0.0097 |
@@ -84,7 +85,7 @@ Neural committee development averaged 0.6968. Direct outer-fold early-stopping n
 
 Participant-level RMRP macro-F1 values were: participant 1, 0.9016; 10, 0.5494; 2, 0.8961; 3, 0.9396; 4, 0.9113; 5, 0.9311; 6, 0.8270; 7, 0.7852; 8, 0.8896; and 9, 0.7483.
 
-The improvement is directionally useful: standing recognition and the weakest participant improved, while mobility remained very high. It is not statistically decisive with ten source participants, and it failed the pre-recorded joint mean/tail engineering gate.
+The improvement is directionally useful: standing recognition, the bottom-30% mean, and the weakest participant improved, while mobility remained very high. It is not statistically decisive with ten source participants, and both the mean gain (+0.0087 versus +0.015 required) and bottom-30% gain (+0.0171 versus +0.020 required) missed the pre-recorded joint engineering gate.
 
 ## Corruption robustness
 
@@ -188,8 +189,8 @@ Implementation commit: `c50a5e23e001763d668eb0256e29e65f69b10413`.
 | RMRP corruption result | `5bd8ba33e9edc082bf97a0dc93afe7a27c4cd9e25d2a3aa8227615ed987c3084` | `98aa38489bb58688ed0530848269bc4eda26bf82875ac92f62a828fe2d141479` |
 | GSP semantic anchors | `4b9bedff7c66ca7f34bfd70c7bb50b48f9f6b4f06d5439846f1b7d4886542b6e` | `a2d8f77b1139273d8e36bcab813d6198f10c780eb195e8a5b3cbd1664050688c` |
 | RMRP semantic anchors | `248d4d2aabc54495050987e9a31e16b8996136f0231662e453886e14039be139` | `bbacf8573c592e64b8e1bd9d6657fc55a74b3b210cbafe88e3a064bc918889e0` |
-| DAGHAR candidate freeze | `ad90b062f6d884508080e798c4b1126c65c30551b7375b9890524ad8dd0a181c` | `debb2417b253e450ce1eee9c526a8162e5e4651c5491c3506d82b30bab3bb1a5` |
-| DAGHAR opening receipt | `234498ae3448e5215990979b009175492932470e0175dd188584486b8c60f03e` | `04d44628f03e1df231ded7caefeed8054e9c9f76f9665283bd2f6864559c89c5` |
+| DAGHAR candidate freeze | `ad90b062907d4291b002fe97eeae9aa3a2a01f0afce3045f22604cfba63d3b69` | `debb2417b253e450ce1eee9c526a8162e5e4651c5491c3506d82b30bab3bb1a5` |
+| DAGHAR opening receipt | `234498aeafaed95d3d8cfd83b89addfc0d548f27512227b4d28600efa3033585` | `04d44628f03e1df231ded7caefeed8054e9c9f76f9665283bd2f6864559c89c5` |
 | DAGHAR held-out result | `21f99368d68c3d1104e75483dbe00cf82e9ca806ae18992ba47aa8727b884d7f` | `e842338136f1baf7ae904ba793b2ae461a951f8cb4a086f431a5315b4831f655` |
 
 The detailed `.audit/v2` result artifacts, external raw data, and fitted checkpoint are intentionally outside normal Git history. The committed code, configurations, dataset manifest, report, and hashes bind the claims without redistributing third-party data.

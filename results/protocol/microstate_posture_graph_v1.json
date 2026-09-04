@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "microstate_posture_graph_prospective_protocol_lock",
+  "status": "locked_before_inner_selection_and_outer_evaluation",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_smartphone_wearable_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Microstate Posture Graph over Robust Multiscale Residual Pyramid",
+    "abbreviation": "MPG-RMRP",
+    "primary_interface": "six_channel_user_acceleration_and_rotation_rate",
+    "candidate_count": 18,
+    "selection_seed": 11,
+    "fixed_evaluation_seeds": [11, 23, 47, 89, 131]
+  },
+  "protocol_document": {
+    "path": "docs/research/MICROSTATE_POSTURE_GRAPH_PROTOCOL.md",
+    "sha256": "5df8ac0ce2d909ec6c6216585da5bb29f2fe8233a2d2a344340976c59b05fb97"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/microstate_posture_graph_nested_v1.yaml",
+    "sha256": "e80c8e5a517215c8d0c9d7f3d03bae30929c7a955a85533ac9ca19f3ca72a939"
+  },
+  "source_window_manifest": {
+    "path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+    "sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+    "allowed_participants": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+    "materialized_window_count": 725
+  },
+  "dataset_manifest": {
+    "path": "manifests/datasets/inclusivehar_v4.json",
+    "sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  },
+  "raw_source_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+  "selection_contract": {
+    "outer_fold_count": 5,
+    "inner_fold_count_per_outer_fold": 4,
+    "participant_is_inference_unit": true,
+    "mean_tie_tolerance": 0.005,
+    "outer_labels_used": false,
+    "selection_must_be_frozen_before_outer_evaluation": true
+  },
+  "evidence_boundary": {
+    "participants_11_through_20_reopened": false,
+    "daghar_or_other_consumed_external_results_used_for_selection": false,
+    "old_corruption_results_used_for_selection": false,
+    "confirmatory_claim_allowed": false,
+    "independent_new_ability_cohort_required": true
+  },
+  "required_git_tag": "mpg-rmrp-protocol-v1",
+  "record_sha256": "23bfd644b071434b248f44d3cce28a42d2b2c94dba56054b049b95f10678e9db"
+}

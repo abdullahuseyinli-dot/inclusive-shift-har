@@ -1,0 +1,142 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-microstate-posture-graph-rmrp-nested-v1"
+declared_on: "2026-09-04"
+status: "prospective_source_development_protocol_locked_before_evaluation"
+method_name: "Microstate Posture Graph over Robust Multiscale Residual Pyramid"
+method_abbreviation: "MPG-RMRP"
+method_origin: "Invented from the frozen RMRP error pattern before MPG-RMRP outer evaluation."
+n_jobs: 4
+input_contract:
+  channels:
+    - motionUserAccelerationX
+    - motionUserAccelerationY
+    - motionUserAccelerationZ
+    - motionRotationRateX
+    - motionRotationRateY
+    - motionRotationRateZ
+  window_samples: 128
+  sampling_rate_hz: 50
+  participant_is_inference_unit: true
+  forbidden_inputs: [participant_id, disability, assistive_device, timestamp, location, released_block_position]
+mobility_head:
+  signal_view: "savgol_order_2_span_seconds_0_20_denoised"
+  feature_map: "geometric_spectral_pyramid_v1"
+  estimator: "extra_trees"
+  n_estimators: 500
+  max_features: "sqrt"
+  min_samples_leaf: 1
+  class_weight: "balanced"
+  participant_class_sample_weight: true
+microstate_codebook:
+  training_rows: "stationary_sitting_and_standing_only"
+  training_partition_only: true
+  participant_balanced: true
+  detrending: "rolling_spatial_geometric_median_24_weiszfeld_iterations_edge_extended"
+  detrend_span_seconds: [0.20, 0.50]
+  timestamp_vector:
+    - detrended_acceleration_norm
+    - detrended_gyroscope_norm
+    - detrended_acceleration_derivative_norm_per_second
+    - detrended_gyroscope_derivative_norm_per_second
+    - normalized_acceleration_gyroscope_dot
+    - normalized_acceleration_gyroscope_cross_norm
+  scaling: "training_stationary_timestamp_median_and_iqr"
+  cluster_count: [4, 6, 8]
+  algorithm: "kmeans_lloyd"
+  n_init: 20
+  max_iter: 300
+  temperature: "training_only_median_positive_within_cluster_squared_distance"
+graph_features:
+  assignment: "soft_exp_negative_squared_distance_over_temperature"
+  occupancy: true
+  transition_lags: [1, 2, 4, 8, 16]
+  transition_normalization: "within_window_valid_transition_mass"
+  state_persistence: true
+  hard_path_mean_and_max_dwell_fraction: true
+  first_half_minus_second_half_occupancy: true
+  observed_channel_and_fully_observed_timestep_coverage: true
+posture_head:
+  training_rows: "stationary_sitting_and_standing_only"
+  sitting_positive_class: true
+  participant_posture_sample_weight: true
+  probability_composition:
+    mobility: "q"
+    sitting: "(1-q)*r"
+    standing: "(1-q)*(1-r)"
+controls:
+  flat_rmrp:
+    description: "selected denoised GSP with flat three-class Extra Trees"
+  hierarchical_rmrp:
+    description: "denoised GSP Extra Trees used by both fixed binary heads"
+  hierarchical_gsp:
+    description: "original GSP Extra Trees used by both fixed binary heads"
+  rmrp_mobility_rist_posture:
+    description: "denoised GSP mobility head with RIST fitted only on stationary windows"
+    n_intervals: 256
+    n_shapelets: 256
+candidates:
+  - {id: h020_k4_logistic_l2_c1, detrend_span_seconds: 0.20, cluster_count: 4, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 1, participant_class_weighted: true}
+  - {id: h020_k4_extra_trees_leaf3, detrend_span_seconds: 0.20, cluster_count: 4, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 2, participant_class_weighted: true}
+  - {id: h020_k4_extra_trees_leaf1, detrend_span_seconds: 0.20, cluster_count: 4, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 3, participant_class_weighted: true}
+  - {id: h050_k4_logistic_l2_c1, detrend_span_seconds: 0.50, cluster_count: 4, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 4, participant_class_weighted: true}
+  - {id: h050_k4_extra_trees_leaf3, detrend_span_seconds: 0.50, cluster_count: 4, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 5, participant_class_weighted: true}
+  - {id: h050_k4_extra_trees_leaf1, detrend_span_seconds: 0.50, cluster_count: 4, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 6, participant_class_weighted: true}
+  - {id: h020_k6_logistic_l2_c1, detrend_span_seconds: 0.20, cluster_count: 6, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 7, participant_class_weighted: true}
+  - {id: h020_k6_extra_trees_leaf3, detrend_span_seconds: 0.20, cluster_count: 6, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 8, participant_class_weighted: true}
+  - {id: h020_k6_extra_trees_leaf1, detrend_span_seconds: 0.20, cluster_count: 6, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 9, participant_class_weighted: true}
+  - {id: h050_k6_logistic_l2_c1, detrend_span_seconds: 0.50, cluster_count: 6, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 10, participant_class_weighted: true}
+  - {id: h050_k6_extra_trees_leaf3, detrend_span_seconds: 0.50, cluster_count: 6, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 11, participant_class_weighted: true}
+  - {id: h050_k6_extra_trees_leaf1, detrend_span_seconds: 0.50, cluster_count: 6, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 12, participant_class_weighted: true}
+  - {id: h020_k8_logistic_l2_c1, detrend_span_seconds: 0.20, cluster_count: 8, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 13, participant_class_weighted: true}
+  - {id: h020_k8_extra_trees_leaf3, detrend_span_seconds: 0.20, cluster_count: 8, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 14, participant_class_weighted: true}
+  - {id: h020_k8_extra_trees_leaf1, detrend_span_seconds: 0.20, cluster_count: 8, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 15, participant_class_weighted: true}
+  - {id: h050_k8_logistic_l2_c1, detrend_span_seconds: 0.50, cluster_count: 8, posture_estimator: logistic_l2_c1, estimator_complexity_rank: 1, complexity_rank: 16, participant_class_weighted: true}
+  - {id: h050_k8_extra_trees_leaf3, detrend_span_seconds: 0.50, cluster_count: 8, posture_estimator: extra_trees_leaf3, estimator_complexity_rank: 2, complexity_rank: 17, participant_class_weighted: true}
+  - {id: h050_k8_extra_trees_leaf1, detrend_span_seconds: 0.50, cluster_count: 8, posture_estimator: extra_trees_leaf1, estimator_complexity_rank: 3, complexity_rank: 18, participant_class_weighted: true}
+selection:
+  seed: 11
+  unit: "participant"
+  primary: "inner_mean_participant_macro_f1"
+  mean_tie_tolerance: 0.005
+  tie_breakers:
+    - inner_bottom_30_percent_participant_macro_f1
+    - smaller_cluster_count
+    - simpler_posture_estimator
+    - complexity_rank
+    - candidate_id
+  outer_labels_used: false
+  selection_frozen_before_outer_evaluation: true
+fixed_evaluation_seeds: [11, 23, 47, 89, 131]
+ablations_after_freeze_without_retuning:
+  - occupancy_only
+  - occupancy_plus_lag_1_transition
+  - full_multiscale_transition_graph
+  - no_detrending
+  - hard_assignment
+  - remove_first_half_minus_second_half_direction
+  - rist_posture_control
+  - gsp_instead_of_rmrp_mobility
+  - same_rmrp_representation_for_both_heads
+separate_secondary_lanes:
+  gravity: "MPG-RMRP-G; actual gravity channels only in posture head; cannot replace primary six-channel result"
+  missingness: "MPG-RMRP-M; explicit provenance mask; never infer missingness from zeros"
+  labelled_personalization: "Active Semantic-Gauge Sentinel only if zero-shot posture remains unresolved"
+advancement_gate:
+  comparator: "current frozen RMRP source-development result"
+  minimum_mean_participant_macro_f1: 0.8529032940215063
+  minimum_bottom_30_percent_participant_macro_f1: 0.7142572354745962
+  minimum_mobility_recall: 0.9528682170542635
+  minimum_sitting_recall: 0.6894017094017094
+  minimum_standing_recall: 0.8169098712446352
+  minimum_positive_fold_count: 3
+  minimum_positive_seed_count: 3
+  maximum_negative_log_likelihood: 0.3900535
+  maximum_multiclass_brier_score: 0.235394
+  stretch_minimum_worst_participant_macro_f1: 0.616809
+claim_policy:
+  confirmatory_claim_allowed: false
+  consumed_target_reuse_allowed: false
+  old_corruption_suite_selection_use_allowed: false
+  daghar_or_kuhar_result_reuse_for_selection_allowed: false
+  participants_11_through_20_reopened: false
+  independent_new_ability_cohort_required: true
