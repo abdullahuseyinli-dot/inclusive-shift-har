@@ -1,0 +1,98 @@
+schema_version: "1.0.0"
+experiment_id: "hera-ctgr-retrospective-source-v1"
+declared_on: "2026-09-04"
+status: "locked_before_fully_nested_retrospective_source_run"
+evidence_status: "retrospective_reused_source_development_not_independent_validation"
+
+method_freeze:
+  tag: "hera-ctgr-implementation-v1"
+  commit: "b274e54992bbfe18aa43243059e3c977b3f7ee5e"
+  method_config:
+    path: "configs/experiments/hera_ctgr_v1.yaml"
+    sha256: "7610775131564c5b1d2819f583d1ba73966b953e2da4de1df55d55a8e03100e5"
+  method_implementation:
+    path: "src/inclusive_shift_har/models/hera_ctgr.py"
+    sha256: "4646a11e8fa0590ce6512fa1e67b884ebfd7f7074bad1435e5e5f11727f2911b"
+  parameters_may_change_after_run: false
+
+inputs:
+  source_manifest:
+    path: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+    sha256: "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+  dataset_manifest:
+    path: "manifests/datasets/inclusivehar_v4.json"
+    sha256: "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  raw_source:
+    path: "data/raw/inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+    sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+  ctgr_config:
+    path: "configs/experiments/confidence_triggered_gravity_residual_v1.yaml"
+    sha256: "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa"
+  ctgr_selection:
+    path: ".audit/v3/max-rnd/ctgr-selection-001/selection.json"
+    sha256: "f7475bc7ec43bf02ccdfe3b8eb6ed9c6a333b51781b638a63f2d257341a37180"
+  ctgr_evaluation_record_pattern: ".audit/v3/max-rnd/ctgr-evaluation-seed-{seed}-001/result.json"
+  cage_config:
+    path: "configs/experiments/cage_har_v1.yaml"
+    sha256: "3c8c3214e7e5aff3b278e2c9bae510631828d5a3b809a1a732e2f5c8b973fa43"
+
+fixed_seeds: [11, 23, 47, 89, 131]
+participant_ids: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+outer_fold_count: 5
+inner_fold_count_per_outer: 4
+
+fixed_method:
+  candidate_top_k: 3
+  candidate_aggregation: "equal_probability_mean"
+  candidate_source: "first_three_entries_of_each_frozen_ctgr_candidate_ranking"
+  physics_veto_quantile: 0.99
+  physics_minimum_valid_pair_fraction: 0.98
+  calibration_temperatures: [0.80, 1.00, 1.25]
+  calibration_posture_logit_offsets: [-0.15, 0.00, 0.15]
+  calibration_mean_tie_tolerance: 0.005
+  responder_low_confidence_threshold: 0.60
+  responder_ridge_penalty: 25.0
+  responder_mean_lower_bound_z: 0.0
+  responder_safe_lower_bound_z: 1.0
+  responder_minimum_advantage: 0.005
+  responder_maximum_support_distance: 3.0
+  uncertain_default_state: "PULSE"
+  matched_random_seed_offset: 20260904
+
+nesting_contract:
+  frozen_ctgr_candidate_map_reused: true
+  top_three_frozen_ranked_candidates_reused_without_outcome_reweighting: true
+  base_and_expert_inner_oof_regenerated_inside_each_outer_training_partition: true
+  broad_path_fit_on_inner_oof_only: true
+  aggregate_calibration_fit_on_inner_oof_only: true
+  responder_fit_at_participant_level_inside_outer_training_partition: true
+  full_calibrator_fit_on_leave_one_training_participant_controller_predictions: true
+  preserved_outer_base_ctgr_and_selected_expert_used_for_evaluation: true
+  outer_labels_used_for_training_selection_calibration_or_routing: false
+  participant_is_inference_unit: true
+
+methods:
+  - base_uncalibrated
+  - frozen_ctgr
+  - global_trust_blend
+  - ctgr_aggregate_calibrated
+  - ctgr_physics_veto
+  - ctgr_candidate_ensemble_top3
+  - hera_ctgr_strict
+  - hera_ctgr_context_mean
+  - hera_ctgr_context_safe
+  - hera_ctgr_full
+  - matched_random_state_control
+  - label_informed_three_way_oracle_diagnostic
+
+claim_policy:
+  participants_11_through_20_may_be_loaded: false
+  daghar_may_be_loaded: false
+  retrospective_result_is_hypothesis_generation_only: true
+  participant_context_lane_is_transductive: true
+  label_informed_oracle_is_attainability_diagnostic_only: true
+  matched_random_state_control_is_diagnostic_only: true
+  independent_validation_claim_allowed: false
+  confirmatory_claim_allowed: false
+  state_of_the_art_claim_allowed: false
+  future_new_development_and_independent_confirmation_still_required: true
