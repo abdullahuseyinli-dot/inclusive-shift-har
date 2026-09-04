@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "hera_ctgr_v2_implementation_protocol",
+  "status": "implementation_complete_new_cohort_required_for_claims",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_sensor_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Decision-Separated Evidence-Marginalized HERA-CTGR",
+    "abbreviation": "HERA-CTGR-v2",
+    "channel_count": 9,
+    "base_class_count": 3,
+    "evidence_weighted_candidate_count": 3,
+    "dual_frame_posture_expert": true,
+    "separate_rescue_and_harm_heads": true,
+    "participant_jackknife_sentinel": true,
+    "rank_preserving_temperature_calibration": true,
+    "mobility_flip_from_posture_path_allowed": false,
+    "one_query_personalization_separate": true,
+    "bout_accumulator_requires_ordered_provenance": true
+  },
+  "protocol_document": {
+    "path": "docs/research/HERA_CTGR_V2_PROTOCOL.md",
+    "sha256": "ac88b99ddd662c129b0d9233ab355606a20824c796b31e08029070538d2c13cd"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/hera_ctgr_v2.yaml",
+    "sha256": "a9cc05d0bb21a4bc9f6b3d64b0359deaf83a10be81cc4804a4a64eebdc422ef8"
+  },
+  "implementation": [
+    {
+      "path": "src/inclusive_shift_har/models/hera_ctgr_v2.py",
+      "sha256": "e324451f655b966853982579f519d61c2c0d6249f134bd5b1001f5cf58a16294"
+    }
+  ],
+  "focused_tests": [
+    {
+      "path": "tests/test_hera_ctgr_v2.py",
+      "sha256": "739a30e7858111eb51e40cf0d8030ee698ade584d56e9e9057338c27c8e3c67b"
+    }
+  ],
+  "frozen_inspiration_evidence": [
+    {
+      "path": "results/development/hera_ctgr_retrospective_v1_summary.json",
+      "sha256": "45df93486c3ae2ef020b9555054ec2ea1c2c719462acaa7b3d5b1dcc2c5d2874",
+      "role": "exhausted_hera_v1_source_hypothesis_generation_only"
+    }
+  ],
+  "implemented_components": [
+    "device_and_gravity_aligned_dual_frame_posture_features",
+    "gravity_gyroscope_consistency_features",
+    "stability_weighted_fixed_candidate_marginalization",
+    "rank_preserving_temperature_calibration",
+    "rank_locked_sitting_standing_decision_offset",
+    "separate_rescue_and_harm_counterfactual_targets",
+    "participant_balanced_ridge_logistic_heads",
+    "whole_participant_jackknife_probability_bounds",
+    "semantic_trust_region_with_exact_core_fallback",
+    "one_query_off_normal_inverted_state_selection",
+    "causal_bout_evidence_accumulator"
+  ],
+  "evidence_boundary": {
+    "inclusivehar_participants_1_through_10_used_to_motivate_design": true,
+    "inclusivehar_participants_11_through_20_reopened": false,
+    "consumed_daghar_targets_reused": false,
+    "real_v2_performance_generated": false,
+    "retrospective_participants_1_through_10_test_allowed_as_hypothesis_generation": true,
+    "retrospective_result_is_independent_validation": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false,
+    "new_development_cohort_required": true,
+    "independent_confirmatory_cohort_required": true
+  },
+  "record_sha256": "9e909de9a9be6b8841197ecb06f4037826bf8f2a7e21bf93a2b3f5d400382532"
+}

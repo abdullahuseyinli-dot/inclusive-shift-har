@@ -1,0 +1,168 @@
+schema_version: "1.0.0"
+experiment_id: "hera-ctgr-v2-new-development-v1"
+declared_on: "2026-09-04"
+status: "implemented_awaiting_new_development_cohort"
+method_name: "Decision-Separated Evidence-Marginalized HERA-CTGR"
+method_abbreviation: "HERA-CTGR-v2"
+method_origin: >-
+  Designed after the frozen HERA-CTGR v1 retrospective result. InclusiveHAR
+  participants 1-10 are exhausted hypothesis-generation evidence; participants
+  11-20 and consumed DAGHAR targets are forbidden for selection or claims.
+
+input_contract:
+  class_names: [mobility, sitting, standing]
+  required_channel_count: 9
+  minimum_development_participants: 12
+  minimum_sessions_per_participant: 2
+  participant_is_inference_unit: true
+  participant_partition_precedes_windowing: true
+  required_new_cohort_fields:
+    - monotonic_timestamp
+    - participant_id
+    - site_id
+    - session_id
+    - trial_id
+    - repetition_id
+    - activity_label
+    - device_model
+    - placement
+    - orientation
+    - sensor_accuracy
+    - sensor_provenance
+  forbidden_model_inputs:
+    - participant_id
+    - disability
+    - assistive_device
+    - timestamp
+    - site_id
+    - session_id
+    - trial_id
+    - location
+  forbidden_dataset_ids: [inclusivehar_v4, daghar_v2]
+  forbidden_participant_ids:
+    - "1"
+    - "2"
+    - "3"
+    - "4"
+    - "5"
+    - "6"
+    - "7"
+    - "8"
+    - "9"
+    - "10"
+    - "11"
+    - "12"
+    - "13"
+    - "14"
+    - "15"
+    - "16"
+    - "17"
+    - "18"
+    - "19"
+    - "20"
+
+evidence_marginalization:
+  candidate_source: "first_three_entries_of_each_frozen_ctgr_candidate_ranking"
+  candidate_count: 3
+  divergence: "jensen_shannon_to_equal_candidate_consensus"
+  divergence_temperature: 0.05
+  minimum_candidate_weight: 0.05
+  outcome_dependent_weighting: false
+
+dual_frame_posture_expert:
+  retains_device_frame_gravity: true
+  retains_slow_and_dc_posture: true
+  gravity_aligned_tangent_frame: true
+  gravity_gyroscope_consistency_features: true
+  full_rotation_invariance_forbidden: true
+  estimator: "extra_trees_leaf3"
+  confidence_thresholds: [0.50, 0.55, 0.60, 0.65]
+  blend_weights: [0.25, 0.50, 0.75, 1.00]
+  selection_mean_tolerance: 0.005
+
+decision_separation:
+  temperature_candidates: [0.75, 0.90, 1.00, 1.10, 1.25]
+  temperature_selected_by: "participant_exclusive_oof_negative_log_likelihood"
+  posture_logit_offset_candidates: [-0.20, -0.10, 0.00, 0.10, 0.20]
+  posture_offset_selected_by: "participant_macro_f1_then_bottom_30_percent_then_identity"
+  mobility_probability_preserved_exactly: true
+  mobility_flip_from_posture_path_allowed: false
+  calibration_and_hard_decision_selection_are_separate: true
+
+rescue_harm_sentinel:
+  separate_binary_heads: true
+  targets: [rescue, harm]
+  training_predictions: "participant_exclusive_oof_only"
+  participant_balanced: true
+  class_balanced: true
+  ridge_penalty: 25.0
+  participant_jackknife_interval_z: 1.0
+  harm_penalty: 2.0
+  minimum_physics_reliability: 0.20
+  maximum_standardized_support_distance: 3.0
+  threshold_grid:
+    minimum_rescue_lower_bound: [0.05, 0.10, 0.20, 0.30]
+    maximum_harm_upper_bound: [0.05, 0.10, 0.15, 0.25]
+    minimum_net_benefit: [0.00, 0.05, 0.10, 0.20]
+  training_gate:
+    minimum_intervention_precision: 0.80
+    maximum_harmful_changed_fraction: 0.15
+    default_if_no_threshold_passes: "no_intervention"
+  allowed_semantic_change: "sitting_standing_only"
+  uncertain_or_ood_fallback: "decision_separated_ensemble_core"
+
+one_query_personalization:
+  reported_separately: true
+  states: [OFF, NORMAL, INVERTED]
+  query_selection: "maximum_label_free_reliable_posture_disagreement"
+  maximum_queries_per_participant: 1
+  queried_window_excluded_from_evaluation: true
+  minimum_stationary_mass: 0.80
+
+bout_evidence:
+  widths: [3, 5, 7]
+  causal_trailing_only: true
+  reset_at_declared_session_trial_or_bout: true
+  shuffled_time_negative_control_required: true
+  unavailable_without_ordered_session_provenance: true
+
+required_ablations:
+  - frozen_ctgr
+  - frozen_hera_ctgr_v1_strict
+  - equal_top3_ctgr
+  - stability_weighted_top3_ctgr
+  - temperature_only_core
+  - decision_separated_core
+  - dual_frame_global_candidate
+  - rescue_harm_logits_only
+  - rescue_harm_physics
+  - hera_ctgr_v2_full
+  - one_query_personalization
+  - participant_oracle_diagnostic
+  - window_oracle_diagnostic
+
+development_advancement_gate:
+  comparators: [frozen_ctgr, frozen_hera_ctgr_v1_strict]
+  minimum_mean_gain_over_frozen_hera_strict: 0.010
+  minimum_mean_gain_over_frozen_ctgr_for_breakthrough: 0.020
+  minimum_bottom_30_percent_gain_over_ctgr: 0.015
+  minimum_intervention_precision: 0.80
+  maximum_harmful_changed_fraction: 0.15
+  mobility_hard_changes_from_posture_path: 0
+  worst_participant_noninferiority_margin: -0.010
+  posture_recall_noninferiority_margin: -0.010
+  nll_and_brier_must_not_worsen: true
+  participant_interval_lower_bound_must_exceed_zero: true
+  improvement_may_not_depend_on_only_one_seed_or_participant: true
+  targets_are_promises: false
+
+claim_policy:
+  retrospective_inclusivehar_result_is_hypothesis_generation_only: true
+  strict_zero_shot_and_one_query_personalization_reported_separately: true
+  participants_11_through_20_may_be_loaded: false
+  daghar_may_be_loaded: false
+  confirmatory_claim_allowed: false
+  state_of_the_art_claim_allowed: false
+  independent_new_development_cohort_required: true
+  separately_sealed_confirmatory_cohort_required: true
+
