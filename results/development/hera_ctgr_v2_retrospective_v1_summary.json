@@ -1,0 +1,266 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "hera_ctgr_v2_fully_nested_retrospective_source_summary",
+  "status": "complete_reused_source_development_not_independent",
+  "created_on": "2026-09-04",
+  "method_freeze": {
+    "tag": "hera-ctgr-v2-implementation-v1",
+    "commit": "5def59c1bf1c9276a10b1fccbf7b023975d962a2"
+  },
+  "execution_freeze": {
+    "tag": "hera-ctgr-v2-retrospective-protocol-v1",
+    "commit": "227331de47de103a122d4e9a462300fc73967b42"
+  },
+  "protocol": {
+    "path": "results/protocol/hera_ctgr_v2_retrospective_v1.json",
+    "sha256": "19fc2d410820ed6dcad77f20ec150ee1e7dcb844a041a59982680ae31963fb51",
+    "record_sha256": "16101fbcd8a031bee9fec133efd8596023b84be8e3e3062d4c46fe8a5fac2f0e"
+  },
+  "run": {
+    "path": ".audit/v6/hera-ctgr-v2/retrospective-source-v1-001/result.json",
+    "sha256": "0eca1fe63b1e39b5edb5084534edc3e8bcc216141fd3e5b06c96eed551e30246",
+    "record_sha256": "0196096c7ca8dfdce61a6be9dfd39f82467dc661ed9a3b5844e471a5cd5e94ec",
+    "predictions_path": ".audit/v6/hera-ctgr-v2/retrospective-source-v1-001/cross_fitted_predictions.npz",
+    "predictions_sha256": "5bbf25ef354f478278dd9c5093bf21df84fc88650cb9a7548d4dadce3f7863be"
+  },
+  "design": {
+    "participant_count": 10,
+    "window_count": 725,
+    "seed_count": 5,
+    "outer_fold_count": 5,
+    "inner_fold_count_per_outer": 4,
+    "participant_is_inference_unit": true,
+    "outer_labels_used_for_zero_shot_training_selection_or_routing": false,
+    "preserved_ctgr_and_hera_v1_predictions_replayed_exactly": true,
+    "pre_outcome_test_count": 737,
+    "pre_outcome_tests_passed": true
+  },
+  "historical_initial_reference": {
+    "mean_macro_f1": 0.7514,
+    "matched_comparator": false,
+    "reason": "different few-person protocol, inputs, training population, and evaluation units"
+  },
+  "five_seed_mean_results": {
+    "base_uncalibrated": {
+      "mean_participant_macro_f1": 0.8395337505837951,
+      "bottom_30_percent_participant_macro_f1": 0.6994146859705921,
+      "worst_participant_macro_f1": 0.5476679935131947,
+      "negative_log_likelihood": 0.3688926229803643,
+      "multiclass_brier_score": 0.22511787255172414
+    },
+    "frozen_ctgr": {
+      "mean_participant_macro_f1": 0.8653982091142408,
+      "bottom_30_percent_participant_macro_f1": 0.7399011628766852,
+      "worst_participant_macro_f1": 0.5751222069529602,
+      "negative_log_likelihood": 0.35425523262176606,
+      "multiclass_brier_score": 0.21164741401257775
+    },
+    "frozen_hera_ctgr_v1_strict": {
+      "mean_participant_macro_f1": 0.8684917479119463,
+      "bottom_30_percent_participant_macro_f1": 0.7393303052090745,
+      "worst_participant_macro_f1": 0.5802802897003103,
+      "negative_log_likelihood": 0.34038302306048857,
+      "multiclass_brier_score": 0.2030325439594712
+    },
+    "equal_top3_ctgr": {
+      "mean_participant_macro_f1": 0.8672733335569698,
+      "bottom_30_percent_participant_macro_f1": 0.7384604378189593,
+      "worst_participant_macro_f1": 0.5751222069529602,
+      "negative_log_likelihood": 0.3528870580760394,
+      "multiclass_brier_score": 0.2102846912421668
+    },
+    "stability_weighted_top3_ctgr": {
+      "mean_participant_macro_f1": 0.8672733335569698,
+      "bottom_30_percent_participant_macro_f1": 0.7384604378189593,
+      "worst_participant_macro_f1": 0.5751222069529602,
+      "negative_log_likelihood": 0.3529158247384526,
+      "multiclass_brier_score": 0.21031054596553994
+    },
+    "temperature_only_core": {
+      "mean_participant_macro_f1": 0.8672733335569698,
+      "bottom_30_percent_participant_macro_f1": 0.7384604378189593,
+      "worst_participant_macro_f1": 0.5751222069529602,
+      "negative_log_likelihood": 0.32720793608961063,
+      "multiclass_brier_score": 0.1985666409435489
+    },
+    "decision_separated_core": {
+      "mean_participant_macro_f1": 0.867493040748332,
+      "bottom_30_percent_participant_macro_f1": 0.73906731161481,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.32829562894453757,
+      "multiclass_brier_score": 0.19911503150835516
+    },
+    "dual_frame_global_candidate": {
+      "mean_participant_macro_f1": 0.867044412225429,
+      "bottom_30_percent_participant_macro_f1": 0.7400933918782933,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.3282380101229683,
+      "multiclass_brier_score": 0.1993176706879103
+    },
+    "rescue_harm_logits_only": {
+      "mean_participant_macro_f1": 0.867493040748332,
+      "bottom_30_percent_participant_macro_f1": 0.73906731161481,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.32829562894453757,
+      "multiclass_brier_score": 0.19911503150835516
+    },
+    "rescue_harm_physics": {
+      "mean_participant_macro_f1": 0.867493040748332,
+      "bottom_30_percent_participant_macro_f1": 0.73906731161481,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.32829562894453757,
+      "multiclass_brier_score": 0.19911503150835516
+    },
+    "hera_ctgr_v2_full": {
+      "mean_participant_macro_f1": 0.867493040748332,
+      "bottom_30_percent_participant_macro_f1": 0.73906731161481,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.32829562894453757,
+      "multiclass_brier_score": 0.19911503150835516
+    },
+    "one_query_matched_core": {
+      "mean_participant_macro_f1": 0.8682405648061804,
+      "bottom_30_percent_participant_macro_f1": 0.7401314599982861,
+      "worst_participant_macro_f1": 0.5797781228369463,
+      "negative_log_likelihood": 0.32746503478336636,
+      "multiclass_brier_score": 0.19848301943526228
+    },
+    "one_query_personalization": {
+      "mean_participant_macro_f1": 0.849870399394048,
+      "bottom_30_percent_participant_macro_f1": 0.6885240436621822,
+      "worst_participant_macro_f1": 0.549181875494861,
+      "negative_log_likelihood": 0.3478422095721927,
+      "multiclass_brier_score": 0.21593417906501755,
+      "labelled_personalization_only": true
+    },
+    "participant_oracle_diagnostic": {
+      "mean_participant_macro_f1": 0.8797281894420991,
+      "bottom_30_percent_participant_macro_f1": 0.7516868714858815,
+      "worst_participant_macro_f1": 0.584354954101084,
+      "negative_log_likelihood": 0.34640542882514697,
+      "multiclass_brier_score": 0.20588689726402318,
+      "uses_evaluation_labels": true
+    },
+    "window_oracle_diagnostic": {
+      "mean_participant_macro_f1": 0.8883135994723761,
+      "bottom_30_percent_participant_macro_f1": 0.7623187535651685,
+      "worst_participant_macro_f1": 0.5936298428893789,
+      "negative_log_likelihood": 0.29110404765863684,
+      "multiclass_brier_score": 0.1714249070352858,
+      "uses_evaluation_labels": true
+    }
+  },
+  "v2_full_comparison": {
+    "difference_from_historical_0_7514": 0.11609304074833204,
+    "difference_from_base_uncalibrated": 0.02795929016453691,
+    "difference_from_frozen_ctgr": 0.0020948316340911877,
+    "difference_from_frozen_hera_v1_strict": -0.0009987071636142764,
+    "positive_seed_count_vs_ctgr": 3,
+    "positive_seed_count_vs_hera_v1": 2,
+    "positive_participant_count_vs_ctgr": 4,
+    "negative_participant_count_vs_ctgr": 3,
+    "positive_participant_count_vs_hera_v1": 1,
+    "negative_participant_count_vs_hera_v1": 6,
+    "mean_difference_interval_vs_ctgr": [-0.002632249658282204, 0.007037072125083399],
+    "mean_difference_interval_vs_hera_v1": [-0.0025308288759199066, 0.0003478975450096122],
+    "breakthrough": false
+  },
+  "component_audit": {
+    "stability_weighting": {
+      "hard_metric_difference_from_equal_top3": 0.0,
+      "negative_log_likelihood_difference": 0.000028766662413248767,
+      "mean_candidate_js_divergence": 0.00025708983039813746,
+      "finding": "candidates were too similar for stability weighting to add useful diversity"
+    },
+    "temperature_calibration": {
+      "selected_temperature_in_all_25_outer_folds": 0.75,
+      "hard_metric_difference_from_weighted_top3": 0.0,
+      "negative_log_likelihood_difference": -0.025707888648841992,
+      "multiclass_brier_difference": -0.011743905021991047,
+      "finding": "strong probability-quality improvement without changing ranks"
+    },
+    "rank_locked_posture_offset": {
+      "mean_difference_from_temperature_only": 0.00021970719136221728,
+      "bottom_30_percent_difference": 0.0006068737958506709,
+      "worst_participant_difference": 0.0046559158839860615,
+      "mobility_membership_changes": 0
+    },
+    "dual_frame_candidate": {
+      "mean_difference_from_decision_core": -0.00044862852290294963,
+      "bottom_30_percent_difference": 0.0010260802634832755,
+      "hard_disagreement_count_across_seed_instances": 13,
+      "rescue_count": 6,
+      "harm_count": 7,
+      "finding": "complementary but not safe as a global replacement"
+    },
+    "rescue_harm_sentinel": {
+      "outer_fold_count": 25,
+      "folds_disabled_for_fewer_than_five_training_responders": 22,
+      "folds_disabled_for_no_safe_training_threshold": 3,
+      "routed_count": 0,
+      "rescue_count": 0,
+      "harm_count": 0,
+      "finding": "exact fallback worked, but responder supervision was too sparse to enable routing"
+    },
+    "one_query_personalization": {
+      "queried_participant_seed_instances": 7,
+      "normal_state_count": 4,
+      "inverted_state_count": 2,
+      "off_state_count": 44,
+      "mean_difference_from_matched_core": -0.018370165412132433,
+      "bottom_30_percent_difference": -0.051607416336103884,
+      "finding": "single-window state inference was unreliable and must not be promoted"
+    },
+    "oracle_headroom": {
+      "participant_oracle_difference_from_v2_full": 0.012235148693767073,
+      "window_oracle_difference_from_v2_full": 0.02082055872404409,
+      "finding": "candidate complementarity exists, but deployable label-free routing remains unresolved"
+    },
+    "bout_accumulator": {
+      "implemented": true,
+      "evaluated": false,
+      "reason": "released source has no authentic session, trial, or timestamp order"
+    }
+  },
+  "advancement_gate": {
+    "overall_passed": false,
+    "mean_gain_over_hera_v1_at_least_0_010": false,
+    "bottom_30_gain_over_ctgr_at_least_0_015": false,
+    "intervention_precision_at_least_0_80": false,
+    "harmful_changed_fraction_at_most_0_15": false,
+    "participant_interval_lower_bound_above_zero": false,
+    "zero_mobility_membership_changes": true,
+    "posture_recall_noninferiority": true,
+    "worst_participant_noninferiority": true,
+    "negative_log_likelihood_not_worse": true,
+    "multiclass_brier_not_worse": true
+  },
+  "conclusion": {
+    "hera_ctgr_v2_breakthrough": false,
+    "best_real_matched_method": "frozen_hera_ctgr_v1_strict",
+    "retain": [
+      "rank_preserving_temperature_calibration",
+      "rank_locked_posture_decision_separation",
+      "exact_core_fallback",
+      "mobility_boundary_lock",
+      "dual_frame_candidate_as_a_research_ablation"
+    ],
+    "do_not_promote": [
+      "stability_weighting_of_near_duplicate_candidates",
+      "sparse_rescue_harm_meta_routing",
+      "single_query_off_normal_inverted_selection",
+      "unevaluated_bout_performance"
+    ],
+    "next_evidence_need": "new ordered multi-participant development cohort with authentic sessions and enough expert disagreements, followed by separately sealed confirmation"
+  },
+  "claim_boundary": {
+    "participants_1_through_10_reused_as_hypothesis_generation": true,
+    "participants_11_through_20_loaded": false,
+    "daghar_loaded": false,
+    "historical_0_7514_score_is_matched_comparator": false,
+    "independent_validation_claim_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false
+  },
+  "record_sha256": "5954bcf76e5bc4d0b02db3d4a880be988ea37ef3152cb9132b4bf0cfb741f687"
+}
