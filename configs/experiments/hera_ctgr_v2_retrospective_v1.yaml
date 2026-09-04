@@ -1,0 +1,112 @@
+schema_version: "1.0.0"
+experiment_id: "hera-ctgr-v2-retrospective-source-v1"
+declared_on: "2026-09-04"
+status: "locked_before_fully_nested_retrospective_source_run"
+evidence_status: "retrospective_reused_source_development_not_independent_validation"
+
+method_freeze:
+  tag: "hera-ctgr-v2-implementation-v1"
+  commit: "5def59c1bf1c9276a10b1fccbf7b023975d962a2"
+  method_config:
+    path: "configs/experiments/hera_ctgr_v2.yaml"
+    sha256: "a9cc05d0bb21a4bc9f6b3d64b0359deaf83a10be81cc4804a4a64eebdc422ef8"
+  method_implementation:
+    path: "src/inclusive_shift_har/models/hera_ctgr_v2.py"
+    sha256: "e324451f655b966853982579f519d61c2c0d6249f134bd5b1001f5cf58a16294"
+  parameters_may_change_after_run: false
+
+inputs:
+  source_manifest:
+    path: "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json"
+    sha256: "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+  dataset_manifest:
+    path: "manifests/datasets/inclusivehar_v4.json"
+    sha256: "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  raw_source:
+    path: "data/raw/inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+    sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+  ctgr_config:
+    path: "configs/experiments/confidence_triggered_gravity_residual_v1.yaml"
+    sha256: "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa"
+  ctgr_selection:
+    path: ".audit/v3/max-rnd/ctgr-selection-001/selection.json"
+    sha256: "f7475bc7ec43bf02ccdfe3b8eb6ed9c6a333b51781b638a63f2d257341a37180"
+  ctgr_evaluation_record_pattern: ".audit/v3/max-rnd/ctgr-evaluation-seed-{seed}-001/result.json"
+  hera_v1_result:
+    path: ".audit/v5/hera-ctgr/retrospective-source-v1-001/result.json"
+    sha256: "ef228971eb8605303c1ea31afb7c42c5dc52c602faf2664906fb7749758ffc98"
+  hera_v1_predictions:
+    path: ".audit/v5/hera-ctgr/retrospective-source-v1-001/cross_fitted_predictions.npz"
+    sha256: "8df7fa091abddc34c183d0f4855be8609f0db2ff0828dabdf257575b905660ad"
+
+fixed_seeds: [11, 23, 47, 89, 131]
+participant_ids: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+outer_fold_count: 5
+inner_fold_count_per_outer: 4
+
+fixed_method:
+  candidate_count: 3
+  divergence_temperature: 0.05
+  minimum_candidate_weight: 0.05
+  temperature_candidates: [0.75, 0.90, 1.00, 1.10, 1.25]
+  posture_logit_offset_candidates: [-0.20, -0.10, 0.00, 0.10, 0.20]
+  dual_estimator: "extra_trees_leaf3"
+  dual_confidence_thresholds: [0.50, 0.55, 0.60, 0.65]
+  dual_blend_weights: [0.25, 0.50, 0.75, 1.00]
+  dual_selection_mean_tolerance: 0.005
+  physics_veto_quantile: 0.99
+  physics_minimum_valid_pair_fraction: 0.98
+  binary_ridge_penalty: 25.0
+  jackknife_interval_z: 1.0
+  harm_penalty: 2.0
+  minimum_physics_reliability: 0.20
+  maximum_support_distance: 3.0
+  minimum_rescue_lower_bound_grid: [0.05, 0.10, 0.20, 0.30]
+  maximum_harm_upper_bound_grid: [0.05, 0.10, 0.15, 0.25]
+  minimum_net_benefit_grid: [0.00, 0.05, 0.10, 0.20]
+  training_minimum_precision: 0.80
+  training_maximum_harmful_fraction: 0.15
+  one_query_minimum_stationary_mass: 0.80
+
+nesting_contract:
+  frozen_ctgr_and_hera_v1_predictions_replayed: true
+  base_candidate_and_dual_predictions_cross_fitted_by_participant: true
+  temperature_offset_dual_and_sentinel_thresholds_selected_on_outer_training_oof_only: true
+  binary_heads_trained_on_participant_exclusive_oof_disagreements: true
+  outer_labels_used_only_after_all_zero_shot_predictions_are_fixed: true
+  participant_is_inference_unit: true
+
+methods:
+  - base_uncalibrated
+  - frozen_ctgr
+  - frozen_hera_ctgr_v1_strict
+  - equal_top3_ctgr
+  - stability_weighted_top3_ctgr
+  - temperature_only_core
+  - decision_separated_core
+  - dual_frame_global_candidate
+  - rescue_harm_logits_only
+  - rescue_harm_physics
+  - hera_ctgr_v2_full
+  - one_query_matched_core
+  - one_query_personalization
+  - participant_oracle_diagnostic
+  - window_oracle_diagnostic
+
+selection_order:
+  temperature: [negative_log_likelihood, proximity_to_identity, numeric_order]
+  posture_offset: [mean_participant_macro_f1, bottom_30_percent, proximity_to_identity, numeric_order]
+  dual_candidate: [within_mean_tolerance, bottom_30_percent, fewer_harms, more_rescues, negative_log_likelihood, lower_coverage]
+  sentinel: [passes_precision_and_harm_gate, mean_participant_macro_f1, bottom_30_percent, precision, fewer_harms, lower_coverage]
+  no_sentinel_threshold_passes: "exact_decision_core_fallback"
+
+claim_policy:
+  participants_11_through_20_may_be_loaded: false
+  daghar_may_be_loaded: false
+  retrospective_result_is_hypothesis_generation_only: true
+  one_query_is_labelled_personalization_only: true
+  participant_and_window_oracles_are_diagnostic_only: true
+  independent_validation_claim_allowed: false
+  confirmatory_claim_allowed: false
+  state_of_the_art_claim_allowed: false
+  future_new_development_and_independent_confirmation_still_required: true

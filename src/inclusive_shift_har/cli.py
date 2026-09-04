@@ -64,6 +64,9 @@ _TRAIN_TRACKS: dict[str, str] = {
     "cage-har-synthetic-smoke": "exercise CAGE-HAR on non-scientific synthetic data",
     "cage-har-retrospective": "run frozen CAGE-HAR as nested reused-source development",
     "hera-ctgr-retrospective": "run frozen HERA-CTGR as nested reused-source development",
+    "hera-ctgr-v2-retrospective": (
+        "run frozen decision-separated HERA-CTGR v2 as nested reused-source development"
+    ),
     "active-semantic-sentinel": "evaluate active labelled posture-semantic personalization",
     "provenance-mask-robustness": "replay RMRP with explicit validity-mask reconstruction",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
@@ -583,6 +586,12 @@ def _workflow_entrypoint(
             return entrypoint, (), False
         if track == "hera-ctgr-retrospective":
             from inclusive_shift_har.experiments.hera_ctgr_retrospective import main as entrypoint
+
+            return entrypoint, (), False
+        if track == "hera-ctgr-v2-retrospective":
+            from inclusive_shift_har.experiments.hera_ctgr_v2_retrospective import (
+                main as entrypoint,
+            )
 
             return entrypoint, (), False
         if track == "active-semantic-sentinel":

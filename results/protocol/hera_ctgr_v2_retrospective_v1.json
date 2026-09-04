@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "hera_ctgr_v2_fully_nested_retrospective_source_protocol",
+  "status": "locked_before_fully_nested_retrospective_source_run",
+  "declared_on": "2026-09-04",
+  "evidence_status": "retrospective_reused_source_development_not_independent_validation",
+  "method_freeze": {
+    "tag": "hera-ctgr-v2-implementation-v1",
+    "commit": "5def59c1bf1c9276a10b1fccbf7b023975d962a2",
+    "parameters_may_change_after_run": false
+  },
+  "protocol_document": {
+    "path": "docs/research/HERA_CTGR_V2_RETROSPECTIVE_V1_PROTOCOL.md",
+    "sha256": "4fc155ec30122e8448821acf8c076f0f7dd1d6e738b6b7c8986d48f740ae3103"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/hera_ctgr_v2_retrospective_v1.yaml",
+    "sha256": "55b5016c92fefbc5432c9da15c66f777ac73e98e55a1d8d408a354fd17a226c8"
+  },
+  "implementation": {
+    "path": "src/inclusive_shift_har/experiments/hera_ctgr_v2_retrospective.py",
+    "sha256": "9d50e46b24b209497235748f3ea9404ed6de5aa0bc0093347e333c2110de7fff"
+  },
+  "cli_registration": {
+    "path": "src/inclusive_shift_har/cli.py",
+    "sha256": "fb07378d20de1af646994e971e79d2bc46bd85918ecbc56138d2c96129d91215"
+  },
+  "focused_test": {
+    "path": "tests/test_hera_ctgr_v2_retrospective.py",
+    "sha256": "fdeb914dbccd67743d4270b7b09bb6e0e8389e41d17c34202e6ff8804a27362c"
+  },
+  "fixed_inputs": {
+    "source_manifest_sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+    "dataset_manifest_sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29",
+    "raw_source_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+    "ctgr_config_sha256": "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa",
+    "ctgr_selection_sha256": "f7475bc7ec43bf02ccdfe3b8eb6ed9c6a333b51781b638a63f2d257341a37180",
+    "hera_v1_result_sha256": "ef228971eb8605303c1ea31afb7c42c5dc52c602faf2664906fb7749758ffc98",
+    "hera_v1_predictions_sha256": "8df7fa091abddc34c183d0f4855be8609f0db2ff0828dabdf257575b905660ad"
+  },
+  "fixed_seeds": [11, 23, 47, 89, 131],
+  "nested_design": {
+    "outer_fold_count": 5,
+    "inner_fold_count_per_outer": 4,
+    "all_zero_shot_models_and_parameters_selected_on_outer_training_only": true,
+    "rescue_and_harm_heads_use_participant_exclusive_oof_disagreements": true,
+    "outer_test_labels_used_only_after_zero_shot_predictions_are_fixed": true,
+    "participant_is_inference_unit": true
+  },
+  "method_matrix": [
+    "base_uncalibrated",
+    "frozen_ctgr",
+    "frozen_hera_ctgr_v1_strict",
+    "equal_top3_ctgr",
+    "stability_weighted_top3_ctgr",
+    "temperature_only_core",
+    "decision_separated_core",
+    "dual_frame_global_candidate",
+    "rescue_harm_logits_only",
+    "rescue_harm_physics",
+    "hera_ctgr_v2_full",
+    "one_query_matched_core",
+    "one_query_personalization",
+    "participant_oracle_diagnostic",
+    "window_oracle_diagnostic"
+  ],
+  "evidence_boundary": {
+    "source_participants_1_through_10_reused": true,
+    "participants_11_through_20_loaded": false,
+    "daghar_loaded": false,
+    "one_query_reported_separately_from_zero_shot": true,
+    "participant_and_window_oracles_excluded_from_model_claims": true,
+    "ordered_bout_lane_evaluable": false,
+    "independent_validation_claim_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false,
+    "new_development_and_independent_confirmation_still_required": true
+  },
+  "record_sha256": "16101fbcd8a031bee9fec133efd8596023b84be8e3e3062d4c46fe8a5fac2f0e"
+}
