@@ -1,0 +1,173 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "cage_har_fully_nested_retrospective_source_summary",
+  "status": "complete_reused_source_development_not_independent",
+  "created_on": "2026-09-04",
+  "evidence_status": "retrospective_reused_source_development_not_independent_validation",
+  "method_freeze": {
+    "tag": "cage-har-implementation-v1",
+    "commit": "3d1e8ae444b9976c7d532b39142ae58d4fe41aad"
+  },
+  "execution_freeze": {
+    "tag": "cage-har-retrospective-protocol-v1",
+    "commit": "34eb6ff0a147684e7ba525ff691440e0880e21d4"
+  },
+  "protocol": {
+    "path": "results/protocol/cage_har_retrospective_v1.json",
+    "sha256": "2da367178c89ca64bcae83f489eb023a3c48e9ddb11f7f447af9b2eb733266e9",
+    "record_sha256": "bb18154a65aa9fe1e4d5e3b0b12e68dd756c8ca0cc04b6bdcc7f5c0ba24be483"
+  },
+  "run": {
+    "path": ".audit/v4/cage-har/retrospective-source-v1-001/result.json",
+    "sha256": "16714500e15aba66abd5f78e590f74834a98e924e04eea1d33e04a41cf670d5f",
+    "record_sha256": "1ca5123d79a712b460a690f96723890a91595330777c9608bb5ced59bbefeea6",
+    "predictions_path": ".audit/v4/cage-har/retrospective-source-v1-001/cross_fitted_predictions.npz",
+    "predictions_sha256": "6af02649ca4435a8402374ccdc83f68e3845d55ea8ef990bd16c0bc5eef57686"
+  },
+  "design": {
+    "participant_count": 10,
+    "window_count": 725,
+    "seed_count": 5,
+    "outer_fold_count": 5,
+    "inner_fold_count_per_outer": 4,
+    "participant_is_inference_unit": true,
+    "outer_labels_used_for_training_selection_or_repair": false,
+    "preserved_ctgr_reports_replayed_exactly_for_all_seeds": true
+  },
+  "five_seed_mean_results": {
+    "base_uncalibrated": {
+      "mean_participant_macro_f1": 0.8395337505837951,
+      "bottom_30_percent_participant_macro_f1": 0.6994146859705921,
+      "worst_participant_macro_f1": 0.5476679935131947,
+      "negative_log_likelihood": 0.3688926229803643,
+      "multiclass_brier_score": 0.22511787255172414
+    },
+    "base_decision_repaired": {
+      "mean_participant_macro_f1": 0.8414794280659592,
+      "bottom_30_percent_participant_macro_f1": 0.6969890756060401,
+      "worst_participant_macro_f1": 0.5412603124615508,
+      "negative_log_likelihood": 0.35345910240773143,
+      "multiclass_brier_score": 0.21902361659925215
+    },
+    "cage_har": {
+      "mean_participant_macro_f1": 0.8465267744553868,
+      "bottom_30_percent_participant_macro_f1": 0.7245669498107533,
+      "worst_participant_macro_f1": 0.5944225708147276,
+      "negative_log_likelihood": 0.3412772010237557,
+      "multiclass_brier_score": 0.2089564432233622
+    },
+    "confidence_trust_gate": {
+      "mean_participant_macro_f1": 0.8566709355378921,
+      "bottom_30_percent_participant_macro_f1": 0.7186909704131074,
+      "worst_participant_macro_f1": 0.5443767058729381,
+      "negative_log_likelihood": 0.34416661527746817,
+      "multiclass_brier_score": 0.21032787440847653
+    },
+    "disagreement_trust_gate": {
+      "mean_participant_macro_f1": 0.8572959925187924,
+      "bottom_30_percent_participant_macro_f1": 0.7146624367277622,
+      "worst_participant_macro_f1": 0.6001920242202385,
+      "negative_log_likelihood": 0.3417353024983802,
+      "multiclass_brier_score": 0.2089727958370291
+    },
+    "global_trust_blend": {
+      "mean_participant_macro_f1": 0.8572959925187924,
+      "bottom_30_percent_participant_macro_f1": 0.7146624367277622,
+      "worst_participant_macro_f1": 0.6001920242202385,
+      "negative_log_likelihood": 0.3187314234380666,
+      "multiclass_brier_score": 0.19227232369743114
+    },
+    "frozen_ctgr": {
+      "mean_participant_macro_f1": 0.8653982091142408,
+      "bottom_30_percent_participant_macro_f1": 0.7399011628766852,
+      "worst_participant_macro_f1": 0.5751222069529602,
+      "negative_log_likelihood": 0.35425523262176606,
+      "multiclass_brier_score": 0.21164741401257775
+    }
+  },
+  "cage_har_differences": {
+    "mean_macro_f1_minus_uncalibrated_rmrp": 0.00699302387159173,
+    "mean_macro_f1_minus_repaired_rmrp": 0.005047346389427609,
+    "mean_macro_f1_minus_frozen_ctgr": -0.01887143465885399,
+    "bottom_30_percent_minus_repaired_rmrp": 0.0275778742047132,
+    "worst_participant_minus_uncalibrated_rmrp": 0.046754577301532874,
+    "worst_participant_minus_frozen_ctgr": 0.019300363861767367,
+    "negative_log_likelihood_minus_frozen_ctgr": -0.01297803159801037,
+    "multiclass_brier_minus_frozen_ctgr": -0.002690970789215544
+  },
+  "per_seed_mean_participant_macro_f1": [
+    {"seed": 11, "rmrp": 0.8379032940215063, "cage_har": 0.8500988823250593, "ctgr": 0.8647412409935648},
+    {"seed": 23, "rmrp": 0.8412244516073674, "cage_har": 0.8472006662312339, "ctgr": 0.8628421949374461},
+    {"seed": 47, "rmrp": 0.8419519721985516, "cage_har": 0.8430064857713621, "ctgr": 0.8664383764420236},
+    {"seed": 89, "rmrp": 0.8394584440200367, "cage_har": 0.8437181884002609, "ctgr": 0.8654189960312892},
+    {"seed": 131, "rmrp": 0.8371305910715131, "cage_har": 0.8486096495490182, "ctgr": 0.8675502371668807}
+  ],
+  "cage_har_routing": {
+    "opportunities": 3625,
+    "route_count": 861,
+    "route_fraction": 0.23751724137931035,
+    "hard_label_change_count": 37,
+    "hard_label_change_fraction": 0.010206896551724139,
+    "rescue_count": 25,
+    "harm_count": 11,
+    "both_wrong_changed_count": 1,
+    "net_rescues": 14,
+    "intervention_precision": 0.6944444444444444,
+    "harmful_changed_fraction": 0.2972972972972973,
+    "hard_change_localization": {
+      "participant_4": {"rescues": 0, "harms": 3},
+      "participant_8": {"rescues": 0, "harms": 8},
+      "participant_9": {"rescues": 11, "harms": 0},
+      "participant_10": {"rescues": 14, "harms": 0},
+      "all_other_participants": {"rescues": 0, "harms": 0}
+    }
+  },
+  "advancement_gate": {
+    "mean_improvement_at_least_0_020": {"observed": 0.005047346389427609, "passed": false},
+    "bottom_30_percent_nonnegative": {"observed": 0.0275778742047132, "passed": true},
+    "intervention_precision_at_least_0_80": {"observed": 0.6944444444444444, "passed": false},
+    "harmful_changed_fraction_at_most_0_15": {"observed": 0.2972972972972973, "passed": false},
+    "engineering_score_at_least_0_875": {"observed": 0.8465267744553868, "passed": false},
+    "stretch_score_at_least_0_884": {"observed": 0.8465267744553868, "passed": false},
+    "clean_health_branch_regression": {"observed": null, "passed": null, "reason": "no separate health expert in the preserved CTGR bank"},
+    "corruption_curve_improvement": {"observed": null, "passed": null, "reason": "no real fault-labelled corruption run in this retrospective lane"},
+    "overall_passed": false
+  },
+  "post_run_descriptive_participant_analysis": {
+    "multiplicity_adjusted_superiority_claim_allowed": false,
+    "cage_har_vs_rmrp": {
+      "mean_difference": 0.006993023871591874,
+      "positive_participants": 6,
+      "negative_participants": 4,
+      "bootstrap_95_percent_interval": [-0.006945304539146558, 0.020744450178261063],
+      "exact_sign_flip_two_sided_p_unadjusted": 0.357421875,
+      "wilcoxon_two_sided_p_unadjusted": 0.375
+    },
+    "cage_har_vs_ctgr": {
+      "mean_difference": -0.018871434658854047,
+      "positive_participants": 3,
+      "negative_participants": 7,
+      "bootstrap_95_percent_interval": [-0.04108812411753223, 0.0025892227998718944],
+      "exact_sign_flip_two_sided_p_unadjusted": 0.142578125,
+      "wilcoxon_two_sided_p_unadjusted": 0.193359375
+    },
+    "bootstrap_resamples": 100000,
+    "bootstrap_seed": 20260904
+  },
+  "conclusion": {
+    "cage_har_breakthrough": false,
+    "current_best_matched_human_method": "CTGR",
+    "current_best_matched_mean_participant_macro_f1": 0.8653982091142408,
+    "cage_har_signal": "consistent small mean gain over RMRP plus better worst-participant and proper scores, but router intervention precision and mean-gain gates failed",
+    "next_method_direction": "retain CTGR or the fixed trust blend and learn participant-level responder state before any window-level intervention",
+    "new_independent_cohort_still_required": true
+  },
+  "claim_boundary": {
+    "participants_11_through_20_loaded": false,
+    "daghar_loaded": false,
+    "independent_validation_claim_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false
+  },
+  "record_sha256": "33fc960b2da8727e73e3571bfec8a7e11442b4b981fea1a8b3e8a44577058441"
+}

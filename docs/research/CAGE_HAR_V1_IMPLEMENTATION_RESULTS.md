@@ -3,6 +3,11 @@
 Status: software and prospective protocol complete on 2026-09-04; real development evaluation
 is waiting for a genuinely new human cohort.
 
+Follow-on: a separate fully nested **retrospective reused-source** evaluation has now been completed
+on participants 1--10. CAGE-HAR reached 0.8465 versus 0.8395 RMRP and 0.8654 CTGR, so it did not
+pass its advancement gate. This does not alter the prospective new-cohort status above. See
+[`CAGE_HAR_RETROSPECTIVE_V1_RESULTS.md`](CAGE_HAR_RETROSPECTIVE_V1_RESULTS.md).
+
 ## Bottom line
 
 CAGE-HAR is implemented as the next nine-channel research candidate. The implementation includes
@@ -24,12 +29,14 @@ smoke values below establish executable contracts only and are not estimates of 
 | Historical k=4 numerical leader | Six-channel few-person post-confirmatory | 0.7593 | Not comparable to source-only methods | Best descriptive model in that different protocol |
 | Matched RMRP control | Six-channel, five-seed source-development CV on participants 1--10 | 0.8395 | Reference for CTGR | Correct matched control for the CTGR experiment |
 | CTGR | Nine-channel, same folds/seeds/source-development participants as matched RMRP | **0.8654** | **+0.0259 over RMRP** | Passed its nine predeclared source-development advancement checks; not independent confirmation |
+| CAGE-HAR retrospective | Nine-channel, fully nested reuse of source participants 1--10 | 0.8465 | +0.0070 over RMRP; -0.0189 versus CTGR | Real development diagnostic; failed advancement gate |
 | CAGE-HAR v1 | Nine-channel, genuinely new development cohort | **N/A** | **N/A** | Implementation frozen; no eligible new cohort is present |
 
 The numerical gap from 0.7514 to 0.8654 is +0.1140, but it is not a valid treatment effect:
 training information, cohorts, evidence phase, and sensor interfaces differ. The defensible matched
-advance is CTGR over RMRP, +0.0259 mean participant macro-F1. A CAGE-HAR breakthrough cannot be
-assessed until the prospective new-cohort run exists.
+advance is CTGR over RMRP, +0.0259 mean participant macro-F1. The retrospective CAGE result is not
+a breakthrough; its independent generalization still cannot be assessed until a prospective
+new-cohort run exists.
 
 ## Implemented research plan
 
@@ -74,8 +81,9 @@ method, or support a state-of-the-art claim.
 | Gate | Result |
 |---|---|
 | Focused CAGE-HAR tests | 44 passed |
-| Full repository tests on the completed CAGE source/test tree | 691 passed in 1719.04 seconds |
-| Final CAGE protocol and release-documentation tests | 13 passed |
+| Full repository tests on the initial CAGE source/test tree | 691 passed in 1719.04 seconds |
+| Full repository tests on the retrospective protocol freeze | 696 passed in 1924.90 seconds |
+| Final result/protocol/CLI/release-documentation checks | 45 passed |
 | Ruff lint | Passed |
 | Ruff formatting check | Passed; 215 files already formatted |
 | Mypy | Passed; 215 source files checked |

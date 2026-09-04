@@ -74,3 +74,29 @@ def test_cage_retrospective_protocol_is_self_hashed_and_lineage_locked() -> None
     assert record["evidence_boundary"]["participants_11_through_20_loaded"] is False
     assert record["evidence_boundary"]["daghar_loaded"] is False
     assert record["evidence_boundary"]["confirmatory_claim_allowed"] is False
+
+
+def test_cage_retrospective_summary_is_self_hashed_and_claim_safe() -> None:
+    path = Path("results/development/cage_har_retrospective_v1_summary.json")
+    record: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    claimed = record.pop("record_sha256")
+    assert claimed == canonical_json_sha256(record)
+    protocol = record["protocol"]
+    assert sha256_file(Path(protocol["path"])) == protocol["sha256"]
+    run = record["run"]
+    run_path = Path(run["path"])
+    prediction_path = Path(run["predictions_path"])
+    if run_path.exists():
+        assert sha256_file(run_path) == run["sha256"]
+        run_record: dict[str, Any] = json.loads(run_path.read_text(encoding="utf-8"))
+        run_claimed = run_record.pop("record_sha256")
+        assert run_claimed == run["record_sha256"]
+        assert run_claimed == canonical_json_sha256(run_record)
+    if prediction_path.exists():
+        assert sha256_file(prediction_path) == run["predictions_sha256"]
+    assert record["advancement_gate"]["overall_passed"] is False
+    assert record["conclusion"]["cage_har_breakthrough"] is False
+    assert record["conclusion"]["current_best_matched_human_method"] == "CTGR"
+    assert record["claim_boundary"]["participants_11_through_20_loaded"] is False
+    assert record["claim_boundary"]["daghar_loaded"] is False
+    assert record["claim_boundary"]["state_of_the_art_claim_allowed"] is False
