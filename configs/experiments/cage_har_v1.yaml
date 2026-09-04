@@ -1,0 +1,127 @@
+schema_version: "1.0.0"
+experiment_id: "cage-har-new-development-v1"
+declared_on: "2026-09-04"
+status: "implemented_awaiting_new_development_cohort"
+method_name: "Counterfactual Advantage-Gated Expert HAR"
+method_abbreviation: "CAGE-HAR"
+method_origin: >-
+  Designed after the frozen CTGR source-development result and its disclosed post-hoc
+  rescue/harm audit. InclusiveHAR participants 1-10 are exhausted for invention
+  selection; participants 11-20 and consumed DAGHAR targets are forbidden.
+
+input_contract:
+  class_names: [mobility, sitting, standing]
+  required_channel_count: 9
+  minimum_participants: 8
+  predictions_must_be_participant_exclusive_oof: true
+  required_new_cohort_fields:
+    - monotonic_timestamp
+    - participant_id
+    - site_id
+    - session_id
+    - trial_id
+    - repetition_id
+    - activity_label
+    - device_model
+    - operating_system
+    - app_version
+    - placement
+    - orientation
+    - sensor_accuracy
+    - sensor_provenance
+  forbidden_model_inputs:
+    - participant_id
+    - disability
+    - assistive_device
+    - timestamp
+    - site_id
+    - session_id
+    - trial_id
+    - location
+  forbidden_dataset_ids: [inclusivehar_v4, daghar_v2]
+  forbidden_participant_ids:
+    - "1"
+    - "2"
+    - "3"
+    - "4"
+    - "5"
+    - "6"
+    - "7"
+    - "8"
+    - "9"
+    - "10"
+    - "11"
+    - "12"
+    - "13"
+    - "14"
+    - "15"
+    - "16"
+    - "17"
+    - "18"
+    - "19"
+    - "20"
+
+decision_repair:
+  temperatures: [0.80, 1.00, 1.25]
+  posture_logit_offsets: [-0.15, 0.00, 0.15]
+  mean_tie_tolerance: 0.005
+  selection_order:
+    - mean_participant_macro_f1_within_tolerance
+    - lower_negative_log_likelihood
+    - closer_to_identity
+    - bottom_30_percent_participant_macro_f1
+
+router:
+  ridge_penalty: 10.0
+  lower_bound_z: 1.0
+  minimum_advantage: 0.010
+  minimum_reliability: 0.50
+  maximum_mix_weight: 0.75
+  advantage_scale: 0.10
+  maximum_kl: 0.05
+  harm_weight_multiplier: 2.0
+  bottom_tail_fraction: 0.30
+  bottom_tail_weight_multiplier: 2.0
+
+ablations:
+  fixed_blend_weight: 0.75
+  confidence_threshold: 0.55
+  required_methods:
+    - base_uncalibrated
+    - base_decision_repaired
+    - global_trust_blend
+    - confidence_trust_gate
+    - disagreement_trust_gate
+    - cage_har
+
+development_advancement_gate:
+  comparator: "base_decision_repaired"
+  minimum_mean_participant_macro_f1_difference: 0.020
+  minimum_bottom_30_percent_difference: 0.000
+  minimum_intervention_precision: 0.80
+  maximum_harmful_changed_fraction: 0.15
+  maximum_clean_health_branch_regression: 0.005
+  minimum_corruption_curve_improvement: 0.015
+  engineering_score_target: 0.875
+  engineering_score_stretch_target: 0.884
+  targets_are_promises: false
+
+confirmatory_gate:
+  participant_is_inference_unit: true
+  minimum_mean_participant_macro_f1_difference: 0.020
+  holm_adjusted_paired_confidence_interval_lower_bound_must_exceed_zero: true
+  bottom_30_percent_confidence_interval_lower_bound_must_exceed_zero: true
+  tenth_percentile_noninferiority_margin: -0.010
+  mobility_recall_noninferiority_margin: -0.010
+  realization_stratum_noninferiority_margin: -0.020
+  nll_and_brier_must_not_worsen: true
+  one_sealed_opening: true
+
+claim_policy:
+  confirmatory_claim_allowed: false
+  locked_inclusivehar_reuse_allowed: false
+  consumed_daghar_reuse_allowed: false
+  synthetic_performance_claim_allowed: false
+  new_development_result_is_confirmatory: false
+  independent_new_ability_relevant_cohort_required: true
+  zero_shot_tta_and_labelled_personalization_reported_separately: true

@@ -60,6 +60,8 @@ _TRAIN_TRACKS: dict[str, str] = {
     "microstate-posture-ablations": "run the frozen explanatory MPG-RMRP ablation suite",
     "ctgr-select": "freeze confidence-triggered gravity residual candidates",
     "ctgr-evaluate": "evaluate frozen confidence-triggered gravity residual candidates",
+    "cage-har-development": "run CAGE-HAR on a guarded new-development OOF bundle",
+    "cage-har-synthetic-smoke": "exercise CAGE-HAR on non-scientific synthetic data",
     "active-semantic-sentinel": "evaluate active labelled posture-semantic personalization",
     "provenance-mask-robustness": "replay RMRP with explicit validity-mask reconstruction",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
@@ -567,6 +569,11 @@ def _workflow_entrypoint(
             )
 
             command = "select" if track.endswith("select") else "evaluate"
+            return entrypoint, (command,), False
+        if track in {"cage-har-development", "cage-har-synthetic-smoke"}:
+            from inclusive_shift_har.experiments.cage_har import main as entrypoint
+
+            command = "run" if track.endswith("development") else "synthetic-smoke"
             return entrypoint, (command,), False
         if track == "active-semantic-sentinel":
             from inclusive_shift_har.experiments.active_semantic_gauge_sentinel import (

@@ -1,0 +1,59 @@
+schema_version: "1.0.0"
+registry_id: "cage-har-equal-information-baselines-v1"
+status: "configured_awaiting_new_development_cohort_and_pending_adapters"
+declared_on: "2026-09-04"
+
+comparison_policy:
+  separate_six_and_nine_channel_leaderboards: true
+  identical_windows_and_participant_splits: true
+  identical_training_and_validation_information: true
+  equal_hyperparameter_budget_within_comparison_class: true
+  report_performance_and_compute_matched_views: true
+  seeds_are_not_independent_sample_size: true
+  target_or_confirmatory_tuning_allowed: false
+  failed_and_unavailable_baselines_remain_visible: true
+
+tracks:
+  six_channel:
+    channel_count: 6
+    methods:
+      - {id: frozen_rmrp, family: engineered_extra_trees, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: random_forest, family: classical, adapter_status: available, licence_status: dependency_compatible, run_status: awaiting_new_cohort}
+      - {id: extra_trees, family: classical, adapter_status: available, licence_status: dependency_compatible, run_status: awaiting_new_cohort}
+      - {id: xgboost, family: classical, adapter_status: available, licence_status: dependency_reviewed_runtime_only, run_status: awaiting_new_cohort}
+      - {id: rbf_svm, family: classical, adapter_status: available, licence_status: dependency_compatible, run_status: awaiting_new_cohort}
+      - {id: logistic_regression, family: classical, adapter_status: available, licence_status: dependency_compatible, run_status: awaiting_new_cohort}
+      - {id: compact_erm, family: neural_domain_generalization, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: compact_coral, family: neural_domain_generalization, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: compact_dann, family: neural_domain_generalization, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: deepconvlstm, family: neural_sequence, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: cnn_bilstm, family: neural_sequence, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: more_har, family: neural_multibranch, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: cnn_har, family: modern_efficient, adapter_status: pending_faithful_adapter, licence_status: pending_review, run_status: blocked}
+      - {id: tinyhar, family: modern_efficient, adapter_status: pending_faithful_adapter, licence_status: pending_review, run_status: blocked}
+      - {id: tinierhar, family: modern_efficient, adapter_status: pending_faithful_adapter, licence_status: pending_review, run_status: blocked}
+      - {id: hart, family: modern_efficient, adapter_status: pending_faithful_adapter, licence_status: pending_review, run_status: blocked}
+
+  nine_channel:
+    channel_count: 9
+    methods:
+      - {id: naive_raw_gravity_concat, family: engineered_extra_trees, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: gravity_posture_expert, family: engineered_posture, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: frozen_ctgr, family: confidence_routed_expert, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+      - {id: parameter_matched_nine_channel_neural, family: neural_control, adapter_status: pending_new_cohort_adapter, licence_status: repository_apache_2, run_status: blocked}
+      - {id: cage_har, family: counterfactual_advantage_routing, adapter_status: available, licence_status: repository_apache_2, run_status: awaiting_new_cohort}
+
+  modern_representation:
+    channel_count: "matched_to_source_track"
+    methods:
+      - {id: reconstruction_ssl_representative, family: self_supervised, adapter_status: pending_method_selection, licence_status: pending_review, run_status: blocked}
+      - {id: contrastive_ssl_representative, family: self_supervised, adapter_status: pending_method_selection, licence_status: pending_review, run_status: blocked}
+      - {id: hybrid_reconstruction_contrastive, family: self_supervised, adapter_status: pending_method_selection, licence_status: pending_review, run_status: blocked}
+      - {id: wearable_foundation_checkpoint, family: foundation_model, adapter_status: pending_checkpoint_selection, licence_status: pending_review, run_status: blocked}
+
+claim_boundary:
+  registry_completion_is_a_performance_result: false
+  unavailable_or_unlicensed_method_may_be_silently_omitted: false
+  generic_har_state_of_the_art_claim_allowed: false
+  protocol_specific_claim_requires_literature_refresh: true
+  independent_confirmatory_cohort_required: true

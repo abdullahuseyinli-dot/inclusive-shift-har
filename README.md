@@ -28,6 +28,8 @@ The number 0.7514 belongs to a v1 few-person experiment in which four target-gro
 
 A prospectively locked follow-on tested the nine-channel Confidence-Triggered Gravity Residual (CTGR). Across five fixed source-development seeds it obtained 0.8654 mean participant macro-F1 versus 0.8395 for matched six-channel RMRP, improved all five seeds, and passed all nine predeclared advancement checks. This is a strong gravity-sensor-sufficiency signal, not a new target result: it reuses source participants 1--10, adds three gravity channels, and was inspired by already-seen source errors. Active labelled personalization and explicit-mask robustness were also completed. See [`docs/research/MAX_RND_SECONDARY_RESULTS.md`](docs/research/MAX_RND_SECONDARY_RESULTS.md) and the self-hashed [`results/development/max_rnd_secondary_v1_summary.json`](results/development/max_rnd_secondary_v1_summary.json).
 
+The next candidate, CAGE-HAR, is implemented but deliberately not evaluated on any locked or consumed human cohort. It replaces CTGR's raw confidence threshold with a participant-jackknifed prediction of counterfactual expert advantage, adds an uncertain posture-preserving gravity gauge, explicit sensor-health context, participant-tail/harm weighting, and a KL-bounded intervention that preserves base mobility mass for posture experts. A soft one-query semantic gauge and an expanded physical-fault suite are included as separate experimental paths. The real runner refuses InclusiveHAR participants 1--20 and consumed DAGHAR evidence; current execution evidence is synthetic contract validation only. See [`docs/research/CAGE_HAR_V1_PROTOCOL.md`](docs/research/CAGE_HAR_V1_PROTOCOL.md) and [`docs/research/CAGE_HAR_V1_IMPLEMENTATION_RESULTS.md`](docs/research/CAGE_HAR_V1_IMPLEMENTATION_RESULTS.md).
+
 ## Evidence classes
 
 | Evidence class | Meaning | Status |
@@ -37,6 +39,7 @@ A prospectively locked follow-on tested the nine-channel Confidence-Triggered Gr
 | Locked confirmatory | Frozen source-only artifacts evaluated once on the sealed target cohort after all gates passed. | Opening 1 complete; no retry or second opening is permitted. |
 | Post-confirmatory secondary | Few-person inclusion, disabled-cohort within-group evaluation, sensor stress, efficiency, signal sensitivity, and qualified CCIL/BPD adaptations. | Completed and explicitly separate from the zero-shot confirmatory claim. |
 | v2 source/external development | Nested source-participant models, fixed corruptions, labelled anchors, and frozen DAGHAR held-out evaluation. | Complete as post-analysis development; no new InclusiveHAR target opening and no confirmatory breakthrough claim. |
+| Prospective CAGE-HAR v1 | Counterfactual-advantage-gated nine-channel expert routing on a future new cohort. | Implementation and synthetic contract validation complete; real development and confirmatory results unavailable. |
 
 The opening receipt is [`results/protocol/confirmatory_target_opening_1.json`](results/protocol/confirmatory_target_opening_1.json). The primary statistics record is [`participant_statistics.json`](results/confirmatory/zero_shot_v1/participant_statistics.json), and the human-readable table is [`model_summary_v1.md`](results/confirmatory/zero_shot_v1/model_summary_v1.md).
 
@@ -153,6 +156,7 @@ uv run pytest
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
+uv run inclusive-shift-har train cage-har-synthetic-smoke -- --config configs/experiments/cage_har_v1.yaml --output-directory .audit/v4/cage-har/synthetic-smoke-001 --code-commit WORKTREE
 ```
 
 The package also provides deterministic split/source-window builders, source-CV aggregation, a CUDA-only UCI source-fold runner, source/final experiment modules, one-time confirmatory evaluation code, locked participant statistics, and create-only publication reporting. CI uses synthetic fixtures and never downloads the research datasets.

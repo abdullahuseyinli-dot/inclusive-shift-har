@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "cage_har_v1_implementation_protocol",
+  "status": "implementation_complete_real_run_blocked_on_new_development_cohort",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_sensor_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Counterfactual Advantage-Gated Expert HAR",
+    "abbreviation": "CAGE-HAR",
+    "channel_count": 9,
+    "base_class_count": 3,
+    "participant_jackknife_router": true,
+    "posture_experts_preserve_base_mobility_mass": true,
+    "kl_bounded_intervention": true,
+    "soft_one_query_semantic_lane_separate": true
+  },
+  "protocol_document": {
+    "path": "docs/research/CAGE_HAR_V1_PROTOCOL.md",
+    "sha256": "b956394b39bc63f9c253c13dde75e5ab9773c266caff300d1ec7bdda434b08ae"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/cage_har_v1.yaml",
+    "sha256": "3c8c3214e7e5aff3b278e2c9bae510631828d5a3b809a1a732e2f5c8b973fa43"
+  },
+  "supporting_configs": [
+    {
+      "path": "configs/experiments/cage_har_baseline_registry_v1.yaml",
+      "sha256": "0aa09da1c4d52ad7306c958a1a78048bf4129480d5e8c40be970dab824dddefb"
+    },
+    {
+      "path": "configs/experiments/cage_har_corruptions_v1.yaml",
+      "sha256": "133ae27421bcc680490d26bdbf2904fefe7732fe3fe0b78cf55af3e435c0bc98"
+    }
+  ],
+  "implementation": [
+    {
+      "path": "src/inclusive_shift_har/models/cage_har.py",
+      "sha256": "f1186a93dcce138debc58c2b607b61c2f2b30df8e717fd48ecd48cb1d967d2c1"
+    },
+    {
+      "path": "src/inclusive_shift_har/experiments/cage_har.py",
+      "sha256": "8e43ee3128edcacd077d58825d50fc11eda5a6df889429ba7e5d51421db715a2"
+    },
+    {
+      "path": "src/inclusive_shift_har/evaluation/cage_corruptions.py",
+      "sha256": "26d85153f4e571f78128978720d73427d56a184352809ffade6a44c9436f3b15"
+    },
+    {
+      "path": "src/inclusive_shift_har/protocols/cage_cohort.py",
+      "sha256": "3cec452ed2911ac6905516e022c021b8287eb8aa06be23bc23fd88efff181b1a"
+    }
+  ],
+  "focused_tests": [
+    {
+      "path": "tests/test_cage_har.py",
+      "sha256": "5aeefa3e655cf7c1a76b83008c0f7c2de0f2173264226bacb4125e476ea4c66d"
+    },
+    {
+      "path": "tests/test_cage_corruptions.py",
+      "sha256": "175973b6871f09f6b28cd51ad59b8e1d8d0db06fb3379d076f139e60581bbc01"
+    },
+    {
+      "path": "tests/test_cage_cohort.py",
+      "sha256": "e1d72634b2f625c2e64def180080c247534038d7e23ebab6576d7a272ca99b6c"
+    },
+    {
+      "path": "tests/test_cage_baseline_registry.py",
+      "sha256": "f776cd84a915e3e5a5046049ba0f7d047f131c487f6cf58c05f55575de9a389f"
+    }
+  ],
+  "frozen_inspiration_evidence": {
+    "path": "results/development/max_rnd_secondary_v1_summary.json",
+    "sha256": "47758ad346889893dfeb6186e52fdc1197129aef0485b6dacc92c5ac17143310",
+    "role": "exhausted_source_hypothesis_generation_only"
+  },
+  "implemented_trial_matrix": [
+    "base_uncalibrated",
+    "base_decision_repaired",
+    "global_trust_blend",
+    "confidence_trust_gate",
+    "disagreement_trust_gate",
+    "cage_har"
+  ],
+  "implemented_fault_families": [
+    "constant_bias",
+    "random_walk_drift",
+    "gain_error",
+    "colored_noise",
+    "contiguous_gap",
+    "axis_dropout",
+    "accelerometer_dropout",
+    "gyroscope_dropout",
+    "gravity_dropout",
+    "stuck_at",
+    "saturation",
+    "orientation_jump",
+    "axis_sign_permutation",
+    "timestamp_jitter",
+    "quantization",
+    "combined_bias_noise_gap"
+  ],
+  "evidence_boundary": {
+    "inclusivehar_participants_1_through_10_reused_for_cage_selection": false,
+    "inclusivehar_participants_11_through_20_reopened": false,
+    "consumed_daghar_targets_reused": false,
+    "real_cage_har_performance_generated": false,
+    "synthetic_contract_smoke_allowed": true,
+    "synthetic_performance_claim_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "new_development_cohort_required": true,
+    "independent_confirmatory_cohort_required": true
+  },
+  "next_gate": {
+    "required_artifact": "self_hashed_cage_har_cohort_manifest_and_participant_exclusive_oof_bundle",
+    "minimum_new_development_participants": 8,
+    "minimum_sessions_per_participant": 2,
+    "real_run_status": "blocked_by_absent_new_development_data_not_by_software"
+  },
+  "record_sha256": "220ed756e03320130641ea5fe96cd3d82162c1cb3b3c3fbaa6aaa8e796f28e61"
+}

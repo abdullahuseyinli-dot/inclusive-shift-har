@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "cage_har_v1_implementation_summary",
+  "status": "implementation_complete_real_evaluation_waiting_for_new_cohort",
+  "created_on": "2026-09-04",
+  "protocol": {
+    "path": "results/protocol/cage_har_v1.json",
+    "sha256": "ffd0a72d0542182b12e618860bf59d092d6efa1add8ed460560bdb26d393510f",
+    "record_sha256": "220ed756e03320130641ea5fe96cd3d82162c1cb3b3c3fbaa6aaa8e796f28e61"
+  },
+  "implemented_components": {
+    "posture_preserving_uncertain_gravity_gauge": "complete",
+    "explicit_sensor_health_context": "complete",
+    "participant_balanced_ridge_advantage_router": "complete",
+    "participant_jackknife_stability_lower_bound": "complete",
+    "harm_and_bottom_tail_weighting": "complete",
+    "mobility_preserving_kl_trust_region": "complete",
+    "soft_query_if_suspect_semantic_gauge": "complete",
+    "expanded_physical_fault_suite": "complete",
+    "separate_six_nine_and_modern_baseline_registry": "complete_with_pending_adapters_visible",
+    "new_cohort_manifest_validator": "complete",
+    "consumed_evidence_denial_gate": "complete",
+    "real_new_development_training": "blocked_absent_new_cohort",
+    "independent_confirmatory_evaluation": "blocked_absent_sealed_cohort"
+  },
+  "synthetic_contract_smoke": {
+    "path": ".audit/v4/cage-har/synthetic-smoke-002/result.json",
+    "sha256": "b420bdc6f79f63b72e1337ab04839165de9081ac8d9d42c150af8a71d5862194",
+    "record_sha256": "8a1c16dba74f5873971fb586faa02b84ee6247c8c6a9a53ea227b4026440efcb",
+    "evidence_status": "synthetic_contract_test_not_scientific_performance",
+    "base_decision_repaired_macro_f1": 0.8841472664608562,
+    "cage_har_macro_f1": 0.9712217240158241,
+    "cage_har_bottom_30_percent_macro_f1": 0.9603464680219067,
+    "route_count": 257,
+    "hard_label_change_count": 91,
+    "rescue_count": 91,
+    "harm_count": 0,
+    "intervention_precision": 1.0,
+    "real_har_performance_claim_allowed": false
+  },
+  "human_data_result_status": {
+    "new_cage_har_score_available": false,
+    "last_frozen_human_data_method": "CTGR",
+    "last_frozen_human_data_macro_f1": 0.8653982090788165,
+    "matched_frozen_rmrp_macro_f1": 0.8395337506105965,
+    "cage_har_improvement_over_ctgr": null,
+    "reason": "No genuinely new development cohort is present; consumed evidence was not reopened."
+  },
+  "claim_boundary": {
+    "synthetic_values_must_not_appear_in_human_result_tables": true,
+    "state_of_the_art_claim_allowed": false,
+    "real_robustness_claim_allowed": false,
+    "new_development_and_independent_confirmatory_cohorts_required": true
+  },
+  "record_sha256": "51ee2fa19dde43ac48b48c16c4161aead8778807b501c565f990325955cda4ba"
+}

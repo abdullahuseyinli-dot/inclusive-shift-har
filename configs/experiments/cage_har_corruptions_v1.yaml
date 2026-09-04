@@ -1,0 +1,48 @@
+schema_version: "1.0.0"
+suite_id: "cage-har-physical-fault-development-v1"
+status: "implemented_uncalibrated_awaiting_real_fault_atlas"
+declared_on: "2026-09-04"
+seed: 20260904
+input_space: "physical_pre_normalization_nine_channel"
+window_boundaries_crossed: false
+severity_empirically_calibrated: false
+primary_claim_eligible: false
+
+conditions:
+  - {id: clean, kind: clean, severity: 0.0}
+  - {id: bias_010, kind: constant_bias, severity: 0.10}
+  - {id: bias_030, kind: constant_bias, severity: 0.30}
+  - {id: random_walk_010, kind: random_walk_drift, severity: 0.10}
+  - {id: random_walk_030, kind: random_walk_drift, severity: 0.30}
+  - {id: gain_010, kind: gain_error, severity: 0.10}
+  - {id: gain_020, kind: gain_error, severity: 0.20}
+  - {id: colored_noise_010, kind: colored_noise, severity: 0.10}
+  - {id: colored_noise_030, kind: colored_noise, severity: 0.30}
+  - {id: gap_0125, kind: contiguous_gap, severity: 0.125}
+  - {id: gap_0250, kind: contiguous_gap, severity: 0.25}
+  - {id: gap_0500, kind: contiguous_gap, severity: 0.50}
+  - {id: axis_dropout, kind: axis_dropout, severity: 1.0}
+  - {id: accelerometer_dropout, kind: accelerometer_dropout, severity: 1.0}
+  - {id: gyroscope_dropout, kind: gyroscope_dropout, severity: 1.0}
+  - {id: gravity_dropout, kind: gravity_dropout, severity: 1.0}
+  - {id: stuck_025, kind: stuck_at, severity: 0.25}
+  - {id: stuck_050, kind: stuck_at, severity: 0.50}
+  - {id: saturation_025, kind: saturation, severity: 0.25}
+  - {id: saturation_050, kind: saturation, severity: 0.50}
+  - {id: orientation_jump_025pi, kind: orientation_jump, severity: 0.25}
+  - {id: orientation_jump_050pi, kind: orientation_jump, severity: 0.50}
+  - {id: axis_sign_permutation, kind: axis_sign_permutation, severity: 1.0}
+  - {id: timestamp_jitter_025, kind: timestamp_jitter, severity: 0.25}
+  - {id: timestamp_jitter_050, kind: timestamp_jitter, severity: 0.50}
+  - {id: quantization_005, kind: quantization, severity: 0.05}
+  - {id: quantization_020, kind: quantization, severity: 0.20}
+  - {id: combined_025, kind: combined_bias_noise_gap, severity: 0.25}
+  - {id: combined_050, kind: combined_bias_noise_gap, severity: 0.50}
+
+reporting:
+  clean_macro_f1_noninferiority_margin: -0.005
+  minimum_corruption_curve_macro_f1_improvement: 0.015
+  participant_level_reporting: true
+  per_fault_family_reporting: true
+  missingness_validity_mask_preserved: true
+  real_fault_atlas_required_before_robustness_claim: true
