@@ -26,6 +26,8 @@ RMRP improved the 18-corruption mean from 0.7507 to 0.7581 and was materially be
 
 The number 0.7514 belongs to a v1 few-person experiment in which four target-group participants entered training; it is not the predecessor of the v2 source-only 0.8379 result. The full method, comparisons, external evaluation, failures, hashes, and publication assessment are in [`docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md`](docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md), with a self-hashed compact ledger in [`results/development/fuse_reframe_v2/research_summary_v1.json`](results/development/fuse_reframe_v2/research_summary_v1.json).
 
+A prospectively locked follow-on tested the nine-channel Confidence-Triggered Gravity Residual (CTGR). Across five fixed source-development seeds it obtained 0.8654 mean participant macro-F1 versus 0.8395 for matched six-channel RMRP, improved all five seeds, and passed all nine predeclared advancement checks. This is a strong gravity-sensor-sufficiency signal, not a new target result: it reuses source participants 1--10, adds three gravity channels, and was inspired by already-seen source errors. Active labelled personalization and explicit-mask robustness were also completed. See [`docs/research/MAX_RND_SECONDARY_RESULTS.md`](docs/research/MAX_RND_SECONDARY_RESULTS.md) and the self-hashed [`results/development/max_rnd_secondary_v1_summary.json`](results/development/max_rnd_secondary_v1_summary.json).
+
 ## Evidence classes
 
 | Evidence class | Meaning | Status |

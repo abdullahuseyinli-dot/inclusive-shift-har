@@ -1,5 +1,7 @@
 # FuSE/ReFrame v2 research report
 
+Follow-on update (2026-09-04): the separately locked Max R&D secondary suite is complete. Nine-channel CTGR reached 0.8654 across five source-development seeds versus 0.8395 matched RMRP and passed its advancement gate; ASGS and explicit-mask robustness also completed. This remains non-confirmatory source development and does not revise any result below. See [`MAX_RND_SECONDARY_RESULTS.md`](MAX_RND_SECONDARY_RESULTS.md).
+
 Status: completed source-development and external held-out evaluation, 2026-09-03.
 
 ## Scope and repository identity

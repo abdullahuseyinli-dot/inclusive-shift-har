@@ -26,6 +26,9 @@ from inclusive_shift_har.experiments.confidence_triggered_gravity_residual impor
 from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
     apply_confidence_triggered_gravity_residual,
 )
+from inclusive_shift_har.experiments.microstate_posture_graph_nested import (
+    _read_hashed_record,
+)
 from inclusive_shift_har.experiments.provenance_mask_robustness import (
     _load_config as load_mask_config,
 )
@@ -196,19 +199,23 @@ def test_provenance_mask_never_infers_missingness_from_zero_and_interpolates() -
         Path("results/protocol/confidence_triggered_gravity_residual_v1.json"),
         Path("results/protocol/active_semantic_gauge_sentinel_v1.json"),
         Path("results/protocol/provenance_mask_robustness_v1.json"),
+        Path("results/development/max_rnd_secondary_v1_summary.json"),
     ],
 )
-def test_max_rnd_protocol_lock_self_hash_and_file_lineage(path: Path) -> None:
+def test_max_rnd_record_self_hash_and_available_file_lineage(path: Path) -> None:
     record = json.loads(path.read_text(encoding="utf-8"))
     claimed = record.pop("record_sha256")
     assert claimed == canonical_json_sha256(record)
 
     def validate_references(value: object) -> None:
         if isinstance(value, dict):
-            if set(("path", "sha256")) <= value.keys():
+            hash_key = "sha256" if "sha256" in value else "file_sha256"
+            if "path" in value and hash_key in value:
                 referenced = Path(str(value["path"]))
+                if referenced.parts[0] == ".audit" and not referenced.exists():
+                    return
                 assert referenced.is_file()
-                assert sha256_file(referenced) == value["sha256"]
+                assert sha256_file(referenced) == value[hash_key]
             for child in value.values():
                 validate_references(child)
         elif isinstance(value, list):
@@ -216,3 +223,47 @@ def test_max_rnd_protocol_lock_self_hash_and_file_lineage(path: Path) -> None:
                 validate_references(child)
 
     validate_references(record)
+
+
+def test_max_rnd_summary_matches_local_audit_when_available() -> None:
+    summary = json.loads(
+        Path("results/development/max_rnd_secondary_v1_summary.json").read_text(encoding="utf-8")
+    )
+    aggregate_path = Path(summary["ctgr"]["aggregate_evidence"]["path"])
+    if not aggregate_path.exists():
+        pytest.skip("ignored local audit evidence is not present in this checkout")
+    aggregate = _read_hashed_record(aggregate_path)
+    for method in ("flat_rmrp", "gravity_posture_expert", "ctgr"):
+        recorded = summary["ctgr"]["five_seed_summary"][method]
+        observed = aggregate["method_summary_across_seeds"][method]
+        for metric in (
+            "mean_participant_macro_f1",
+            "bottom_30_percent_participant_macro_f1",
+            "worst_participant_macro_f1",
+            "mobility_recall",
+            "sitting_recall",
+            "standing_recall",
+            "negative_log_likelihood",
+            "multiclass_brier_score",
+        ):
+            assert recorded[metric] == observed[metric]
+    assert summary["ctgr"]["five_seed_summary"]["advancement_gate_passed"] is True
+    assert aggregate["advancement_gate"]["passed"] is True
+
+    sentinel = _read_hashed_record(
+        Path(summary["active_semantic_gauge_sentinel"]["result_evidence"]["path"])
+    )
+    sentinel_budget_one = sentinel["base_models"]["gsp"]["budgets"][0]["active"]
+    assert (
+        summary["active_semantic_gauge_sentinel"]["gsp_active_budget_one"][
+            "adapted_mean_participant_macro_f1"
+        ]
+        == sentinel_budget_one["adapted_report"]["primary"]["mean_participant_macro_f1"]
+    )
+    provenance = _read_hashed_record(
+        Path(summary["provenance_mask_robustness"]["result_evidence"]["path"])
+    )
+    assert (
+        summary["provenance_mask_robustness"]["mean_all_corrupted_mask_reconstruction"]
+        == provenance["suite"]["mean_all_corrupted"]["explicit_mask_reconstruction_rmrp"]
+    )

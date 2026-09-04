@@ -1,6 +1,10 @@
 # Project status and evidence gates
 
-This is a superseding status snapshot updated 2026-09-03. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+This is a superseding status snapshot updated 2026-09-04. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+
+## 2026-09-04 Max R&D secondary addendum
+
+The prospectively locked nine-channel Confidence-Triggered Gravity Residual completed five fixed source-development seeds at 0.8654 mean participant macro-F1 versus 0.8395 matched RMRP. It improved all five seeds, averaged 3.4 positive outer folds, improved the bottom-30% endpoint from 0.6994 to 0.7399, and passed all nine advancement checks. The result reuses source participants 1--10 after disclosed post-hoc inspiration and adds three gravity channels, so it is not independent confirmation and cannot replace the locked six-channel target result. ASGS produced a +0.0300 matched-window GSP gain using about one queried label per participant; explicit-mask reconstruction produced a smaller +0.0033 mean across corruption cases. Participants 11--20 and target predictions remained unopened. See `docs/research/MAX_RND_SECONDARY_RESULTS.md` and `results/development/max_rnd_secondary_v1_summary.json`.
 
 ## 2026-09-03 FuSE/ReFrame v2 addendum
 
@@ -22,6 +26,7 @@ Sparse labelled Semantic Anchor Reconciliation reached 0.8654 mean and 0.7677 wo
 | 4E - cross-source and SSL/foundation | Not evaluated | exact-label classification blocked beyond sitting; adapted transfer not implemented; licence/interface/checkpoint gates unresolved |
 | 4F - sensor reliability | Complete post-confirmatory secondary evidence | 120 stressed cells; compact ERM/CORAL; severity calibration limitation retained |
 | 4G - FuSE/ReFrame v2 | Source-development and external held-out evaluation complete; not confirmatory | RMRP nested source result, corruption audit, sparse labelled anchors, and one consumed DAGHAR held-out opening; no v2 target access |
+| 4H - Max R&D secondary | CTGR gate passed; ASGS and explicit-mask diagnostics complete; not confirmatory | Five-seed CTGR source matrix, labelled-personalization controls, new-seed corruption suite, immutable pre-run tag `max-rnd-secondary-v1`; no target access |
 | 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
 | 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
 | 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
@@ -73,6 +78,8 @@ Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exac
 - Qualified CCIL/BPD aggregate record SHA-256: `c7b27e2a6d5ddf94efcd2c2064cb84aecfc70dfe3d4f38539660c3479128c180`
 - Raw/total acceleration aggregate record SHA-256: `817405fd04b78a7a30ac985d84ad5009800edb78e48a69c8d246c0e4003a815a`
 - SI-unit equivalence record SHA-256: `ca42d11b9b846307afc1cd2dfeda9e113c81fbdcc8bd60f1499eb22f1fb7bcaa`
+- CTGR five-seed source-development record SHA-256: `1cabbd7ec48ed334bb620e0376f8b26b520fcf7443e1d26bb4e83d197c345128`
+- Max R&D compact summary record SHA-256: `507a598eb432ebd72effd407515469ffbde8767cf210cf85a0c618e6dfb7ddb0`
 - Frozen training code commit: `b4dc38fb9d5a0c17003221b61156ebc065395170`
 - One-time target evidence commit: `f0d11b2`
 - Active protocol tag: `protocol-v1.2.0`

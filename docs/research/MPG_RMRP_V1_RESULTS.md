@@ -2,6 +2,8 @@
 
 Status: complete, prospectively evaluated, failed advancement gate, not confirmatory (2026-09-04).
 
+Follow-on update: the next-stage plan described below has now been executed. The separately locked nine-channel CTGR branch reached 0.8654 versus 0.8395 matched RMRP across five seeds and passed its source-development gate; ASGS and explicit-mask robustness also completed. This does not alter MPG-RMRP's negative result. See [`MAX_RND_SECONDARY_RESULTS.md`](MAX_RND_SECONDARY_RESULTS.md).
+
 ## Scope
 
 This result belongs to the smartphone/wearable InclusiveShift-HAR repository. It is not the DINO/ConvNeXt image-classification project and it is not the robot thesis repository. The experiment used only InclusiveHAR source participants 1--10 under the locked participant-exclusive nested protocol. Participants 11--20 and previously opened DAGHAR evaluation domains were not accessed.
