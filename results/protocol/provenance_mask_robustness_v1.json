@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "provenance_mask_robustness_prospective_protocol_lock",
+  "status": "locked_before_first_new_seed_corruption_run",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_smartphone_wearable_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Explicit-Provenance Mask Reconstruction",
+    "seed": 20260904,
+    "case_count": 18,
+    "frozen_model": "seed_11_rmrp",
+    "retraining_allowed": false
+  },
+  "protocol_document": {
+    "path": "docs/research/PROVENANCE_MASK_ROBUSTNESS_PROTOCOL.md",
+    "sha256": "56c8c4cca3ea1403ed30838013ace8fa006fa03a5212da531bbba49f55a83bcb"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/provenance_mask_robustness_v1.yaml",
+    "sha256": "7ec5b8c94a8fd717b8d8542278a9ae5b570e475d1d4ef0e0e453b1e8c8440506"
+  },
+  "implementation": [
+    {
+      "path": "src/inclusive_shift_har/evaluation/provenance_corruptions.py",
+      "sha256": "425d1442e6953c95dfcde2af00857187f9fb893c3c5bc33eda0f709fd9fac92f"
+    },
+    {
+      "path": "src/inclusive_shift_har/experiments/provenance_mask_robustness.py",
+      "sha256": "f07ad55eca0e4c7a693adb6e761ffd1496a2a2e94817804d9c44f5939789f09d"
+    }
+  ],
+  "source_window_manifest": {
+    "path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+    "sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2"
+  },
+  "dataset_manifest": {
+    "path": "manifests/datasets/inclusivehar_v4.json",
+    "sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  },
+  "raw_source_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+  "evaluation_contract": {
+    "explicit_boolean_mask_required": true,
+    "numeric_zero_never_implies_missing": true,
+    "training_only_fallback_statistics": true,
+    "same_mask_for_all_comparators": true,
+    "clean_probability_exact_replay_required": true,
+    "corruption_results_allowed_for_selection": false
+  },
+  "evidence_boundary": {
+    "source_only_diagnostic": true,
+    "clean_model_advancement_claim_allowed": false,
+    "target_data_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "independent_external_validation_required": true
+  },
+  "required_git_tag": "max-rnd-secondary-v1",
+  "record_sha256": "1250a0bc4aa450b6816f9452805231a4027866e0e7f59a5ab8db36030b9557cb"
+}

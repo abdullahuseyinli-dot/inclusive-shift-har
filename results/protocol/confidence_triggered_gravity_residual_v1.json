@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "confidence_triggered_gravity_residual_prospective_protocol_lock",
+  "status": "locked_before_inner_selection_and_outer_evaluation",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_smartphone_wearable_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Confidence-Triggered Gravity Residual",
+    "abbreviation": "CTGR",
+    "primary_channel_count": 6,
+    "auxiliary_gravity_channel_count": 3,
+    "candidate_count": 121,
+    "selection_seed": 11,
+    "fixed_evaluation_seeds": [11, 23, 47, 89, 131]
+  },
+  "protocol_document": {
+    "path": "docs/research/CONFIDENCE_TRIGGERED_GRAVITY_RESIDUAL_PROTOCOL.md",
+    "sha256": "7172b042d47cd36a9909f84708dda6d78f9f589849e50f4ca91c497cb8eb77f3"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/confidence_triggered_gravity_residual_v1.yaml",
+    "sha256": "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa"
+  },
+  "implementation": [
+    {
+      "path": "src/inclusive_shift_har/models/gravity_posture_reference.py",
+      "sha256": "dca5f152e03ea83ff6e426421636f48d5155b6ca086313dbb31b6a5884d52f40"
+    },
+    {
+      "path": "src/inclusive_shift_har/experiments/confidence_triggered_gravity_residual.py",
+      "sha256": "7a64e7ab1dd06bcedb7009f1e17d12065457f176387f3d9bdbc934ccf0358034"
+    }
+  ],
+  "source_window_manifest": {
+    "path": "results/protocol/source_windows/inclusivehar_v4_source_development_v1_2.json",
+    "sha256": "1d49435ad9371a9701198e15ec30a35a5c3c38ee5458f6f1980de7d4306e76e2",
+    "allowed_participants": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+  },
+  "dataset_manifest": {
+    "path": "manifests/datasets/inclusivehar_v4.json",
+    "sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29"
+  },
+  "raw_source_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+  "post_hoc_inspiration_lineage": [
+    {
+      "path": ".audit/v2/gravity-anchored/nested-001/result.json",
+      "sha256": "0613f0c57f891b6aa71c73e2f48dbf7ef4f23dd5cf8d9a4ee58886a24c43f643",
+      "record_sha256": "457235bec8e34a9824aa56139456fb3d949e2db252d89c08b000a4d2900e38c7"
+    },
+    {
+      "path": ".audit/v3/mpg-rmrp/multiseed-summary-001/result.json",
+      "sha256": "378089f21965e6e9df538c0043c77ec59c694bf824cb941d66117079d5f3daf5",
+      "record_sha256": "65b68cbf2e08187d99f0df65012b677bd3c86f7d55952b4b9c102627cf35c7e3"
+    }
+  ],
+  "selection_contract": {
+    "participant_is_inference_unit": true,
+    "outer_labels_used": false,
+    "selection_must_be_frozen_before_outer_evaluation": true,
+    "same_seed_flat_rmrp_control_required": true
+  },
+  "evidence_boundary": {
+    "nine_channel_sensor_sufficiency_only": true,
+    "primary_six_channel_claim_allowed": false,
+    "participants_11_through_20_reopened": false,
+    "target_or_daghar_selection_use_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "independent_new_ability_relevant_cohort_required": true
+  },
+  "required_git_tag": "max-rnd-secondary-v1",
+  "record_sha256": "a63ebe14eae6076a103faf8f52396d31ef3ca7b750f76397e90337050d0ad48f"
+}

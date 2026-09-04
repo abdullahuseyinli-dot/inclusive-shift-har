@@ -1,0 +1,40 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-provenance-mask-rmrp-robustness-v1"
+declared_on: "2026-09-04"
+status: "source_corruption_diagnostic_locked_before_first_run"
+role: "new-seed source-only explicit-provenance robustness diagnostic of frozen RMRP"
+seed: 20260904
+sampling_rate_hz: 50
+saturation_training_quantile: 0.999
+selection_use_prohibited: true
+missingness_contract:
+  explicit_boolean_mask_required: true
+  numeric_zero_never_implies_missing: true
+  invalid_value_reconstruction: "within-window linear interpolation with edge extension"
+  fully_absent_channel_fallback: "outer-training-only channel median"
+  comparator_receives_same_mask: true
+suite:
+  - {name: clean, severity: 0.0}
+  - {name: axis_dropout, severity: 0.3333333333333333}
+  - {name: axis_dropout, severity: 0.6666666666666666}
+  - {name: modality_dropout, severity: 1.0}
+  - {name: contiguous_gap, severity: 0.125}
+  - {name: contiguous_gap, severity: 0.25}
+  - {name: stuck_at, severity: 0.25}
+  - {name: stuck_at, severity: 0.50}
+  - {name: saturation, severity: 0.25}
+  - {name: saturation, severity: 0.50}
+  - {name: bias_drift, severity: 0.20}
+  - {name: bias_drift, severity: 0.50}
+  - {name: scale_drift, severity: 0.20}
+  - {name: scale_drift, severity: 0.50}
+  - {name: gaussian_noise, severity: 0.10}
+  - {name: gaussian_noise, severity: 0.30}
+  - {name: constrained_rotation, severity: 0.25}
+  - {name: constrained_rotation, severity: 0.50}
+claim_policy:
+  target_data_allowed: false
+  clean_model_advancement_claim_allowed: false
+  corruption_results_allowed_for_model_selection: false
+  synthetic_within_window_gap_claim_only: true
+  independent_external_validation_required: true

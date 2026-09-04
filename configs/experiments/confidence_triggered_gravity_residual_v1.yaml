@@ -1,0 +1,81 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-confidence-triggered-gravity-residual-v1"
+declared_on: "2026-09-04"
+status: "iterative_source_development_protocol_locked_before_ctgr_selection"
+method_name: "Confidence-Triggered Gravity Residual"
+method_abbreviation: "CTGR"
+method_origin: >-
+  Designed after MPG-RMRP failed and after an explicitly disclosed post-hoc diagnostic
+  of previously generated RMRP/gravity OOF probabilities; the source cohort is therefore
+  development evidence and cannot independently validate CTGR.
+n_jobs: 4
+input_contract:
+  primary_channels:
+    - motionUserAccelerationX
+    - motionUserAccelerationY
+    - motionUserAccelerationZ
+    - motionRotationRateX
+    - motionRotationRateY
+    - motionRotationRateZ
+  auxiliary_channels:
+    - motionGravityX
+    - motionGravityY
+    - motionGravityZ
+  window_samples: 128
+  sampling_rate_hz: 50
+  participant_is_inference_unit: true
+  forbidden_inputs: [participant_id, disability, assistive_device, timestamp, location, released_block_position]
+base_model:
+  representation: "RMRP selected denoised GSP view"
+  estimator: "three-class Extra Trees leaf one"
+  unchanged_probability_is_default: true
+gravity_posture_expert:
+  training_rows: "sitting and standing outer-training rows only"
+  physical_series:
+    - normalized_gravity_direction
+    - user_acceleration_parallel_and_perpendicular_to_gravity
+    - gyroscope_parallel_and_perpendicular_to_gravity
+    - total_acceleration_parallel_and_perpendicular_to_gravity
+    - gravity_direction_angular_speed
+    - device_axis_and_permutation_robust_gravity_coordinates
+  trainable_preprocessing_fit_on_outer_or_inner_training_only: true
+method:
+  expert_views: [physics, physics_plus_rmrp, total_gsp, dual_gsp]
+  posture_estimators: [extra_trees_leaf3, extra_trees_leaf1]
+  confidence_thresholds: [0.45, 0.50, 0.55, 0.60, 0.65]
+  blend_weights: [0.50, 0.75, 1.00]
+  trigger_rule: "max base three-class probability strictly below selected threshold"
+  composition: "preserve base mobility mass; gravity expert only redistributes stationary mass"
+  include_base_no_route: true
+  candidate_count: 121
+selection:
+  seed: 11
+  unit: "participant"
+  outer_labels_used: false
+  mean_tie_tolerance: 0.005
+  tie_breakers:
+    - inner_bottom_30_percent_participant_macro_f1
+    - smaller_mean_trigger_fraction
+    - lower_complexity_rank
+    - candidate_id
+  separate_freeze_before_outer_evaluation: true
+fixed_evaluation_seeds: [11, 23, 47, 89, 131]
+advancement_gate:
+  comparator: "same-seed flat RMRP"
+  minimum_mean_participant_macro_f1: 0.8529032940215063
+  minimum_bottom_30_percent_participant_macro_f1: 0.7142572354745962
+  minimum_mobility_recall: 0.9528682170542635
+  minimum_sitting_recall: 0.6894017094017094
+  minimum_standing_recall: 0.8169098712446352
+  minimum_positive_seed_count: 3
+  minimum_positive_fold_count: 3
+  maximum_negative_log_likelihood: 0.3900535
+  maximum_multiclass_brier_score: 0.235394
+claim_policy:
+  primary_six_channel_claim_allowed: false
+  nine_channel_sensor_sufficiency_only: true
+  confirmatory_claim_allowed: false
+  post_hoc_source_inspiration_disclosed: true
+  participants_11_through_20_reopened: false
+  target_or_daghar_selection_use_allowed: false
+  independent_new_ability_relevant_cohort_required: true

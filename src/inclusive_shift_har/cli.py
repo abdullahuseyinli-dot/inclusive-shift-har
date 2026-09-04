@@ -58,6 +58,10 @@ _TRAIN_TRACKS: dict[str, str] = {
     "microstate-posture-select": "freeze MPG-RMRP candidates using nested inner participants",
     "microstate-posture-evaluate": "evaluate frozen MPG-RMRP candidates at one locked seed",
     "microstate-posture-ablations": "run the frozen explanatory MPG-RMRP ablation suite",
+    "ctgr-select": "freeze confidence-triggered gravity residual candidates",
+    "ctgr-evaluate": "evaluate frozen confidence-triggered gravity residual candidates",
+    "active-semantic-sentinel": "evaluate active labelled posture-semantic personalization",
+    "provenance-mask-robustness": "replay RMRP with explicit validity-mask reconstruction",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
     "fixed-oof-fusion": "evaluate fixed pooling of frozen target-sealed OOF experts",
     "daghar-augmented-nested": "run nested source selection with DAGHAR development support",
@@ -83,6 +87,7 @@ _EVALUATE_TRACKS: dict[str, str] = {
     "sensor-stress": "aggregate frozen post-confirmatory sensor-stress evidence",
     "raw-total-statistics": "aggregate raw/total-acceleration sensitivity evidence",
     "microstate-posture-summary": "aggregate the frozen five-seed MPG-RMRP evaluation",
+    "ctgr-summary": "aggregate the frozen five-seed CTGR sensor-sufficiency evaluation",
 }
 
 _INCLUSIVEHAR_NATIVE_CPU_MODELS = frozenset({"random_forest", "svm_rbf", "logistic_regression"})
@@ -556,6 +561,25 @@ def _workflow_entrypoint(
             )
 
             return entrypoint, (), False
+        if track in {"ctgr-select", "ctgr-evaluate"}:
+            from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
+                main as entrypoint,
+            )
+
+            command = "select" if track.endswith("select") else "evaluate"
+            return entrypoint, (command,), False
+        if track == "active-semantic-sentinel":
+            from inclusive_shift_har.experiments.active_semantic_gauge_sentinel import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
+        if track == "provenance-mask-robustness":
+            from inclusive_shift_har.experiments.provenance_mask_robustness import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
         if track == "semantic-anchor-reconciliation":
             from inclusive_shift_har.experiments.semantic_anchor_reconciliation import (
                 main as entrypoint,
@@ -624,6 +648,12 @@ def _workflow_entrypoint(
             )
 
             return entrypoint, ("summarize",), False
+        if track == "ctgr-summary":
+            from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
+                main as entrypoint,
+            )
+
+            return entrypoint, ("summary",), False
     raise KeyError(track)
 
 

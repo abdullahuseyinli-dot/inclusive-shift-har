@@ -29,6 +29,12 @@ from inclusive_shift_har.models.gravity_anchored_pyramid import (
     gravity_anchored_feature_names,
     gravity_anchored_feature_views,
 )
+from inclusive_shift_har.models.gravity_posture_reference import (
+    extract_gravity_posture_reference_features,
+    gravity_posture_reference_feature_names,
+    gravity_reference_time_series,
+    gravity_reference_time_series_names,
+)
 from inclusive_shift_har.models.legacy_models import build_exact_legacy_model
 from inclusive_shift_har.models.microstate_posture_graph import (
     MicrostateCodebook,
@@ -68,6 +74,7 @@ __all__ = [
     "build_exact_legacy_model",
     "compose_mobility_posture_probabilities",
     "extract_geometric_spectral_pyramid_features",
+    "extract_gravity_posture_reference_features",
     "extract_microstate_posture_features",
     "extract_microstate_state_vectors",
     "extract_undetrended_microstate_state_vectors",
@@ -76,6 +83,9 @@ __all__ = [
     "gradient_reverse",
     "gravity_anchored_feature_names",
     "gravity_anchored_feature_views",
+    "gravity_posture_reference_feature_names",
+    "gravity_reference_time_series",
+    "gravity_reference_time_series_names",
     "invariant_features_torch",
     "microstate_posture_feature_names",
     "microstate_state_vector_names",

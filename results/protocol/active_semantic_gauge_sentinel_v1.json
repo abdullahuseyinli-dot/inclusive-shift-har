@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "active_semantic_gauge_sentinel_prospective_protocol_lock",
+  "status": "locked_before_first_labelled_personalization_run",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_smartphone_wearable_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Active Semantic-Gauge Sentinel",
+    "abbreviation": "ASGS",
+    "base_models": ["gsp", "rmrp"],
+    "query_budgets_per_participant": [1, 2, 3],
+    "minimum_absolute_log_bayes_factor": 1.0986122886681098,
+    "active_and_random_seed": 271828,
+    "fixed_sar_seed": 314159
+  },
+  "protocol_document": {
+    "path": "docs/research/ACTIVE_SEMANTIC_GAUGE_SENTINEL_PROTOCOL.md",
+    "sha256": "5ecaaf57c7c34d932d77bb6b2de8ece884bc288f062556d72bb186c1e8033f55"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/active_semantic_gauge_sentinel_v1.yaml",
+    "sha256": "10feef2e92f13b8ef5339bc98a8da49ebd34b81a9452a80b9f6c51405e9d3b1f"
+  },
+  "implementation": {
+    "path": "src/inclusive_shift_har/experiments/active_semantic_gauge_sentinel.py",
+    "sha256": "78fb1dc9c837e31ff7b833f33565cb5d0eec21404ddd79f15bbf7ed4130d1c3b"
+  },
+  "frozen_base_results": [
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/result.json",
+      "sha256": "27fbdf69998c8e617610df8e363b70c6310df783768b1ed103bf32e458949ee5"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/result.json",
+      "sha256": "d5fdbb4b30f91453a6511e0e0e3163c9f10db2fdeb687fac6f415c8c3c31bcee"
+    }
+  ],
+  "evaluation_contract": {
+    "query_selected_before_label_access": true,
+    "query_windows_excluded_from_evaluation": true,
+    "same_remaining_window_no_adaptation_control_required": true,
+    "random_query_control_required": true,
+    "fixed_one_plus_one_sar_control_required": true,
+    "all_budgets_reported_without_best_budget_selection": true
+  },
+  "evidence_boundary": {
+    "labelled_personalization_only": true,
+    "zero_shot_claim_allowed": false,
+    "target_data_allowed": false,
+    "confirmatory_claim_allowed": false,
+    "independent_new_ability_relevant_cohort_required": true
+  },
+  "required_git_tag": "max-rnd-secondary-v1",
+  "record_sha256": "7cba7bcac742a8c9b0006707f69247611d28b91e290344c0fe3d6477571a7d58"
+}
