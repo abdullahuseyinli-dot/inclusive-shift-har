@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "mpg_rmrp_v1_committed_research_summary",
+  "status": "complete_source_development_failed_advancement_gate_not_confirmatory",
+  "method": "Microstate Posture Graph over Robust Multiscale Residual Pyramid",
+  "implementation_commit": "76e2aa81252c0945eb6ff203046bb17155d96dc0",
+  "protocol_tag": "mpg-rmrp-protocol-v1",
+  "selection": {
+    "path": ".audit/v3/mpg-rmrp/selection-001/selection.json",
+    "record_sha256": "3ade58db04320a484e0c3eba6f8614b6644dbb9dcc0ebfffa0db9ff6bc497e1d",
+    "file_sha256": "fcf838bc35cd6e667d0f7499a26f19ffa680faaef9fde3ff5726ab36fbcbfb17",
+    "selected_candidate_by_fold": {
+      "source_cv_01": "h050_k8_extra_trees_leaf1",
+      "source_cv_02": "h050_k6_extra_trees_leaf1",
+      "source_cv_03": "h020_k6_extra_trees_leaf1",
+      "source_cv_04": "h050_k6_logistic_l2_c1",
+      "source_cv_05": "h020_k8_extra_trees_leaf1"
+    }
+  },
+  "fixed_seed_results": {
+    "11": {"flat_rmrp_mean_participant_macro_f1": 0.8379032940215063, "mpg_rmrp_mean_participant_macro_f1": 0.5878167327510264, "record_sha256": "fd5ee3465572a880add523a3e010785ce645ab52883fe7230351df968204ccce"},
+    "23": {"flat_rmrp_mean_participant_macro_f1": 0.8412244516073674, "mpg_rmrp_mean_participant_macro_f1": 0.571949302031149, "record_sha256": "d34c4692a5ef113c60e87fa52396d97bd8f12d161dd3f7b6ba17a82f9752d751"},
+    "47": {"flat_rmrp_mean_participant_macro_f1": 0.8419519721985516, "mpg_rmrp_mean_participant_macro_f1": 0.5941972164534864, "record_sha256": "d4801dec1e0edb7ff321b1e707497f29af8818e2531e426ea86caa3a92dc7d62"},
+    "89": {"flat_rmrp_mean_participant_macro_f1": 0.8394584440200367, "mpg_rmrp_mean_participant_macro_f1": 0.5770766536992323, "record_sha256": "a57134598bf8f32bd1390e34342bab8313c05ad15f43aa9c77a6b5cb8af1f0a6"},
+    "131": {"flat_rmrp_mean_participant_macro_f1": 0.8371305910715131, "mpg_rmrp_mean_participant_macro_f1": 0.5875460641663076, "record_sha256": "729d83226bb4cbc5aecbd166631816dbdbceb1c3113f7bf6aa793cce8c0f1378"}
+  },
+  "across_seed_summary": {
+    "flat_rmrp": {
+      "mean_participant_macro_f1": 0.8395337505837951,
+      "bottom_30_percent_participant_macro_f1": 0.6994146859705921,
+      "worst_participant_macro_f1": 0.5476679935131947,
+      "mobility_recall": 0.975968992248062,
+      "sitting_recall": 0.7162393162393162,
+      "standing_recall": 0.8317596566523605,
+      "negative_log_likelihood": 0.3688926229803643,
+      "multiclass_brier_score": 0.22511787255172414
+    },
+    "mpg_rmrp": {
+      "mean_participant_macro_f1": 0.5837171938202403,
+      "bottom_30_percent_participant_macro_f1": 0.5174690881714732,
+      "worst_participant_macro_f1": 0.49928415810768756,
+      "mobility_recall": 0.975968992248062,
+      "sitting_recall": 0.364957264957265,
+      "standing_recall": 0.5296137339055794,
+      "negative_log_likelihood": 0.5461938007097309,
+      "multiclass_brier_score": 0.37557954527478754
+    },
+    "mpg_minus_flat_mean_participant_macro_f1": -0.25581655676355475,
+    "positive_seed_count": 0,
+    "positive_fold_count": 0
+  },
+  "advancement_gate_passed": false,
+  "mechanistic_interpretation": "The locally detrended rotation-invariant microstate replacement preserved the mobility head but discarded discriminative sitting-versus-standing information; it is retained as a falsified architecture.",
+  "multiseed_evidence": {
+    "path": ".audit/v3/mpg-rmrp/multiseed-summary-001/result.json",
+    "record_sha256": "65b68cbf2e08187d99f0df65012b677bd3c86f7d55952b4b9c102627cf35c7e3",
+    "file_sha256": "378089f21965e6e9df538c0043c77ec59c694bf824cb941d66117079d5f3daf5"
+  },
+  "claim_boundary": {
+    "confirmatory_claim_allowed": false,
+    "source_participants_reused_for_future_method_invention": true,
+    "independent_new_ability_relevant_cohort_required": true
+  },
+  "record_sha256": "6efdc6ec5399ace6339d7cd23e4c83082c2be08a68d57d5dcf98cc31fce4c925"
+}

@@ -8,6 +8,7 @@ from inclusive_shift_har.models.microstate_posture_graph import (
     compose_mobility_posture_probabilities,
     extract_microstate_posture_features,
     extract_microstate_state_vectors,
+    extract_undetrended_microstate_state_vectors,
     fit_microstate_codebook,
     microstate_assignments,
     microstate_posture_feature_names,
@@ -56,9 +57,7 @@ def test_microstate_vectors_are_deterministic_rotation_invariant_and_named() -> 
             [0.0, 0.0, 1.0],
         ]
     )
-    rotated = np.concatenate(
-        (values[:, :, :3] @ rotation.T, values[:, :, 3:] @ rotation.T), axis=2
-    )
+    rotated = np.concatenate((values[:, :, :3] @ rotation.T, values[:, :, 3:] @ rotation.T), axis=2)
     first = extract_microstate_state_vectors(
         values, sampling_rate_hz=50.0, detrend_span_seconds=0.2
     )
@@ -71,6 +70,19 @@ def test_microstate_vectors_are_deterministic_rotation_invariant_and_named() -> 
     np.testing.assert_array_equal(first, replay)
     np.testing.assert_allclose(first, transformed, rtol=1e-9, atol=1e-9)
     assert first.shape == (8, 128, len(microstate_state_vector_names()))
+
+
+def test_undetrended_microstate_vectors_preserve_offsets_for_frozen_ablation() -> None:
+    values = _signals()
+    shifted = values.copy()
+    shifted[:, :, 0] += 3.0
+    detrended = extract_microstate_state_vectors(
+        shifted, sampling_rate_hz=50.0, detrend_span_seconds=0.2
+    )
+    undetrended = extract_undetrended_microstate_state_vectors(shifted, sampling_rate_hz=50.0)
+    assert undetrended.shape == detrended.shape == (8, 128, 6)
+    assert np.isfinite(undetrended).all()
+    assert float(undetrended[:, :, 0].mean()) > float(detrended[:, :, 0].mean()) + 2.0
 
 
 def test_codebook_ignores_mobility_rows_and_soft_assignments_normalize() -> None:

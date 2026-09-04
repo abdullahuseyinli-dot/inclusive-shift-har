@@ -57,6 +57,7 @@ _TRAIN_TRACKS: dict[str, str] = {
     "gravity-anchored-nested": "run nested gravity sensor-sufficiency development",
     "microstate-posture-select": "freeze MPG-RMRP candidates using nested inner participants",
     "microstate-posture-evaluate": "evaluate frozen MPG-RMRP candidates at one locked seed",
+    "microstate-posture-ablations": "run the frozen explanatory MPG-RMRP ablation suite",
     "semantic-anchor-reconciliation": "evaluate labelled posture-semantic personalization",
     "fixed-oof-fusion": "evaluate fixed pooling of frozen target-sealed OOF experts",
     "daghar-augmented-nested": "run nested source selection with DAGHAR development support",
@@ -549,6 +550,12 @@ def _workflow_entrypoint(
 
             command = "select" if track.endswith("select") else "evaluate"
             return entrypoint, (command,), False
+        if track == "microstate-posture-ablations":
+            from inclusive_shift_har.experiments.microstate_posture_graph_ablations import (
+                main as entrypoint,
+            )
+
+            return entrypoint, (), False
         if track == "semantic-anchor-reconciliation":
             from inclusive_shift_har.experiments.semantic_anchor_reconciliation import (
                 main as entrypoint,

@@ -24,9 +24,7 @@ def test_v2_research_summary_is_self_hashed_and_claim_bounded(
         == 0.8379032940215063
     )
     assert (
-        record["robust_multiscale_residual_pyramid"][
-            "bottom_30_percent_participant_macro_f1"
-        ]
+        record["robust_multiscale_residual_pyramid"]["bottom_30_percent_participant_macro_f1"]
         == 0.6942572354745962
     )
     assert (
@@ -53,9 +51,9 @@ def test_v2_research_evidence_references_match_local_audit(repository_root: Path
     summary = load_json_strict(
         repository_root / "results/development/fuse_reframe_v2/research_summary_v1.json"
     )
-    report = (
-        repository_root / "docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md"
-    ).read_text(encoding="utf-8")
+    report = (repository_root / "docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md").read_text(
+        encoding="utf-8"
+    )
     paths = {
         "gsp_nested": ".audit/v2/geometric-pyramid/nested-001/result.json",
         "rmrp_nested": ".audit/v2/robust-multiscale/publication-001/result.json",

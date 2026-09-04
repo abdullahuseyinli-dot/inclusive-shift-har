@@ -78,7 +78,9 @@ def _load_config(path: Path) -> dict[str, Any]:
     candidates_raw = config.get("candidates")
     if not isinstance(candidates_raw, list) or len(candidates_raw) != 18:
         raise ValueError("MPG-RMRP protocol requires exactly 18 posture candidates")
-    candidates = [_mapping(item, name=f"candidates[{index}]") for index, item in enumerate(candidates_raw)]
+    candidates = [
+        _mapping(item, name=f"candidates[{index}]") for index, item in enumerate(candidates_raw)
+    ]
     identifiers = [str(item.get("id", "")) for item in candidates]
     if any(not item for item in identifiers) or len(set(identifiers)) != len(identifiers):
         raise ValueError("MPG-RMRP candidate ids must be non-empty and unique")
@@ -147,9 +149,7 @@ def _materialize_source(
     manifest = _load_source_manifest(source_manifest_path)
     class_names = tuple(
         str(item)
-        for item in manifest["ontology"]["runnable_track_schemas"]["functional_core"][
-            "class_order"
-        ]
+        for item in manifest["ontology"]["runnable_track_schemas"]["functional_core"]["class_order"]
     )
     if class_names != _CLASS_NAMES:
         raise ValueError("MPG-RMRP requires the three-class functional-core ontology")
@@ -167,7 +167,9 @@ def _materialize_source(
     participants = np.asarray(batch.participant_ids, dtype=np.str_)
     windows = np.asarray(batch.window_ids, dtype=np.str_)
     if set(participants.tolist()) != {str(index) for index in range(1, 11)}:
-        raise PermissionError("MPG-RMRP source materialization crossed the participant 1-10 boundary")
+        raise PermissionError(
+            "MPG-RMRP source materialization crossed the participant 1-10 boundary"
+        )
     return manifest, signals, labels, participants, windows
 
 
@@ -350,9 +352,7 @@ def run_microstate_posture_graph_selection(
         source_manifest_path=source_manifest_path,
         raw_csv_path=raw_csv_path,
     )
-    denoised = robust_multiscale_signal_views(
-        signals, sampling_rate_hz=sampling_rate
-    )["denoised"]
+    denoised = robust_multiscale_signal_views(signals, sampling_rate_hz=sampling_rate)["denoised"]
     mobility_features = extract_geometric_spectral_pyramid_features(
         denoised, sampling_rate_hz=sampling_rate
     )
@@ -713,8 +713,8 @@ def run_microstate_posture_graph_evaluation(
             n_jobs=n_jobs,
             split_manifest_sha256=str(manifest["source_split_manifest_sha256"]),
         )
-        probabilities["rmrp_mobility_rist_posture"] = (
-            compose_mobility_posture_probabilities(shared_mobility_probability, sitting_rist)
+        probabilities["rmrp_mobility_rist_posture"] = compose_mobility_posture_probabilities(
+            shared_mobility_probability, sitting_rist
         )
         span = float(candidate["detrend_span_seconds"])
         codebook, training_graph, evaluation_graph = _fit_codebook_and_features(
@@ -916,9 +916,7 @@ def _report_metrics(report: dict[str, Any]) -> dict[str, float]:
         "bottom_30_percent_participant_macro_f1": float(
             primary["bottom_30_percent_participant_macro_f1"]
         ),
-        "lower_decile_participant_macro_f1": float(
-            primary["lower_decile_participant_macro_f1"]
-        ),
+        "lower_decile_participant_macro_f1": float(primary["lower_decile_participant_macro_f1"]),
         "worst_participant_macro_f1": float(primary["worst_participant_macro_f1"]),
         "mobility_recall": float(recall["mobility"]),
         "sitting_recall": float(recall["sitting"]),
@@ -946,7 +944,9 @@ def run_microstate_posture_graph_multiseed_summary(
         raise ValueError("MPG-RMRP summary requires every locked seed exactly once")
     config_hash = sha256_file(config_path)
     selection_hashes = {str(item["selection_record"]["record_sha256"]) for item in records}
-    if len(selection_hashes) != 1 or any(item["config"]["sha256"] != config_hash for item in records):
+    if len(selection_hashes) != 1 or any(
+        item["config"]["sha256"] != config_hash for item in records
+    ):
         raise ValueError("MPG-RMRP seed results do not share one config and selection freeze")
     path_record_pairs.sort(key=lambda item: int(item[1]["seed"]))
     records = [record for _, record in path_record_pairs]
@@ -959,7 +959,9 @@ def run_microstate_posture_graph_multiseed_summary(
     for method in _METHODS:
         keys = tuple(next(iter(by_seed.values()))[method])
         method_summary[method] = {
-            key: float(np.mean([by_seed[str(seed)][method][key] for seed in sorted(expected_seeds)]))
+            key: float(
+                np.mean([by_seed[str(seed)][method][key] for seed in sorted(expected_seeds)])
+            )
             for key in keys
         }
         method_summary[method]["seed_standard_deviation_mean_participant_macro_f1"] = float(
@@ -992,9 +994,7 @@ def run_microstate_posture_graph_multiseed_summary(
     checks = {
         "mean_participant_macro_f1": mpg["mean_participant_macro_f1"]
         >= float(gate["minimum_mean_participant_macro_f1"]),
-        "bottom_30_percent_participant_macro_f1": mpg[
-            "bottom_30_percent_participant_macro_f1"
-        ]
+        "bottom_30_percent_participant_macro_f1": mpg["bottom_30_percent_participant_macro_f1"]
         >= float(gate["minimum_bottom_30_percent_participant_macro_f1"]),
         "mobility_recall": mpg["mobility_recall"] >= float(gate["minimum_mobility_recall"]),
         "sitting_recall": mpg["sitting_recall"] >= float(gate["minimum_sitting_recall"]),
@@ -1102,8 +1102,7 @@ def main(argv: list[str] | None = None) -> int:
             "status": result["status"],
             "seed": result["seed"],
             "primary": {
-                method: report["primary"]
-                for method, report in result["aggregate_reports"].items()
+                method: report["primary"] for method, report in result["aggregate_reports"].items()
             },
             "record_sha256": result["record_sha256"],
         }

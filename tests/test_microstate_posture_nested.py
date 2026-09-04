@@ -5,6 +5,9 @@ from pathlib import Path
 
 import pytest
 
+from inclusive_shift_har.experiments.microstate_posture_graph_ablations import (
+    _METHODS as ABLATION_METHODS,
+)
 from inclusive_shift_har.experiments.microstate_posture_graph_nested import (
     _load_config,
     _read_hashed_record,
@@ -46,6 +49,7 @@ def test_mpg_config_is_exactly_locked_to_eighteen_candidates() -> None:
         "rmrp_mobility_rist_posture",
     ]
     assert config["claim_policy"]["confirmatory_claim_allowed"] is False
+    assert tuple(config["ablations_after_freeze_without_retuning"]) == ABLATION_METHODS[1:]
 
 
 def test_mpg_selection_applies_mean_tolerance_then_tail_and_simplicity() -> None:
@@ -76,7 +80,12 @@ def test_mpg_protocol_lock_self_hashes_and_binds_files(repository_root: Path) ->
     record = load_json_strict(path)
     claimed = record.pop("record_sha256")
     assert claimed == canonical_json_sha256(record)
-    for field in ("protocol_document", "experiment_config", "source_window_manifest", "dataset_manifest"):
+    for field in (
+        "protocol_document",
+        "experiment_config",
+        "source_window_manifest",
+        "dataset_manifest",
+    ):
         reference = record[field]
         assert reference["sha256"] == sha256_file(repository_root / reference["path"])
     assert record["evidence_boundary"]["participants_11_through_20_reopened"] is False

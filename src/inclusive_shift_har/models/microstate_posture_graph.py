@@ -188,6 +188,51 @@ def extract_microstate_state_vectors(
     return np.asarray(vectors, dtype=np.float64)
 
 
+def extract_undetrended_microstate_state_vectors(
+    signals: NDArray[np.floating[Any]],
+    *,
+    sampling_rate_hz: float,
+) -> FloatArray:
+    """Map raw timestamps to the locked six-vector for the no-detrending ablation."""
+
+    values = _validated_signals(signals)
+    if not np.isfinite(sampling_rate_hz) or sampling_rate_hz <= 0:
+        raise ValueError("sampling rate must be finite and positive")
+    acceleration = values[:, :, :3]
+    gyroscope = values[:, :, 3:]
+    acceleration_delta = np.diff(acceleration, axis=1, prepend=acceleration[:, :1, :])
+    gyroscope_delta = np.diff(gyroscope, axis=1, prepend=gyroscope[:, :1, :])
+    acceleration_norm = np.linalg.norm(acceleration, axis=2)
+    gyroscope_norm = np.linalg.norm(gyroscope, axis=2)
+    joint_scale = acceleration_norm * gyroscope_norm
+    well_conditioned = joint_scale > 1e-8
+    safe_scale = np.where(well_conditioned, joint_scale, 1.0)
+    dot = np.where(
+        well_conditioned,
+        np.sum(acceleration * gyroscope, axis=2) / safe_scale,
+        0.0,
+    )
+    cross = np.where(
+        well_conditioned,
+        np.linalg.norm(np.cross(acceleration, gyroscope), axis=2) / safe_scale,
+        0.0,
+    )
+    vectors = np.stack(
+        (
+            acceleration_norm,
+            gyroscope_norm,
+            np.linalg.norm(acceleration_delta, axis=2) * sampling_rate_hz,
+            np.linalg.norm(gyroscope_delta, axis=2) * sampling_rate_hz,
+            dot,
+            cross,
+        ),
+        axis=2,
+    )
+    if not np.isfinite(vectors).all():
+        raise ValueError("undetrended microstate extraction produced non-finite values")
+    return np.asarray(vectors, dtype=np.float64)
+
+
 def fit_microstate_codebook(
     state_vectors: NDArray[np.floating[Any]],
     labels: NDArray[np.integer[Any]],
