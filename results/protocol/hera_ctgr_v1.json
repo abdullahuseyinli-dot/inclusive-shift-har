@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "hera_ctgr_v1_implementation_protocol",
+  "status": "implementation_complete_new_cohort_required_for_claims",
+  "declared_on": "2026-09-04",
+  "repository_scope": "inclusive_shift_har_sensor_imu_not_vision_or_robot_thesis",
+  "method": {
+    "name": "Hierarchical Evidence-Regularized Adaptive CTGR",
+    "abbreviation": "HERA-CTGR",
+    "channel_count": 9,
+    "base_class_count": 3,
+    "fixed_states": ["OFF", "PULSE", "BROAD"],
+    "physics_consistency_veto": true,
+    "participant_level_responder_controller": true,
+    "posture_calibration_preserves_mobility_mass": true,
+    "selection_uncertainty_ensemble_size": 3
+  },
+  "protocol_document": {
+    "path": "docs/research/HERA_CTGR_V1_PROTOCOL.md",
+    "sha256": "9117c243525b14d8a8699a6184d6ac6a4abf1658712fc8cf36bd85e5acf0b920"
+  },
+  "experiment_config": {
+    "path": "configs/experiments/hera_ctgr_v1.yaml",
+    "sha256": "7610775131564c5b1d2819f583d1ba73966b953e2da4de1df55d55a8e03100e5"
+  },
+  "implementation": [
+    {
+      "path": "src/inclusive_shift_har/models/hera_ctgr.py",
+      "sha256": "4646a11e8fa0590ce6512fa1e67b884ebfd7f7074bad1435e5e5f11727f2911b"
+    }
+  ],
+  "focused_tests": [
+    {
+      "path": "tests/test_hera_ctgr.py",
+      "sha256": "539fd30526a0b27bd3cc48399d9c1f845db34059c0605956867e0c1a8e62f5fc"
+    }
+  ],
+  "frozen_inspiration_evidence": [
+    {
+      "path": "results/development/max_rnd_secondary_v1_summary.json",
+      "sha256": "47758ad346889893dfeb6186e52fdc1197129aef0485b6dacc92c5ac17143310",
+      "role": "exhausted_ctgr_source_hypothesis_generation_only"
+    },
+    {
+      "path": "results/development/cage_har_retrospective_v1_summary.json",
+      "sha256": "86e4567459b76558a01c86b7702611f750995849ec1fa908b1c238bc41dfac11",
+      "role": "exhausted_cage_source_hypothesis_generation_only"
+    }
+  ],
+  "implemented_components": [
+    "gravity_gyroscope_kinematic_consistency",
+    "training_only_physics_reference",
+    "deterministic_physics_veto",
+    "conditional_posture_calibration",
+    "fixed_candidate_probability_averaging",
+    "fifteen_feature_unlabelled_responder_signature",
+    "standardized_support_distance",
+    "tri_state_participant_controller_with_pulse_fallback"
+  ],
+  "evidence_boundary": {
+    "inclusivehar_participants_1_through_10_used_to_motivate_design": true,
+    "inclusivehar_participants_11_through_20_reopened": false,
+    "consumed_daghar_targets_reused": false,
+    "real_hera_ctgr_performance_generated": false,
+    "retrospective_participants_1_through_10_test_allowed_as_hypothesis_generation": true,
+    "retrospective_result_is_independent_validation": false,
+    "confirmatory_claim_allowed": false,
+    "state_of_the_art_claim_allowed": false,
+    "new_development_cohort_required": true,
+    "independent_confirmatory_cohort_required": true
+  },
+  "record_sha256": "47e0396bacc8d3ce78eafc7c68d21b9b9055ca8c584d703de7c3d9992b86e6a6"
+}

@@ -1,0 +1,144 @@
+schema_version: "1.0.0"
+experiment_id: "hera-ctgr-new-development-v1"
+declared_on: "2026-09-04"
+status: "implemented_awaiting_new_development_cohort"
+method_name: "Hierarchical Evidence-Regularized Adaptive CTGR"
+method_abbreviation: "HERA-CTGR"
+method_origin: >-
+  Designed after the frozen CTGR result and the failed CAGE-HAR retrospective router.
+  InclusiveHAR participants 1-10 are exhausted hypothesis-generation evidence;
+  participants 11-20 and consumed DAGHAR targets are forbidden for selection.
+
+input_contract:
+  class_names: [mobility, sitting, standing]
+  required_channel_count: 9
+  minimum_development_participants: 12
+  minimum_sessions_per_participant: 2
+  participant_is_inference_unit: true
+  required_new_cohort_fields:
+    - monotonic_timestamp
+    - participant_id
+    - site_id
+    - session_id
+    - trial_id
+    - repetition_id
+    - activity_label
+    - device_model
+    - placement
+    - orientation
+    - sensor_accuracy
+    - sensor_provenance
+  forbidden_model_inputs:
+    - participant_id
+    - disability
+    - assistive_device
+    - timestamp
+    - site_id
+    - session_id
+    - trial_id
+    - location
+  forbidden_dataset_ids: [inclusivehar_v4, daghar_v2]
+  forbidden_participant_ids:
+    - "1"
+    - "2"
+    - "3"
+    - "4"
+    - "5"
+    - "6"
+    - "7"
+    - "8"
+    - "9"
+    - "10"
+    - "11"
+    - "12"
+    - "13"
+    - "14"
+    - "15"
+    - "16"
+    - "17"
+    - "18"
+    - "19"
+    - "20"
+
+frozen_paths:
+  off: "unchanged RMRP"
+  pulse: "frozen confidence-triggered CTGR"
+  broad: "CAGE global trust-region blend"
+  uncertain_default: pulse
+  mobility_mass_preserved: true
+
+physics_consistency:
+  relation: "d(gravity_unit)/dt approximately equals negative gyro cross gravity_unit"
+  veto_quantile_fit_on_training_windows_only: 0.99
+  minimum_valid_pair_fraction: 0.98
+  untrusted_fallback: off
+  absolute_gravity_and_slow_posture_preserved: true
+  full_so3_invariance_forbidden: true
+
+candidate_uncertainty:
+  source: "frozen CTGR inner-ranking eligible set"
+  top_k: 3
+  aggregation: equal_probability_mean
+  outcome_dependent_reweighting: false
+
+aggregate_calibration:
+  temperatures: [0.80, 1.00, 1.25]
+  posture_logit_offsets: [-0.15, 0.00, 0.15]
+  mean_tie_tolerance: 0.005
+  mobility_mass_preserved_exactly: true
+  fitted_on_participant_exclusive_oof_predictions_only: true
+
+responder_controller:
+  granularity: participant_or_disjoint_session_context
+  feature_count: 15
+  low_confidence_threshold: 0.60
+  ridge_penalty: 25.0
+  exploratory_mean_lower_bound_z: 0.0
+  safe_lower_bound_z: 1.0
+  minimum_advantage_over_pulse: 0.005
+  maximum_standardized_support_distance: 3.0
+  target: "participant macro-F1 difference relative to pulse"
+  evaluation_labels_available_to_controller: false
+  uncertain_or_ood_fallback: pulse
+
+required_ablations:
+  - base_uncalibrated
+  - frozen_ctgr
+  - global_trust_blend
+  - ctgr_aggregate_calibrated
+  - ctgr_physics_veto
+  - ctgr_candidate_ensemble_top3
+  - hera_ctgr_strict
+  - hera_ctgr_context_mean
+  - hera_ctgr_context_safe
+  - hera_ctgr_full
+  - matched_random_state_control
+  - label_informed_three_way_oracle_diagnostic
+
+development_advancement_gate:
+  comparator: frozen_ctgr
+  minimum_mean_participant_macro_f1_difference: 0.010
+  minimum_bottom_30_percent_difference: 0.015
+  minimum_intervention_precision: 0.80
+  maximum_harmful_changed_fraction: 0.15
+  worst_participant_noninferiority_margin: -0.010
+  posture_recall_noninferiority_margin: -0.010
+  nll_and_brier_must_not_worsen: true
+  improvement_may_not_depend_on_only_one_participant: true
+  targets_are_promises: false
+
+breakthrough_gate:
+  minimum_mean_participant_macro_f1_difference: 0.020
+  paired_participant_confidence_interval_lower_bound_must_exceed_zero: true
+  bottom_30_percent_confidence_interval_lower_bound_must_exceed_zero: true
+  multiplicity_adjustment: holm
+
+claim_policy:
+  retrospective_inclusivehar_result_is_hypothesis_generation_only: true
+  strict_window_zero_shot_reported_separately: true
+  unlabeled_participant_context_reported_as_transductive: true
+  one_query_personalization_reported_separately: true
+  confirmatory_claim_allowed: false
+  state_of_the_art_claim_allowed: false
+  independent_new_ability_relevant_cohort_required: true
+
