@@ -1,0 +1,23 @@
+{
+  "basis": [
+    "docs/HARDWARE.md",
+    "results/failures/cuda_lstm_exit_c0000409",
+    ".audit/phase2_external_v3/native_exit_probes/commands/deep_full_no_cudnn/completion.json"
+  ],
+  "declared_at_utc": "2026-09-05T05:29:41.862317+00:00",
+  "execution": "For the external DeepConvLSTM control, use CUDA tensors with cuDNN disabled for that fold and restore the prior process setting afterward. TinyHAR-style keeps its inherited backend. Record the setting explicitly in config, checkpoint, training record and result.",
+  "frozen_budgets": "Seeds 11,23,47; same 5-fold participant-exclusive splits, training/validation allocation, 40-epoch maximum, stopping/checkpoint rule, loss and model parameters. Preserve the existing float16 mixed_precision setting (FP32 master parameters with CUDA FP16 autocast and GradScaler), not FP32-only training. No hyperparameter search or best-backend selection.",
+  "interpretation": "Runtime-policy repair, not a model-performance improvement claim. Different numerical backend/dropout execution can change predictions; never claim bitwise equivalence or select whichever backend scores highest.",
+  "pre_outcome_precision_description_correction": {
+    "prior_path": ".audit\\phase2_external_v3\\external-neural-cuda-nocudnn-v1_declaration_20260905.json",
+    "reason": "Direct inspection of ExternalNeuralConfig and retained checkpoints confirms inherited float16 AMP; the v1 wording FP32 precision was inaccurate. No new-backend scientific outcomes exist.",
+    "sha256": "b54a9b624b9426a576d44d87e9ae521894d8c2ee90b205f33fa20983b94bb659"
+  },
+  "protocol_id": "external-neural-cuda-nocudnn-v2",
+  "reason": "The external runner omitted the documented no-cuDNN recurrent execution setting. A standalone CUDA LSTM forward reproduces native exit 0xC0000409, while CPU, CUDA ATen and the full synthetic DeepConvLSTM no-cuDNN training probe exit 0.",
+  "record_sha256": "bdc81f04e99af652f857827228f0ac6a2870f8861ef27fd50babdec51c0366cc",
+  "replacements": "One neural-only corrected FoG run; one neural-only complete-case IMU run; the available-trial IMU campaign and replacement HAR-PMD neural lanes use this declared setting. Existing cuDNN results and native failures remain separate qualified rows. Classical/transfer predictions are not retuned.",
+  "schema_version": "1.0.0",
+  "status": "FROZEN_BEFORE_REPLACEMENT_MODEL_OUTCOMES",
+  "stop_rule": "After clean committed implementation and successful synthetic train/exit checks, run each fixed replacement once. Preserve any failure without silently falling back to another backend."
+}

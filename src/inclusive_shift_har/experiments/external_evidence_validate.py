@@ -202,6 +202,16 @@ def _method_contract_errors(result: dict[str, Any], audit: dict[str, Any]) -> li
         result.get("primary_seed_averaged"), dict
     ):
         errors.append("frozen three-seed participant-averaged evidence is missing")
+    if result.get("runtime_backend_protocol") == "external-neural-cuda-nocudnn-v2":
+        records = result.get("fold_records", [])
+        if not records:
+            errors.append("external neural backend records are missing")
+        for record in records:
+            expected_disabled = str(record.get("model", "")).startswith("DeepConvLSTM-")
+            if record.get("disable_cudnn") is not expected_disabled:
+                errors.append("neural fold differs from the declared recurrent backend policy")
+            if record.get("mixed_precision") != "float16":
+                errors.append("neural fold differs from inherited float16 AMP policy")
     return errors
 
 
@@ -237,6 +247,15 @@ def _metric_evidence_errors(result: dict[str, Any], prediction_path: Path | None
         )
         if canonical_json_sha256(recomputed) != canonical_json_sha256(primary):
             return ["primary participant statistics differ from retained predictions"]
+        if result.get("experiment_id") == "participant-balanced-hierarchical-posture-forest-v3":
+            from inclusive_shift_har.experiments.hierarchical_posture import (
+                posture_advancement_gate,
+            )
+
+            if canonical_json_sha256(posture_advancement_gate(recomputed)) != canonical_json_sha256(
+                result.get("advancement_gate")
+            ):
+                return ["posture R&D gate differs from independently reconstructed statistics"]
     except (KeyError, ValueError, TypeError, StopIteration, IndexError) as error:
         return [f"primary reconstruction failed: {type(error).__name__}: {error}"]
     return []

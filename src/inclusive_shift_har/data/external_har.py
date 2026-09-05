@@ -13,7 +13,7 @@ import io
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from fractions import Fraction
 from pathlib import PurePosixPath
 from typing import Any, cast
@@ -1530,6 +1530,7 @@ def load_sole_harmony(
     }
     accumulator = _WindowAccumulator.empty()
     receipts: list[SourceReceipt] = []
+    annotation_issues: list[dict[str, Any]] = []
     label_map = {0: 1, 1: 2, 2: 0, 3: 0, 4: 0}
     for participant_index in range(1, participant_limit + 1):
         participant_code = f"C{participant_index:03d}"
@@ -1602,9 +1603,26 @@ def load_sole_harmony(
                 session = f"{participant}:session-{session_value}"
                 previous_stop = float("-inf")
                 for interval_index, row in enumerate(labels):
+                    if not np.isfinite(row).all() or row[0] != np.rint(row[0]):
+                        raise ValueError(f"invalid camera annotation code in {mat_name}")
                     source_label = int(row[0])
                     start_time = float(row[1])
                     stop_time = float(row[2])
+                    if source_label == -1 and start_time == stop_time:
+                        annotation_issues.append(
+                            {
+                                "protocol_id": "sole-harmony-zero-duration-unknown-v1",
+                                "member": mat_name,
+                                "stable_sorted_interval_index": interval_index,
+                                "start_time": start_time,
+                                "stop_time": stop_time,
+                                "source_label": source_label,
+                                "excluded_duration_ms": 0.0,
+                                "reason": "zero-duration unknown camera marker",
+                                "action": "empty marker omitted; positive-duration bouts unchanged",
+                            }
+                        )
+                        continue
                     if not np.isfinite([start_time, stop_time]).all() or stop_time <= start_time:
                         raise ValueError(f"invalid camera interval in {mat_name}")
                     if start_time < previous_stop:
@@ -1636,7 +1654,7 @@ def load_sole_harmony(
                             window_samples=window_samples,
                         )
                 del payload, timestamps, linear, gyroscope, raw, gravity, labels
-    return accumulator.finish(
+    result = accumulator.finish(
         dataset_id=dataset_id,
         channel_lane="derived-gravity-9ch",
         sampling_rate_hz=target_rate_hz,
@@ -1644,3 +1662,4 @@ def load_sole_harmony(
         gravity_source="provider_raw_acceleration_minus_linear_acceleration",
         gravity_cutoff_hz=None,
     )
+    return replace(result, source_issues=tuple(annotation_issues))

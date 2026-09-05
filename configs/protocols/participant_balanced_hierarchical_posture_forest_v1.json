@@ -1,0 +1,77 @@
+{
+  "advancement_gates": [
+    "Primary paired mean 95-percent CI lower bound strictly greater than 0",
+    "Paired bottom-ceil(0.30*N) participant mean 95-percent CI lower bound at least 0; no positive harm margin is introduced",
+    "Only after primary mean and tail gates pass: superiority to PB-RF-D9, then PB-RF-6ch in this fixed order, each paired mean CI lower bound greater than 0",
+    "Mean seed-specific sitting recall improves; mobility recall and negative-log-likelihood do not worsen; otherwise report a tradeoff and do not promote",
+    "True specialist must outperform its shuffled-label negative control; no candidate promotion if the mechanism is unnecessary"
+  ],
+  "artifact_contract": "New create-only directory, clean launch manifest, frozen protocol and dataset receipts, all-seed probabilities, split audit, result self-hash, independent reconstruction, command exit status, explicit failure record. No raw dataset or large model artifacts committed.",
+  "basis": {
+    "baseline_primary_mean": 0.5709501934959623,
+    "corrected_fog_result_sha256": "8a48ad9c864588cd21d79eb822504fce2013c7c624accef4d67c846ffacdbc69",
+    "corrected_source_only_transfer_result_sha256": "132c3e6cad95f6fefcc5bb24067b3703ac3cbdd57dae23c539e225de3381a882",
+    "previous_hera_full_primary_gate": "failed on corrected FoG; no further HERA routing search"
+  },
+  "comparison_tuple": "Same hashes, participants, ontology, physical segment/window grid, seed folds and participant metrics as corrected FoG. Sensor lanes are explicit ablations: six-channel RF versus a six-channel mobility / derived-nine-channel posture candidate. No cross-dataset or old/new preprocessing improvement claim.",
+  "compute_matching": "500 total trees per configuration; report tree/node counts, serialized trusted-local model bytes, feature dimensions, fitting and inference wall time. Tree budget is matched, parameter counts and runtime need not be equal.",
+  "costs": "Equal false-sitting and false-standing cost within each participant/class task; rare support addressed by fixed training mass, not post hoc thresholds. No learned probability calibration or decision threshold search.",
+  "datasets": {
+    "conditional_replication": "Only if every advancement gate passes: the already declared IMU-HAR-IL available-trials-v1 cohort, a development replication, not confirmation",
+    "excluded_from_selection": [
+      "InclusiveHAR target raw data",
+      "HAR-PMD stress outcomes",
+      "Sole-HARmony oracle outcomes",
+      "controlled-access or sealed data"
+    ],
+    "primary": "FoG-STAR record 17838806, all 22 participants, corrected session-grid-v3; development-consumed"
+  },
+  "declared_at_utc": "2026-09-05T05:12:36.499212+00:00",
+  "features": "Inherited deterministic engineered per-window features, no new feature search or normalization fitting on evaluation data. Derived gravity remains distinct from native gravity.",
+  "hypothesis": "The corrected FoG dataset has only 74 sitting windows among 1213 and unequal per-person support. Equal participant/class training mass and a stationary/posture probability factorization may improve rare-posture recognition without harming mean or lower-tail participant F1.",
+  "inference": "Independent window features only; P(mobility)=root probability, P(sitting)=(1-P(mobility))*specialist sitting probability, P(standing)=(1-P(mobility))*specialist standing probability. No labels, identity metadata, reset oracle, tuning or test-time personalization accepted.",
+  "model_variants": {
+    "HPF-unweighted": "250-tree six-channel mobility-versus-stationary root plus 250-tree derived-nine-channel sitting-versus-standing specialist, balanced_subsample; no participant weighting",
+    "PB-HPF": "Same 250+250 hierarchy, with participant/class sample weights for each task; sole candidate",
+    "PB-HPF-shuffled-posture": "Same candidate but shuffle specialist training labels within each training participant using the fixed negative-control RNG; evaluation labels never altered or accepted by inference",
+    "PB-RF-6ch": "500-tree flat six-channel forest; replace class_weight with fixed participant/class sample weights",
+    "PB-RF-D9": "Same flat participant/class-balanced forest, derived nine channels; gravity and weighting control",
+    "RandomForest-6ch": "Exact inherited 500-tree baseline, sqrt max_features, min_samples_leaf 2, balanced_subsample, n_jobs 1; require exact reproduction of retained base class decisions and participant metrics"
+  },
+  "multiplicity": "One primary candidate and a fixed-sequence intersection of advancement gates; all other contrasts, individual seeds and sensitivity metrics descriptive. No selection of a different configuration if the sole candidate fails.",
+  "novelty_scope": "A prospective test of a motivated combination, not a claim that activity hierarchies or participant weighting are new. Generic hierarchical HAR has prior literature and official Sole-HARmony implementations.",
+  "outer_folds": 5,
+  "primary_contrast": "PB-HPF minus RandomForest-6ch",
+  "primary_metric": "Mean across seeds of equally weighted participant fixed-three-class macro-F1; participant-cluster bootstrap 10000 draws, seed 20260905, paired resampling across methods and all seeds",
+  "protocol_id": "participant-balanced-hierarchical-posture-forest-v1",
+  "record_sha256": "d89007f1eed114806817008e24417fec5cee50c46576d9cff192abaec689bf57",
+  "required_reporting": [
+    "all methods/seeds",
+    "support and missing-class ceiling",
+    "present/complete-class sensitivity",
+    "per-class precision recall F1",
+    "confusion matrices",
+    "calibration",
+    "participant quartiles worst and bottom-30-percent",
+    "paired confidence intervals",
+    "rescue harm tie counts",
+    "mechanism usage and specialist mass",
+    "measured cost and model size"
+  ],
+  "schema_version": "1.0.0",
+  "search_budget": {
+    "candidate_redesigns_after_outcomes": 0,
+    "configurations": 6,
+    "hyperparameter_trials": 0,
+    "outer_fits_per_configuration": 15
+  },
+  "seed_derivation": "seed + 101*outer_fold; specialist seed additionally +10000; shuffled negative seed additionally +20000",
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "selection_and_stop_rule": "Run one corrected-FoG suite from a clean committed implementation. If any advancement gate fails, stop expansion of this candidate and retain the negative/tradeoff result. Only after all gates pass run one fixed IMU available-trials development replication; do not retune on it.",
+  "status": "FROZEN_BEFORE_CANDIDATE_IMPLEMENTATION_OR_OUTCOMES",
+  "training_weights": "Each participant has equal total mass; their observed classes divide that mass equally; within participant/class, windows have equal weight. Normalize mean weight to 1. Root weights use the binary mobility label; specialist weights use only stationary training windows. Never use evaluation participant identity for prediction."
+}

@@ -66,10 +66,17 @@ def test_neural_runner_serializes_all_seeds_and_uses_label_free_evaluation(
         valid = set(data.participant_ids[kwargs["validation_indices"]])
         test = set(data.participant_ids[kwargs["evaluation_indices"]])
         assert not train & valid and not train & test and not valid & test
+        config = kwargs["config"]
+        assert config.disable_cudnn == (config.model_name == "deepconvlstm")
+        assert config.mixed_precision == "float16"
         visits.append(test)
         values = signals[kwargs["evaluation_indices"]]
         predicted = np.clip(np.rint(values[:, :, 0].mean(axis=1) / 3.0), 0, 2).astype(int)
-        return np.eye(3)[predicted], {"synthetic_training_seam": True}
+        return np.eye(3)[predicted], {
+            "synthetic_training_seam": True,
+            "disable_cudnn": config.disable_cudnn,
+            "mixed_precision": config.mixed_precision,
+        }
 
     monkeypatch.setattr(cross_dataset_neural, "_train_fold", training)
     root = Path(__file__).resolve().parents[1]
@@ -177,7 +184,7 @@ def test_primary_suite_routes_cohort_policy_and_orders_acceptance_gates(
                 assert kwargs["data"] is source
             kwargs["output_directory"].mkdir()
             events.append(stage)
-            return {"reports": {}}
+            return {"reports": {}, "primary_seed_averaged": {"methods": {}}}
 
         return run
 

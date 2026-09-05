@@ -1,0 +1,14 @@
+{
+  "basis": ".audit/frozen_external_v3_5a585e9/.audit/phase2_external_v3/sole_camera_failure_probe_20260905/diagnostic.json",
+  "budget": "Retry the same first 12 provider participants, first two sessions per participant, seeds 11,23,47 and inherited temporal/classical controls once after clean commit. No outcome-based participant/session replacement.",
+  "declared_at_utc": "2026-09-05T05:24:18.928855+00:00",
+  "evidence_role": "Oracle camera-bout diagnostic only. This correction does not make annotation-defined resets deployable, streaming or confirmatory.",
+  "failure_preservation": "Retain original failed campaign, its command exit1, source schema probe and all prior one-participant work. Material schema ambiguity remains explicit, not imputed.",
+  "invariance": "The retained positive-duration intervals, their sensor values, gravity, timestamps and window origins remain unchanged. Preserve original stable interval indices when omitting empty unknown markers.",
+  "protocol_id": "sole-harmony-zero-duration-unknown-v1",
+  "reason": "The full 12-participant/two-session oracle campaign stopped on six finite, zero-duration rows with unknown label -1 in C002/C002_1664294172/DataStruct.mat. The 181-row diagnostic found no positive-duration overlaps.",
+  "record_sha256": "9aa54f59392f682faca784a862ff0721df1f8ce206c28e5eae97b54de8975a3e",
+  "schema_version": "1.0.0",
+  "selection": "Ignore only finite rows whose label is exactly -1 and whose start equals stop. Record source row index, exact timestamps, source file receipt and zero excluded duration. Reject inverted intervals, nonfinite intervals, nonintegral/invalid codes and positive-duration overlaps as before. No supported positive-duration label is removed.",
+  "status": "FROZEN_BEFORE_REPLACEMENT_MODEL_OUTCOMES"
+}

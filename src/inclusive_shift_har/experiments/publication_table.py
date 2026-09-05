@@ -159,8 +159,14 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
                 "validation": validation,
             }
         )
-        for notice in directory.parent.glob("runtime_termination_failure*.json"):
-            qualifications[str(notice.resolve())] = sha256_file(notice)
+        for enclosing in (directory, *directory.parents[:3]):
+            for notice in enclosing.glob("runtime_termination_failure*.json"):
+                qualifications[str(notice.resolve())] = sha256_file(notice)
+            if (enclosing / "campaign_plan.json").is_file() or enclosing.name in {
+                ".audit",
+                "results",
+            }:
+                break
     assert common is not None
     inputs = ParticipantMetricInputs(
         dataset_id=common["dataset"]["dataset_id"],

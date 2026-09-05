@@ -155,3 +155,19 @@ def test_table_carries_runtime_qualification_and_discloses_local_neural_variant(
     assert result["evidence_status"].endswith("with_runtime_qualification")
     assert result["runtime_qualifications"]
     assert "TinyHAR-style-6ch" in table.table_markdown(result)
+
+
+def test_nested_primary_suite_keeps_enclosing_campaign_failure(
+    tmp_path: Path, validated: None
+) -> None:
+    campaign = tmp_path / "campaign"
+    suite = campaign / "primary_suite"
+    suite.mkdir(parents=True)
+    run = _fixture(suite, "run", "RandomForest-6ch")
+    (campaign / "campaign_plan.json").write_text("{}", encoding="utf-8")
+    (campaign / "runtime_termination_failure_example.json").write_text(
+        '{"status":"failure"}', encoding="utf-8"
+    )
+    result = table.reconstruct_matched_table([run], tmp_path)
+    assert result["evidence_status"].endswith("with_runtime_qualification")
+    assert len(result["runtime_qualifications"]) == 1

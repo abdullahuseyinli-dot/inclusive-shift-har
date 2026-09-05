@@ -24,11 +24,8 @@ from inclusive_shift_har.experiments.external_evidence_validate import validate_
 
 
 def _method_means(result: dict[str, Any]) -> dict[str, float]:
-    reports = cast(dict[str, dict[str, Any]], result["reports"])
-    return {
-        name: float(report["primary"]["mean_participant_macro_f1"])
-        for name, report in reports.items()
-    }
+    reports = cast(dict[str, dict[str, Any]], result["primary_seed_averaged"]["methods"])
+    return {name: float(report["mean_participant_macro_f1"]) for name, report in reports.items()}
 
 
 def _validate_stage(directory: Path, repository_root: Path) -> None:

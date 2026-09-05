@@ -55,6 +55,7 @@ class ExternalNeuralConfig:
     patience: int = 8
     minimum_epochs: int = 8
     mixed_precision: str = "float16"
+    disable_cudnn: bool = False
 
     def validate(self) -> None:
         if self.model_name not in {"deepconvlstm", "tinyhar"}:
@@ -253,6 +254,33 @@ def _train_fold(
     class_names: tuple[str, ...],
 ) -> tuple[FloatArray, dict[str, Any]]:
     config.validate()
+    with torch.backends.cudnn.flags(enabled=not config.disable_cudnn):
+        return _train_fold_impl(
+            data,
+            signals,
+            training_indices=training_indices,
+            validation_indices=validation_indices,
+            evaluation_indices=evaluation_indices,
+            config=config,
+            output_path=output_path,
+            device=device,
+            class_names=class_names,
+        )
+
+
+def _train_fold_impl(
+    data: ExternalHARWindows,
+    signals: Float32Array,
+    *,
+    training_indices: IntArray,
+    validation_indices: IntArray,
+    evaluation_indices: IntArray,
+    config: ExternalNeuralConfig,
+    output_path: Path,
+    device: torch.device,
+    class_names: tuple[str, ...],
+) -> tuple[FloatArray, dict[str, Any]]:
+    config.validate()
     _configure_determinism(config.seed)
     class_count = len(class_names)
     mean, scale = _normalization(signals, training_indices)
@@ -385,6 +413,9 @@ def _train_fold(
             stream,
         )
     return outer_probability, {
+        "disable_cudnn": config.disable_cudnn,
+        "mixed_precision": config.mixed_precision,
+        "device": str(device),
         "selected_epoch": best_epoch,
         "selected_validation_mean_participant_macro_f1": best_metric,
         "epochs_completed": len(history),
@@ -471,6 +502,7 @@ def evaluate_neural_controls(
                     model_name=model_name,
                     seed=seed + 101 * outer_fold,
                     epochs=epochs,
+                    disable_cudnn=model_name == "deepconvlstm",
                 )
                 checkpoint_path = (
                     output_directory
@@ -528,6 +560,7 @@ def evaluate_neural_controls(
             "dataset": data.summary(),
             "seeds": list(seeds),
             "device": str(device),
+            "runtime_backend_protocol": "external-neural-cuda-nocudnn-v2",
             "input_channels": int(selected_signals.shape[2]),
             "method_suffix": method_suffix,
             "reports": reports,
