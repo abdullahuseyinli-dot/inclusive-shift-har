@@ -938,13 +938,31 @@ def test_nvidia_nccl_exception_is_lock_bound_and_fully_reconstructable(
         )
 
 
-def test_license_inventory_preserves_multiline_license_words(tmp_path: Path) -> None:
+@pytest.mark.parametrize("system,machine", [("Windows", "AMD64"), ("Linux", "x86_64")])
+def test_license_inventory_preserves_multiline_license_words(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, system: str, machine: str
+) -> None:
     repository, candidate, policy = _exception_repository(tmp_path / "repository")
-    inventory = tmp_path / "inventory.json"
-    _write_json(
-        inventory,
-        [{"Name": "example", "Version": "1.0", "License": "BSD-3-Clause\n Copyright holder"}],
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.system", lambda: system
     )
+    monkeypatch.setattr(
+        "inclusive_shift_har.artifacts.release_gate.platform.machine", lambda: machine
+    )
+    inventory = tmp_path / "inventory.json"
+    packages = [{"Name": "example", "Version": "1.0", "License": "BSD-3-Clause\n Copyright holder"}]
+    if system == "Linux":
+        packages.extend(
+            [
+                {"Name": "xgboost", "Version": "3.2.0", "License": "Apache-2.0"},
+                {
+                    "Name": "nvidia-nccl-cu12",
+                    "Version": "2.31.2",
+                    "License": "LicenseRef-NVIDIA-Proprietary",
+                },
+            ]
+        )
+    _write_json(inventory, packages)
     result = audit_licenses(
         repository_root=repository,
         inventory_path=inventory,

@@ -26,6 +26,17 @@ def partition_nodes(nodes: list[str], workers: int) -> list[list[str]]:
     return shards
 
 
+def write_shard_arguments(path: Path, nodes: list[str]) -> dict[str, str]:
+    """Pytest 8.2+ argument files avoid Windows' 32K process-command limit."""
+    if not nodes or any(
+        not node.startswith("tests/") or "\n" in node or "\r" in node for node in nodes
+    ):
+        raise ValueError("argument files require one safe collected test node per line")
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write("\n".join(nodes) + "\n")
+    return {"path": str(path), "sha256": sha256_file(path)}
+
+
 def run_full_suite(output: Path, root: Path, workers: int) -> dict[str, Any]:
     output.mkdir(parents=True, exist_ok=False)
     collection = record_command(
@@ -39,7 +50,16 @@ def run_full_suite(output: Path, root: Path, workers: int) -> dict[str, Any]:
         if line.startswith("tests/") and "::" in line
     ]
     shards = partition_nodes(nodes, workers)
-    plan = {"collected_nodes": nodes, "shards": shards, "collected_count": len(nodes)}
+    argument_files = [
+        write_shard_arguments(output / f"shard_{index:02d}.args", shard)
+        for index, shard in enumerate(shards)
+    ]
+    plan = {
+        "collected_nodes": nodes,
+        "shards": shards,
+        "collected_count": len(nodes),
+        "argument_files": argument_files,
+    }
     plan["record_sha256"] = canonical_json_sha256(plan)
     _write_json_create_only(output / "collection_plan.json", plan)
     commands = [
@@ -49,9 +69,9 @@ def run_full_suite(output: Path, root: Path, workers: int) -> dict[str, Any]:
             "pytest",
             "-q",
             f"--junitxml={output / f'shard_{index:02d}.xml'}",
-            *shard,
+            f"@{argument_files[index]['path']}",
         ]
-        for index, shard in enumerate(shards)
+        for index in range(len(shards))
     ]
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
@@ -71,11 +91,18 @@ def run_full_suite(output: Path, root: Path, workers: int) -> dict[str, Any]:
             for key in ("tests", "failures", "errors", "skipped")
         }
         reports.append({**counts, "expected_tests": len(shard), "sha256": sha256_file(path)})
-    passed = all(record["exit_code"] == 0 for record in records) and all(
-        report.get("tests") == report["expected_tests"]
-        and report.get("failures") == 0
-        and report.get("errors") == 0
-        for report in reports
+    arguments_unchanged = all(
+        sha256_file(Path(item["path"])) == item["sha256"] for item in argument_files
+    )
+    passed = (
+        arguments_unchanged
+        and all(record["exit_code"] == 0 for record in records)
+        and all(
+            report.get("tests") == report["expected_tests"]
+            and report.get("failures") == 0
+            and report.get("errors") == 0
+            for report in reports
+        )
     )
     summary = {
         "status": "PASS" if passed else "FAILED_PRESERVED",
@@ -84,6 +111,7 @@ def run_full_suite(output: Path, root: Path, workers: int) -> dict[str, Any]:
         "no_collected_tests_omitted_or_duplicated": sum(len(shard) for shard in shards)
         == len(nodes),
         "plan_sha256": plan["record_sha256"],
+        "argument_files_unchanged": arguments_unchanged,
         "shard_reports": reports,
     }
     summary["record_sha256"] = canonical_json_sha256(summary)
