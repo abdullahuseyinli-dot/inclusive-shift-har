@@ -20,6 +20,9 @@ from inclusive_shift_har.artifacts.release_gate import (
     SCAN_KIND,
     SECRET_KIND,
     ReleaseGateError,
+    _blob_content_violations,
+    _blob_payload,
+    _blob_payloads,
     _commit,
     _safe_relative,
     _sha256,
@@ -35,6 +38,22 @@ from inclusive_shift_har.artifacts.release_gate import (
 )
 from inclusive_shift_har.artifacts.release_inventory import FORBIDDEN_ARTIFACT_SUFFIXES
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256
+
+
+@pytest.mark.parametrize("suffix", [".in", ".xml"])
+def test_text_evidence_extensions_do_not_disable_binary_detection(suffix: str) -> None:
+    def violations(payload: bytes) -> list[tuple[str, str]]:
+        return _blob_content_violations(
+            payload,
+            path=f"evidence{suffix}",
+            signatures={"zip": b"PK\x03\x04"},
+            allowed_signatures={},
+            allowed_binary_suffixes={".pdf"},
+        )
+
+    assert not violations(b"<testsuite tests='1'/>\n")
+    assert any(code == "disguised_binary_nul" for code, _ in violations(b"data\x00"))
+    assert any(code == "disguised_binary_signature" for code, _ in violations(b"PK\x03\x04"))
 
 
 def _git(root: Path, *arguments: str) -> str:
@@ -125,6 +144,25 @@ EXCEPTION_MARKER = (
     "sys_platform == 'linux' or (extra == 'extra-19-inclusive-shift-har-training-cpu' "
     "and extra == 'extra-19-inclusive-shift-har-training-cuda')"
 )
+
+
+def test_batched_git_payloads_match_single_reads_and_reject_mismatched_objects(
+    tmp_path: Path,
+) -> None:
+    repository, commit = _repository(tmp_path / "batch-repository")
+    expected = {}
+    for name in ("README.md", ".gitignore", ".gitleaks.toml"):
+        object_id = _git(repository, "rev-parse", f"{commit}:{name}")
+        expected[object_id] = (repository / name).stat().st_size
+    payloads = dict(_blob_payloads(repository, expected))
+    assert set(payloads) == set(expected)
+    for object_id, size in expected.items():
+        assert payloads[object_id] == _blob_payload(repository, object_id, expected_size=size)
+    object_id = next(iter(expected))
+    with pytest.raises(ReleaseGateError, match="identity/type/size"):
+        list(_blob_payloads(repository, {object_id: expected[object_id] + 1}))
+    with pytest.raises(ReleaseGateError, match="identity/type/size"):
+        list(_blob_payloads(repository, {"f" * 40: 1}))
 
 
 def _exception_repository(
@@ -898,6 +936,26 @@ def test_nvidia_nccl_exception_is_lock_bound_and_fully_reconstructable(
             candidate=candidate,
             policy=json.loads(policy.read_text(encoding="utf-8")),
         )
+
+
+def test_license_inventory_preserves_multiline_license_words(tmp_path: Path) -> None:
+    repository, candidate, policy = _exception_repository(tmp_path / "repository")
+    inventory = tmp_path / "inventory.json"
+    _write_json(
+        inventory,
+        [{"Name": "example", "Version": "1.0", "License": "BSD-3-Clause\n Copyright holder"}],
+    )
+    result = audit_licenses(
+        repository_root=repository,
+        inventory_path=inventory,
+        candidate_commit=candidate,
+        policy_path=policy,
+        pip_licenses_version="5.5.5",
+        created_at_utc="2026-09-05T02:15:00Z",
+    )
+    assert result["status"] == "pass"
+    assert result["packages"][0]["license"] == "BSD-3-Clause Copyright holder"
+    assert result["inventory"]["file_sha256"] == hashlib.sha256(inventory.read_bytes()).hexdigest()
 
 
 def test_nvidia_nccl_exception_rejects_duplicate_missing_parent_and_wrong_license(
@@ -1792,7 +1850,7 @@ def test_gitleaks_allowlist_is_rule_path_and_exact_field_scoped(repository_root:
     assert rule["id"] == "generic-api-key"
     allowlists = rule["allowlists"]
     assert isinstance(allowlists, list)
-    assert len(allowlists) == 1
+    assert len(allowlists) == 2
     allowlist = allowlists[0]
     assert isinstance(allowlist, dict)
     assert set(allowlist) == {
@@ -1809,6 +1867,20 @@ def test_gitleaks_allowlist_is_rule_path_and_exact_field_scoped(repository_root:
         r'^secret_scan":"[0-9a-f]{64}"$',
         r'^secret_scan\.json":"[0-9a-f]{64}"$',
     ]
+
+    source_hash_rule = allowlists[1]
+    assert source_hash_rule["condition"] == "AND"
+    assert source_hash_rule["regexTarget"] == "match"
+    public_digest = hashlib.sha256(
+        (repository_root / "docs/research/CONTROLLED_DATA_ACCESS_CHECKLIST.md").read_bytes()
+    ).hexdigest()
+    source_pattern = re.compile(source_hash_rule["regexes"][0])
+    source_path = re.compile(source_hash_rule["paths"][0])
+    assert source_path.search("results/research/cross_dataset_har_v3/run/result.json")
+    assert not source_path.search("credentials.json")
+    assert source_pattern.fullmatch(f'CONTROLLED_DATA_ACCESS_CHECKLIST.md": "{public_digest}"')
+    assert not source_pattern.fullmatch(f'CONTROLLED_DATA_ACCESS_CHECKLIST.md": "{"a" * 64}"')
+    assert not source_pattern.fullmatch(f'api_key": "{public_digest}"')
 
     path_pattern = re.compile(allowlist["paths"][0])
     assert path_pattern.search("ci.json")

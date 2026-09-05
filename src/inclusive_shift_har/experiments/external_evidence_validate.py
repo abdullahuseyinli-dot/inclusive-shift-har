@@ -3,14 +3,21 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
+import subprocess
 from collections.abc import Iterator
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, cast
 
 import numpy as np
 
+from inclusive_shift_har.evaluation.external_statistics import (
+    ParticipantMetricInputs,
+    seed_evidence,
+)
 from inclusive_shift_har.experiments.cross_dataset_har import _write_json_create_only
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 
@@ -98,6 +105,141 @@ def _expected_window_count(result: dict[str, Any], audit: dict[str, Any]) -> int
         if isinstance(candidate, dict) and isinstance(candidate.get("window_count"), int):
             return int(candidate["window_count"])
     return None
+
+
+def _manifest_commit_errors(
+    repository_root: Path,
+    commit: object,
+    files: dict[str, str],
+) -> list[str]:
+    """Compare retained launch hashes with Git blobs, never current source alone."""
+
+    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        return ["missing or invalid launch commit"]
+    if not files or any(
+        PurePosixPath(name).is_absolute()
+        or ".." in PurePosixPath(name).parts
+        or "\n" in name
+        or "\\" in name
+        or ":" in name
+        for name in files
+    ):
+        return ["missing or unsafe manifest file paths"]
+    names = sorted(files)
+    response = subprocess.run(
+        ["git", "cat-file", "--batch"],
+        cwd=repository_root,
+        input="".join(f"{commit}:{name}\n" for name in names).encode("utf-8"),
+        capture_output=True,
+        check=False,
+    )
+    if response.returncode:
+        return ["launch commit objects unavailable in this repository"]
+    errors: list[str] = []
+    offset = 0
+    for name in names:
+        end = response.stdout.find(b"\n", offset)
+        header = response.stdout[offset:end].split()
+        if len(header) != 3 or header[1] != b"blob":
+            errors.append(f"launch source blob unavailable: {name}")
+            offset = end + 1
+            continue
+        size = int(header[2])
+        blob = response.stdout[end + 1 : end + 1 + size]
+        if hashlib.sha256(blob).hexdigest() != files[name]:
+            errors.append(f"launch manifest differs from committed source: {name}")
+        offset = end + 1 + size + 1
+    return errors
+
+
+def _method_contract_errors(result: dict[str, Any], audit: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    summaries = [
+        value
+        for key in ("dataset", "source_dataset", "target_dataset")
+        if isinstance(value := audit.get(key, result.get(key)), dict)
+    ]
+    if not summaries or any("dataset_id" not in item for item in summaries):
+        errors.append("dataset identity and preprocessing contract unavailable")
+    for summary in summaries:
+        if summary.get("dataset_id") == "sole_harmony_v1":
+            errors.append("Sole-HARmony camera-bout preprocessing is an oracle diagnostic")
+        if summary.get("dataset_id") != "fog_star_v3":
+            continue
+        segments = summary.get("preprocessing_audit", [])
+        admitted_total = 0
+        if not segments:
+            errors.append(
+                "FoG annotation-independent resampling evidence absent; historical run superseded"
+            )
+        for segment in segments:
+            if (
+                segment.get("protocol_id") != "external-har-session-grid-v3"
+                or segment.get("annotation_dependency") is not False
+                or segment.get("resampling_passes") != 1
+            ):
+                errors.append("FoG physical segment does not satisfy the v3 signal contract")
+            starts = segment.get("candidate_start_samples", [])
+            admitted = segment.get("admitted_candidate_indices", [])
+            rejected = segment.get("excluded_candidate_indices", {})
+            accounted = list(admitted) + [
+                index for indices in rejected.values() for index in indices
+            ]
+            if sorted(accounted) != list(range(len(starts))) or len(starts) != segment.get(
+                "candidate_window_count"
+            ):
+                errors.append("FoG candidate admission/exclusion accounting is incomplete")
+            if starts != [
+                index * int(segment.get("window_samples", 0)) for index in range(len(starts))
+            ]:
+                errors.append(
+                    "FoG candidate grid is not globally uniform within its physical segment"
+                )
+            admitted_total += len(admitted)
+        if admitted_total != summary.get("window_count"):
+            errors.append("FoG admitted candidates do not match retained windows")
+    if result.get("seeds") != [11, 23, 47] or not isinstance(
+        result.get("primary_seed_averaged"), dict
+    ):
+        errors.append("frozen three-seed participant-averaged evidence is missing")
+    return errors
+
+
+def _metric_evidence_errors(result: dict[str, Any], prediction_path: Path | None) -> list[str]:
+    """Recompute the complete primary report from each retained seed, not its hash alone."""
+
+    primary = result.get("primary_seed_averaged")
+    if not isinstance(primary, dict) or prediction_path is None or not prediction_path.is_file():
+        return ["primary metrics cannot be reconstructed from retained seed predictions"]
+    try:
+        methods = primary["methods"]
+        seeds = primary["seeds"]
+        example = next(iter(methods.values()))["reports_by_seed"][str(seeds[0])]
+        dataset = result.get("target_dataset", result.get("dataset", {}))
+        with np.load(prediction_path, allow_pickle=False) as archive:
+            inputs = ParticipantMetricInputs(
+                dataset_id=dataset["dataset_id"],
+                class_names=tuple(example["class_names"]),
+                labels=archive["labels"],
+                participant_ids=archive["participant_ids"],
+            )
+            probabilities = {
+                seed: {
+                    method: np.asarray(
+                        archive[f"probability__seed-{seed}__{method}"], dtype=np.float64
+                    )
+                    for method in methods
+                }
+                for seed in seeds
+            }
+        recomputed, _ = seed_evidence(
+            inputs, probabilities, primary_contrast_eligible="target_dataset" not in result
+        )
+        if canonical_json_sha256(recomputed) != canonical_json_sha256(primary):
+            return ["primary participant statistics differ from retained predictions"]
+    except (KeyError, ValueError, TypeError, StopIteration, IndexError) as error:
+        return [f"primary reconstruction failed: {type(error).__name__}: {error}"]
+    return []
 
 
 def validate_run_directory(run_directory: Path, repository_root: Path) -> dict[str, Any]:
@@ -294,14 +436,51 @@ def validate_run_directory(run_directory: Path, repository_root: Path) -> dict[s
     check("development_claim_boundary_retained", not unsafe_claims, unsafe_claims)
 
     integrity = all(item["passed"] for item in checks if item["blocking"])
+    launch = result.get("git_at_launch", {})
+    clean_launch = (
+        isinstance(launch, dict)
+        and launch.get("worktree_dirty") is False
+        and launch.get("status_entries") == []
+    )
+    commit_errors = _manifest_commit_errors(
+        repository_root,
+        launch.get("commit") if isinstance(launch, dict) else None,
+        manifest_files,
+    )
+    method_errors = _method_contract_errors(result, audit)
+    metric_errors = _metric_evidence_errors(result, prediction_path)
+    manifest_v2 = (
+        isinstance(manifest, dict) and manifest.get("protocol_id") == "external-har-session-grid-v3"
+    )
+    scientific_contract = (
+        clean_launch
+        and not commit_errors
+        and not method_errors
+        and not metric_errors
+        and manifest_v2
+    )
+    ready = integrity and scientific_contract
     return {
         "schema_version": "1.0.0",
         "validated_at": datetime.now(UTC).isoformat(),
         "run_directory": str(run_directory),
-        "status": "VALIDATED" if integrity else "INVALID_EVIDENCE_PACKAGE",
+        "status": "VALIDATED"
+        if ready
+        else "PROVISIONAL"
+        if integrity
+        else "INVALID_EVIDENCE_PACKAGE",
         "checks": checks,
         "integrity_passed": integrity,
-        "publication_evidence_ready": integrity,
+        "publication_evidence_ready": ready,
+        "scientific_contract_passed": scientific_contract,
+        "scientific_contract_checks": {
+            "clean_git_at_launch": clean_launch,
+            "versioned_protocol_correction": manifest_v2,
+            "launch_manifest_commit_errors": commit_errors,
+            "method_contract_errors": method_errors,
+            "metric_reconstruction_errors": metric_errors,
+        },
+        "limitation": "Contract validation is not a general proof of scientific validity or deployability.",
         "claim_scope": "development evidence only; not confirmatory and not SOTA",
     }
 

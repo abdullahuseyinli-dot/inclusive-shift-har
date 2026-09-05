@@ -1,0 +1,98 @@
+schema_version: "1.0.0"
+ledger_id: "external-evidence-roles-20260905-v2"
+created_at_utc: "2026-09-05T01:56:58Z"
+immutable: true
+policy: "Create a new version to correct metadata; never upgrade consumed data to sealed confirmation."
+source_registry: "configs/datasets/external_har_portfolio_v1.yaml"
+raw_artifact_hashes: "Exact per-object SHA-256 and access timestamps are bound by each run's data_audit.json and source receipts; absent hashes remain unavailable."
+datasets:
+  inclusivehar_v4_source:
+    role: development
+    participants: "P1-P10; development-consumed"
+    sessions: "unrecoverable"
+    ontology: "functional-core and inclusive-native are separate locked endpoints"
+    placement: "smartphone; released signal interface"
+    channels: "six primary, native gravity sensitivity separately"
+    version_hash_reference: "results/protocol/protocol_lock_v1_2.json"
+    license_reference: "manifests/datasets"
+    bias: "released subject-label blocks, hidden joins and group-associated activity realization"
+  inclusivehar_v4_target:
+    role: replication
+    participants: "P11-P20; opening 1 consumed, unavailable for tuning or new confirmation"
+    access_rule: "Do not reopen raw target signals or run target inference. Audit retained results only."
+    evidence_reference: "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json"
+  daghar_v2:
+    role: replication
+    participants: "consumed provider holdout; exact per-domain N in retained evaluation"
+    preprocessing: "provider prewindowed 60-sample signals; upstream boundary provenance limited"
+    ontology: "mapped walking/sitting/standing core"
+    evidence_reference: "configs/experiments/daghar_external_evaluation_v1.yaml"
+    access_rule: "retained artifact audit only; no untouched-cohort claim"
+  fog_star_v3:
+    role: development
+    record_url: "https://zenodo.org/records/17838806"
+    version: "v3"
+    accessed_on: "2026-09-05"
+    participants: 22
+    sessions: "recorded sessionID and taskID, exact coverage in per-run audit"
+    placement: "back IMU"
+    channels: "six inertial; separately named derived gravity"
+    ontology: [mobility, sitting, standing]
+    sensor_data_sha256: "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477"
+    license: "CC-BY-4.0"
+    redistribution: "attribution required; no raw data in Git"
+    bias: "Parkinson disease, elicitation tasks, class imbalance and missing participant classes; architecture-development consumed"
+  imu_har_il_v1:
+    role: development
+    record_url: "https://data.csiro.au/collection/csiro:74700"
+    version: "CSIRO collection 74700, DOI 10.25919/d7xf-n080"
+    accessed_on: "2026-09-05 metadata audit; run-specific file access timestamps recorded separately"
+    participants: "50 reported; eligibility determined from measured source audit"
+    sessions: "one collection visit; four repetitions reuse participants"
+    placement: "Body-WT waist IMU"
+    channels: "six inertial; separately named derived gravity"
+    ontology: [mobility, sitting, standing]
+    license: "CC-BY-NC-4.0 per retained source registry, current provider re-verification required"
+    redistribution: "noncommercial restrictions apply to data and derived artifacts; Apache code license does not relicense them"
+    bias: "scripted activity files and repeated observations; no participant-N inflation"
+  har_pmd_v1:
+    role: stress_test
+    record_url: "https://zenodo.org/records/7939223"
+    version: "provider v2; legacy internal identifier har_pmd_v1 retained"
+    accessed_on: "2026-09-05"
+    participants: "120 reported; 1-12 already consumed as pilot"
+    sessions: "indoor/outdoor activity files"
+    placement: "smartphone; heterogeneous Android devices"
+    channels: "6ch and provider-native9ch separate lanes"
+    ontology: [stationary, walking, crutches, walker, manual_wheelchair]
+    archive_md5: "cdc7b79aaa0450d68d94f430f2a2de63"
+    license: "CC-BY-4.0"
+    redistribution: "attribution required; no raw data in Git"
+    bias: "simulated aid use; still merges sitting/standing; no clinical ability or posture validation"
+  sole_harmony_v1:
+    role: oracle_diagnostic
+    record_url: "https://zenodo.org/records/19242395"
+    accessed_on: "2026-09-05 metadata audit"
+    participants: "13 reported; retained run covers only one participant/session"
+    sessions: "five per participant reported; required temporal gate is >=12 participants with >=2 sessions"
+    placement: "right insole"
+    channels: "linear acceleration, gyro, provider raw-minus-linear derived gravity"
+    ontology: [mobility, sitting, standing]
+    license: "CC-BY-4.0"
+    redistribution: "attribution required; no raw data in Git"
+    bias: "healthy young adults, sitting dominance, camera-label boundaries are oracle information"
+  wear_gait_pd:
+    role: sealed_confirmation
+    access: "BLOCKED_NO_AUTHORIZED_ACCESS"
+    record_url: "https://www.synapse.org/Synapse:syn52540892"
+    license: "not accepted or inferred; authorized terms required"
+    hashes: null
+    redistribution: "not authorized"
+    rule: "No agreement acceptance, impersonation, credential discovery, or access bypass. Freeze all method choices before any prospective opening."
+  parkinson_at_home:
+    role: sealed_confirmation
+    access: "BLOCKED_NO_AUTHORIZED_ACCESS"
+    descriptor_url: "https://www.jmir.org/2020/10/e19068"
+    license: "steward approval and data terms unavailable"
+    hashes: null
+    redistribution: "not authorized"

@@ -1,0 +1,3104 @@
+{
+  "created_at_utc": "2026-09-05T02:48:57.317772+00:00",
+  "model_training_performed": false,
+  "provider_sensor_data_downloaded": false,
+  "record_sha256": "134e7aaeae2940e345cad994e563a78eb183a9f3515e72b1bab769fbfcf3a312",
+  "records": [
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "participant_count": 22,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.542517315629318,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.542517315629318
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5490406726312774,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5490406726312774
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5661533111726907,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5661533111726907
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5554231790137838,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5554231790137838
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5624288139195982,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5624288139195982
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.565854210372465,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.565854210372465
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5562071058241865,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5562071058241865
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5676701488438807,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5676701488438807
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5562071058241865,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5562071058241865
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5661533111726907,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5661533111726907
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5288304373966103,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5288304373966103
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5859635857938688,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5859635857938688
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.638400792648377,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.638400792648377
+        }
+      },
+      "prediction_file_sha256": "de864a4d00c1de08c67bf8d7c5a0c8266128ed660a5eee7ed334627835a6ee94",
+      "result_file_sha256": "182cd193aeb6f96519e36decd79ba8f9e4f02070c1073e4824c5845f102d14cc",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "gravity_preprocessing": {
+          "causal_lowpass_cutoff_hz": 0.3,
+          "source": "causal_lowpass_from_total_acceleration"
+        },
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5880338505845258,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5880338505845258
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.601139093984841,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.601139093984841
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6054597825495656,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6054597825495656
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6084294251827318,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6084294251827318
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5978006861057169,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5978006861057169
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5973841726676781,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5973841726676781
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.595088897316828,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.595088897316828
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014233433735154,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014233433735154
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.531265524627925,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.531265524627925
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6306130033107453,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6306130033107453
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6491051473329712,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6491051473329712
+        }
+      },
+      "prediction_file_sha256": "45dccc8f506e74edf00c5f96838e2fbeeb30bbd6ddd336c4d035d65258b8a907",
+      "result_file_sha256": "51eb071c6949066fa2f456a236a5c81c7262e5d6e6c2c4b73afb46e55c45ef6b",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "gravity_preprocessing": {
+          "causal_lowpass_cutoff_hz": 0.3,
+          "source": "causal_lowpass_from_total_acceleration"
+        },
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "DeepConvLSTM-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.4962719194072171,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.4962719194072171
+        },
+        "TinyHAR-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5644003963255642,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5644003963255642
+        }
+      },
+      "prediction_file_sha256": "428bddf730f4352c463c637922fb1eafc36aee4bf27d39e5e5116fcb2d43b4cb",
+      "result_file_sha256": "b0c1fe81d37c07e01face4e009b4d9f0f827dff07a4de94c517293ea92a4dda8",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "participant_count": 22,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "DeepConvLSTM-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5045475185578367,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5045475185578367
+        },
+        "TinyHAR-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5151944084028268,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5151944084028268
+        }
+      },
+      "prediction_file_sha256": "2959a416ce5727f163dcd456ca869d7462ff7d69ea2a6f5ef497c1a3fb133c4b",
+      "result_file_sha256": "cbee2d7a46f1b23c30fc12451419aabbe000a5db81c7eecae5ce57047ce4ddb3",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "gravity_preprocessing": {
+          "causal_lowpass_cutoff_hz": 0.3,
+          "source": "causal_lowpass_from_total_acceleration"
+        },
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5880338505845258,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5880338505845258
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.601139093984841,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.601139093984841
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6054597825495656,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6054597825495656
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6084294251827318,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6084294251827318
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5978006861057169,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5978006861057169
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5973841726676781,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5973841726676781
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.595088897316828,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.595088897316828
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014233433735154,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014233433735154
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.531265524627925,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.531265524627925
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6306130033107453,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6306130033107453
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6491051473329712,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6491051473329712
+        }
+      },
+      "prediction_file_sha256": "a68e67fcbf7b0129e6d719ccd1119a21cb7288a3c8765fb97dd8b92417b2047d",
+      "result_file_sha256": "f773bcba4f439589f990ce4bd777f02f967a750c53a29e58949e545b745cc3b6",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "gravity_preprocessing": {
+          "causal_lowpass_cutoff_hz": 0.3,
+          "source": "causal_lowpass_from_total_acceleration"
+        },
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "DeepConvLSTM-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.4962719194072171,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.4962719194072171
+        },
+        "TinyHAR-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5644003963255642,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5644003963255642
+        }
+      },
+      "prediction_file_sha256": "428bddf730f4352c463c637922fb1eafc36aee4bf27d39e5e5116fcb2d43b4cb",
+      "result_file_sha256": "27c8b92f4b31589556e2478227c79817d48952bffffadc0ed2e81c102501e0a2",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "participant_count": 22,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.532146323087643,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.532146323087643
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5389536900519469,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5389536900519469
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.552065861838336,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.552065861838336
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5463846429374454,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5463846429374454
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5490226222280791,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5490226222280791
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5641040919990187,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5641040919990187
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5410954255242189,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5410954255242189
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5446368129151289,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5446368129151289
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5410954255242189,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5410954255242189
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5505741286392857,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5505741286392857
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5142359714977843,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5142359714977843
+        }
+      },
+      "prediction_file_sha256": "6e4748bff94ab78c203f527425c3561fe9e3b52d08371be656b99ec5f5e40a69",
+      "result_file_sha256": "6eba498c0fe01155094f37db4ce981af127b253fe38cf3410029e61daa41ee57",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5880338505845258,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5880338505845258
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.601139093984841,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.601139093984841
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6054597825495656,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6054597825495656
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6084294251827318,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6084294251827318
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5978006861057169,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5978006861057169
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5973841726676781,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5973841726676781
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.595088897316828,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.595088897316828
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014233433735154,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014233433735154
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6014206118437283,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6014206118437283
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.531265524627925,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.531265524627925
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6306130033107453,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6306130033107453
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.6491051473329712,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.6491051473329712
+        }
+      },
+      "prediction_file_sha256": "76a0279363bc69ad9beab08176ead89991bb0bf259ffe4d1ab2c2d9ac1bd97c2",
+      "result_file_sha256": "e591cbdaf4a92aa67279e418fdbd993597bd2fcb917813116aafa45bee709e9a",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "DeepConvLSTM-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.4962719194072171,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.4962719194072171
+        },
+        "TinyHAR-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5644003963255642,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5644003963255642
+        }
+      },
+      "prediction_file_sha256": "b3f74f3dd66556fb604a522a20df5634d1752d658ff144227970d3efe7f61fb9",
+      "result_file_sha256": "e9bbf44f8cc5820960e095c9e4d5ab79bb84ed589ce0c902584735f9b6a92520",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "native-gravity-9ch",
+        "class_window_counts": {
+          "crutches": 4588,
+          "manual_wheelchair": 4580,
+          "stationary": 4558,
+          "walker": 4588,
+          "walking": 4695
+        },
+        "dataset_id": "har_pmd_v1",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "participant_count": 12,
+        "raw_local_mirror": false,
+        "receipt_count": 120,
+        "sampling_rate_hz": 50.0,
+        "session_count": 24,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 120,
+        "window_count": 23009,
+        "window_samples": 128
+      },
+      "evidence_status": "provisional",
+      "method_scores": {
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8720754904141966,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8720754904141966
+        },
+        "RandomForest-N9": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8352600621036664,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8352600621036664
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8929206671960591,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8929206671960591
+        },
+        "XGBoost-N9": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8562414405841504,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8562414405841504
+        }
+      },
+      "prediction_file_sha256": "e3b9e72ebf3955af4bca3645754337f0c43aaeb836202bc36287b142a343e57d",
+      "result_file_sha256": "f69517ad63127251bab6ff678e762110776fb35c32e21a88dab7d1c714bd21db",
+      "run_directory": "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_schema_fixed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 2379,
+          "sitting": 2064,
+          "standing": 2099
+        },
+        "dataset_id": "imu_har_il_v1",
+        "exclusion_count": 1,
+        "exclusions": [
+          {
+            "action": "participant excluded before windowing to retain complete core support",
+            "missing_folders": [
+              "HAR_IMU_IL/P_46/Repetition_1/Walk",
+              "HAR_IMU_IL/P_46/Repetition_1/Sit",
+              "HAR_IMU_IL/P_46/Repetition_1/Stand"
+            ],
+            "participant_id": "imuharil:P_46",
+            "reason": "missing Body-WT.csv in at least one requested core trial"
+          }
+        ],
+        "participant_count": 47,
+        "raw_local_mirror": false,
+        "receipt_count": 147,
+        "sampling_rate_hz": 50.0,
+        "session_count": 47,
+        "source_issue_count": 90,
+        "source_issues": [
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Walk/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Sit/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Stand/Body-WT.csv"
+          },
+          {
+            "action": "trial retained using the provider activity-folder label; all six required sensor channels were present",
+            "issue": "redundant Activity_label column absent",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Walk/Body-WT.csv"
+          }
+        ],
+        "trial_count": 141,
+        "window_count": 6542,
+        "window_samples": 128
+      },
+      "evidence_status": "provisional",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9404678313292146,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9404678313292146
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9475976792087852,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9475976792087852
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479345700186963,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479345700186963
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9474288864652753,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9474288864652753
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9474251985405564,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9474251985405564
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.947927824136721,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.947927824136721
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9481114487704123,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9481114487704123
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479738545867449,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479738545867449
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9481114487704123,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9481114487704123
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479345700186963,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479345700186963
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9209455024026793,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9209455024026793
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9059357253941299,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9059357253941299
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9194895297671617,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9194895297671617
+        }
+      },
+      "prediction_file_sha256": "d2ef1d697ff932d8df1c371e8d0f1b0d17c8e3ec9a27f31b52750781bbfe93f4",
+      "result_file_sha256": "768aa84050926c1c571d14aa8a73baff681b78c33ac71a859af1e39b24dbe367",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_audited_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 2379,
+          "sitting": 2064,
+          "standing": 2099
+        },
+        "dataset_id": "imu_har_il_v1",
+        "exclusion_count": 3,
+        "exclusions": [
+          {
+            "action": "participant excluded before windowing to retain complete core support",
+            "missing_folders": [
+              "HAR_IMU_IL/P_46/Repetition_1/Walk",
+              "HAR_IMU_IL/P_46/Repetition_1/Sit",
+              "HAR_IMU_IL/P_46/Repetition_1/Stand"
+            ],
+            "participant_id": "imuharil:P_46",
+            "reason": "missing Body-WT.csv in at least one requested core trial"
+          },
+          {
+            "action": "participant excluded before any of their trials were windowed",
+            "invalid_trials": [
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 4501
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 4501
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7620
+              }
+            ],
+            "participant_id": "imuharil:P_18",
+            "reason": "one or more requested core trials failed the pre-window data-quality gate"
+          },
+          {
+            "action": "participant excluded before any of their trials were windowed",
+            "invalid_trials": [
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7320
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 6521
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7260
+              }
+            ],
+            "participant_id": "imuharil:P_19",
+            "reason": "one or more requested core trials failed the pre-window data-quality gate"
+          }
+        ],
+        "participant_count": 47,
+        "raw_local_mirror": false,
+        "receipt_count": 147,
+        "sampling_rate_hz": 50.0,
+        "session_count": 47,
+        "source_issue_count": 90,
+        "source_issues": [
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          }
+        ],
+        "trial_count": 141,
+        "window_count": 6542,
+        "window_samples": 128
+      },
+      "evidence_status": "provisional",
+      "method_scores": {
+        "DeepConvLSTM-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8517796318121326,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8517796318121326
+        },
+        "TinyHAR-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.8805192950596326,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.8805192950596326
+        }
+      },
+      "prediction_file_sha256": "94ada21cc3d40439575e674b5ae073706ecd5a727b6db6dfd88705fccab654c5",
+      "result_file_sha256": "ece0736de583a6bb7d9a731bf59a79fd5f466447cd4ef6f21549930ffe28cdb8",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 2379,
+          "sitting": 2064,
+          "standing": 2099
+        },
+        "dataset_id": "imu_har_il_v1",
+        "exclusion_count": 3,
+        "exclusions": [
+          {
+            "action": "participant excluded before windowing to retain complete core support",
+            "missing_folders": [
+              "HAR_IMU_IL/P_46/Repetition_1/Walk",
+              "HAR_IMU_IL/P_46/Repetition_1/Sit",
+              "HAR_IMU_IL/P_46/Repetition_1/Stand"
+            ],
+            "participant_id": "imuharil:P_46",
+            "reason": "missing Body-WT.csv in at least one requested core trial"
+          },
+          {
+            "action": "participant excluded before any of their trials were windowed",
+            "invalid_trials": [
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 4501
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 4501
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7620
+              }
+            ],
+            "participant_id": "imuharil:P_18",
+            "reason": "one or more requested core trials failed the pre-window data-quality gate"
+          },
+          {
+            "action": "participant excluded before any of their trials were windowed",
+            "invalid_trials": [
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7320
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 6521
+              },
+              {
+                "finite_sensor_row_count": 0,
+                "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+                "reason": "no finite segment can produce one complete analysis window",
+                "row_count": 7260
+              }
+            ],
+            "participant_id": "imuharil:P_19",
+            "reason": "one or more requested core trials failed the pre-window data-quality gate"
+          }
+        ],
+        "participant_count": 47,
+        "raw_local_mirror": false,
+        "receipt_count": 147,
+        "sampling_rate_hz": 50.0,
+        "session_count": 47,
+        "source_issue_count": 90,
+        "source_issues": [
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_11/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_12/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_13/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_14/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_15/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_16/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_17/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_20/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_21/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_22/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_23/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_24/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_25/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_26/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_27/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_28/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_29/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_30/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_31/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_32/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_33/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_34/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_35/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_36/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_37/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_38/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_39/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Sit/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Stand/Body-WT.csv",
+            "observed_column": "Activity Label"
+          },
+          {
+            "action": "provider numeric label was validated against the activity folder",
+            "canonical_column": "Activity_label",
+            "issue": "activity-label column uses the documented schema variant",
+            "member": "HAR_IMU_IL/P_40/Repetition_1/Walk/Body-WT.csv",
+            "observed_column": "Activity Label"
+          }
+        ],
+        "trial_count": 141,
+        "window_count": 6542,
+        "window_samples": 128
+      },
+      "evidence_status": "provisional",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9404678313292146,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9404678313292146
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9475976792087852,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9475976792087852
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479345700186963,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479345700186963
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9474288864652753,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9474288864652753
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9474251985405564,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9474251985405564
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.947927824136721,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.947927824136721
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9481114487704123,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9481114487704123
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479738545867449,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479738545867449
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9481114487704123,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9481114487704123
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9479345700186963,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9479345700186963
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9209455024026793,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9209455024026793
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9059357253941299,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9059357253941299
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.9194895297671617,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.9194895297671617
+        }
+      },
+      "prediction_file_sha256": "2f55a9a6e905600f26388097c0e2c52857fcd997a3f2d2bbd045bde6b1bd11d6",
+      "result_file_sha256": "8895410a3a20e3d264c9d5fa1a7d9fb14705e940aa2f295220373f6f41006988",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11,
+        23,
+        47
+      ]
+    },
+    {
+      "all_available_score_reconstructions_match": true,
+      "dataset_summary": {
+        "channel_lane": "derived-gravity-9ch",
+        "class_window_counts": {
+          "mobility": 1154,
+          "sitting": 89,
+          "standing": 221
+        },
+        "dataset_id": "fog_star_v3",
+        "exclusion_count": 0,
+        "exclusions": [],
+        "participant_class_support": {
+          "mobility": 22,
+          "sitting": 17,
+          "standing": 20
+        },
+        "participant_count": 22,
+        "participants_with_all_classes": 16,
+        "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+        "raw_local_mirror": false,
+        "receipt_count": 1,
+        "sampling_rate_hz": 50.0,
+        "session_count": 31,
+        "source_issue_count": 0,
+        "source_issues": [],
+        "trial_count": 95,
+        "window_count": 1464,
+        "window_samples": 128
+      },
+      "evidence_status": "superseded",
+      "method_scores": {
+        "CAGE-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5132764898029242,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5132764898029242
+        },
+        "CTGR-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5361560053831583,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5361560053831583
+        },
+        "CTGR-DG-top3-equal": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5381424087666664,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5381424087666664
+        },
+        "HERA-DG-context-safe": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5305487988028091,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5305487988028091
+        },
+        "HERA-DG-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.532201137616359,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.532201137616359
+        },
+        "HERA-DG-strict": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5385440623231152,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5385440623231152
+        },
+        "HERA-DG-v2-core": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5386850820690156,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5386850820690156
+        },
+        "HERA-DG-v2-dual": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5467905883275107,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5467905883275107
+        },
+        "HERA-DG-v2-full": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5386850820690156,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5386850820690156
+        },
+        "HERA-DG-v2-weighted": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5381424087666664,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5381424087666664
+        },
+        "RMRP-DG": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5038230777425541,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5038230777425541
+        },
+        "RandomForest-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.534985315048902,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.534985315048902
+        },
+        "XGBoost-6ch": {
+          "absolute_difference": 0.0,
+          "recomputed_mean": 0.5409991215049583,
+          "reconstruction_status": "MATCH",
+          "retained_report_mean": 0.5409991215049583
+        }
+      },
+      "prediction_file_sha256": "79fb1aae11fc97c202f3b559f74f4c650d13800fc3550128b1a440a2b757122b",
+      "result_file_sha256": "0de1d0dc0b672b1aef479e7f6c9be58badbdbf0fd4342f9b5ebd7bdfef6f478b",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904",
+      "score_reconstruction_is_not_method_validity": true,
+      "seeds": [
+        11
+      ]
+    }
+  ],
+  "target_inclusivehar_raw_reopened": false
+}

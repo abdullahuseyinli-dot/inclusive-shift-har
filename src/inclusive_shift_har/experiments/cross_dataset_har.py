@@ -964,7 +964,10 @@ def evaluate_external_development(
             "outer_labels_used_before_prediction_freeze": False,
         },
     }
-    return result, ensemble
+    from inclusive_shift_har.evaluation.external_statistics import seed_evidence
+
+    result["primary_seed_averaged"], seed_predictions = seed_evidence(data, seed_probabilities)
+    return result, {**ensemble, **seed_predictions}
 
 
 def _write_json_create_only(path: Path, value: dict[str, Any]) -> None:
@@ -995,13 +998,23 @@ def _git_state(repository_root: Path) -> dict[str, Any]:
 def _source_input_manifest(repository_root: Path) -> dict[str, Any]:
     """Hash executable source and the declared external protocol at run start."""
 
+    if Path(__file__).resolve().parents[3] != repository_root.resolve():
+        raise ValueError(
+            "executed research package does not belong to the declared repository root"
+        )
     candidates = list((repository_root / "src").rglob("*.py"))
+    candidates.extend((repository_root / "configs").rglob("*.yaml"))
+    candidates.extend((repository_root / "configs").rglob("*.json"))
+    candidates.extend((repository_root / "docs/research").glob("*.md"))
     candidates.extend(
         repository_root / relative
         for relative in (
             "configs/datasets/external_har_portfolio_v1.yaml",
             "configs/experiments/cross_dataset_har_rnd_v1.yaml",
             "docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
+            "docs/research/EXTERNAL_HAR_PHYSICAL_GRID_V2_CORRECTION.md",
+            "configs/protocols/external_har_physical_grid_v2.yaml",
+            "configs/datasets/evidence_roles_20260905_v2.yaml",
             "pyproject.toml",
             "uv.lock",
             "requirements/external-har-research.in",
@@ -1014,6 +1027,7 @@ def _source_input_manifest(repository_root: Path) -> dict[str, Any]:
         if path.is_file()
     }
     return {
+        "protocol_id": "external-har-session-grid-v3",
         "file_count": len(files),
         "files": files,
         "manifest_sha256": canonical_json_sha256(files),

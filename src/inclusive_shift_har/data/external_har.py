@@ -13,7 +13,7 @@ import io
 import json
 import time
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from fractions import Fraction
 from pathlib import PurePosixPath
 from typing import Any, cast
@@ -34,6 +34,7 @@ StringArray = NDArray[np.str_]
 STANDARD_GRAVITY_M_S2 = 9.80665
 CORE_CLASS_NAMES = ("mobility", "sitting", "standing")
 CORE_CLASS_INDEX = {name: index for index, name in enumerate(CORE_CLASS_NAMES)}
+PHYSICAL_GRID_PROTOCOL = "external-har-session-grid-v3"
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,6 +80,7 @@ class ExternalHARWindows:
     class_names: tuple[str, ...] = CORE_CLASS_NAMES
     gravity_source: str = "unspecified"
     gravity_cutoff_hz: float | None = None
+    preprocessing_audit: tuple[dict[str, Any], ...] = ()
 
     def validate(self, *, require_all_classes: bool = True) -> None:
         """Fail closed on alignment, units, identifiers, or lane ambiguity."""
@@ -179,6 +181,7 @@ class ExternalHARWindows:
                 "source": self.gravity_source,
                 "causal_lowpass_cutoff_hz": self.gravity_cutoff_hz,
             },
+            "preprocessing_audit": list(self.preprocessing_audit),
             "raw_local_mirror": False,
         }
 
@@ -203,10 +206,92 @@ class _WindowAccumulator:
     sessions: list[str]
     trials: list[str]
     windows: list[str]
+    preprocessing_audit: list[dict[str, Any]] = field(default_factory=list)
+    exclusions: list[dict[str, Any]] = field(default_factory=list)
 
     @classmethod
     def empty(cls) -> _WindowAccumulator:
         return cls([], [], [], [], [], [], [])
+
+    def add_annotated_segment(
+        self,
+        segment: UniformPhysicalSegment,
+        *,
+        source_labels: FloatArray,
+        label_map: dict[int, int],
+        participant: str,
+        session: str,
+        trial: str,
+        run_index: int,
+    ) -> None:
+        """Assign labels and apply homogeneous admission to an already fixed grid.
+
+        Source samples in the complete half-open window time interval are checked
+        as well as projected annotations, so downsampling cannot hide a short
+        transition or a missing annotation. No rejected candidate shifts the grid.
+        """
+
+        if source_labels.shape != segment.source_timestamps.shape:
+            raise ValueError("annotations must align with the physical source segment")
+        source_indices = (
+            np.searchsorted(segment.source_timestamps, segment.timestamps, side="right") - 1
+        )
+        projected = source_labels[np.clip(source_indices, 0, source_labels.size - 1)]
+        admitted: list[int] = []
+        rejected: dict[str, list[int]] = {
+            "missing_or_unsupported_annotation": [],
+            "mixed_annotation": [],
+        }
+        for window_index, start in enumerate(segment.candidate_starts):
+            stop = int(start) + segment.window_samples
+            start_time = segment.timestamps[start]
+            stop_time = start_time + segment.window_samples / segment.target_rate_hz
+            left = max(
+                0, int(np.searchsorted(segment.source_timestamps, start_time, side="right")) - 1
+            )
+            right = int(np.searchsorted(segment.source_timestamps, stop_time, side="left"))
+            annotations = np.concatenate((projected[start:stop], source_labels[left:right]))
+            if not np.isfinite(annotations).all() or any(
+                value not in label_map for value in np.unique(annotations)
+            ):
+                rejected["missing_or_unsupported_annotation"].append(window_index)
+                continue
+            if np.any(annotations != annotations[0]):
+                rejected["mixed_annotation"].append(window_index)
+                continue
+            identifier = (
+                f"{participant}/{session}/{trial}/run-{run_index:04d}-finite-000/"
+                f"window-{window_index:06d}"
+            )
+            self.signals.append(np.asarray(segment.signals[start:stop], dtype=np.float32))
+            self.gravity.append(np.asarray(segment.gravity[start:stop], dtype=np.float32))
+            self.labels.append(label_map[int(annotations[0])])
+            self.participants.append(participant)
+            self.sessions.append(session)
+            self.trials.append(trial)
+            self.windows.append(identifier)
+            admitted.append(window_index)
+        audit = {
+            **segment.audit(),
+            "participant_id": participant,
+            "session_id": session,
+            "trial_id": trial,
+            "run_index": run_index,
+            "admitted_candidate_indices": admitted,
+            "excluded_candidate_indices": rejected,
+        }
+        self.preprocessing_audit.append(audit)
+        for reason, indices in rejected.items():
+            if indices:
+                self.exclusions.append(
+                    {
+                        "trial_id": trial,
+                        "run_index": run_index,
+                        "reason": reason,
+                        "candidate_indices": indices,
+                        "window_count": len(indices),
+                    }
+                )
 
     def add_uniform_trial(
         self,
@@ -310,10 +395,11 @@ class _WindowAccumulator:
             trial_ids=np.asarray(self.trials, dtype=np.str_),
             window_ids=np.asarray(self.windows, dtype=np.str_),
             receipts=tuple(receipts),
-            exclusions=(),
+            exclusions=tuple(self.exclusions),
             source_issues=(),
             gravity_source=gravity_source,
             gravity_cutoff_hz=gravity_cutoff_hz,
+            preprocessing_audit=tuple(self.preprocessing_audit),
         )
         result.validate(require_all_classes=require_all_classes)
         return result
@@ -355,11 +441,123 @@ def resample_uniform(
     array = np.asarray(values, dtype=np.float64)
     if array.ndim != 2 or array.shape[0] < 2 or not np.isfinite(array).all():
         raise ValueError("uniform resampling requires a finite [time,channel] sequence")
-    if min(source_rate_hz, target_rate_hz) <= 0.0:
+    if (
+        not np.isfinite([source_rate_hz, target_rate_hz]).all()
+        or min(source_rate_hz, target_rate_hz) <= 0.0
+    ):
         raise ValueError("resampling rates must be positive")
     ratio = Fraction(str(target_rate_hz / source_rate_hz)).limit_denominator(10_000)
     result = resample_poly(array, ratio.numerator, ratio.denominator, axis=0)
     return np.asarray(result, dtype=np.float64)
+
+
+def _array_sha256(values: NDArray[Any]) -> str:
+    """Hash shape, dtype and C-order bytes; retain no raw signal values in JSON."""
+
+    digest = hashlib.sha256()
+    digest.update(str((values.shape, values.dtype.str)).encode("ascii"))
+    digest.update(values.tobytes(order="C"))
+    return digest.hexdigest()
+
+
+@dataclass(frozen=True, slots=True)
+class UniformPhysicalSegment:
+    """Pre-annotation signal grid. This interface deliberately has no label field."""
+
+    signals: FloatArray
+    gravity: FloatArray
+    source_timestamps: FloatArray
+    timestamps: FloatArray
+    candidate_starts: IntArray
+    source_rate_hz: float
+    target_rate_hz: float
+    window_samples: int
+
+    def audit(self) -> dict[str, Any]:
+        return {
+            "protocol_id": PHYSICAL_GRID_PROTOCOL,
+            "source_samples": int(self.source_timestamps.size),
+            "resampled_samples": int(self.timestamps.size),
+            "source_rate_hz": self.source_rate_hz,
+            "target_rate_hz": self.target_rate_hz,
+            "window_samples": self.window_samples,
+            "candidate_start_samples": self.candidate_starts.tolist(),
+            "candidate_window_count": int(self.candidate_starts.size),
+            "dropped_tail_samples": int(self.timestamps.size % self.window_samples),
+            "start_timestamp": float(self.timestamps[0]),
+            "last_timestamp": float(self.timestamps[-1]),
+            "source_timestamps_sha256": _array_sha256(self.source_timestamps),
+            "timestamps_sha256": _array_sha256(self.timestamps),
+            "signals_sha256": _array_sha256(self.signals),
+            "gravity_sha256": _array_sha256(self.gravity),
+            "candidate_grid_sha256": _array_sha256(self.candidate_starts),
+            "resampling_passes": 1,
+            "annotation_dependency": False,
+        }
+
+
+def resample_physical_segment(
+    *,
+    timestamps: FloatArray,
+    acceleration: FloatArray,
+    gyroscope: FloatArray,
+    gravity: FloatArray | None,
+    source_rate_hz: float,
+    target_rate_hz: float,
+    gravity_cutoff_hz: float,
+    window_samples: int,
+) -> UniformPhysicalSegment:
+    """Filter one finite observable segment and resample its nine channels once.
+
+    Uniform sampling is provider-declared. Polyphase resampling is an offline,
+    symmetric FIR operation, not a zero-lookahead streaming implementation. Its
+    boundaries and padding depend only on the physical segment, never annotations.
+    When gravity is supplied, acceleration already denotes linear acceleration.
+    """
+
+    if (
+        timestamps.ndim != 1
+        or timestamps.size < 3
+        or acceleration.shape != (timestamps.size, 3)
+        or gyroscope.shape != acceleration.shape
+        or not np.isfinite(timestamps).all()
+        or np.any(np.diff(timestamps) <= 0.0)
+        or not np.isfinite(acceleration).all()
+        or not np.isfinite(gyroscope).all()
+        or window_samples < 1
+    ):
+        raise ValueError("physical resampling requires aligned finite monotonic sensor data")
+    derived = (
+        causal_gravity_lowpass(
+            acceleration, sampling_rate_hz=source_rate_hz, cutoff_hz=gravity_cutoff_hz
+        )
+        if gravity is None
+        else np.asarray(gravity, dtype=np.float64)
+    )
+    if derived.shape != acceleration.shape or not np.isfinite(derived).all():
+        raise ValueError("physical gravity must align with the sensor segment")
+    linear = acceleration - derived if gravity is None else acceleration
+    resampled = resample_uniform(
+        np.column_stack((linear, gyroscope, derived)),
+        source_rate_hz=source_rate_hz,
+        target_rate_hz=target_rate_hz,
+    )
+    grid = timestamps[0] + np.arange(resampled.shape[0], dtype=np.float64) / target_rate_hz
+    # A source sample represents one nominal sample interval. Never extrapolate
+    # annotations beyond the final interval, even if rounded rates/jitter disagree.
+    in_recording = grid < timestamps[-1] + 1.0 / source_rate_hz
+    grid, resampled = grid[in_recording], resampled[in_recording]
+    count = grid.size // window_samples
+    return UniformPhysicalSegment(
+        signals=np.asarray(resampled[:, :6], dtype=np.float64),
+        gravity=np.asarray(resampled[:, 6:], dtype=np.float64),
+        source_timestamps=timestamps.copy(),
+        timestamps=grid,
+        candidate_starts=np.arange(count, dtype=np.int64) * window_samples,
+        source_rate_hz=source_rate_hz,
+        target_rate_hz=target_rate_hz,
+        window_samples=window_samples,
+    )
 
 
 def participant_fold_assignment(
@@ -418,6 +616,7 @@ def concatenate_external_windows(
         class_names=datasets[0].class_names,
         gravity_source=datasets[0].gravity_source,
         gravity_cutoff_hz=datasets[0].gravity_cutoff_hz,
+        preprocessing_audit=tuple(audit for item in datasets for audit in item.preprocessing_audit),
     )
     result.validate()
     return result
@@ -576,7 +775,6 @@ def load_fog_star(
         "activity",
         "subjectID",
         "sessionID",
-        "taskID",
     ]
     frame = pd.read_csv(io.BytesIO(payload), usecols=columns)
     participants = sorted(frame["subjectID"].dropna().astype(int).unique().tolist())
@@ -587,9 +785,11 @@ def load_fog_star(
     selected = frame[frame["subjectID"].isin(participants)]
     label_map = {1: 0, 2: 1, 3: 2, 6: 0, 7: 0}
     accumulator = _WindowAccumulator.empty()
-    grouping = ["subjectID", "sessionID", "taskID"]
+    # taskID is an annotated task code, not a verified acquisition-start event.
+    # Even changing or removing it must not change the signal/grid construction.
+    grouping = ["subjectID", "sessionID"]
     for keys, trial_frame in selected.groupby(grouping, sort=True, dropna=False):
-        subject, session_value, task_value = cast(tuple[Any, Any, Any], keys)
+        subject, session_value = cast(tuple[Any, Any], keys)
         timestamps = trial_frame["timestamp"].to_numpy(dtype=np.float64)
         activities = trial_frame["activity"].to_numpy(dtype=np.float64)
         total = (
@@ -603,7 +803,7 @@ def load_fog_star(
         )
         participant = f"fogstar:{int(subject):03d}"
         session = f"{participant}:session-{int(session_value):03d}"
-        trial = f"{session}:task-{int(task_value):03d}"
+        trial = f"{session}:recording"
         physical_runs = _contiguous_signal_runs(
             timestamps,
             total,
@@ -611,45 +811,45 @@ def load_fog_star(
             nominal_rate_hz=60.0,
             maximum_gap_factor=maximum_gap_factor,
         )
-        run_index = 0
-        for physical_start, physical_stop in physical_runs:
-            physical_total = total[physical_start:physical_stop]
-            physical_gravity = causal_gravity_lowpass(
-                physical_total,
-                sampling_rate_hz=60.0,
-                cutoff_hz=gravity_cutoff_hz,
+        omitted_rows = timestamps.size - sum(stop - start for start, stop in physical_runs)
+        if omitted_rows:
+            accumulator.exclusions.append(
+                {
+                    "trial_id": trial,
+                    "reason": "nonfinite_sensor_or_timestamp",
+                    "source_rows": omitted_rows,
+                }
             )
-            physical_linear = physical_total - physical_gravity
-            physical_timestamps = timestamps[physical_start:physical_stop]
-            physical_activities = np.where(
-                np.isfinite(activities[physical_start:physical_stop]),
-                activities[physical_start:physical_stop],
-                -1_000_000,
-            ).astype(np.int64)
-            label_runs = _contiguous_label_runs(
-                physical_timestamps,
-                physical_activities,
-                nominal_rate_hz=60.0,
-                maximum_gap_factor=maximum_gap_factor,
+        for run_index, (physical_start, physical_stop) in enumerate(physical_runs):
+            if physical_stop - physical_start < 3:
+                accumulator.exclusions.append(
+                    {
+                        "trial_id": trial,
+                        "run_index": run_index,
+                        "reason": "short_physical_segment",
+                        "source_rows": physical_stop - physical_start,
+                    }
+                )
+                continue
+            segment = resample_physical_segment(
+                timestamps=timestamps[physical_start:physical_stop],
+                acceleration=total[physical_start:physical_stop],
+                gyroscope=gyro[physical_start:physical_stop],
+                gravity=None,
+                source_rate_hz=60.0,
+                target_rate_hz=target_rate_hz,
+                gravity_cutoff_hz=gravity_cutoff_hz,
+                window_samples=window_samples,
             )
-            for label_start, label_stop in label_runs:
-                activity = int(physical_activities[label_start])
-                if activity in label_map:
-                    accumulator.add_uniform_trial(
-                        total_acceleration=physical_linear[label_start:label_stop],
-                        gyroscope=gyro[physical_start + label_start : physical_start + label_stop],
-                        gravity=physical_gravity[label_start:label_stop],
-                        source_rate_hz=60.0,
-                        target_rate_hz=target_rate_hz,
-                        gravity_cutoff_hz=gravity_cutoff_hz,
-                        label=label_map[activity],
-                        participant=participant,
-                        session=session,
-                        trial=trial,
-                        run_index=run_index,
-                        window_samples=window_samples,
-                    )
-                run_index += 1
+            accumulator.add_annotated_segment(
+                segment,
+                source_labels=activities[physical_start:physical_stop],
+                label_map=label_map,
+                participant=participant,
+                session=session,
+                trial=trial,
+                run_index=run_index,
+            )
     return accumulator.finish(
         dataset_id=dataset_id,
         channel_lane="derived-gravity-9ch",

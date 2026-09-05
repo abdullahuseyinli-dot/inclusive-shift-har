@@ -16,7 +16,7 @@ import re
 import subprocess
 import sys
 import tomllib
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -146,6 +146,7 @@ TEXT_SUFFIXES = {
     ".csv",
     ".gitignore",
     ".gitleaksignore",
+    ".in",
     ".json",
     ".lock",
     ".md",
@@ -153,6 +154,7 @@ TEXT_SUFFIXES = {
     ".toml",
     ".txt",
     ".typed",
+    ".xml",
     ".yaml",
     ".yml",
 }
@@ -1711,6 +1713,59 @@ def _blob_payload(root: Path, object_id: str, *, expected_size: int) -> bytes:
     return result.stdout
 
 
+def _blob_payloads(root: Path, expected_sizes: Mapping[str, int]) -> Iterator[tuple[str, bytes]]:
+    """Read already-admitted Git objects in bounded batches, checking every object ID.
+
+    Path, extension and size admission remain the callers' responsibility. No
+    worktree/raw paths are opened. Batching avoids thousands of Windows process
+    launches without altering payload inspection or alias/path-specific checks.
+    """
+
+    def read_batch(batch: list[tuple[str, int]]) -> Iterator[tuple[str, bytes]]:
+        response = subprocess.run(
+            ["git", "--no-replace-objects", "cat-file", "--batch"],
+            cwd=root,
+            input="".join(f"{object_id}\n" for object_id, _ in batch).encode("ascii"),
+            capture_output=True,
+            check=False,
+        )
+        if response.returncode:
+            raise ReleaseGateError("batched Git object read failed")
+        offset = 0
+        for object_id, size in batch:
+            end = response.stdout.find(b"\n", offset)
+            expected = f"{object_id} blob {size}".encode("ascii")
+            if end < 0 or response.stdout[offset:end] != expected:
+                raise ReleaseGateError("batched Git object identity/type/size mismatch")
+            payload = response.stdout[end + 1 : end + 1 + size]
+            offset = end + 1 + size
+            if len(payload) != size or response.stdout[offset : offset + 1] != b"\n":
+                raise ReleaseGateError("batched Git object payload is truncated")
+            digest = hashlib.sha1(
+                f"blob {size}\0".encode("ascii") + payload, usedforsecurity=False
+            ).hexdigest()
+            if digest != object_id:
+                raise ReleaseGateError("batched Git object payload hash mismatch")
+            offset += 1
+            yield object_id, payload
+        if offset != len(response.stdout):
+            raise ReleaseGateError("batched Git object response has trailing content")
+
+    batch: list[tuple[str, int]] = []
+    batch_bytes = 0
+    for object_id, size in sorted(expected_sizes.items()):
+        _commit(object_id, name="blob object ID")
+        if size < 0:
+            raise ReleaseGateError("negative Git blob size")
+        if batch and (batch_bytes + size > 32 * 1024 * 1024 or len(batch) >= 128):
+            yield from read_batch(batch)
+            batch, batch_bytes = [], 0
+        batch.append((object_id, size))
+        batch_bytes += size
+    if batch:
+        yield from read_batch(batch)
+
+
 def _blob_content_violations(
     payload: bytes,
     *,
@@ -1928,28 +1983,24 @@ def scan_index(
         if not prohibited_path and not prohibited_suffix and size <= maximum:
             inspection_targets.add((object_id, path))
 
+    paths_by_object: dict[str, list[str]] = {}
     for object_id, path in sorted(inspection_targets):
-        size = next(
-            entry_size
-            for _mode, entry_object_id, stage, entry_path, _kind, entry_size in entries
-            if entry_object_id == object_id and stage == 0 and entry_path == path
-        )
-        assert size is not None
-        payload = _blob_payload(root, object_id, expected_size=size)
-        for code, detail in _blob_content_violations(
-            payload,
-            path=path,
-            signatures=signatures,
-            allowed_signatures=allowed_signatures,
-            allowed_binary_suffixes=allowed_binary_suffixes,
-        ):
-            violations.append(
-                {
-                    "code": code,
-                    "path": path,
-                    "detail": detail,
-                }
-            )
+        paths_by_object.setdefault(object_id, []).append(path)
+    sizes = {
+        object_id: size
+        for _mode, object_id, _stage, _path, _kind, size in entries
+        if object_id in paths_by_object and size is not None
+    }
+    for object_id, payload in _blob_payloads(root, sizes):
+        for path in paths_by_object[object_id]:
+            for code, detail in _blob_content_violations(
+                payload,
+                path=path,
+                signatures=signatures,
+                allowed_signatures=allowed_signatures,
+                allowed_binary_suffixes=allowed_binary_suffixes,
+            ):
+                violations.append({"code": code, "path": path, "detail": detail})
 
     unique_violations = sorted(
         {(item["code"], item["path"], item["detail"]): item for item in violations}.values(),
@@ -2123,24 +2174,22 @@ def scan_repository(
             if prohibited_path or prohibited_suffix or size > maximum:
                 continue
             inspection_targets.setdefault((object_id, path), revision)
+    paths_by_object: dict[str, list[tuple[str, str]]] = {}
     for (object_id, path), revision in sorted(inspection_targets.items()):
-        size = objects[object_id][0]
-        payload = _blob_payload(root, object_id, expected_size=size)
-        for code, detail in _blob_content_violations(
-            payload,
-            path=path,
-            signatures=signatures,
-            allowed_signatures=allowed_signatures,
-            allowed_binary_suffixes=allowed_binary_suffixes,
-        ):
-            violations.append(
-                {
-                    "code": code,
-                    "commit": revision,
-                    "path": path,
-                    "detail": detail,
-                }
-            )
+        paths_by_object.setdefault(object_id, []).append((path, revision))
+    sizes = {object_id: objects[object_id][0] for object_id in paths_by_object}
+    for object_id, payload in _blob_payloads(root, sizes):
+        for path, revision in paths_by_object[object_id]:
+            for code, detail in _blob_content_violations(
+                payload,
+                path=path,
+                signatures=signatures,
+                allowed_signatures=allowed_signatures,
+                allowed_binary_suffixes=allowed_binary_suffixes,
+            ):
+                violations.append(
+                    {"code": code, "commit": revision, "path": path, "detail": detail}
+                )
     # Deduplicate violations caused by the same path/object recurring unchanged in history.
     unique_violations = sorted(
         {(item["code"], item["path"], item["detail"]): item for item in violations}.values(),
@@ -2344,6 +2393,10 @@ def audit_licenses(
         name = _text(package.get("Name"), name=f"license inventory[{index}].Name")
         version = _text(package.get("Version"), name=f"license inventory[{index}].Version")
         license_name = _text(package.get("License"), name=f"license inventory[{index}].License")
+        # Distribution metadata can contain a multiline license (e.g. aeon).
+        # Retain the original inventory hash and all words; only normalize
+        # whitespace for the single-line canonical package record.
+        license_name = " ".join(license_name.split())
         identity = f"{name}@{version}".casefold()
         normalized_packages.append(
             {"identity": identity, "package": name, "version": version, "license": license_name}

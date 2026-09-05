@@ -1,0 +1,352 @@
+{
+  "access_agreements_accepted": false,
+  "created_at_utc": "2026-09-05T02:37:25.736860+00:00",
+  "datasets": {
+    "daghar_v2": {
+      "access_rule": "retained artifact audit only; no untouched-cohort claim",
+      "evidence_reference": "configs/experiments/daghar_external_evaluation_v1.yaml",
+      "ontology": "mapped walking/sitting/standing core",
+      "participants": "consumed provider holdout; exact per-domain N in retained evaluation",
+      "preprocessing": "provider prewindowed 60-sample signals; upstream boundary provenance limited",
+      "role": "replication",
+      "verified_manifest_metadata": {
+        "artifacts": [
+          {
+            "artifact_id": "daghar_v2_standardized_view_zip",
+            "download_url": "https://zenodo.org/api/records/13987073/files/standardized_view.zip/content",
+            "expected_sha256": "e018334c57c4fed0913591e68c3007e85b13767a37b2db3ae0d79978363831e8",
+            "expected_size_bytes": 191454525,
+            "git_policy": "exclude_raw_from_git",
+            "hash_provenance": "locally_observed_official_https",
+            "media_type": "application/zip",
+            "provider_filename": "standardized_view.zip",
+            "provider_md5": "385837c498b3fd2a8b72785c6b2946c6",
+            "role": "external_domain_generalization_proxy",
+            "storage_path": "external/daghar/v2/standardized_view.zip"
+          }
+        ],
+        "license": {
+          "notices": [
+            {
+              "identifier": "CC-BY-4.0",
+              "name": "Creative Commons Attribution 4.0 International",
+              "source": "Zenodo DAGHAR version 2 record",
+              "url": "https://creativecommons.org/licenses/by/4.0/"
+            }
+          ],
+          "redistribution_policy": "do_not_redistribute_raw",
+          "status": "clear"
+        },
+        "manifest_path": "manifests/datasets/daghar_v2.json",
+        "manifest_sha256": "e511fcdda1cd7a1e3c028f3e95c49798383384b73ca9e8cdc008ede98e200649",
+        "provenance": {
+          "metadata_endpoint": "https://zenodo.org/api/records/13987073",
+          "metadata_verified_date": "2026-09-03",
+          "official_repository_commit": "5dd56f647c44f1de12f22f224c31fe0f71609675",
+          "official_repository_url": "https://github.com/H-IAAC/DAGHAR",
+          "retrieval_transport": "official_zenodo_https",
+          "retrieved_at_utc": "2026-09-03T19:21:58.6902203Z"
+        },
+        "raw_or_target_data_reopened": false,
+        "release": {
+          "doi": "10.5281/zenodo.13987073",
+          "landing_url": "https://zenodo.org/records/13987073",
+          "published_date": "2024-10-24",
+          "version": "2"
+        }
+      }
+    },
+    "fog_star_v3": {
+      "accessed_on": "2026-09-05",
+      "bias": "Parkinson disease, elicitation tasks, class imbalance and missing participant classes; architecture-development consumed",
+      "channels": "six inertial; separately named derived gravity",
+      "license": "CC-BY-4.0",
+      "ontology": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "participants": 22,
+      "placement": "back IMU",
+      "provider_timebase_limitation": "Reconstructed nominal time; raw acquisition continuity unavailable for independent audit.",
+      "record_url": "https://zenodo.org/records/17838806",
+      "redistribution": "attribution required; no raw data in Git",
+      "role": "development",
+      "sensor_data_sha256": "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477",
+      "sessions": "Session identifiers, timestamp gaps and finite sensor runs only. taskID is an annotation and is ignored by v3 preprocessing.",
+      "version": "v3"
+    },
+    "har_pmd_v1": {
+      "accessed_on": "2026-09-05",
+      "archive_md5": "cdc7b79aaa0450d68d94f430f2a2de63",
+      "bias": "simulated aid use; still merges sitting/standing; no clinical ability or posture validation",
+      "channels": "6ch and provider-native9ch separate lanes",
+      "license": "CC-BY-4.0",
+      "ontology": [
+        "stationary",
+        "walking",
+        "crutches",
+        "walker",
+        "manual_wheelchair"
+      ],
+      "participants": "120 reported; 1-12 already consumed as pilot",
+      "placement": "smartphone; heterogeneous Android devices",
+      "record_url": "https://zenodo.org/records/7939223",
+      "redistribution": "attribution required; no raw data in Git",
+      "role": "stress_test",
+      "sessions": "indoor/outdoor activity files",
+      "version": "provider v2; legacy internal identifier har_pmd_v1 retained"
+    },
+    "imu_har_il_v1": {
+      "accessed_on": "2026-09-05 metadata audit; run-specific file access timestamps recorded separately",
+      "bias": "scripted activity files and repeated observations; no participant-N inflation",
+      "channels": "six inertial; separately named derived gravity",
+      "complete_case_limit": "The all-repetition runner requires complete usable Walk/Sit/Stand files for all four repetitions; voluntary missing repetitions can exclude participants. Report all exclusions and do not interpret repetitions as independent N.",
+      "license": "CC-BY-NC-4.0",
+      "license_provider_text": "Creative Commons Attribution-Noncommercial 4.0 Licence",
+      "metadata_receipt": {
+        "accessed_at_utc": "2026-09-05T02:37:23.891743+00:00",
+        "bytes": 4918,
+        "http_status": 200,
+        "sha256": "c0290bee10e7a53c312250dfb9ccb03661403403b1f6c94ed9317fb21e6817a6",
+        "url": "https://data.csiro.au/dap/ws/v2/collections/74700"
+      },
+      "ontology": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "participants": "50 reported; eligibility determined from measured source audit",
+      "placement": "Body-WT waist IMU",
+      "provider_rights": "All Rights (including copyright) CSIRO 2026.",
+      "provider_version_fields": {
+        "access": "The metadata and files (if any) are available to the public.",
+        "dataRestricted": "FALSE",
+        "dataVersionNumber": 1,
+        "latestVersion": 3,
+        "metadata": "https://data.csiro.au/dap/ws/v2/collections/74700/metadata",
+        "versionNumber": 1
+      },
+      "record_url": "https://data.csiro.au/collection/csiro:74700",
+      "redistribution": "noncommercial restrictions apply to data and derived artifacts; Apache code license does not relicense them",
+      "role": "development",
+      "sessions": "one collection visit; four repetitions reuse participants",
+      "version": "CSIRO collection 74700, DOI 10.25919/d7xf-n080"
+    },
+    "inclusivehar_v4_source": {
+      "bias": "released subject-label blocks, hidden joins and group-associated activity realization",
+      "channels": "six primary, native gravity sensitivity separately",
+      "license_reference": "manifests/datasets",
+      "ontology": "functional-core and inclusive-native are separate locked endpoints",
+      "participants": "P1-P10; development-consumed",
+      "placement": "smartphone; released signal interface",
+      "role": "development",
+      "sessions": "unrecoverable",
+      "verified_manifest_metadata": {
+        "artifacts": [
+          {
+            "artifact_id": "inclusivehar_v4_sensor_csv",
+            "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/6be7ec3b-a21a-4288-8e09-18f1f238ddf2/file_downloaded",
+            "expected_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+            "expected_size_bytes": 148915541,
+            "git_policy": "exclude_raw_from_git",
+            "hash_provenance": "provider_sha256",
+            "media_type": "text/csv",
+            "provider_filename": "InclusiveHAR_dataset_v2 (1).csv",
+            "role": "raw_sensor_table",
+            "storage_path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+          },
+          {
+            "artifact_id": "inclusivehar_v4_disability_description_docx",
+            "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/ee96cd50-8214-4ecd-83ff-0da10c862849/file_downloaded",
+            "expected_sha256": "b8c033dd630412103b8dd463c8a171aa4727fc7222ba6b7fdc1e2487315e0dfb",
+            "expected_size_bytes": 16997,
+            "git_policy": "exclude_raw_from_git",
+            "hash_provenance": "provider_sha256",
+            "media_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "provider_filename": "Description of individuals with disabilities.docx",
+            "role": "sensitive_participant_metadata",
+            "storage_path": "inclusivehar/v4/Description of individuals with disabilities.docx"
+          }
+        ],
+        "license": {
+          "notices": [
+            {
+              "identifier": "CC-BY-4.0",
+              "name": "Creative Commons Attribution 4.0 International",
+              "source": "Mendeley Data version 4 record",
+              "url": "https://creativecommons.org/licenses/by/4.0/"
+            }
+          ],
+          "redistribution_policy": "do_not_redistribute_raw",
+          "status": "clear"
+        },
+        "manifest_path": "manifests/datasets/inclusivehar_v4.json",
+        "manifest_sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29",
+        "provenance": {
+          "metadata_endpoint": "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=4",
+          "metadata_verified_date": "2026-08-23",
+          "official_repository_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4"
+        },
+        "raw_or_target_data_reopened": false,
+        "release": {
+          "doi": "10.17632/r78dn3f6nc.4",
+          "landing_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4",
+          "published_date": "2026-02-18",
+          "version": "4"
+        }
+      },
+      "version_hash_reference": "results/protocol/protocol_lock_v1_2.json"
+    },
+    "inclusivehar_v4_target": {
+      "access_rule": "Do not reopen raw target signals or run target inference. Audit retained results only.",
+      "evidence_reference": "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json",
+      "participants": "P11-P20; opening 1 consumed, unavailable for tuning or new confirmation",
+      "role": "replication",
+      "verified_manifest_metadata": {
+        "artifacts": [
+          {
+            "artifact_id": "inclusivehar_v4_sensor_csv",
+            "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/6be7ec3b-a21a-4288-8e09-18f1f238ddf2/file_downloaded",
+            "expected_sha256": "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34",
+            "expected_size_bytes": 148915541,
+            "git_policy": "exclude_raw_from_git",
+            "hash_provenance": "provider_sha256",
+            "media_type": "text/csv",
+            "provider_filename": "InclusiveHAR_dataset_v2 (1).csv",
+            "role": "raw_sensor_table",
+            "storage_path": "inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv"
+          },
+          {
+            "artifact_id": "inclusivehar_v4_disability_description_docx",
+            "download_url": "https://data.mendeley.com/public-files/datasets/r78dn3f6nc/files/ee96cd50-8214-4ecd-83ff-0da10c862849/file_downloaded",
+            "expected_sha256": "b8c033dd630412103b8dd463c8a171aa4727fc7222ba6b7fdc1e2487315e0dfb",
+            "expected_size_bytes": 16997,
+            "git_policy": "exclude_raw_from_git",
+            "hash_provenance": "provider_sha256",
+            "media_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "provider_filename": "Description of individuals with disabilities.docx",
+            "role": "sensitive_participant_metadata",
+            "storage_path": "inclusivehar/v4/Description of individuals with disabilities.docx"
+          }
+        ],
+        "license": {
+          "notices": [
+            {
+              "identifier": "CC-BY-4.0",
+              "name": "Creative Commons Attribution 4.0 International",
+              "source": "Mendeley Data version 4 record",
+              "url": "https://creativecommons.org/licenses/by/4.0/"
+            }
+          ],
+          "redistribution_policy": "do_not_redistribute_raw",
+          "status": "clear"
+        },
+        "manifest_path": "manifests/datasets/inclusivehar_v4.json",
+        "manifest_sha256": "52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29",
+        "provenance": {
+          "metadata_endpoint": "https://data.mendeley.com/public-api/datasets/r78dn3f6nc/files?folder_id=root&version=4",
+          "metadata_verified_date": "2026-08-23",
+          "official_repository_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4"
+        },
+        "raw_or_target_data_reopened": false,
+        "release": {
+          "doi": "10.17632/r78dn3f6nc.4",
+          "landing_url": "https://data.mendeley.com/datasets/r78dn3f6nc/4",
+          "published_date": "2026-02-18",
+          "version": "4"
+        }
+      }
+    },
+    "parkinson_at_home": {
+      "access": "BLOCKED_NO_AUTHORIZED_ACCESS",
+      "descriptor_url": "https://www.jmir.org/2020/10/e19068",
+      "hashes": null,
+      "license": "steward approval and data terms unavailable",
+      "redistribution": "not authorized",
+      "role": "sealed_confirmation"
+    },
+    "sole_harmony_v1": {
+      "accessed_on": "2026-09-05 metadata audit",
+      "bias": "healthy young adults, sitting dominance, camera-label boundaries are oracle information",
+      "channels": "linear acceleration, gyro, provider raw-minus-linear derived gravity",
+      "coverage_audit": "Public central-directory inventory exposes at least two session files for all 13 participants; full session read/parse and experimental completion not yet established.",
+      "license": "CC-BY-4.0",
+      "ontology": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "participants": "13 reported; retained run covers only one participant/session",
+      "placement": "right insole",
+      "record_url": "https://zenodo.org/records/19242395",
+      "redistribution": "attribution required; no raw data in Git",
+      "role": "oracle_diagnostic",
+      "sessions": "five per participant reported; required temporal gate is >=12 participants with >=2 sessions"
+    },
+    "wear_gait_pd": {
+      "access": "BLOCKED_NO_AUTHORIZED_ACCESS",
+      "hashes": null,
+      "license": "not accepted or inferred; authorized terms required",
+      "record_url": "https://www.synapse.org/Synapse:syn52540892",
+      "redistribution": "not authorized",
+      "role": "sealed_confirmation",
+      "rule": "No agreement acceptance, impersonation, credential discovery, or access bypass. Freeze all method choices before any prospective opening."
+    }
+  },
+  "fresh_primary_source_receipts": {
+    "benchhar_license": {
+      "accessed_at_utc": "2026-09-05T02:37:25.730885+00:00",
+      "bytes": 140,
+      "http_status": 404,
+      "interpretation": "license unavailable; no code reuse authorized",
+      "license_metadata": null,
+      "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1",
+      "url": "https://api.github.com/repos/saiketa/HAR-Bench/license"
+    },
+    "harood_license": {
+      "accessed_at_utc": "2026-09-05T02:37:25.233771+00:00",
+      "bytes": 140,
+      "http_status": 404,
+      "interpretation": "license unavailable; no code reuse authorized",
+      "license_metadata": null,
+      "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1",
+      "url": "https://api.github.com/repos/AIFrontierLab/HAROOD/license"
+    },
+    "imu_har_il": {
+      "accessed_at_utc": "2026-09-05T02:37:23.891743+00:00",
+      "bytes": 4918,
+      "http_status": 200,
+      "sha256": "c0290bee10e7a53c312250dfb9ccb03661403403b1f6c94ed9317fb21e6817a6",
+      "url": "https://data.csiro.au/dap/ws/v2/collections/74700"
+    },
+    "tinierhar_license": {
+      "accessed_at_utc": "2026-09-05T02:37:24.395359+00:00",
+      "bytes": 140,
+      "http_status": 404,
+      "interpretation": "license unavailable; no code reuse authorized",
+      "license_metadata": null,
+      "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1",
+      "url": "https://api.github.com/repos/zhaxidele/TinierHAR/license"
+    },
+    "tinyhar_license": {
+      "accessed_at_utc": "2026-09-05T02:37:24.767678+00:00",
+      "bytes": 140,
+      "http_status": 404,
+      "interpretation": "license unavailable; no code reuse authorized",
+      "license_metadata": null,
+      "sha256": "6c0109c2ac75f1f264b61da6aff1737f7bc7eac254e6396710ff81a4139f32b1",
+      "url": "https://api.github.com/repos/teco-kit/ISWC22-HAR/license"
+    }
+  },
+  "immutable_evidence_roles_unchanged": true,
+  "metadata_correction": "CSIRO metadata is a URL string, not a dict. The earlier local parser failure was not an external access denial. Public API confirms dataset CC BY-NC 4.0.",
+  "prior_metadata_parser_failure_preserved": ".audit/physical_grid_v2/source_metadata_20260905/metadata_audit.json",
+  "protocol_id": "external-har-session-grid-v3",
+  "raw_third_party_data_committed": false,
+  "record_sha256": "e0b4378aa10f421cf849db2513bbb860973790dff81cfde735a49ec32200122c",
+  "role_ledger_path": "configs/datasets/evidence_roles_20260905_v2.yaml",
+  "role_ledger_sha256": "4ed27e159c73c9cde60bd7c4ea59e3105b0fbcea71b053a93cc144a43d7231af",
+  "schema_version": "1.0.0",
+  "source_code_reuse_from_inspected_repositories": false
+}

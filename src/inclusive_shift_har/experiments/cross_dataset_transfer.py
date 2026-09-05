@@ -601,7 +601,12 @@ def evaluate_zero_shot_transfer(
             "wear_gait_opened": False,
         },
     }
-    return result, ensemble
+    from inclusive_shift_har.evaluation.external_statistics import seed_evidence
+
+    result["primary_seed_averaged"], seed_predictions = seed_evidence(
+        target, per_seed, primary_contrast_eligible=False
+    )
+    return result, {**ensemble, **seed_predictions}
 
 
 def run_and_write_transfer(

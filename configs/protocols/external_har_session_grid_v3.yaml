@@ -1,0 +1,24 @@
+schema_version: "3.0.0"
+protocol_id: "external-har-session-grid-v3"
+declared_at_utc: "2026-09-05T02:31:27Z"
+status: "frozen_validity_amendment_before_replacement_outcomes"
+inherits: "configs/protocols/external_har_physical_grid_v2.yaml"
+reason: "Provider task segments are annotations, not verified physical acquisition starts."
+fog_overrides:
+  observable_segments: [participant, session, timestamp_gap, nonfinite_sensor_run]
+  ignored_annotations_for_signal_processing: [activity, taskID, fog, severity]
+  task_id_may_define_segments: false
+  retained_timestamp_order: "provider row order within recording session"
+  provider_timebase_limitation: "Nominal reconstructed time; acquisition continuity beyond released timestamps cannot be independently established."
+  independence_claim: "repository signal pipeline independent of all task/activity annotations"
+  streaming_deployment_claim: false
+inherited_unchanged:
+  - model_parameters
+  - folds_and_seeds
+  - primary_estimand_and_contrast
+  - label_homogeneity_admission
+  - resampling_and_gravity_parameters
+  - evidence_roles_and_promotion_gate
+supersedes: [external-har-v1, external-har-physical-grid-v2]
+v2_replacement_experiments_launched: false
+historical_results_deleted: false

@@ -198,7 +198,11 @@ def evaluate_temporal_lane(
             "shuffled_control_is_independent_inference": False,
         },
     }
-    return result, outputs
+    # Preserve the predictions supporting the nested base reports as well.
+    return result, {
+        **outputs,
+        **{f"base__{name}": values for name, values in base_predictions.items()},
+    }
 
 
 def run_and_write(

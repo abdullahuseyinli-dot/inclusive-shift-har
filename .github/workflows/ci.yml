@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 'research/**'
   pull_request:
   workflow_dispatch:
 
@@ -24,7 +25,7 @@ jobs:
   synthetic-validation:
     name: Synthetic validation (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -62,24 +63,35 @@ jobs:
           UV_FROZEN: "false"
         run: uv sync --locked --extra training-cpu --group research
 
-      - name: Run synthetic tests
-        run: uv run pytest -q
+      - name: Install hash-locked external research overlay
+        run: uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock
+
+      - name: Run complete synthetic collection in audited shards
+        run: uv run --no-sync python -m inclusive_shift_har.artifacts.parallel_test_gate --output .audit/ci-test-shards --workers 2
+
+      - name: Preserve synthetic test collection and reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: synthetic-tests-${{ matrix.os }}-${{ github.sha }}
+          path: .audit/ci-test-shards
+          include-hidden-files: true
 
       - name: Lint
-        run: uv run ruff check src tests
+        run: uv run --no-sync ruff check src tests
 
       - name: Check formatting
-        run: uv run ruff format --check src tests
+        run: uv run --no-sync ruff format --check src tests
 
       - name: Type-check
-        run: uv run mypy src tests
+        run: uv run --no-sync mypy src tests
 
   release-security:
     name: Complete-history release security
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: synthetic-validation
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
 
     steps:
       - name: Check out complete history without persisted credentials
@@ -107,6 +119,9 @@ jobs:
           UV_FROZEN: "false"
         run: uv sync --locked --extra training-cpu --group research --group release
 
+      - name: Install hash-locked external research overlay
+        run: uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock
+
       - name: Prepare candidate-scoped attestation directory
         shell: bash
         run: mkdir -p ".audit/release-attestations/${GITHUB_SHA}"
@@ -116,7 +131,7 @@ jobs:
         shell: bash
         run: |
           now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          uv run python -m inclusive_shift_har.artifacts.release_gate scan-repository \
+          uv run --no-sync python -m inclusive_shift_har.artifacts.release_gate scan-repository \
             --repository-root . \
             --candidate-commit "${GITHUB_SHA}" \
             --policy configs/release/release_gate_policy_v1.json \
@@ -153,7 +168,7 @@ jobs:
             --report-path "${evidence}/gitleaks.json"
           gitleaks_exit=$?
           now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          uv run python -m inclusive_shift_har.artifacts.release_gate validate-secret-scan \
+          uv run --no-sync python -m inclusive_shift_har.artifacts.release_gate validate-secret-scan \
             --repository-root . \
             --report "${evidence}/gitleaks.json" \
             --candidate-commit "${GITHUB_SHA}" \
@@ -172,9 +187,9 @@ jobs:
         shell: bash
         run: |
           evidence=".audit/release-attestations/${GITHUB_SHA}"
-          uv run pip-licenses --format=json --with-urls --output-file="${evidence}/python_licenses.json"
+          uv run --no-sync pip-licenses --format=json --with-urls --output-file="${evidence}/python_licenses.json"
           now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          uv run python -m inclusive_shift_har.artifacts.release_gate audit-licenses \
+          uv run --no-sync python -m inclusive_shift_har.artifacts.release_gate audit-licenses \
             --repository-root . \
             --inventory "${evidence}/python_licenses.json" \
             --candidate-commit "${GITHUB_SHA}" \
@@ -206,18 +221,18 @@ jobs:
               failed=1
             fi
           }
-          run_gate tests uv run pytest -q
-          run_gate lint uv run ruff check src tests
-          run_gate format uv run ruff format --check src tests
-          run_gate types uv run mypy src tests
-          run_gate manifests uv run inclusive-shift-har validate-manifests --json
-          run_gate splits uv run inclusive-shift-har audit-splits \
+          run_gate tests uv run --no-sync python -m inclusive_shift_har.artifacts.parallel_test_gate --output "${evidence}/test-shards" --workers 2
+          run_gate lint uv run --no-sync ruff check src tests
+          run_gate format uv run --no-sync ruff format --check src tests
+          run_gate types uv run --no-sync mypy src tests
+          run_gate manifests uv run --no-sync inclusive-shift-har validate-manifests --json
+          run_gate splits uv run --no-sync inclusive-shift-har audit-splits \
             --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json \
             --json
-          run_gate configuration uv run pytest -q tests/test_few_person_protocol.py \
+          run_gate configuration uv run --no-sync pytest -q tests/test_few_person_protocol.py \
             tests/test_protocol_splits.py tests/test_schema_documents.py \
             tests/test_uci_source_protocol.py
-          run_gate artifacts uv run inclusive-shift-har validate-artifacts \
+          run_gate artifacts uv run --no-sync inclusive-shift-har validate-artifacts \
             --artifact-root results --require-artifacts --json
           exit "${failed}"
 
@@ -225,7 +240,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          uv run python - <<'PY'
+          uv run --no-sync python - <<'PY'
           import hashlib
           import json
           import os
@@ -319,7 +334,7 @@ jobs:
         run: |
           now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           evidence=".audit/release-attestations/${GITHUB_SHA}"
-          uv run python -m inclusive_shift_har.artifacts.release_gate validate-ci-bundle \
+          uv run --no-sync python -m inclusive_shift_har.artifacts.release_gate validate-ci-bundle \
             --repository-root . \
             --candidate-commit "${GITHUB_SHA}" \
             --policy configs/release/release_gate_policy_v1.json \
@@ -330,7 +345,7 @@ jobs:
       - name: Validate tracked precommit report
         if: always()
         run: >-
-          uv run python -m inclusive_shift_har.artifacts.release_gate validate
+          uv run --no-sync python -m inclusive_shift_har.artifacts.release_gate validate
           --report results/release/final_release_gate_report.json
           --repository-root .
 

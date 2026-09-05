@@ -20,6 +20,7 @@ from inclusive_shift_har.experiments.cross_dataset_har import (
 )
 from inclusive_shift_har.experiments.cross_dataset_neural import run_and_write_neural
 from inclusive_shift_har.experiments.cross_dataset_transfer import run_and_write_transfer
+from inclusive_shift_har.experiments.external_evidence_validate import validate_run_directory
 
 
 def _method_means(result: dict[str, Any]) -> dict[str, float]:
@@ -28,6 +29,13 @@ def _method_means(result: dict[str, Any]) -> dict[str, float]:
         name: float(report["primary"]["mean_participant_macro_f1"])
         for name, report in reports.items()
     }
+
+
+def _validate_stage(directory: Path, repository_root: Path) -> None:
+    validation = validate_run_directory(directory, repository_root)
+    _write_json_create_only(directory / "validation.json", validation)
+    if not validation["publication_evidence_ready"]:
+        raise ValueError(f"external suite acceptance gate failed: {directory}")
 
 
 def run_primary_suite(
@@ -85,6 +93,7 @@ def run_primary_suite(
             n_jobs=n_jobs,
             include_classical=True,
         )
+        _validate_stage(output_root / "imu_har_il_all_repetitions_3seed", repository_root)
         _write_json_create_only(
             output_root / "stage_01_imu_classical_complete.json",
             {
@@ -100,6 +109,7 @@ def run_primary_suite(
             seeds=seeds,
             epochs=epochs,
         )
+        _validate_stage(output_root / "imu_har_il_all_repetitions_neural_3seed", repository_root)
         _write_json_create_only(
             output_root / "stage_02_imu_neural_complete.json",
             {
@@ -122,6 +132,7 @@ def run_primary_suite(
             n_jobs=n_jobs,
             include_classical=True,
         )
+        _validate_stage(output_root / "imu_all_to_fog_zero_shot_3seed", repository_root)
         completed = {
             "schema_version": "1.0.0",
             "status": "PRIMARY_SUITE_COMPLETE",

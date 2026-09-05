@@ -1,0 +1,57 @@
+schema_version: "2.0.0"
+protocol_id: "external-har-physical-grid-v2"
+declared_at_utc: "2026-09-05T01:56:58Z"
+status: "frozen_validity_correction_before_replacement_outcomes"
+inherits_model_parameters_from: "configs/experiments/cross_dataset_har_rnd_v1.yaml"
+supersedes_external_boundary_rule_only: true
+inclusivehar_locked_protocol_changed: false
+evidence_role_ledger: "configs/datasets/evidence_roles_20260905_v2.yaml"
+preprocessing:
+  observable_segments: [participant, session, physical_trial, timestamp_gap, nonfinite_sensor_run]
+  labels_may_define_segments: false
+  resampling: "one joint nine-channel polyphase pass per physical segment"
+  resampling_lookahead: "offline symmetric FIR; no zero-lookahead streaming claim"
+  source_rates_hz: {fog_star_v3: 60.0, imu_har_il_v1: 60.0, sole_harmony_v1: 270.0}
+  target_rate_hz: 50.0
+  window_samples: 128
+  stride_samples: 128
+  grid_origin: "first finite sample of each observable physical segment"
+  annotation_projection: "previous source sample on the post-resampling time grid"
+  admission: "all projected and interval-covered source annotations finite, supported and identical"
+  homogeneous_on: "provider activity code before core ontology merging"
+  rejection_rephases_windows: false
+  padding: "polyphase zero-extension only at observable segment edges; incomplete windows dropped"
+  boundary_and_excluded_window_accounting_required: true
+  fog_timestamp_unit: "seconds in the pinned CSV; provider README says ms inconsistently"
+  gravity_cutoff_hz: 0.30
+  above_rule_scope: "FoG-STAR replacement; file-defined IMU/HAR-PMD trials unchanged"
+  sole_harmony_camera_bout_lane: "oracle diagnostic only; never publication-ready deployment evidence"
+experiments:
+  seeds: [11, 23, 47]
+  outer_folds: 5
+  inner_folds: 4
+  neural_epochs: 40
+  neural_patience: 8
+  neural_minimum_epochs: 8
+  imu_repetitions: [1, 2, 3, 4]
+  har_pmd_participants_requested: 120
+  har_pmd_lanes: [6ch, native9ch]
+  primary_estimand: "mean across seeds of equally weighted participant fixed-class macro-F1"
+  seed_probability_ensemble: "secondary; must not replace primary seed-averaged result"
+  primary_contrast: "HERA-DG-full minus XGBoost-6ch on corrected FoG-STAR development"
+  uncertainty_unit: "participant cluster, all seeds of a participant resampled together"
+  bootstrap_replicates: 10000
+  bootstrap_seed: 20260905
+  multiplicity: "one primary contrast; all other comparisons descriptive, no superiority declarations"
+  lower_tail: "worst participant and bottom ceil(0.30*N) participant mean"
+  promotion_rule: "primary paired 95% CI lower bound >0 and bottom-30% difference CI lower bound >=0"
+  missing_class_sensitivities: [fixed_class_primary, present_class_secondary, all_classes_supported_participants]
+  tuning_budget_changed: false
+publication:
+  clean_commit_at_launch_required: true
+  launch_manifest_must_match_commit: true
+  artifact_integrity_implies_method_validity: false
+  previous_fog_results: "superseded protocol-invalid; original files immutable"
+  previous_imu_and_har_pmd_pilots: "provisional until full current-contract reconstruction"
+  numerical_before_after_across_preprocessing_versions: "non-comparable"
+  new_method_or_sota_claim_authorized: false

@@ -1,0 +1,390 @@
+{
+  "artifacts_deleted_or_modified": false,
+  "created_at_utc": "2026-09-05T02:09:57.699789+00:00",
+  "entries": [
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904/data_audit.json": "dc7b20e4c46af6f7ed57a382a37ff444ec77d87ad966389d43838190d05d8e70",
+        "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904/predictions.npz": "de864a4d00c1de08c67bf8d7c5a0c8266128ed660a5eee7ed334627835a6ee94",
+        "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904/result.json": "182cd193aeb6f96519e36decd79ba8f9e4f02070c1073e4824c5845f102d14cc"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905/data_audit.json": "f7b77f3df32f280315914dcf6b9da70109d42bed929403b231d2c4c08085d73d",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905/predictions.npz": "45dccc8f506e74edf00c5f96838e2fbeeb30bbd6ddd336c4d035d65258b8a907",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905/replication_check.json": "b45a597718223497db2bdb7065571c1156a0a962e11c679783f8fd58def64e20",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905/result.json": "51eb071c6949066fa2f456a236a5c81c7262e5d6e6c2c4b73afb46e55c45ef6b",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905/validation.json": "52958a427c6a5ef9c7f962cde375b819ae53115f291473668aaec2556ebc1551"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-0__deepconvlstm.pt": "46470d521a86f3eded4303d2a9400a5074031c6dbce3789896871efaba4763dc",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-0__tinyhar.pt": "997cbde21257ee64e1e005b223e318f3fa8f515a0f12b17418f567d9659705c2",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-1__deepconvlstm.pt": "e0c4872abcc0e0c2d0bce787f9b7837e3148c694a12e4c34af62614a3f2e4cb6",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-1__tinyhar.pt": "3201f33843b6b00683f4b9bbb180c288b665e09f68a8652d0507f970bb4a54fa",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-2__deepconvlstm.pt": "75d908b24894b3ecca0f0b3fbd7754bb7e5ece55e427156929521ecbd0ca2f5e",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-2__tinyhar.pt": "d1e412fb50cc53883c51dd0104dde65b2fc88f93c26addbad1399df038daa2a4",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-3__deepconvlstm.pt": "6c3d73300cad3a589e83a2700477aa6148d5396a8b4d6415afa8e179a4407ca9",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-3__tinyhar.pt": "33d2231f848cd231a7b64c890f67d3f5cfd17c313f4be11734a9b581deed3429",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-4__deepconvlstm.pt": "42823af6b48e4f955f28fc6e6283490adbe1830114876281b31e6cabdfddd4cb",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-11__fold-4__tinyhar.pt": "9c6e26debccfee5e1b9c1c01c51dd72df519800c89489b6b1b9e89c6de6de1e0",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-0__deepconvlstm.pt": "d497dc9b122f3cc76965cce9866b57b9abeb8bc83ca5345996422fce20ef6ec4",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-0__tinyhar.pt": "f159fb03e19b913dc0ffa266b2accfa2c68b2822855e75a809fb49020f041aae",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-1__deepconvlstm.pt": "acdc19a065b17c0616401f0db38875dcaefa9057a1dfa7f11f755caa3e401eee",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-1__tinyhar.pt": "1471e388e06aa7709a7ddfccaebd50d4f18b7e08f462d015264502202cdb1da9",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-2__deepconvlstm.pt": "3df705644a9d1fdd63d03dae957b852d9279ccbae0520cb2d70f790a1f42d4ba",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-2__tinyhar.pt": "5a26ede441c1e4a21517e4bfbfa3dead873df65b14ae0d1e4476ea6ea03e1aa5",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-3__deepconvlstm.pt": "efd5b7709eb446694e4a24f315ca4a247d7883d6a0212caa8281f47c0f6446ea",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-3__tinyhar.pt": "2cf93c013812d39207d402f4addedae9608381aac3b531b9fa6d1235fbb8a9eb",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-4__deepconvlstm.pt": "d5d6471533b88540f69497e78074738fafff5cc9fd6fdb384740c953116a55c5",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-23__fold-4__tinyhar.pt": "6533dcca407bf9d3ca38660460e552c3f4f4e32c66c1e3851d5381c2e18ac9c1",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-0__deepconvlstm.pt": "19fcbd55a1a24725027ebbb61174f6539152afb4f376f40c5bd73d9b148370cf",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-0__tinyhar.pt": "8ed8020c47f4879dbb84caeafcc3f8b5305a81bd1f16f809692c8f3f1444fa89",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-1__deepconvlstm.pt": "c5874c951b47abfad09dd94b42e0dc11846dbb13d70230f8fb09c4e89f56c0c7",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-1__tinyhar.pt": "f70893ba9a608b3f2bdb5f819ece08e49916cd6e1cd7805b8400f4400aa2b487",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-2__deepconvlstm.pt": "93c21550e34a0f17f5725aec7d365051eb08bc4d5482f58b28b2fb6a43b7bdff",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-2__tinyhar.pt": "3ed009749138ac8a7c3b957e43ade886a64adc85c3cd7f7e61958fad9042db68",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-3__deepconvlstm.pt": "fe2d823b5d5ca1afd0a663985a9bf693bf82c7b5a863699b42bde6dd10debe2f",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-3__tinyhar.pt": "e8ba72dec2cae8667d8e90c255e5ae0156a8e8b151c181ab15a44d6797da00c1",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-4__deepconvlstm.pt": "753ae5da060fe7f217ec4cd26d9d4ee815a8f0edd84826654c4eee4f71394c43",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/checkpoints/seed-47__fold-4__tinyhar.pt": "4af405868e8329c5f279bb3e3b094643076d7bfd7707d4c338d2ac24888c0d63",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/data_audit.json": "721018f7c94c741ed90a20f34f76a608c194c45b0bc8f4236e40f60956dc04f8",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/predictions.npz": "428bddf730f4352c463c637922fb1eafc36aee4bf27d39e5e5116fcb2d43b4cb",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/replication_check.json": "a9f57d27aa09b5999af95eab1e50b5a2f62938669b597197d1d6a1eed0d2d425",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/result.json": "b0c1fe81d37c07e01face4e009b4d9f0f827dff07a4de94c517293ea92a4dda8",
+        "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905/validation.json": "36b9599f93da40237f34aa554c06fb48afd774c4cbedc4bb1d514c9e51aaac0d"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-0__deepconvlstm.pt": "35d626b38512e1c8b2bf6bfbe366421a19ba86ce733e7015382709a943b3e709",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-0__tinyhar.pt": "5c3ba8ad937da27780014628103bd87bb0d265b53c67446a292eb2b70c4e6419",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-1__deepconvlstm.pt": "1b47a2086c38a3ba118b9e9506a2f4e86572f8a33c48f340a65a2bb25ceffb47",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-1__tinyhar.pt": "2750eb63d6084fa3e01caf7b0f62b6a7c2bd674d6a12859b9e406aa4ffdcb799",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-2__deepconvlstm.pt": "1d74a8b31b5b5233c78965cfb5552e34d74b6412a7714913a788906b7eb328e8",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-2__tinyhar.pt": "4e36d9925223885622635344ccb28e1f279eed2c7dc91502c1dbae2946bb71e3",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-3__deepconvlstm.pt": "e9b29c53fe1d106a30b9a042e65bb8c297b02a120f75fdbd6c7107bc46147054",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-3__tinyhar.pt": "142bba1d5ce06417ca18c9fb4e5c891b8f26abba133af7a59bb982051ca08ad7",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-4__deepconvlstm.pt": "2b765208ed97d25d259770d037b1199d064e344ee111384d9ec68eb0e5b4e252",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-11__fold-4__tinyhar.pt": "2d8179672208af042fb2fe6a5286fae718a2f8d50e023f3a8bd0d8a79943ccdc",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-0__deepconvlstm.pt": "5d7176d445d85dd17402ced08dd2ec45761307a5972b81adde5b8f9d1b0c0dad",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-0__tinyhar.pt": "ee08acc8cb0f8019d1ab81b01d37d23c1bb8abd13fac1b92670c6412dd9d618d",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-1__deepconvlstm.pt": "1f61fbf80e5ec9509adaa00d495984933294167be5b7b57f61688d17ba9a47fd",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-1__tinyhar.pt": "f4e351c300932a67c83292a5eabadd0bc268ff9594a9b6f0d0f2553ff9ca463d",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-2__deepconvlstm.pt": "7edb39bd3b7cf9780b142247254af3bea555b945be668ad3d7f3fcb7dd9067c6",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-2__tinyhar.pt": "4c04cb6c38caacfe194299f453c4c449fa86d947b93f192626c58d3a53c8b6c8",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-3__deepconvlstm.pt": "98564bbc3afee9344a92d04f3e53213ceb27ef4e786cab78769e4780a33b9e65",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-3__tinyhar.pt": "107ae2859846573c343118f350acabde7d11b740cb0eef35467003400fd8cafb",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-4__deepconvlstm.pt": "a2c5842b589bee8b359da7fa8efe9cb8f54863659a5d4442af0a50943dfac1cf",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-23__fold-4__tinyhar.pt": "5302301ad2f6e27e497ea158707ae40c9493c01760808f5956e305274444043e",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-0__deepconvlstm.pt": "8c09a7d4f96812bac2ce6018f49b45d584aaf4c785c50b5014db6fcae3a8ae21",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-0__tinyhar.pt": "173c45a8e55a65d2bd0dec57ffcdbcad8e87d6d57be44e5051a800cc12e08464",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-1__deepconvlstm.pt": "2754bc0af637a657abdb0f5f03414acf15c3f22a97458bed358d5b767d6e4374",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-1__tinyhar.pt": "4d5dfbf405d1778281d15c5b9cf1bc4b3e82a74b944c1012ec2c5529b218b439",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-2__deepconvlstm.pt": "f518ffb009ee5b22bb848273ea36f0280ef618bd2e17e256ab69e7375d853c9b",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-2__tinyhar.pt": "9327fee18c0e5926d23d2734c9bb3b5e7bd71ff71ec14d231c7d0b492790693a",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-3__deepconvlstm.pt": "4bb562fb9ee5608a9f91d2b884c87c3926e2b1f708a2d1876dc221854a6066b1",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-3__tinyhar.pt": "e762794cd03f0bb2de82aeebdb0f5ae31ad0d6e4cbea8e4db7f7e7baf822ea51",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-4__deepconvlstm.pt": "61b4889c020099eacc5cac0c4f7df7057941a2a7002e561d03e7aaf08c5d9c1d",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/checkpoints/seed-47__fold-4__tinyhar.pt": "c0f242ec21cc120fce116a9a80c8832a8edd5feed0a0b43c6a7202fc1f2b1436",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/data_audit.json": "879b8cf84a13801a72a7dab69b4a762404eddb8b75195cbd7eed88e1eb04ea0f",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/predictions.npz": "2959a416ce5727f163dcd456ca869d7462ff7d69ea2a6f5ef497c1a3fb133c4b",
+        "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904/result.json": "cbee2d7a46f1b23c30fc12451419aabbe000a5db81c7eecae5ce57047ce4ddb3"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905/data_audit.json": "536af75958cabd76de8aaabb556b8a37556d524103af8b81be42285d363bf668",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905/predictions.npz": "a68e67fcbf7b0129e6d719ccd1119a21cb7288a3c8765fb97dd8b92417b2047d",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905/replication_check.json": "3eff6c0ed413bc4a648c673c4af61a0b945052f47e089467fd0c798190726e77",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905/result.json": "f773bcba4f439589f990ce4bd777f02f967a750c53a29e58949e545b745cc3b6",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905/validation.json": "6846f70897e98b9d6ea4e35f5f106a80c372d20d57ba3bb70ae64f123e3d15d3"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-0__deepconvlstm.pt": "46470d521a86f3eded4303d2a9400a5074031c6dbce3789896871efaba4763dc",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-0__tinyhar.pt": "997cbde21257ee64e1e005b223e318f3fa8f515a0f12b17418f567d9659705c2",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-1__deepconvlstm.pt": "e0c4872abcc0e0c2d0bce787f9b7837e3148c694a12e4c34af62614a3f2e4cb6",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-1__tinyhar.pt": "3201f33843b6b00683f4b9bbb180c288b665e09f68a8652d0507f970bb4a54fa",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-2__deepconvlstm.pt": "75d908b24894b3ecca0f0b3fbd7754bb7e5ece55e427156929521ecbd0ca2f5e",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-2__tinyhar.pt": "d1e412fb50cc53883c51dd0104dde65b2fc88f93c26addbad1399df038daa2a4",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-3__deepconvlstm.pt": "6c3d73300cad3a589e83a2700477aa6148d5396a8b4d6415afa8e179a4407ca9",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-3__tinyhar.pt": "33d2231f848cd231a7b64c890f67d3f5cfd17c313f4be11734a9b581deed3429",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-4__deepconvlstm.pt": "42823af6b48e4f955f28fc6e6283490adbe1830114876281b31e6cabdfddd4cb",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-11__fold-4__tinyhar.pt": "9c6e26debccfee5e1b9c1c01c51dd72df519800c89489b6b1b9e89c6de6de1e0",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-0__deepconvlstm.pt": "d497dc9b122f3cc76965cce9866b57b9abeb8bc83ca5345996422fce20ef6ec4",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-0__tinyhar.pt": "f159fb03e19b913dc0ffa266b2accfa2c68b2822855e75a809fb49020f041aae",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-1__deepconvlstm.pt": "acdc19a065b17c0616401f0db38875dcaefa9057a1dfa7f11f755caa3e401eee",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-1__tinyhar.pt": "1471e388e06aa7709a7ddfccaebd50d4f18b7e08f462d015264502202cdb1da9",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-2__deepconvlstm.pt": "3df705644a9d1fdd63d03dae957b852d9279ccbae0520cb2d70f790a1f42d4ba",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-2__tinyhar.pt": "5a26ede441c1e4a21517e4bfbfa3dead873df65b14ae0d1e4476ea6ea03e1aa5",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-3__deepconvlstm.pt": "efd5b7709eb446694e4a24f315ca4a247d7883d6a0212caa8281f47c0f6446ea",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-3__tinyhar.pt": "2cf93c013812d39207d402f4addedae9608381aac3b531b9fa6d1235fbb8a9eb",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-4__deepconvlstm.pt": "d5d6471533b88540f69497e78074738fafff5cc9fd6fdb384740c953116a55c5",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-23__fold-4__tinyhar.pt": "6533dcca407bf9d3ca38660460e552c3f4f4e32c66c1e3851d5381c2e18ac9c1",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-0__deepconvlstm.pt": "19fcbd55a1a24725027ebbb61174f6539152afb4f376f40c5bd73d9b148370cf",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-0__tinyhar.pt": "8ed8020c47f4879dbb84caeafcc3f8b5305a81bd1f16f809692c8f3f1444fa89",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-1__deepconvlstm.pt": "c5874c951b47abfad09dd94b42e0dc11846dbb13d70230f8fb09c4e89f56c0c7",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-1__tinyhar.pt": "f70893ba9a608b3f2bdb5f819ece08e49916cd6e1cd7805b8400f4400aa2b487",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-2__deepconvlstm.pt": "93c21550e34a0f17f5725aec7d365051eb08bc4d5482f58b28b2fb6a43b7bdff",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-2__tinyhar.pt": "3ed009749138ac8a7c3b957e43ade886a64adc85c3cd7f7e61958fad9042db68",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-3__deepconvlstm.pt": "fe2d823b5d5ca1afd0a663985a9bf693bf82c7b5a863699b42bde6dd10debe2f",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-3__tinyhar.pt": "e8ba72dec2cae8667d8e90c255e5ae0156a8e8b151c181ab15a44d6797da00c1",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-4__deepconvlstm.pt": "753ae5da060fe7f217ec4cd26d9d4ee815a8f0edd84826654c4eee4f71394c43",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/checkpoints/seed-47__fold-4__tinyhar.pt": "4af405868e8329c5f279bb3e3b094643076d7bfd7707d4c338d2ac24888c0d63",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/data_audit.json": "81044d0e9557fb6cae634f19365b67374b72e7696c7eb0af9bed29322c59932b",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/predictions.npz": "428bddf730f4352c463c637922fb1eafc36aee4bf27d39e5e5116fcb2d43b4cb",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/replication_check.json": "dd411ea3a7d5949816caf8a65d2f681d169bc2104780dc4ba064077a1efb0640",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/result.json": "27c8b92f4b31589556e2478227c79817d48952bffffadc0ed2e81c102501e0a2",
+        "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905/validation.json": "5506d94ce3028116cd8f1f62e2afd75f4d00ed2016fd18b1545e06c290732c11"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904/data_audit.json": "43d36946359f443c6100ec0011d22b90fb2f3eefc8d5faa4c29a10154f48356d",
+        "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904/predictions.npz": "6e4748bff94ab78c203f527425c3561fe9e3b52d08371be656b99ec5f5e40a69",
+        "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904/result.json": "6eba498c0fe01155094f37db4ce981af127b253fe38cf3410029e61daa41ee57"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904/data_audit.json": "38db48bfd1a7c10d0d05de002cf42050cd248cb7c5a9b223f476e0593978a700",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904/predictions.npz": "76a0279363bc69ad9beab08176ead89991bb0bf259ffe4d1ab2c2d9ac1bd97c2",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904/result.json": "e591cbdaf4a92aa67279e418fdbd993597bd2fcb917813116aafa45bee709e9a"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-0__deepconvlstm.pt": "46470d521a86f3eded4303d2a9400a5074031c6dbce3789896871efaba4763dc",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-0__tinyhar.pt": "997cbde21257ee64e1e005b223e318f3fa8f515a0f12b17418f567d9659705c2",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-1__deepconvlstm.pt": "e0c4872abcc0e0c2d0bce787f9b7837e3148c694a12e4c34af62614a3f2e4cb6",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-1__tinyhar.pt": "3201f33843b6b00683f4b9bbb180c288b665e09f68a8652d0507f970bb4a54fa",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-2__deepconvlstm.pt": "75d908b24894b3ecca0f0b3fbd7754bb7e5ece55e427156929521ecbd0ca2f5e",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-2__tinyhar.pt": "d1e412fb50cc53883c51dd0104dde65b2fc88f93c26addbad1399df038daa2a4",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-3__deepconvlstm.pt": "6c3d73300cad3a589e83a2700477aa6148d5396a8b4d6415afa8e179a4407ca9",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-3__tinyhar.pt": "33d2231f848cd231a7b64c890f67d3f5cfd17c313f4be11734a9b581deed3429",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-4__deepconvlstm.pt": "42823af6b48e4f955f28fc6e6283490adbe1830114876281b31e6cabdfddd4cb",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-11__fold-4__tinyhar.pt": "9c6e26debccfee5e1b9c1c01c51dd72df519800c89489b6b1b9e89c6de6de1e0",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-0__deepconvlstm.pt": "d497dc9b122f3cc76965cce9866b57b9abeb8bc83ca5345996422fce20ef6ec4",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-0__tinyhar.pt": "f159fb03e19b913dc0ffa266b2accfa2c68b2822855e75a809fb49020f041aae",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-1__deepconvlstm.pt": "acdc19a065b17c0616401f0db38875dcaefa9057a1dfa7f11f755caa3e401eee",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-1__tinyhar.pt": "1471e388e06aa7709a7ddfccaebd50d4f18b7e08f462d015264502202cdb1da9",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-2__deepconvlstm.pt": "3df705644a9d1fdd63d03dae957b852d9279ccbae0520cb2d70f790a1f42d4ba",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-2__tinyhar.pt": "5a26ede441c1e4a21517e4bfbfa3dead873df65b14ae0d1e4476ea6ea03e1aa5",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-3__deepconvlstm.pt": "efd5b7709eb446694e4a24f315ca4a247d7883d6a0212caa8281f47c0f6446ea",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-3__tinyhar.pt": "2cf93c013812d39207d402f4addedae9608381aac3b531b9fa6d1235fbb8a9eb",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-4__deepconvlstm.pt": "d5d6471533b88540f69497e78074738fafff5cc9fd6fdb384740c953116a55c5",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-23__fold-4__tinyhar.pt": "6533dcca407bf9d3ca38660460e552c3f4f4e32c66c1e3851d5381c2e18ac9c1",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-0__deepconvlstm.pt": "19fcbd55a1a24725027ebbb61174f6539152afb4f376f40c5bd73d9b148370cf",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-0__tinyhar.pt": "8ed8020c47f4879dbb84caeafcc3f8b5305a81bd1f16f809692c8f3f1444fa89",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-1__deepconvlstm.pt": "c5874c951b47abfad09dd94b42e0dc11846dbb13d70230f8fb09c4e89f56c0c7",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-1__tinyhar.pt": "f70893ba9a608b3f2bdb5f819ece08e49916cd6e1cd7805b8400f4400aa2b487",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-2__deepconvlstm.pt": "93c21550e34a0f17f5725aec7d365051eb08bc4d5482f58b28b2fb6a43b7bdff",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-2__tinyhar.pt": "3ed009749138ac8a7c3b957e43ade886a64adc85c3cd7f7e61958fad9042db68",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-3__deepconvlstm.pt": "fe2d823b5d5ca1afd0a663985a9bf693bf82c7b5a863699b42bde6dd10debe2f",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-3__tinyhar.pt": "e8ba72dec2cae8667d8e90c255e5ae0156a8e8b151c181ab15a44d6797da00c1",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-4__deepconvlstm.pt": "753ae5da060fe7f217ec4cd26d9d4ee815a8f0edd84826654c4eee4f71394c43",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/checkpoints/seed-47__fold-4__tinyhar.pt": "4af405868e8329c5f279bb3e3b094643076d7bfd7707d4c338d2ac24888c0d63",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/data_audit.json": "8efa616fd409a510a488853d842940fb6b8372ebde3caa05acad4166f248b7f7",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/predictions.npz": "b3f74f3dd66556fb604a522a20df5634d1752d658ff144227970d3efe7f61fb9",
+        "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904/result.json": "e9bbf44f8cc5820960e095c9e4d5ab79bb84ed589ce0c902584735f9b6a92520"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_schema_fixed_20260904/data_audit.json": "333acbc5fc7f1d599770fe3321a03030912fa9aab21ee83f225c737bff5cf042",
+        "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_schema_fixed_20260904/predictions.npz": "e3b9e72ebf3955af4bca3645754337f0c43aaeb836202bc36287b142a343e57d",
+        "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_schema_fixed_20260904/result.json": "f69517ad63127251bab6ff678e762110776fb35c32e21a88dab7d1c714bd21db"
+      },
+      "reason": "consumed development/pilot; full-cohort current-contract clean-source reconstruction required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_schema_fixed_20260904",
+      "status": "provisional"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_validation_20260904/data_audit.json": "916bcdf267ae8436ebdbd497cecbde156efc877bb4a73368754b83e981263442",
+        "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_validation_20260904/failure.json": "90c6289b0a3994c61b8daff559ec00644a48dc33030d68cb714978307108f67a"
+      },
+      "reason": "failed or incomplete historical evidence; original files retained",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/har_pmd_12p_seed11_validation_20260904",
+      "status": "failed_preserved"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_20260904/failure.json": "8e95ec2e4f96f0f282b41604dd6db0835dbc6b892d5e7041c33d6b42469eec23"
+      },
+      "reason": "failed or incomplete historical evidence; original files retained",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_20260904",
+      "status": "failed_preserved"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_audited_20260904/data_audit.json": "8b5bb744b54af937b9da6dc01f8bf35cd7c11c02ddc8e717c14e5594d058a9ca",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_audited_20260904/predictions.npz": "d2ef1d697ff932d8df1c371e8d0f1b0d17c8e3ec9a27f31b52750781bbfe93f4",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_audited_20260904/result.json": "768aa84050926c1c571d14aa8a73baff681b78c33ac71a859af1e39b24dbe367"
+      },
+      "reason": "consumed development/pilot; full-cohort current-contract clean-source reconstruction required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_audited_20260904",
+      "status": "provisional"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_completecase_20260904/failure.json": "58ca76038ac111d1889ea0af344350e0d8d6a8d65ba0b6ae69fda285bbca7b0a"
+      },
+      "reason": "failed or incomplete historical evidence; original files retained",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_full_3seed_completecase_20260904",
+      "status": "failed_preserved"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-0__deepconvlstm.pt": "15bd63b40a4a5ec8f5ee9959a05309328b0e653a6c781b3a38a466cf64889e54",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-0__tinyhar.pt": "f2707ade799d97c77b749956f4879795e9b3aa7fd31254d2b349dc177b9e650c",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-1__deepconvlstm.pt": "c4299a08a9a4d1b2fd2fcacb09d05ee8330796eea31913bc3c48a93e032e08fe",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-1__tinyhar.pt": "5c1c6636357549bbada556ff8f34367a93a4cdb11582ee5b4dc52a56251e78a1",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-2__deepconvlstm.pt": "82d7d71bb23d0783c32da2b28dadde0662ca905699851291f01452ecbb771863",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-2__tinyhar.pt": "c43c628130bb69143abc0f10513ff108a1f05fdd8f06eccedbfc5b425222c883",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-3__deepconvlstm.pt": "0fae698f2f4faa6b1760264b0baf3984b59aa56c7643e798ffe8b7c99c38257b",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-3__tinyhar.pt": "7c7c631c4778c7ea74832a72494fb662d378e5edb3514a0626d7dd06cb4e6fc2",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-4__deepconvlstm.pt": "535d36523f57997f69a2b28590b9993d4cfd875a64b0a40dc381b821206867d3",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-11__fold-4__tinyhar.pt": "841b51d9907bfcab29203a7ab84ad3e82caab4019846122d2eccaa6e4a152008",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-0__deepconvlstm.pt": "d354f08330a222cb9d3015e77862ee05970f1a526d442afc7cef690160e4cea2",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-0__tinyhar.pt": "1e33da5b9e1162c3307e15096c8fe8da6de8966637a893c5bcd9773ff0ab9c96",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-1__deepconvlstm.pt": "690926274eac90d2eb8506985e761242ae38c12541f327fd661cbc69672ef968",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-1__tinyhar.pt": "b6a0d2d0096fa9d39ce4384cbdcb1853db2015577eb582c5e520197bd1e204fe",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-2__deepconvlstm.pt": "15d1fbc45d319170211570ebfd5c57658fe7fb702d812a8d444870d656fd4e2d",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-2__tinyhar.pt": "f4972791cc25d3c24dd3b2bf063adb7037e575f374af5facd73681316f3afb6a",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-3__deepconvlstm.pt": "1f7e23900cf1241e7817bca9b63474fb82143686905256dc3e3407b9a3be45a1",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-3__tinyhar.pt": "d61e1a50229ccd08f39baccc15fb1ad60af9efdacb4cff54d496dc3614863f25",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-4__deepconvlstm.pt": "9e3a92791ea3c19b639be43caff21a5086c08bdbc36b9b7b4bc210b1e2b7b50b",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-23__fold-4__tinyhar.pt": "08455820d2df1c84cd863837c798f8dc6309e93716672fb462ead42b9bd7db95",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-0__deepconvlstm.pt": "ed623cd45a001189da6a3275965c46aec2fea11d3a8b410c015e7715fe1e7f8a",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-0__tinyhar.pt": "b4fe37281bd8f00ead12f1f1c80c481de3364173e2328dc332b32eb95cb680d3",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-1__deepconvlstm.pt": "c69a5ebc1c1ccfa9528d9244aa603db81fefce4ff352b08bff97eadc98a7d262",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-1__tinyhar.pt": "a84c1a762633abfa24ac2a2117b5018a2cc5e056faebb2d4d92e349d6dde1f30",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-2__deepconvlstm.pt": "bccea8b1cbda996c99960555353d7973c344a1ac8f91a805615df4f256858de7",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-2__tinyhar.pt": "3c218ea54cf673e892327144f3b9d18d4ea22313702c59b7db61e0a827c4fa5a",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-3__deepconvlstm.pt": "74118d0adf8ce6dd29e76dfe8fb9e8f9ea827f4a682aa862dfd39bb483a90902",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-3__tinyhar.pt": "fa830da83235e18c90931e2227c1fa480538c76618590ff75cef3fa021d819e9",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-4__deepconvlstm.pt": "fef36a8d4cd67cbe90a2c61e38034abb4a409ebb10f61ab5b87106eb46a8d54b",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/checkpoints/seed-47__fold-4__tinyhar.pt": "94b8901f04488bea9bb0973e3c80a4bfb9579d69797eb7f28310215f84c9a618",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/data_audit.json": "df0da0d661e7ded89034b6f421ab9c51358a9f1efbce9848398939c23e86c88a",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/predictions.npz": "94ada21cc3d40439575e674b5ae073706ecd5a727b6db6dfd88705fccab654c5",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904/result.json": "ece0736de583a6bb7d9a731bf59a79fd5f466447cd4ef6f21549930ffe28cdb8"
+      },
+      "reason": "consumed development/pilot; full-cohort current-contract clean-source reconstruction required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_neural_quality_gated_3seed_20260904",
+      "status": "provisional"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904/data_audit.json": "8496da6b9f9b9d11aa80a0ae6b0047157ba7b246995ff987695507ab6a069e6d",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904/predictions.npz": "2f55a9a6e905600f26388097c0e2c52857fcd997a3f2d2bbd045bde6b1bd11d6",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904/replication_check.json": "1f5526ca8498084c641a6eab7ed6b9cf4d629282337d9c40bfdc75fd54b944bd",
+        "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904/result.json": "8895410a3a20e3d264c9d5fa1a7d9fb14705e940aa2f295220373f6f41006988"
+      },
+      "reason": "consumed development/pilot; full-cohort current-contract clean-source reconstruction required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_har_il_rep1_quality_gated_3seed_20260904",
+      "status": "provisional"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904/data_audit.json": "b23a96cbec93c65aa34f9bb648258f3eb3f0e2c322e8d6b6ae7664f32560c836",
+        "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904/predictions.npz": "79fb1aae11fc97c202f3b559f74f4c650d13800fc3550128b1a440a2b757122b",
+        "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904/result.json": "0de1d0dc0b672b1aef479e7f6c9be58badbdbf0fd4342f9b5ebd7bdfef6f478b"
+      },
+      "reason": "ground-truth-dependent FoG resampling/window phase; physical-grid-v2 replacement required",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904",
+      "status": "superseded"
+    },
+    {
+      "file_hashes": {
+        "results/research/cross_dataset_har_v1/sole_harmony_1p1s_schema_audit_20260904/data_audit.json": "e3e670a873031d1a3117cbbf9caf31e6a53178d61eaf76acc508ef566db3903e"
+      },
+      "reason": "one participant/session and camera-bout oracle boundaries",
+      "replacement_run": null,
+      "replacement_status": "pending_not_claimed_completed",
+      "run_directory": "results/research/cross_dataset_har_v1/sole_harmony_1p1s_schema_audit_20260904",
+      "status": "diagnostic"
+    }
+  ],
+  "missing_previous_replacement": {
+    "exists": false,
+    "path": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_trial_continuous_seed11_validation_20260905",
+    "status": "not_completed_no_result_claim"
+  },
+  "preserved_untracked_test_report": {
+    "path": "results/research/cross_dataset_har_v1/repository_test_gate_20260905.xml",
+    "sha256": "5885ddd4022e68b77df11f36e88b148529c3c418b9ce9daca85460b619e9769e"
+  },
+  "prior_ledger": {
+    "path": "results/research/cross_dataset_har_v1/supersession_ledger_20260905.json",
+    "sha256": "ce7824bfeeeb16763f2295c34dca4cd43f227aebe582944188c32cafcf57707f"
+  },
+  "protocol_id": "external-har-physical-grid-v2",
+  "record_sha256": "bfca1285f303fc06d6e632561015e36bf8a136890a2263e0734a4ed0d9387381",
+  "schema_version": "2.0.0"
+}

@@ -517,6 +517,9 @@ def evaluate_neural_controls(
         )
         for method, probability in ensemble.items()
     }
+    from inclusive_shift_har.evaluation.external_statistics import seed_evidence
+
+    primary_seed_averaged, seed_predictions = seed_evidence(data, per_seed)
     return (
         {
             "schema_version": "1.0.0",
@@ -528,6 +531,7 @@ def evaluate_neural_controls(
             "input_channels": int(selected_signals.shape[2]),
             "method_suffix": method_suffix,
             "reports": reports,
+            "primary_seed_averaged": primary_seed_averaged,
             "fold_records": fold_records,
             "claim_policy": {
                 "proposed_method": False,
@@ -535,7 +539,7 @@ def evaluate_neural_controls(
                 "state_of_the_art_claim_allowed": False,
             },
         },
-        ensemble,
+        {**ensemble, **seed_predictions},
     )
 
 

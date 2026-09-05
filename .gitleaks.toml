@@ -18,3 +18,12 @@ regexes = [
   '''^secret_scan":"[0-9a-f]{64}"$''',
   '''^secret_scan\.json":"[0-9a-f]{64}"$''',
 ]
+
+# Verified SHA-256 of the public access checklist, not an access credential.
+# Exact digest + field + generated v3 evidence path only; see the dated review.
+[[rules.allowlists]]
+description = "Reviewed public access-checklist source hash in external v3 manifests"
+condition = "AND"
+regexTarget = "match"
+paths = ['''(?:^|[/\\])results[/\\]research[/\\]cross_dataset_har_v3[/\\].*\.json$''']
+regexes = ['''^CONTROLLED_DATA_ACCESS_CHECKLIST\.md":\s*"71c41f68123709208a6743fefc65e1f93ea3b6c8ef2176b99435f069f9b492a5"$''']

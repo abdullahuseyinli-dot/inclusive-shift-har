@@ -189,7 +189,10 @@ def evaluate_har_pmd_stress(
             "state_of_the_art_claim_allowed": False,
         },
     }
-    return result, ensemble
+    from inclusive_shift_har.evaluation.external_statistics import seed_evidence
+
+    result["primary_seed_averaged"], seed_predictions = seed_evidence(data, per_seed)
+    return result, {**ensemble, **seed_predictions}
 
 
 def run_and_write(
@@ -297,21 +300,25 @@ def main(argv: list[str] | None = None) -> int:
             run_and_write_neural,
         )
 
-        neural = run_and_write_neural(
-            data=data,
-            signals=data.nine_channel_signals,
-            class_names=data.class_names,
-            method_suffix="N9",
-            experiment_id="har-pmd-native-interface-neural-controls-v1",
-            output_directory=(args.output_directory.resolve() / "neural"),
-            repository_root=args.repository_root.resolve(),
-            seeds=tuple(args.seeds),
-            epochs=args.neural_epochs,
-        )
-        neural_summary = {
-            name: report["primary"]["mean_participant_macro_f1"]
-            for name, report in neural["reports"].items()
-        }
+        neural_summary = {}
+        for suffix, signals in (("6ch", data.signals), ("N9", data.nine_channel_signals)):
+            neural = run_and_write_neural(
+                data=data,
+                signals=signals,
+                class_names=data.class_names,
+                method_suffix=suffix,
+                experiment_id="har-pmd-native-interface-neural-controls-v1",
+                output_directory=(args.output_directory.resolve() / f"neural_{suffix}"),
+                repository_root=args.repository_root.resolve(),
+                seeds=tuple(args.seeds),
+                epochs=args.neural_epochs,
+            )
+            neural_summary.update(
+                {
+                    name: report["primary"]["mean_participant_macro_f1"]
+                    for name, report in neural["reports"].items()
+                }
+            )
     print(
         json.dumps(
             {
