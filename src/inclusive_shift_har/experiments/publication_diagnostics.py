@@ -117,6 +117,19 @@ def _checked_statistics(result: dict[str, Any]) -> dict[str, Any]:
     return cast(dict[str, Any], primary)
 
 
+def _figure_method_label(name: str, contract: dict[str, Any]) -> str:
+    count = contract["input_channel_count"]
+    lane = "unknown channels" if count is None else f"{count}ch"
+    qualifier = (
+        "; annotation-selected diagnostic"
+        if contract["annotation_selected_evaluation_context"]
+        else "; participant batch"
+        if contract["inference_unit"] == "noncausal_participant_batch"
+        else ""
+    )
+    return name.replace("TinyHAR-", "TinyHAR-style-") + f" [{lane}{qualifier}]"
+
+
 def write_distribution_figure(result: dict[str, Any], output: Path, *, status: str) -> list[Path]:
     """Show every frozen method and participant on a common 0--1 scale."""
     import matplotlib
@@ -131,7 +144,7 @@ def write_distribution_figure(result: dict[str, Any], output: Path, *, status: s
     if any(path.exists() for path in paths):
         raise FileExistsError("publication figures are create-only")
     with plt.rc_context({"svg.hashsalt": "external-har-session-grid-v3", "font.size": 10}):
-        fig, axis = plt.subplots(figsize=(10, max(3.5, 0.43 * len(names) + 1.8)))
+        fig, axis = plt.subplots(figsize=(12, max(4.5, 0.43 * len(names) + 1.8)))
         for position, name in enumerate(names):
             row = primary["methods"][name]
             participants = sorted(row["participant_values"])
@@ -153,17 +166,7 @@ def write_distribution_figure(result: dict[str, Any], output: Path, *, status: s
             )
         axis.set_yticks(
             range(len(names)),
-            [
-                name.replace("TinyHAR-", "TinyHAR-style-")
-                + (
-                    " [annotation-selected diagnostic]"
-                    if contracts[name]["annotation_selected_evaluation_context"]
-                    else " [participant batch]"
-                    if contracts[name]["inference_unit"] == "noncausal_participant_batch"
-                    else ""
-                )
-                for name in names
-            ],
+            [_figure_method_label(name, contracts[name]) for name in names],
         )
         axis.invert_yaxis()
         axis.set_xlim(-0.02, 1.02)
@@ -182,11 +185,14 @@ def write_distribution_figure(result: dict[str, Any], output: Path, *, status: s
             0.5,
             0.025,
             "Grey: each participant. Blue: mean and participant-bootstrap 95% interval.\n"
-            "All methods shown; channel suffixes identify distinct input lanes. No SOTA or confirmation claim.",
+            "Labels state actual channel counts. Different input/context budgets are not matched comparisons.\n"
+            "All methods shown; native and derived gravity remain separate. No SOTA or confirmation claim.",
             ha="center",
             fontsize=9,
         )
-        fig.tight_layout(rect=(0, 0.09, 1, 1))
+        # Reserve enough space for the three-line evidence qualification even
+        # when a comparison group contains only one or two methods.
+        fig.tight_layout(rect=(0, 0.17, 1, 1))
         fig.savefig(
             paths[0],
             metadata={"Date": None, "Creator": "InclusiveShift-HAR publication diagnostics"},

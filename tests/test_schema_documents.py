@@ -93,6 +93,35 @@ def test_release_version_is_consistent_across_package_metadata(repository_root: 
     } == {version}
 
 
+def test_research_branch_ci_runs_full_collection_and_artifact_contracts(
+    repository_root: Path,
+) -> None:
+    workflow = yaml.load(
+        (repository_root / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
+        Loader=yaml.BaseLoader,
+    )
+    assert "research/**" in workflow["on"]["push"]["branches"]
+    job = workflow["jobs"]["synthetic-validation"]
+    assert "if" not in job
+    assert set(job["strategy"]["matrix"]["os"]) == {"ubuntu-latest", "windows-latest"}
+    steps = {step["name"]: step for step in job["steps"] if "name" in step}
+    assert steps["Check out repository"]["with"]["fetch-depth"] == "0"
+    expected = {
+        "Run complete synthetic collection in audited shards": "artifacts.parallel_test_gate",
+        "Validate tracked research manifests": "validate-manifests --json",
+        "Audit locked participant splits": "audit-splits",
+        "Validate retained research artifacts": "validate-artifacts",
+        "Parse every research configuration": "yaml.safe_load",
+        "Verify dependency lock freshness offline": "uv lock --check --offline",
+        "Verify retained Git object integrity": "git fsck --full",
+    }
+    for name, command in expected.items():
+        assert command in steps[name]["run"]
+        assert "if" not in steps[name]
+        assert "continue-on-error" not in steps[name]
+    assert steps["Verify dependency lock freshness offline"]["env"]["UV_FROZEN"] == "false"
+
+
 def test_ci_and_gitattributes_preserve_hash_bound_files_on_windows(
     repository_root: Path,
 ) -> None:

@@ -1,0 +1,106 @@
+{
+  "created_at_utc": "2026-09-05T10:07:53.330018+00:00",
+  "export_plan_sha256": "89dc457b4f5cbf2f6b2f4a2dec9718161c8125475a935e49c4b3d9ec74c088bf",
+  "exports": [
+    {
+      "dataset_license": "CC-BY-4.0",
+      "evidence_status": "validated_development",
+      "export_directory": "fog_classical_observable_context",
+      "launch_commit": "ecafde4c2712d01c6f59435ef5537787f91b6946",
+      "model_checkpoints": "retained locally outside Git; this package reproduces metrics, not a weights distribution",
+      "source_directory": "C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\.audit\\phase2_external_v3\\fog_observable_context_3seed_ecafde4",
+      "source_file_hashes": {
+        "data_audit.json": {
+          "sha256": "56ef9abb9dd8c1a5ed28c7da8f200cb3570034f8e23f8b99a84b435c597d98ff",
+          "size_bytes": 168563
+        },
+        "predictions.npz": {
+          "sha256": "09140171d14aedbc168feb0a5de9bc3159f087d80dead30112131addc5fffe1b",
+          "size_bytes": 862218
+        },
+        "result.json": {
+          "sha256": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+          "size_bytes": 2768571
+        },
+        "validation.json": {
+          "sha256": "7b4263700b6d8aa997c3c7e5f8c42461ee6777c0a92a0029e39561eb9e4b39a4",
+          "size_bytes": 48743
+        }
+      }
+    },
+    {
+      "dataset_license": "CC-BY-4.0",
+      "evidence_status": "validated_development",
+      "export_directory": "fog_neural_nocudnn",
+      "launch_commit": "b2dae889d96d51a953289d00a20c68fcfec3f1fa",
+      "model_checkpoints": "retained locally outside Git; this package reproduces metrics, not a weights distribution",
+      "source_directory": "C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\.audit\\phase2_external_v3\\fog_neural_nocudnn_3seed_b2dae",
+      "source_file_hashes": {
+        "data_audit.json": {
+          "sha256": "dd6e9dbd005eaf5951ec9853d6325b549828cc73e8e82c1d2d86c407c4b2155b",
+          "size_bytes": 165781
+        },
+        "predictions.npz": {
+          "sha256": "de3a0f141b41d4954793b28ff6663d432465d462b0488a673426826154b4306b",
+          "size_bytes": 137766
+        },
+        "result.json": {
+          "sha256": "69a5ba46c4680044804b8018cd3d49722beb87f410be856539ac4baeeda11cbb",
+          "size_bytes": 370992
+        },
+        "validation.json": {
+          "sha256": "3b9a952b64c0952b018f5570432d8b0dcc1c4b868aaa1b1ad851f542af1c8e00",
+          "size_bytes": 39043
+        }
+      }
+    },
+    {
+      "dataset_license": "CC-BY-4.0",
+      "evidence_status": "validated_development_negative_candidate_gate",
+      "export_directory": "fog_posture_forest_negative",
+      "launch_commit": "b2dae889d96d51a953289d00a20c68fcfec3f1fa",
+      "model_checkpoints": "retained locally outside Git; this package reproduces metrics, not a weights distribution",
+      "source_directory": "C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\.audit\\phase2_external_v3\\posture_forest_3seed_b2dae",
+      "source_file_hashes": {
+        "data_audit.json": {
+          "sha256": "84d07703fb7706f92b128b424b4986235cf8be835f9a499734ae5fc70b065bb3",
+          "size_bytes": 173911
+        },
+        "predictions.npz": {
+          "sha256": "47908adeb25ca1da33555d5b566444b3de7098251113526c6aeff5bbfe789471",
+          "size_bytes": 610250
+        },
+        "result.json": {
+          "sha256": "6cc3916e660cf00044422465c3a63b20f8c05b393db165015a9aca08e4a54079",
+          "size_bytes": 1063351
+        },
+        "validation.json": {
+          "sha256": "c37cb9d577193126624878a8d862bf50ee67b19d6617790ee757dc408c13b328",
+          "size_bytes": 39031
+        }
+      }
+    }
+  ],
+  "files": {
+    "DATA_LICENSE_AND_SCOPE.md": "0b68c9d6acd8d59c0c11ff902e2f707616afeacbb9b2995d117d9bc32a3030d9",
+    "export_plan.json": "89dc457b4f5cbf2f6b2f4a2dec9718161c8125475a935e49c4b3d9ec74c088bf",
+    "fog_classical_observable_context/data_audit.json": "56ef9abb9dd8c1a5ed28c7da8f200cb3570034f8e23f8b99a84b435c597d98ff",
+    "fog_classical_observable_context/predictions.npz": "09140171d14aedbc168feb0a5de9bc3159f087d80dead30112131addc5fffe1b",
+    "fog_classical_observable_context/result.json": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+    "fog_classical_observable_context/validation.json": "7b4263700b6d8aa997c3c7e5f8c42461ee6777c0a92a0029e39561eb9e4b39a4",
+    "fog_classical_observable_context/validation_export.json": "ed66411874ddff7ff179d6c44eeb6ddbe93dffe780f1bc2822dadfb65fd208f0",
+    "fog_neural_nocudnn/data_audit.json": "dd6e9dbd005eaf5951ec9853d6325b549828cc73e8e82c1d2d86c407c4b2155b",
+    "fog_neural_nocudnn/predictions.npz": "de3a0f141b41d4954793b28ff6663d432465d462b0488a673426826154b4306b",
+    "fog_neural_nocudnn/result.json": "69a5ba46c4680044804b8018cd3d49722beb87f410be856539ac4baeeda11cbb",
+    "fog_neural_nocudnn/validation.json": "3b9a952b64c0952b018f5570432d8b0dcc1c4b868aaa1b1ad851f542af1c8e00",
+    "fog_neural_nocudnn/validation_export.json": "4d98cde33f242e4fd0667ffd46983649b1e293eaaaa501cc8aaf033060b9f68a",
+    "fog_posture_forest_negative/data_audit.json": "84d07703fb7706f92b128b424b4986235cf8be835f9a499734ae5fc70b065bb3",
+    "fog_posture_forest_negative/predictions.npz": "47908adeb25ca1da33555d5b566444b3de7098251113526c6aeff5bbfe789471",
+    "fog_posture_forest_negative/result.json": "6cc3916e660cf00044422465c3a63b20f8c05b393db165015a9aca08e4a54079",
+    "fog_posture_forest_negative/validation.json": "c37cb9d577193126624878a8d862bf50ee67b19d6617790ee757dc408c13b328",
+    "fog_posture_forest_negative/validation_export.json": "f511b46f3ecd5d70b3ba877922cb2435c795ff3555a86a882867f475e8256b7c"
+  },
+  "final_publication_freeze": false,
+  "record_sha256": "b8d809b75e258b40cdf8e810ddfbe2d3c03fb83074520837b95c03fee7e6195a",
+  "status": "COMPLETED_FOG_METRIC_EVIDENCE_EXPORTED"
+}

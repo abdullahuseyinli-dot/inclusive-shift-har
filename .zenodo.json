@@ -1,6 +1,6 @@
 {
-  "title": "InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Ability-Associated Population Shift in Smartphone Activity Recognition",
-  "description": "Research software for auditable, participant-exclusive released-block evaluation of ability-associated population shift in smartphone inertial human activity recognition. The released cohort label is not a direct measure of physical ability, and InclusiveHAR v4 omits timestamps and trial identifiers. In the locked ten-participant target evaluation, compact DANN and CORAL were effectively tied; the full MoRe-HAR configuration scored lower on mean and lower-tail participant macro-F1.",
+  "title": "InclusiveShift-HAR: Annotation-Isolated Wearable Activity Evaluation and Participant-Level Reproducibility Evidence",
+  "description": "Research software for participant-exclusive wearable activity evaluation, annotation-isolated signal preprocessing and explicit inference-population contracts. Opened datasets retain development, stress-test, diagnostic or historical consumed roles. Negative model outcomes, failures and superseded evidence remain visible. InclusiveHAR trial boundaries are unrecoverable. No SOTA, clinical-validity, independent-confirmation or publication-acceptance claim is asserted. Candidate metadata only, not a published deposit.",
   "upload_type": "software",
   "creators": [
     {
@@ -15,7 +15,8 @@
     "inertial sensors",
     "domain generalization",
     "participant-exclusive evaluation",
+    "annotation leakage",
     "reproducible research"
   ],
-  "notes": "Apache-2.0 covers repository-authored material only. Third-party datasets, legacy coursework artifacts, checkpoints, papers, and figures retain their own licences and citations. This file prepares future release metadata and does not represent an existing public release or DOI."
+  "notes": "Apache-2.0 covers repository-authored material only. Third-party datasets, legacy coursework artifacts, predictions, checkpoints, papers and figures retain their own licences and citations; IMU-HAR-IL is CC BY-NC 4.0. The listed version is the current development package version, not a newly published release or tag. Owner approval and an actual immutable version/commit are required before deposition. No DOI or acceptance status is asserted. Raw third-party archives, restricted data and large checkpoints are not automatically part of a software deposit."
 }

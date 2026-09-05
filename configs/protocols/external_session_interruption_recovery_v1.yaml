@@ -1,0 +1,56 @@
+protocol_id: external-session-interruption-recovery-v1
+declared_at_utc: '2026-09-05T13:01:55Z'
+status: frozen_before_recovery_launch_and_outcomes
+reason: >-
+  After explicit session interruptions, the full HAR-PMD classical run, the
+  full Sole-HARmony oracle run and the complete-case corrected-context transfer
+  have no result.json. No matching experiment processes were observed at
+  12:32 UTC or 12:57 UTC. The transfer recorder retained exit code 3221225786
+  at 12:12:59 UTC. The other two recorders have no completion receipt.
+  Exact operating-system causation is not established. These are incomplete
+  attempts, not scientific failures, passes or score-based stopping decisions.
+preserved_attempts:
+  - .audit/phase2_external_v3/har_pmd_full_3seed_5a585e9
+  - .audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae
+  - .audit/phase2_external_v3/imu_complete_to_fog_observable_context_3seed_ecafde4
+recovery_budget:
+  full_har_pmd_classical: 1
+  full_sole_harmony_oracle: 1
+  complete_case_imu_to_fog_observable_context: 1
+  available_trial_imu_campaign: 0
+  neural_campaigns: 0
+existing_unspent_authority: >-
+  Resource-retry-v1/v2 already authorize one available-trial IMU campaign,
+  one complete-case IMU neural retry and one full HAR-PMD neural acquisition
+  retry. This amendment does not duplicate or enlarge those budgets.
+unchanged_scientific_contract:
+  seeds: [11, 23, 47]
+  hyperparameter_or_model_changes: 0
+  score_based_selection: false
+  partial_checkpoint_resume: false
+  har_pmd: [120_participants, 248496_windows, 6ch, provider_native_9ch]
+  sole_harmony: [12_participants, 24_sessions, 137997_windows, camera_bout_oracle]
+  complete_case_imu: [19_participants, 9817_windows, repetitions_1_2_3_4]
+  fog_target: [22_participants, 1939_observable_candidates, 1213_scored_windows]
+execution:
+  clean_committed_source_required: true
+  protocol_commit_required_before_recovery: true
+  new_create_only_directories_required: true
+  concurrency: one_new_large_campaign_at_a_time
+  performance_or_participant_downscaling: prohibited
+  classical_n_jobs: 1
+  supervised_launch: >-
+    A finite hidden-window supervisor may survive an interactive turn
+    interruption. Record its PID, exact argv, source and each terminal status;
+    monitor it and never duplicate an active or completed scheduled job.
+  har_pmd_transport: >-
+    Use only the already verified provider archive, with exhaustive clean
+    all-participant transport-witness checks before fitting. No TLS bypass.
+  artifact_acceptance: >-
+    Validate each completed stage before accepting it. Do not rerun the old
+    HAR-PMD neural backend after classical completion. The separately frozen
+    no-cuDNN neural retry supplies those controls.
+failure_policy: >-
+  Retain every incomplete directory and original receipt. Preserve any further
+  failure and diagnose it; no automatic retry loop, configuration substitution,
+  favorable-seed selection or unrecorded increase in the trial budget.

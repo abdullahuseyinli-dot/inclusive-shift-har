@@ -1,24 +1,99 @@
-# InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Ability-Associated Population Shift in Smartphone Activity Recognition
+# InclusiveShift-HAR: Auditable Wearable Activity Recognition
+
+## Current external research checkpoint — 5 September 2026
+
+The FoG-STAR audit confirmed annotation-dependent resampling/window phase and,
+subsequently, annotation-selected context aggregation in two HERA variants.
+Both paths are repaired under versioned protocols. Earlier FoG-derived and
+FoG-target scores remain superseded or explicitly qualified; artifact integrity
+alone did not detect these semantic defects. See the
+[signal-grid amendment](docs/research/EXTERNAL_HAR_SESSION_GRID_V3_AMENDMENT.md)
+and [observable-context correction](docs/research/EXTERNAL_HAR_OBSERVABLE_CONTEXT_V1_CORRECTION.md).
+
+The current completed FoG package uses 22 development-consumed participants,
+1,939 label-independent candidate windows and 1,213 homogeneous scoring windows.
+Only 16 participants support all three classes. Results use fixed-class
+participant macro-F1 averaged over seeds 11/23/47, not probability-ensemble F1.
+The [generated table](results/research/cross_dataset_har_v3/observable_context_tables_20260905/table.md)
+separates six-channel, derived-nine-channel and noncausal participant-context
+budgets. No independent-confirmation, clinical-validity, SOTA or breakthrough
+claim is supported.
+
+| Matched six-channel, independent-window result | Participant macro-F1 | Evidence status |
+|---|---:|---|
+| Random Forest | 0.570950 | Validated development |
+| XGBoost | 0.565904 | Validated development |
+| Finite PB-HPF candidate | 0.550761 | Validated negative result; primary/tail gate failed |
+
+All three completed packages and validations are indexed in the
+[create-only evidence checkpoint](results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/).
+Its binary predictions are retained locally but deliberately excluded from Git
+by the repository's release policy. A Git-only clone is not sufficient to
+reconstruct metrics: the separately supplied, hash-verified
+[prediction payload](docs/research/EXTERNAL_HAR_PREDICTION_PAYLOAD_V1.md) is required.
+No public payload release or download location is claimed at this checkpoint.
+PB-HPF expansion stopped after its predeclared failure; its derived-gravity
+diagnostic is not substituted as a new headline. The context correction's FoG
+run exited normally from clean commit `ecafde4c2712d01c6f59435ef5537787f91b6946`;
+all 11 unaffected methods passed the frozen parity check.
+
+This is not the final publication freeze. Complete IMU evidence reconstruction,
+the full HAR-PMD model campaign and the expanded Sole-HARmony oracle diagnostic
+remain tracked separately until their final gates pass. More repetitions do not
+increase independent participant N. InclusiveHAR target participants P11-P20
+are not reopened for tuning. See the immutable
+[evidence-role ledger](configs/datasets/evidence_roles_20260905_v2.yaml).
+
+### Reconstruct the completed core table without raw data or training
+
+Start from a clean checkout containing this evidence checkpoint. Install the
+locked CPU research environment and hashed external-reader overlay. Restore
+the separately supplied prediction payload using the create-only, hash-checking
+commands in the linked payload document before running the table command.
+Use a new output directory; do not overwrite earlier reproductions.
+
+```powershell
+uv sync --locked --extra training-cpu --group research
+uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock
+$env:PYTHONPATH = Join-Path (Get-Location) 'src'
+.venv/Scripts/python.exe -m inclusive_shift_har.experiments.publication_table --repository-root . --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn --output .audit/core_table_reproduction_01
+```
+
+This reconstructs metrics from hash-verified predictions; it does not retrain
+models or prove universal cross-hardware bitwise equivalence. Full fitting uses
+the frozen source and campaign commands in the protocols, serializing large
+jobs. Preserve all failures and technical retry receipts. FoG-derived artifacts
+retain [CC BY 4.0 attribution](results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/DATA_LICENSE_AND_SCOPE.md);
+IMU-HAR-IL separately carries CC BY-NC 4.0. Apache-2.0 licenses repository code,
+not third-party data or weights. No release, tag, DOI or Zenodo deposit is
+created by these commands; the existing `v0.1.7` tag keeps its older scope.
+
+## Historical InclusiveHAR benchmark scope
 
 InclusiveShift-HAR studies how smartphone inertial HAR systems trained on conventional participant populations transfer to people whose activities may be physically realized differently, including users of assistive devices. The repository separates legacy coursework, source-only development, and a single locked target evaluation with immutable lineage.
 
 The original working title said "leakage-safe." InclusiveHAR v4 does not release timestamps or trial identifiers, so hidden joins inside released participant-activity blocks cannot be ruled out. The benchmark is participant-exclusive and raw-row-disjoint under the released schema, but it is not trial-safe. That limitation is part of the result, not a footnote.
 
-## Main result
+## Historical locked target result — not new confirmation
 
 The one-time zero-shot target evaluation is complete. It used 10 held-out target participants, 807 non-overlapping released-block windows, three functional-core classes, 20 predeclared model/ablation configurations, and five frozen seeds per configuration.
 
-| Result | Mean participant macro-F1 | Worst participant | Lower decile |
-|---|---:|---:|---:|
-| Compact DANN | 0.6808 | 0.2699 | 0.3559 |
-| Compact CORAL | 0.6808 | 0.2741 | 0.3670 |
-| MoRe-HAR full | 0.6353 | 0.2584 | 0.2660 |
+| Result | Mean participant macro-F1 | Worst participant | Lower decile | Evidence status |
+|---|---:|---:|---:|---|
+| Compact DANN | 0.6808 | 0.2699 | 0.3559 | Historical locked opening, now consumed |
+| Compact CORAL | 0.6808 | 0.2741 | 0.3670 | Historical locked opening, now consumed |
+| MoRe-HAR full | 0.6353 | 0.2584 | 0.2660 | Historical locked opening; negative hypothesis |
 
 Compact DANN had the numerically highest locked-primary target mean, but its lead over compact CORAL was only 0.0000556; the two are effectively tied at the precision supported by these data. The legacy joint CNN/BiLSTM had the highest worst-participant value (0.2943), and CORAL had the highest lower-decile value (0.3670). MoRe-HAR did not improve either the mean or the required lower-tail endpoints against the strongest eligible baselines. Its preregistered hypothesis is therefore **not supported**. This negative outcome is retained, and the auditable benchmark is the primary contribution.
 
 The complete table, participant values, calibration metrics, AURC, per-class recall, comparisons, and self-hashed report are in [`results/confirmatory/zero_shot_v1/`](results/confirmatory/zero_shot_v1/). The 95% interval for compact DANN is [0.5391, 0.8093], reflecting substantial participant uncertainty. A later descriptive comparison estimated a DANN source-minus-target gap of 0.1196 with interval [-0.0371, 0.2831], but the source estimate is one-seed grouped cross-validation while the target estimate averages five final-fit seeds. The two cohorts are unpaired and were evaluated under different training regimes, so that gap is reported only as a cohort-specific descriptive comparison.
 
 ## FuSE/ReFrame v2 source-development extension
+
+These historical source summaries have their own evaluation tuples. In
+particular, adding native gravity channels is a representation ablation, not
+a matched fixed-input before/after architecture improvement. None of these
+numbers is numerically comparable to the external FoG/IMU/HAR-PMD tables.
 
 The post-analysis v2 research suite invented a deterministic Robust Multiscale Residual Pyramid (RMRP) for the same smartphone IMU task. Strict 5-by-4 participant-exclusive nested source cross-validation improved mean/worst-participant macro-F1 from 0.8292/0.4985 with the Geometric Spectral Pyramid to 0.8379/0.5494 with RMRP. The lower decile declined from 0.7373 to 0.7284, the paired mean gain was not statistically decisive, and the +0.015 recorded engineering threshold was not met. This is a useful robustness result, not a confirmed breakthrough or a replacement for the locked v1 target result.
 

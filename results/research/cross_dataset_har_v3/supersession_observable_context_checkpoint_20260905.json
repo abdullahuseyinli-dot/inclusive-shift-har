@@ -1,0 +1,166 @@
+{
+  "corrected_signal_original_context_package": {
+    "affected_evidence_status": "superseded for annotation-independent inference; retained annotation-selected context diagnostic",
+    "affected_methods": [
+      "HERA-DG-context-safe",
+      "HERA-DG-full"
+    ],
+    "context_change_is_a_model_improvement_claim": false,
+    "parity_record_file_sha256": "7c8ad4c6b2018f3306e2d20d319f2245142e96a138b874ae23564ccc8f90e6e9",
+    "path": ".audit/phase2_external_v3/fog_star_3seed_5a585e9/classical",
+    "replacement": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+    "replacement_result_file_sha256": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+    "result_file_sha256": "8a48ad9c864588cd21d79eb822504fce2013c7c624accef4d67c846ffacdbc69",
+    "unaffected_methods": "11 window-local methods remain numerically valid with their original native-exit qualification; all passed the corrected-context parity check"
+  },
+  "created_at_utc": "2026-09-05T10:26:29.318235+00:00",
+  "earlier_ledger_entries_not_replaced_by_this_snapshot": true,
+  "files_deleted_or_overwritten": false,
+  "finite_posture_hypothesis": {
+    "decision": "STOP_CANDIDATE_EXPANSION_RETAIN_NEGATIVE_OR_TRADEOFF_RESULT",
+    "new_candidate_selected_after_failure": false,
+    "path": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_posture_forest_negative",
+    "status": "VALIDATED_NEGATIVE_RESULT"
+  },
+  "historical_fog_updates": [
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "9f93feb30c7f4536041b82c527b20a73135665c29b905deea975603e8bd6a147",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_full_3seed_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "2a3c83f0b0036f9eae80c5e64d68fa6e61d3660af9a456fb2535fe92f4e9afb5",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_3seed_20260905",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "9f4404b88855b42ad0275d0abe94590280a3dc7054239b40b08e590a7a3156ac",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_label_blind_provenance_neural_3seed_20260905",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "1ed27a1d7c85ffea65a732fc4c51b3a57bc8b62f92d31e8dfccb65863777769f",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_neural_3seed_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "6a3779e8bd04a26c705899de143a90a6a26e33e27f51e9049bea07b6aa8327c9",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_classical_3seed_20260905",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "fc28edba76921041a5b992ba524a77ffb98af68c02c303d863c79315faa94053",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_publication_checkpoint_neural_3seed_20260905",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "d5da802320706c0947969d68d02733150c144bdb745938b094c1ee3ff835c87b",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_seed11_method_validation_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "7548f9a448460bb05870b7dbcfdd31010001828e9fd5c2290b658ccdefead563",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_3seed_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "3dd8bf931fbd14952e1bd6551e19482a93dadbb49d406147616ddfb906fe3ed7",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/fog_star_trial_continuous_gravity_neural_3seed_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn",
+      "replacement_status": "validated corrected-protocol development evidence"
+    },
+    {
+      "before_after_full_tuple_matches": false,
+      "evidence_status": "superseded",
+      "numerical_architecture_improvement_comparison_allowed": false,
+      "original_file_hashes_sha256": "76029440d20846b791b883b080e6cf234d67847e4dcbb614164d55d5ae345a18",
+      "original_files_removed_or_modified": false,
+      "original_run_directory": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_zero_shot_seed11_validation_20260904",
+      "reason": "Annotation-dependent FoG signal resampling/window phase; prior metrics are not current-protocol scientific evidence.",
+      "replacement_directory": null,
+      "replacement_status": "corrected-context transfer queued; no completed replacement claimed in this snapshot"
+    }
+  ],
+  "missing_earlier_claimed_replacement": {
+    "exists": false,
+    "path": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_trial_continuous_seed11_validation_20260905",
+    "status": "Original absent directory remains absent; not fabricated or relabelled as a completed run"
+  },
+  "neural_runtime_replacement": {
+    "normal_process_exit": true,
+    "prior_abnormal_exits_preserved": true,
+    "protocol": "external-neural-cuda-nocudnn-v2",
+    "replacement": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn"
+  },
+  "new_confirmation_or_release_claim": false,
+  "parent_ledger": {
+    "file_sha256": "a85d63df4ffa356b9f80721ab13e6f7d350e839fcdb3e421592de604e3adcc83",
+    "path": "results/research/cross_dataset_har_v2/supersession_snapshot_20260905_v2.json"
+  },
+  "protocol_id": "external-har-session-grid-v3+external-har-observable-context-v1",
+  "record_sha256": "e0314b54d627cb031edc6fb35bee8d5d81c28f64df36c5c045388cd526643ddb",
+  "remaining_portfolio": {
+    "available_trial_imu": "N47/20390-window acquisition audit; Windows resource failure preserved; one identical serial retry not yet launched",
+    "complete_case_imu_classical": "completed and integrity-validated; native process exit qualified; distinct N19 scripted cohort",
+    "complete_case_imu_neural": "old body-complete/native-exit-qualified result retained; no-cuDNN OOM attempt preserved; one identical retry not yet launched",
+    "complete_case_imu_to_fog": "corrected-context replacement queued for resource headroom; earlier window-local corrected-signal transfer retained",
+    "controlled_access": "WearGait-PD and Parkinson@Home unavailable; no agreement accepted or data opened",
+    "har_pmd_full": "120 participants/248496 windows acquired; original classical computation ongoing; replacement neural acquisition TLS failure preserved; verified local provider copy ready",
+    "sole_harmony": "12 participants/24 sessions/137997 windows acquired; camera-bout oracle computation ongoing, not deployable evidence"
+  },
+  "schema_version": "3.1.0",
+  "status": "INTERMEDIATE_CORRECTION_CHECKPOINT_NOT_FINAL_PORTFOLIO_FREEZE"
+}

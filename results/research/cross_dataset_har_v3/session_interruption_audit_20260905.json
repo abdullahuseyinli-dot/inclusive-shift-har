@@ -1,0 +1,205 @@
+{
+  "attempts": [
+    {
+      "attempt": "har_pmd_classical",
+      "command_directory": ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9",
+      "files_at_audit": {
+        ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/launch.json": {
+          "bytes": 34139,
+          "path": ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/launch.json",
+          "sha256": "1208c7e5ed4d7915ea24eccd8260a38eb5226850c4c69d1112a0c496d1936363"
+        },
+        ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/stdout.log": {
+          "bytes": 114,
+          "path": ".audit/phase2_external_v3/commands/har_pmd_full_3seed_5a585e9/stdout.log",
+          "sha256": "050af4d525c6a77849e9a1cfbbf8d5ad0bc83ba4ec0675938f0b97056aab7716"
+        },
+        ".audit/phase2_external_v3/har_pmd_full_3seed_5a585e9/campaign_plan.json": {
+          "bytes": 35563,
+          "path": ".audit/phase2_external_v3/har_pmd_full_3seed_5a585e9/campaign_plan.json",
+          "sha256": "411c3ee115a47ec68d71f6bf8c03728b7925ee7aee4a9921778a04dbbac2309d"
+        },
+        ".audit/phase2_external_v3/har_pmd_full_3seed_5a585e9/classical/data_audit.json": {
+          "bytes": 749553,
+          "path": ".audit/phase2_external_v3/har_pmd_full_3seed_5a585e9/classical/data_audit.json",
+          "sha256": "06254fc3f806d276e472910bdbfcbfcdb9cecdc7a942e8e86221d2396c0489a6"
+        }
+      },
+      "matching_processes_at_audit": [],
+      "recorded_completion_at_utc": null,
+      "recorded_exit_code": null,
+      "result_present": false,
+      "run_directory": ".audit/phase2_external_v3/har_pmd_full_3seed_5a585e9",
+      "scientific_result_inferred": false,
+      "status": "INCOMPLETE_AFTER_SESSION_INTERRUPTION_PRESERVED",
+      "terminal_receipt_present": false
+    },
+    {
+      "attempt": "sole_harmony_oracle",
+      "command_directory": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae",
+      "files_at_audit": {
+        ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/launch.json": {
+          "bytes": 35887,
+          "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/launch.json",
+          "sha256": "74f5d901469cadc2ace6363e5c38ffac094665d73168ccde3a97ad42dacc223c"
+        },
+        ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stdout.log": {
+          "bytes": 119,
+          "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stdout.log",
+          "sha256": "be93aa2012e35415932a63e09a64804cee22c8d06e8c384cdf70e75d3e008765"
+        },
+        ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/campaign_plan.json": {
+          "bytes": 37370,
+          "path": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/campaign_plan.json",
+          "sha256": "0b3db1820a17d7b9e4477061f9caf993f53e473ca092713c5f54621a9883a02e"
+        },
+        ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/oracle_temporal/data_audit.json": {
+          "bytes": 124443,
+          "path": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/oracle_temporal/data_audit.json",
+          "sha256": "081c3ddeedf998e5fabca158691aa98cdfb3ff4cf09b74a0f31d477e1cf78b2d"
+        }
+      },
+      "matching_processes_at_audit": [],
+      "recorded_completion_at_utc": null,
+      "recorded_exit_code": null,
+      "result_present": false,
+      "run_directory": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae",
+      "scientific_result_inferred": false,
+      "status": "INCOMPLETE_AFTER_SESSION_INTERRUPTION_PRESERVED",
+      "terminal_receipt_present": false
+    },
+    {
+      "attempt": "complete_case_imu_to_fog_context",
+      "command_directory": ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4",
+      "files_at_audit": {
+        ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/completion.json": {
+          "bytes": 37775,
+          "path": ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/completion.json",
+          "sha256": "12f94e7aa58d3145786040073ac44f8ccea045cab00942ef7c4530c457f8e7db"
+        },
+        ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/launch.json": {
+          "bytes": 37397,
+          "path": ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/launch.json",
+          "sha256": "4d8541504d3230718462ff62b581a45e71ac1392c0b96e5a1637e7d16a3deed2"
+        },
+        ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/stdout.log": {
+          "bytes": 0,
+          "path": ".audit/phase2_external_v3/commands/imu_complete_context_ecafde4/stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/phase2_external_v3/imu_complete_to_fog_observable_context_3seed_ecafde4/data_audit.json": {
+          "bytes": 404136,
+          "path": ".audit/phase2_external_v3/imu_complete_to_fog_observable_context_3seed_ecafde4/data_audit.json",
+          "sha256": "6d58cd25e7f1526108c488fae79fa694d62dcddaf31d6475c53bc73950a99fbb"
+        }
+      },
+      "matching_processes_at_audit": [],
+      "recorded_completion_at_utc": "2026-09-05T12:12:59.604392+00:00",
+      "recorded_exit_code": 3221225786,
+      "result_present": false,
+      "run_directory": ".audit/phase2_external_v3/imu_complete_to_fog_observable_context_3seed_ecafde4",
+      "scientific_result_inferred": false,
+      "status": "INCOMPLETE_AFTER_SESSION_INTERRUPTION_PRESERVED",
+      "terminal_receipt_present": true
+    },
+    {
+      "attempt": "reporting_gate_952",
+      "command_directory": ".audit/session_grid_v3/reporting_precommit_gates_01/tests",
+      "files_at_audit": {
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/completion.json": {
+          "bytes": 40063,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/completion.json",
+          "sha256": "d9ef8a8d60e45a817a718bbc7884492b1c1eefb5801b62760bd50443196e5678"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/launch.json": {
+          "bytes": 39706,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/launch.json",
+          "sha256": "ed03a077b14a7000a5d2b7fff71cc591d3f0d8c26f3837187c8b406e704ba025"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/stdout.log": {
+          "bytes": 101602,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection/stdout.log",
+          "sha256": "687fac70ff0452e70ed50f63cf9d246784c82cd1201eacb600a8808c7ca06764"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection_plan.json": {
+          "bytes": 217138,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/collection_plan.json",
+          "sha256": "b5445fd64f54ee2767710fc0b95321b643aa0feaff49555408edd143c9253494"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00.args": {
+          "bytes": 100618,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00.args",
+          "sha256": "7cc2e673a81ea10516f25f68676d29d0ba26031ac7bd64f7541c13d2a799a44c"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/launch.json": {
+          "bytes": 40157,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/launch.json",
+          "sha256": "344382175a54665be24df24461dd6a5f9a07e05f46a6e19484aafed8300d5806"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/stdout.log": {
+          "bytes": 819,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/full_test_shards/shard_00/stdout.log",
+          "sha256": "9f3bf82fdd86a67aabd68269e86f84c23ec50993c187cfd9c21667224a0c13ab"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/tests/launch.json": {
+          "bytes": 39974,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/tests/launch.json",
+          "sha256": "6f7d30b1f7011d6e15bf9fa00a5eb273eb7eb8c2eded24397d28e49709f896eb"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/tests/stderr.log": {
+          "bytes": 0,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/tests/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        ".audit/session_grid_v3/reporting_precommit_gates_01/tests/stdout.log": {
+          "bytes": 480,
+          "path": ".audit/session_grid_v3/reporting_precommit_gates_01/tests/stdout.log",
+          "sha256": "e27b15a3fb163b9a6e022f36fe316e3bb02cb3bbe129ea5f28f7b94a6f49b0ec"
+        }
+      },
+      "matching_processes_at_audit": [],
+      "recorded_completion_at_utc": null,
+      "recorded_exit_code": null,
+      "result_present": false,
+      "run_directory": ".audit/session_grid_v3/reporting_precommit_gates_01",
+      "scientific_result_inferred": false,
+      "status": "INCOMPLETE_AFTER_SESSION_INTERRUPTION_PRESERVED",
+      "terminal_receipt_present": false
+    }
+  ],
+  "partial_test_progress_is_not_a_passing_gate": true,
+  "prior_artifacts_modified_or_deleted": false,
+  "reason": "Explicit session interruptions preceded the observed loss of processes and incomplete records; precise OS causation is not established.",
+  "record_kind": "external_session_interruption_audit",
+  "record_sha256": "a3df20773939ef7572468f7781b488f28bdeea5b737d61f3dfe39f584a94c2c0",
+  "recorded_at_utc": "2026-09-05T13:04:43.903123+00:00",
+  "recovery_protocol": "configs/protocols/external_session_interruption_recovery_v1.yaml",
+  "recovery_protocol_sha256": "55744e92d93edb12914894d24f1ff308b70b573aea35dcdf12e1698a76069396",
+  "script_sha256": "8fa2bf4035f8f67a8f0ad8635f1933512b574f5ec8103fc74ba0dc9dc3cc7f70",
+  "status": "INCOMPLETE_ATTEMPTS_PRESERVED_NOT_ACCEPTED"
+}

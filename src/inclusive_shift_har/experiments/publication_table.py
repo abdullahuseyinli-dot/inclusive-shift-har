@@ -17,6 +17,11 @@ from inclusive_shift_har.evaluation.external_statistics import (
 )
 from inclusive_shift_har.evaluation.inference_contracts import method_inference_contracts
 from inclusive_shift_har.experiments.external_evidence_validate import validate_run_directory
+from inclusive_shift_har.experiments.transport_equivalence import (
+    load_transport_witness,
+    run_transport_contract,
+    witness_reference,
+)
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 
 _IDENTITY_ARRAYS = ("labels", "participant_ids", "session_ids", "trial_ids", "window_ids")
@@ -94,7 +99,7 @@ def _strongest_control_comparisons(
     controls = [
         name
         for name in methods
-        if name.startswith(("RandomForest-", "XGBoost-", "DeepConvLSTM-", "TinyHAR-"))
+        if name.startswith(("RandomForest-", "XGBoost-", "DeepConvLSTM-", "TinyHAR-", "PB-RF-"))
     ]
     if not controls:
         return {"status": "no_applicable_control_in_table"}
@@ -130,13 +135,20 @@ def _strongest_control_comparisons(
         }
     return {
         "control": strongest,
+        "control_is_predeclared_derived_gravity_diagnostic": strongest == "PB-RF-D9",
         "selection": "largest observed primary mean among frozen applicable controls; lexical tie break",
         "inference_status": "descriptive post-selection comparisons; no new primary test or superiority gate",
         "pairs": pairs,
     }
 
 
-def reconstruct_matched_table(run_directories: list[Path], repository_root: Path) -> dict[str, Any]:
+def reconstruct_matched_table(
+    run_directories: list[Path],
+    repository_root: Path,
+    *,
+    identical_reference_methods: tuple[str, ...] = (),
+    transport_parity: Path | None = None,
+) -> dict[str, Any]:
     """Reject mismatched datasets/grids/roles before pooling distinct methods.
 
     No model is fit and no source signal is opened. Neural/classical supervision
@@ -146,6 +158,13 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
     """
     if not run_directories:
         raise ValueError("at least one validated run is required")
+    if identical_reference_methods not in ((), ("RandomForest-6ch",)):
+        raise ValueError("only the explicit FoG RandomForest-6ch shared reference is supported")
+    witness = (
+        None
+        if transport_parity is None
+        else load_transport_witness(transport_parity, repository_root)
+    )
     common: dict[str, Any] | None = None
     identity: dict[str, Any] = {}
     merged: dict[int, dict[str, Any]] = {seed: {} for seed in (11, 23, 47)}
@@ -153,6 +172,8 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
     qualifications: dict[str, str] = {}
     inference_contracts: dict[str, dict[str, Any]] = {}
     method_statuses: dict[str, str] = {}
+    method_sources: dict[str, dict[str, str]] = {}
+    identical_references: list[dict[str, Any]] = []
     for directory in run_directories:
         validation = validate_run_directory(directory, repository_root)
         if not validation["publication_evidence_ready"] and not validation.get(
@@ -164,10 +185,20 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
         dataset = result["target_dataset" if transfer else "dataset"]
         methods = result["primary_seed_averaged"]["methods"]
         first_report = next(iter(result["reports"].values()))
+        scoring_dataset = {
+            key: value for key, value in dataset.items() if key != "observable_candidate_pool"
+        }
+        preprocessing = _preprocessing_contract(result, dataset)
+        if witness is not None:
+            with np.load(
+                directory / result["prediction_artifact"]["path"], allow_pickle=False
+            ) as payload:
+                transport_identities = {name: payload[name] for name in _IDENTITY_ARRAYS}
+            scoring_dataset, preprocessing = run_transport_contract(
+                result, audit, witness, transport_identities
+            )
         contract = {
-            "dataset": {
-                key: value for key, value in dataset.items() if key != "observable_candidate_pool"
-            },
+            "dataset": scoring_dataset,
             "source_dataset": result.get("source_dataset"),
             "source_receipts": _receipt_contract(audit),
             "class_names": first_report["class_names"],
@@ -176,7 +207,7 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
             if transfer
             else "participant_exclusive_within_dataset",
             "protocol_id": result["source_input_manifest"]["protocol_id"],
-            "preprocessing_equivalence": _preprocessing_contract(result, dataset),
+            "preprocessing_equivalence": preprocessing,
             "estimand": result["primary_seed_averaged"]["estimand"],
             "outer_folds": None if transfer else 5,
             "personalization_budget": 0,
@@ -189,7 +220,6 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
             raise ValueError("non-comparable run contracts; present these as separate tables")
         common = contract
         current_contracts = method_inference_contracts(result)
-        inference_contracts.update(current_contracts)
         prediction = directory / result["prediction_artifact"]["path"]
         with np.load(prediction, allow_pickle=False) as archive:
             for name in _IDENTITY_ARRAYS:
@@ -199,13 +229,43 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
                 identity[name] = values.copy()
             for seed in merged:
                 for method in methods:
-                    if method in merged[seed]:
-                        raise ValueError(
-                            f"duplicate method cannot silently replace evidence: {method}"
-                        )
-                    merged[seed][method] = np.asarray(
+                    values = np.asarray(
                         archive[f"probability__seed-{seed}__{method}"], dtype=np.float64
                     )
+                    if method in merged[seed]:
+                        if (
+                            method in identical_reference_methods
+                            and dataset["dataset_id"] == "fog_star_v3"
+                            and current_contracts[method] == inference_contracts[method]
+                            and values.shape == merged[seed][method].shape
+                            and values.tobytes() == merged[seed][method].tobytes()
+                        ):
+                            identical_references.append(
+                                {
+                                    "method": method,
+                                    "seed": seed,
+                                    "retained_source": method_sources[method],
+                                    "additional_source": str(directory.resolve()),
+                                    "additional_result_sha256": sha256_file(
+                                        directory / "result.json"
+                                    ),
+                                    "probabilities_bitwise_identical": True,
+                                    "counted_as_independent_replication_or_extra_participants": False,
+                                }
+                            )
+                            continue
+                        raise ValueError(
+                            f"duplicate method cannot silently replace evidence or differ: {method}"
+                        )
+                    merged[seed][method] = values
+                    method_sources.setdefault(
+                        method,
+                        {
+                            "run_directory": str(directory.resolve()),
+                            "result_sha256": sha256_file(directory / "result.json"),
+                        },
+                    )
+        inference_contracts.update(current_contracts)
         sources.append(
             {
                 "run_directory": str(directory.resolve()),
@@ -220,6 +280,11 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
                 ],
                 "runtime_backend_protocol": result.get("runtime_backend_protocol"),
                 "observable_candidate_pool": dataset.get("observable_candidate_pool"),
+                "original_raw_local_mirror": dataset.get("raw_local_mirror"),
+                "original_source_storage_audit": dataset.get("source_storage_audit"),
+                "method_input_lanes": result.get("method_input_lanes"),
+                "retained_advancement_gate": result.get("advancement_gate"),
+                "retained_baseline_reconstruction": result.get("baseline_reconstruction"),
                 "validation": validation,
             }
         )
@@ -241,8 +306,21 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
                 if dataset["dataset_id"] == "har_pmd_v1"
                 else "validated_development"
             )
+            if (
+                result.get("method_input_lanes", {}).get(method)
+                == "derived-nine-channel diagnostic"
+            ):
+                status = "diagnostic_derived_gravity_control_validated_development"
+            if (
+                method == "PB-HPF"
+                and result.get("advancement_gate", {}).get("all_advancement_gates_passed") is False
+            ):
+                status = "validated_development_failed_candidate_gate"
             if local_qualifications:
                 status += "_with_runtime_qualification"
+            if method in method_statuses and method in identical_reference_methods:
+                if status != method_statuses[method]:
+                    status = "; ".join(sorted({status, method_statuses[method]}))
             method_statuses[method] = status
     assert common is not None
     inputs = ParticipantMetricInputs(
@@ -281,7 +359,17 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
         "descriptive_comparisons_vs_strongest_observed_control": _strongest_control_comparisons(
             statistics, inference_contracts
         ),
+        "descriptive_comparisons_vs_strongest_same_input_and_context_control": (
+            _same_budget_control_comparisons(statistics, inference_contracts)
+        ),
         "sources": sources,
+        "explicit_identical_reference_methods": list(identical_reference_methods),
+        "identical_reference_checks": identical_references,
+        "transport_equivalence_reference": (
+            None
+            if transport_parity is None or witness is None
+            else witness_reference(transport_parity, witness)
+        ),
         "runtime_qualifications": qualifications,
         "reconstruction_only_no_training_or_raw_data_access": True,
         "independent_confirmation_or_sota_claim_allowed": False,
@@ -294,6 +382,39 @@ def reconstruct_matched_table(run_directories: list[Path], repository_root: Path
         record["evidence_status"] = "mixed_validated_and_diagnostic_methods"
     record["record_sha256"] = canonical_json_sha256(record)
     return record
+
+
+def _same_budget_control_comparisons(
+    statistics: dict[str, Any], contracts: dict[str, dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Do not call the best cross-representation control a matched comparator.
+
+    This supplements the explicitly qualified global descriptive contrasts.
+    A group without a frozen control stays without one; no newly favorable
+    method or missing baseline is invented to fill the gap.
+    """
+    groups: dict[str, list[str]] = {}
+    budgets: dict[str, dict[str, Any]] = {}
+    for name, contract in contracts.items():
+        budget = {
+            key: contract[key]
+            for key in ("input_channel_count", "inference_unit", "context_population")
+        }
+        signature = canonical_json_sha256(budget)
+        groups.setdefault(signature, []).append(name)
+        budgets[signature] = budget
+    return [
+        {
+            "input_and_context_budget": budgets[signature],
+            "methods": sorted(names),
+            "comparisons": _strongest_control_comparisons(
+                {"methods": {name: statistics["methods"][name] for name in names}},
+                {name: contracts[name] for name in names},
+            ),
+            "scope": "Same recorded input/context budget; descriptive post-selection, not a new superiority test or equal-compute claim.",
+        }
+        for signature, names in sorted(groups.items())
+    ]
 
 
 def table_markdown(record: dict[str, Any]) -> str:
@@ -346,6 +467,9 @@ def table_markdown(record: dict[str, Any]) -> str:
             "6ch/N9/DG suffixes identify the frozen representation comparison. "
             "Neural architecture names denote repository implementations, not verified "
             "reproductions of the original papers' training recipes.",
+            "The predeclared PB-RF-D9 diagnostic may be a descriptive control, but never "
+            "replaces the failed PB-HPF candidate or its original primary gate. Any "
+            "explicit shared RF reference is checked bitwise for every seed and counted once.",
             "",
             f"Comparison contract SHA-256: `{record['comparison_contract_sha256']}`.",
             "",
@@ -362,8 +486,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--run-directory", type=Path, action="append", required=True)
     parser.add_argument("--repository-root", type=Path, default=Path.cwd())
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--identical-reference-method", action="append", default=[])
+    parser.add_argument("--transport-parity", type=Path)
     args = parser.parse_args(argv)
-    record = reconstruct_matched_table(args.run_directory, args.repository_root.resolve())
+    record = reconstruct_matched_table(
+        args.run_directory,
+        args.repository_root.resolve(),
+        identical_reference_methods=tuple(args.identical_reference_method),
+        transport_parity=args.transport_parity,
+    )
     args.output.mkdir(parents=True, exist_ok=False)
     _write_json_create_only(args.output / "table.json", record)
     with (args.output / "table.md").open("x", encoding="utf-8", newline="\n") as stream:

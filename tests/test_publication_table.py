@@ -129,6 +129,82 @@ def test_table_rejects_duplicate_methods_and_failed_validation(
         table.reconstruct_matched_table([run], tmp_path)
 
 
+def test_shared_fog_forest_reference_requires_explicit_opt_in_and_bitwise_parity(
+    tmp_path: Path, validated: None
+) -> None:
+    first = _fixture(tmp_path, "first", "RandomForest-6ch")
+    repeated = _fixture(tmp_path, "repeated", "RandomForest-6ch")
+    result = table.reconstruct_matched_table(
+        [first, repeated], tmp_path, identical_reference_methods=("RandomForest-6ch",)
+    )
+    assert list(result["statistics"]["methods"]) == ["RandomForest-6ch"]
+    assert result["statistics"]["participant_count"] == 3
+    assert len(result["sources"]) == 2
+    assert len(result["identical_reference_checks"]) == 3
+    assert all(
+        item["probabilities_bitwise_identical"]
+        and not item["counted_as_independent_replication_or_extra_participants"]
+        for item in result["identical_reference_checks"]
+    )
+    changed = _fixture(tmp_path, "changed", "RandomForest-6ch", correct=False)
+    with pytest.raises(ValueError, match="duplicate method"):
+        table.reconstruct_matched_table(
+            [first, changed], tmp_path, identical_reference_methods=("RandomForest-6ch",)
+        )
+
+
+def test_reference_deduplication_cannot_hide_signed_zero_probability_differences(
+    tmp_path: Path, validated: None
+) -> None:
+    first = _fixture(tmp_path, "first", "RandomForest-6ch")
+    second = _fixture(tmp_path, "second", "RandomForest-6ch")
+    path = second / "predictions.npz"
+    with np.load(path, allow_pickle=False) as archive:
+        arrays = {name: archive[name] for name in archive.files}
+    arrays["probability__seed-11__RandomForest-6ch"][0, 1] = -0.0
+    np.savez_compressed(path, **arrays)
+    with pytest.raises(ValueError, match="duplicate method"):
+        table.reconstruct_matched_table(
+            [first, second], tmp_path, identical_reference_methods=("RandomForest-6ch",)
+        )
+
+
+def test_no_arbitrary_method_deduplication_allowlist(tmp_path: Path, validated: None) -> None:
+    run = _fixture(tmp_path, "run", "XGBoost-6ch")
+    with pytest.raises(ValueError, match="only the explicit FoG"):
+        table.reconstruct_matched_table(
+            [run, run], tmp_path, identical_reference_methods=("XGBoost-6ch",)
+        )
+
+
+def test_diagnostic_control_and_failed_candidate_never_become_passed_primary(
+    tmp_path: Path, validated: None
+) -> None:
+    diagnostic = _fixture(tmp_path, "diagnostic", "PB-RF-D9")
+    candidate = _fixture(tmp_path, "candidate", "PB-HPF", correct=False)
+    for directory, extra in (
+        (diagnostic, {"method_input_lanes": {"PB-RF-D9": "derived-nine-channel diagnostic"}}),
+        (candidate, {"advancement_gate": {"all_advancement_gates_passed": False}}),
+    ):
+        path = directory / "result.json"
+        record = json.loads(path.read_text(encoding="utf-8"))
+        record.update(extra)
+        path.write_text(json.dumps(record), encoding="utf-8")
+    result = table.reconstruct_matched_table([diagnostic, candidate], tmp_path)
+    assert result["method_evidence_statuses"]["PB-RF-D9"].startswith("diagnostic_")
+    assert result["method_evidence_statuses"]["PB-HPF"].endswith("failed_candidate_gate")
+    assert (
+        result["sources"][1]["retained_advancement_gate"]["all_advancement_gates_passed"] is False
+    )
+    assert result["descriptive_comparisons_vs_strongest_observed_control"]["control"] == "PB-RF-D9"
+    six = next(
+        group
+        for group in result["descriptive_comparisons_vs_strongest_same_input_and_context_control"]
+        if "PB-HPF" in group["methods"]
+    )
+    assert six["comparisons"]["status"] == "no_applicable_control_in_table"
+
+
 @pytest.mark.parametrize("name", ["labels", "window_ids"])
 def test_table_rejects_rephased_or_relabelled_predictions(
     tmp_path: Path, validated: None, name: str
@@ -203,6 +279,25 @@ def test_unknown_channel_group_is_not_silently_nine_channels(
     unknown = _fixture(tmp_path, "unknown", "unrecognized")
     result = table.reconstruct_matched_table([control, unknown], tmp_path)
     assert "unknown input channels" in table.table_markdown(result)
+
+
+def test_strongest_matched_control_cannot_come_from_another_inference_budget(
+    tmp_path: Path, validated: None
+) -> None:
+    forest = _fixture(tmp_path, "forest", "RandomForest-6ch")
+    neural = _fixture(tmp_path, "neural", "TinyHAR-DG", correct=False)
+    local = _fixture(tmp_path, "local", "CTGR-DG")
+    context = _fixture(tmp_path, "context", "HERA-DG-full")
+    result = table.reconstruct_matched_table([forest, neural, local, context], tmp_path)
+    groups = result["descriptive_comparisons_vs_strongest_same_input_and_context_control"]
+    six = next(group for group in groups if "RandomForest-6ch" in group["methods"])
+    nine = next(group for group in groups if "CTGR-DG" in group["methods"])
+    batch = next(group for group in groups if "HERA-DG-full" in group["methods"])
+    assert six["comparisons"]["control"] == "RandomForest-6ch"
+    assert nine["comparisons"]["control"] == "TinyHAR-DG"
+    assert nine["comparisons"]["pairs"]["CTGR-DG"]["input_or_inference_contract_differences"] == []
+    assert batch["comparisons"]["status"] == "no_applicable_control_in_table"
+    assert "HERA-DG-full" not in six["comparisons"]["pairs"]
 
 
 def _add_materialization_witness(directory: Path, *, different_source: bool) -> None:

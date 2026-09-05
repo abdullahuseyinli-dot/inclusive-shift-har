@@ -42,6 +42,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Python 3.11
@@ -85,6 +86,43 @@ jobs:
 
       - name: Type-check
         run: uv run --no-sync mypy src tests
+
+      - name: Validate tracked research manifests
+        run: uv run --no-sync inclusive-shift-har validate-manifests --json
+
+      - name: Audit locked participant splits
+        run: >-
+          uv run --no-sync inclusive-shift-har audit-splits
+          --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json
+          --json
+
+      - name: Validate retained research artifacts
+        run: >-
+          uv run --no-sync inclusive-shift-har validate-artifacts
+          --artifact-root results --require-artifacts --json
+
+      - name: Parse every research configuration
+        shell: bash
+        run: |
+          uv run --no-sync python - <<'PY'
+          import json
+          from pathlib import Path
+          import yaml
+          paths = sorted(Path('configs').rglob('*.yaml')) + sorted(Path('configs').rglob('*.json'))
+          assert paths, 'No research configurations found'
+          for path in paths:
+              with path.open(encoding='utf-8') as stream:
+                  yaml.safe_load(stream) if path.suffix == '.yaml' else json.load(stream)
+          print(json.dumps({'configuration_count': len(paths), 'syntax_status': 'PASS'}))
+          PY
+
+      - name: Verify dependency lock freshness offline
+        env:
+          UV_FROZEN: "false"
+        run: uv lock --check --offline
+
+      - name: Verify retained Git object integrity
+        run: git fsck --full
 
   release-security:
     name: Complete-history release security

@@ -7,9 +7,42 @@ import pytest
 
 from inclusive_shift_har.experiments.publication_diagnostics import (
     _checked_statistics,
+    _figure_method_label,
     mechanism_summary,
     write_distribution_figure,
 )
+
+
+@pytest.mark.parametrize(
+    ("name", "count", "batch", "diagnostic", "expected"),
+    [
+        ("RMRP-DG", 6, False, False, "RMRP-DG [6ch]"),
+        ("CTGR-DG", 9, False, False, "CTGR-DG [9ch]"),
+        ("HERA-DG-full", 9, True, False, "HERA-DG-full [9ch; participant batch]"),
+        ("unrecognized", None, False, False, "unrecognized [unknown channels]"),
+        (
+            "HERA-DG-full",
+            9,
+            True,
+            True,
+            "HERA-DG-full [9ch; annotation-selected diagnostic]",
+        ),
+    ],
+)
+def test_figure_labels_state_actual_channels_not_misleading_method_suffixes(
+    name: str, count: int | None, batch: bool, diagnostic: bool, expected: str
+) -> None:
+    assert (
+        _figure_method_label(
+            name,
+            {
+                "input_channel_count": count,
+                "inference_unit": "noncausal_participant_batch" if batch else "independent_window",
+                "annotation_selected_evaluation_context": diagnostic,
+            },
+        )
+        == expected
+    )
 
 
 def test_mechanism_counts_do_not_infer_activation_or_participant_n() -> None:
@@ -90,3 +123,24 @@ def test_figure_contains_all_methods_status_and_preserves_existing_output(tmp_pa
     assert len(_checked_statistics(_result())["methods"]) == 2
     with pytest.raises(FileExistsError, match="create-only"):
         write_distribution_figure(_result(), tmp_path, status="changed")
+
+
+def test_small_comparison_figure_xlabel_does_not_overlap_evidence_footer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from matplotlib.figure import Figure
+
+    original = Figure.savefig
+    checked = []
+
+    def checked_savefig(figure: Figure, *args: Any, **kwargs: Any) -> None:
+        figure.canvas.draw()
+        xlabel = figure.axes[0].xaxis.label.get_window_extent()
+        footer = figure.texts[0].get_window_extent()
+        assert xlabel.y0 > footer.y1 + 2
+        checked.append(True)
+        original(figure, *args, **kwargs)
+
+    monkeypatch.setattr(Figure, "savefig", checked_savefig)
+    write_distribution_figure(_result(), tmp_path, status="synthetic diagnostic")
+    assert checked == [True, True]
