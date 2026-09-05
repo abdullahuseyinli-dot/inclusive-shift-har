@@ -80,13 +80,16 @@ def run_campaign(
         flush=True,
     )
     try:
-        if dataset == "imu-har-il":
+        if dataset in {"imu-har-il", "imu-har-il-available"}:
             run_primary_suite(
                 output_root=output / "primary_suite",
                 repository_root=repository_root,
                 seeds=(11, 23, 47),
                 epochs=40,
                 n_jobs=n_jobs,
+                selection_policy="available_valid_trials"
+                if dataset == "imu-har-il-available"
+                else "complete_requested_core",
             )
         elif dataset == "fog-star":
             data = load_fog_star()
@@ -175,7 +178,9 @@ def run_campaign(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--dataset", choices=("fog-star", "imu-har-il", "har-pmd", "sole-harmony"), required=True
+        "--dataset",
+        choices=("fog-star", "imu-har-il", "imu-har-il-available", "har-pmd", "sole-harmony"),
+        required=True,
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repository-root", type=Path, default=Path.cwd())

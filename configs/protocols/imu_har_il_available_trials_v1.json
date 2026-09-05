@@ -1,0 +1,55 @@
+{
+  "basis": {
+    "complete_case_data_audit": ".audit\\phase2_external_v3\\imu_all_3seed_5a585e9\\primary_suite\\imu_har_il_all_repetitions_3seed\\data_audit.json",
+    "excluded_for_bad_requested_trials": 3,
+    "excluded_for_missing_files": 28,
+    "requested_participants": 50,
+    "retained_participants": 19,
+    "sha256": "04e259bb84967bf888141308566842f3ff79edca60cee7795d76213e7dd1f471"
+  },
+  "comparison_rule": "complete-case, repetition-1, and available-trial rows differ in participants/observations and are non-comparable before/after model improvements",
+  "complete_case_model_performance_inspected_before_declaration": false,
+  "declared_at_utc": "2026-09-05T04:21:09.063773+00:00",
+  "evidence_promotion": "no consumed cohort is promoted to confirmation",
+  "evidence_role": "development_missing_data_sensitivity_not_confirmation",
+  "folds": {
+    "inner": 4,
+    "outer": 5
+  },
+  "model_protocol": "all inherited classical/invention and neural controls; unchanged model/hyperparameter budgets",
+  "neural_epochs": 40,
+  "prior_complete_case_run": "retained unchanged as a separate prespecified 19-participant analysis",
+  "protocol_id": "imu-har-il-available-trials-v1",
+  "record_sha256": "7df5f88cb0a32d8e1897097474267f59a320ec269a62e219352f919e5b2f4053",
+  "schema_version": "1.0.0",
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "selection_policy": {
+    "independent_unit": "participant, never repetition",
+    "invalid_trial": "quarantine affected trial for missing sensor schema, annotation conflict, or no finite complete window; do not drop valid peer trials",
+    "missing_classes": "retain and report fixed-class ceiling, present-class and complete-class sensitivities",
+    "missing_trial": "record missing file; retain other available trials and do not invent data",
+    "participant_eligibility": "at least one eligible window from an available valid trial",
+    "requested_activities": [
+      "Walk",
+      "Sit",
+      "Stand"
+    ],
+    "requested_participants": "all provider participants; no outcome-based selection",
+    "requested_repetitions": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "sensor": "Body-WT waist IMU"
+  },
+  "signal_pipeline": "same file-defined trial boundaries, finite runs, units, causal 0.30 Hz gravity, 60-to-50 Hz resampling and 128/128 windows as frozen external v3; missingness changes eligibility only",
+  "statistical_rule": "same seed-averaged participant fixed-class metric and 10000 participant-cluster bootstrap; descriptive sensitivity only, no additional primary superiority hypothesis",
+  "status": "frozen_coverage_amendment_before_available_trial_outcomes",
+  "stop_rule": "one full three-seed suite and transfer after clean implementation/protocol commit; preserve all failures and exclusions",
+  "transfer": "same source-only transfer suite into corrected FoG; development evidence"
+}

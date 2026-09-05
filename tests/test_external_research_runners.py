@@ -22,6 +22,7 @@ from inclusive_shift_har.experiments import (
     cross_dataset_transfer,
     external_primary_suite,
     har_pmd_stress,
+    publication_campaign,
 )
 from inclusive_shift_har.experiments.external_evidence_validate import validate_run_directory
 
@@ -148,6 +149,101 @@ def test_primary_suite_preserves_acquisition_failure(
     assert failure["status"] == "FAILED_PRESERVED"
     assert failure["source_input_manifest"]["protocol_id"] == "external-har-session-grid-v3"
     assert not (tmp_path / "suite/suite_complete.json").exists()
+
+
+@pytest.mark.parametrize("policy", ["complete_requested_core", "available_valid_trials"])
+def test_primary_suite_routes_cohort_policy_and_orders_acceptance_gates(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, policy: str
+) -> None:
+    events: list[str] = []
+    source, target = _data("imu_har_il_v1"), _data("fog_star_v3")
+
+    def acquire(**kwargs: Any) -> ExternalHARWindows:
+        assert kwargs["selection_policy"] == policy
+        assert kwargs["repetition_limit"] == 4
+        events.append("source")
+        return source
+
+    def acquire_target(**kwargs: Any) -> ExternalHARWindows:
+        events.append("target_after_source_gates")
+        return target
+
+    def runner(stage: str) -> Any:
+        def run(**kwargs: Any) -> dict[str, Any]:
+            assert kwargs["seeds"] == (11, 23, 47)
+            if stage == "transfer":
+                assert kwargs["source"] is source and kwargs["target"] is target
+            else:
+                assert kwargs["data"] is source
+            kwargs["output_directory"].mkdir()
+            events.append(stage)
+            return {"reports": {}}
+
+        return run
+
+    monkeypatch.setattr(external_primary_suite, "load_imu_har_il", acquire)
+    monkeypatch.setattr(external_primary_suite, "load_fog_star", acquire_target)
+    monkeypatch.setattr(external_primary_suite, "run_and_write", runner("classical"))
+    monkeypatch.setattr(external_primary_suite, "run_and_write_neural", runner("neural"))
+    monkeypatch.setattr(external_primary_suite, "run_and_write_transfer", runner("transfer"))
+    monkeypatch.setattr(
+        external_primary_suite, "_validate_stage", lambda *_args: events.append("gate")
+    )
+    result = external_primary_suite.run_primary_suite(
+        output_root=tmp_path / "suite",
+        repository_root=Path(__file__).resolve().parents[1],
+        seeds=(11, 23, 47),
+        epochs=40,
+        n_jobs=1,
+        selection_policy=policy,
+    )
+    assert result["cohort_selection_policy"] == policy
+    assert events == [
+        "source",
+        "classical",
+        "gate",
+        "neural",
+        "gate",
+        "target_after_source_gates",
+        "transfer",
+        "gate",
+    ]
+    plan = json.loads((tmp_path / "suite/suite_plan.json").read_text())
+    assert plan["cohort_selection_policy"] == policy
+    tag = "available_trials" if policy == "available_valid_trials" else "all_repetitions"
+    assert (tmp_path / f"suite/imu_har_il_{tag}_3seed").is_dir()
+
+
+def test_available_campaign_cli_dispatches_explicit_selection_policy(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calls: list[dict[str, Any]] = []
+    monkeypatch.setattr(
+        publication_campaign,
+        "_git_state",
+        lambda _root: {"worktree_dirty": False, "commit": "synthetic", "status_entries": []},
+    )
+    monkeypatch.setattr(publication_campaign, "_source_input_manifest", lambda _root: {"files": {}})
+    monkeypatch.setattr(publication_campaign, "_manifest_commit_errors", lambda *_args: [])
+    monkeypatch.setattr(
+        publication_campaign, "run_primary_suite", lambda **kwargs: calls.append(kwargs)
+    )
+    assert (
+        publication_campaign.main(
+            [
+                "--dataset",
+                "imu-har-il-available",
+                "--output",
+                str(tmp_path / "campaign"),
+                "--repository-root",
+                str(tmp_path),
+            ]
+        )
+        == 0
+    )
+    assert len(calls) == 1 and calls[0]["selection_policy"] == "available_valid_trials"
+    assert calls[0]["seeds"] == (11, 23, 47) and calls[0]["epochs"] == 40
+    assert (tmp_path / "campaign/campaign_complete.json").is_file()
 
 
 def test_har_pmd_runner_has_separate_native_and_six_channel_predictions(

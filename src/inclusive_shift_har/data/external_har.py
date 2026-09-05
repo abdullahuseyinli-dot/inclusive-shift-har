@@ -81,6 +81,7 @@ class ExternalHARWindows:
     gravity_source: str = "unspecified"
     gravity_cutoff_hz: float | None = None
     preprocessing_audit: tuple[dict[str, Any], ...] = ()
+    cohort_audit: dict[str, Any] | None = None
 
     def validate(self, *, require_all_classes: bool = True) -> None:
         """Fail closed on alignment, units, identifiers, or lane ambiguity."""
@@ -153,7 +154,7 @@ class ExternalHARWindows:
             len(set(self.labels[self.participant_ids == participant].tolist()))
             for participant in participants
         ]
-        return {
+        summary = {
             "dataset_id": self.dataset_id,
             "channel_lane": self.channel_lane,
             "sampling_rate_hz": self.sampling_rate_hz,
@@ -184,6 +185,9 @@ class ExternalHARWindows:
             "preprocessing_audit": list(self.preprocessing_audit),
             "raw_local_mirror": False,
         }
+        if self.cohort_audit is not None:
+            summary["cohort_audit"] = self.cohort_audit
+        return summary
 
 
 @dataclass(frozen=True, slots=True)
@@ -957,6 +961,7 @@ def _imu_har_il_inventory(
     repetition_limit: int | None,
     activities: tuple[str, ...],
     workers: int,
+    require_complete_core: bool = True,
 ) -> tuple[tuple[_IMUSourceFile, ...], tuple[dict[str, Any], ...]]:
     folders = _request_json("https://data.csiro.au/dap/ws/v2/collections/74700/folders")
     specifications = _imu_folder_paths(
@@ -975,7 +980,8 @@ def _imu_har_il_inventory(
             (
                 source
                 for specification, source in resolved
-                if source is not None and specification[0] not in incomplete_participants
+                if source is not None
+                and (not require_complete_core or specification[0] not in incomplete_participants)
             ),
             key=lambda item: (item.participant, item.repetition, item.activity),
         )
@@ -991,7 +997,9 @@ def _imu_har_il_inventory(
             {
                 "participant_id": f"imuharil:{participant}",
                 "reason": "missing Body-WT.csv in at least one requested core trial",
-                "action": "participant excluded before windowing to retain complete core support",
+                "action": "participant excluded before windowing to retain complete core support"
+                if require_complete_core
+                else "missing trial omitted; other available trials retained",
                 "missing_folders": missing,
             }
         )
@@ -1035,15 +1043,20 @@ def load_imu_har_il(
     gravity_cutoff_hz: float = 0.30,
     discovery_workers: int = 12,
     download_workers: int = 8,
+    selection_policy: str = "complete_requested_core",
 ) -> ExternalHARWindows:
     """Stream the IMU-HAR-IL Body-WT core without storing third-party raw files."""
 
+    if selection_policy not in {"complete_requested_core", "available_valid_trials"}:
+        raise ValueError("unknown IMU-HAR-IL cohort selection policy")
+    complete_core = selection_policy == "complete_requested_core"
     dataset_id = "imu_har_il_v1"
     files, exclusions = _imu_har_il_inventory(
         participant_limit=participant_limit,
         repetition_limit=repetition_limit,
         activities=("Walk", "Sit", "Stand"),
         workers=discovery_workers,
+        require_complete_core=complete_core,
     )
     label_map = {"Walk": 0, "Sit": 1, "Stand": 2}
     provider_label_map = {"Walk": 5, "Sit": 1, "Stand": 2}
@@ -1152,17 +1165,24 @@ def load_imu_har_il(
             downloaded.append((source, frame))
 
     invalid_participants = set(invalid_trials)
+    invalid_members = {str(item["member"]) for items in invalid_trials.values() for item in items}
     data_quality_exclusions = tuple(
         {
             "participant_id": f"imuharil:{participant}",
-            "reason": "one or more requested core trials failed the pre-window data-quality gate",
-            "action": "participant excluded before any of their trials were windowed",
+            "reason": "one or more requested core trials failed the pre-window data-quality gate"
+            if complete_core
+            else "one or more requested core trials quarantined by the trial-quality gate",
+            "action": "participant excluded before any of their trials were windowed"
+            if complete_core
+            else "affected trials excluded; other valid trials retained",
             "invalid_trials": invalid_trials[participant],
         }
         for participant in sorted(invalid_participants)
     )
     for source, frame in downloaded:
-        if source.participant in invalid_participants:
+        if (complete_core and source.participant in invalid_participants) or (
+            not complete_core and source.filename in invalid_members
+        ):
             continue
         total = frame[["Acc_X", "Acc_Y", "Acc_Z"]].to_numpy(dtype=np.float64)
         gyro = frame[["Gyr_X", "Gyr_Y", "Gyr_Z"]].to_numpy(dtype=np.float64) * np.pi / 180.0
@@ -1191,6 +1211,32 @@ def load_imu_har_il(
         gravity_source="causal_lowpass_from_total_acceleration",
         gravity_cutoff_hz=gravity_cutoff_hz,
     )
+    requested_people = {f"imuharil:{item.participant}" for item in files} | {
+        str(item["participant_id"]) for item in exclusions
+    }
+    cohort_audit = (
+        None
+        if complete_core
+        else {
+            "protocol_id": "imu-har-il-available-trials-v1",
+            "selection_policy": selection_policy,
+            "requested_repetition_limit": repetition_limit,
+            "requested_participant_count": len(requested_people),
+            "requested_participants": sorted(requested_people),
+            "resolved_source_file_count": len(files),
+            "missing_requested_trial_count": sum(
+                len(item["missing_folders"]) for item in exclusions
+            ),
+            "quarantined_trial_count": len(invalid_members),
+            "retained_participant_count": int(np.unique(result.participant_ids).size),
+            "retained_trial_count": int(np.unique(result.trial_ids).size),
+            "participants_with_no_retained_windows": sorted(
+                requested_people - set(result.participant_ids.tolist())
+            ),
+            "independent_unit": "participant; repetitions do not increase independent N",
+            "complete_case_or_repetition1_before_after_comparison_allowed": False,
+        }
+    )
     return ExternalHARWindows(
         dataset_id=result.dataset_id,
         channel_lane=result.channel_lane,
@@ -1207,6 +1253,7 @@ def load_imu_har_il(
         source_issues=tuple(issues),
         gravity_source=result.gravity_source,
         gravity_cutoff_hz=result.gravity_cutoff_hz,
+        cohort_audit=cohort_audit,
     )
 
 

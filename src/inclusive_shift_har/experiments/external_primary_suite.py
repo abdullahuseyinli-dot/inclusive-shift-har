@@ -45,9 +45,22 @@ def run_primary_suite(
     seeds: tuple[int, ...],
     epochs: int,
     n_jobs: int,
+    selection_policy: str = "complete_requested_core",
 ) -> dict[str, Any]:
     """Reuse one full source materialization across source and transfer experiments."""
 
+    if selection_policy not in {"complete_requested_core", "available_valid_trials"}:
+        raise ValueError("unknown IMU-HAR-IL suite cohort policy")
+    source_tag = (
+        "imu_har_il_available_trials"
+        if selection_policy == "available_valid_trials"
+        else "imu_har_il_all_repetitions"
+    )
+    transfer_tag = (
+        "imu_available_to_fog_zero_shot_3seed"
+        if selection_policy == "available_valid_trials"
+        else "imu_all_to_fog_zero_shot_3seed"
+    )
     git_at_launch = _git_state(repository_root)
     source_input_manifest = _source_input_manifest(repository_root)
     output_root.mkdir(parents=True, exist_ok=False)
@@ -64,6 +77,7 @@ def run_primary_suite(
             ],
             "seeds": list(seeds),
             "neural_epochs": epochs,
+            "cohort_selection_policy": selection_policy,
             "raw_local_mirror": False,
             "source_materialization_reused_in_memory": True,
             "git_at_launch": git_at_launch,
@@ -81,19 +95,20 @@ def run_primary_suite(
         gravity_cutoff_hz = float(derived["cutoff_hz"])
         source = load_imu_har_il(
             repetition_limit=4,
+            selection_policy=selection_policy,
             target_rate_hz=target_rate_hz,
             window_samples=window_samples,
             gravity_cutoff_hz=gravity_cutoff_hz,
         )
         classical = run_and_write(
             data=source,
-            output_directory=output_root / "imu_har_il_all_repetitions_3seed",
+            output_directory=output_root / f"{source_tag}_3seed",
             repository_root=repository_root,
             seeds=seeds,
             n_jobs=n_jobs,
             include_classical=True,
         )
-        _validate_stage(output_root / "imu_har_il_all_repetitions_3seed", repository_root)
+        _validate_stage(output_root / f"{source_tag}_3seed", repository_root)
         _write_json_create_only(
             output_root / "stage_01_imu_classical_complete.json",
             {
@@ -104,12 +119,12 @@ def run_primary_suite(
         )
         neural = run_and_write_neural(
             data=source,
-            output_directory=output_root / "imu_har_il_all_repetitions_neural_3seed",
+            output_directory=output_root / f"{source_tag}_neural_3seed",
             repository_root=repository_root,
             seeds=seeds,
             epochs=epochs,
         )
-        _validate_stage(output_root / "imu_har_il_all_repetitions_neural_3seed", repository_root)
+        _validate_stage(output_root / f"{source_tag}_neural_3seed", repository_root)
         _write_json_create_only(
             output_root / "stage_02_imu_neural_complete.json",
             {
@@ -126,13 +141,13 @@ def run_primary_suite(
         transfer = run_and_write_transfer(
             source=source,
             target=target,
-            output_directory=output_root / "imu_all_to_fog_zero_shot_3seed",
+            output_directory=output_root / transfer_tag,
             repository_root=repository_root,
             seeds=seeds,
             n_jobs=n_jobs,
             include_classical=True,
         )
-        _validate_stage(output_root / "imu_all_to_fog_zero_shot_3seed", repository_root)
+        _validate_stage(output_root / transfer_tag, repository_root)
         completed = {
             "schema_version": "1.0.0",
             "status": "PRIMARY_SUITE_COMPLETE",
@@ -142,6 +157,7 @@ def run_primary_suite(
             "imu_neural_method_means": _method_means(neural),
             "zero_shot_method_means": _method_means(transfer),
             "raw_local_mirror": False,
+            "cohort_selection_policy": selection_policy,
         }
         _write_json_create_only(output_root / "suite_complete.json", completed)
         return completed
@@ -171,6 +187,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=[11, 23, 47])
     parser.add_argument("--epochs", type=int, default=40)
     parser.add_argument("--n-jobs", type=int, default=-1)
+    parser.add_argument(
+        "--selection-policy",
+        choices=("complete_requested_core", "available_valid_trials"),
+        default="complete_requested_core",
+    )
     return parser
 
 
@@ -182,6 +203,7 @@ def main(argv: list[str] | None = None) -> int:
         seeds=tuple(args.seeds),
         epochs=args.epochs,
         n_jobs=args.n_jobs,
+        selection_policy=args.selection_policy,
     )
     print(json.dumps(result, indent=2, sort_keys=True))
     return 0
