@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import platform
-import subprocess
 import sys
 import traceback
 from dataclasses import dataclass
@@ -22,13 +21,24 @@ import numpy as np
 import yaml
 from numpy.typing import NDArray
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _git_state as _git_state,
+)
+from inclusive_shift_har.artifacts.research_provenance import (
+    _source_input_manifest as _source_input_manifest,
+)
+from inclusive_shift_har.artifacts.research_provenance import (
+    _write_json_create_only as _write_json_create_only,
+)
 from inclusive_shift_har.data.external_har import (
     CORE_CLASS_NAMES,
     ExternalHARWindows,
     load_fog_star,
     load_imu_har_il,
+    observable_modelling_pool,
     participant_fold_assignment,
 )
+from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
 from inclusive_shift_har.experiments.cage_har import _report
 from inclusive_shift_har.experiments.cage_har_retrospective import (
     _outer_context,
@@ -413,6 +423,9 @@ def _evaluate_seed(
     repository_root: Path,
     include_classical: bool,
 ) -> tuple[dict[str, FloatArray], dict[str, Any]]:
+    data, scoring_indices, supervised_eligibility = observable_modelling_pool(
+        data, include_supervised_labels=True
+    )
     labels = data.labels
     participants = data.participant_ids
     signals = np.asarray(data.signals, dtype=np.float64)
@@ -457,7 +470,7 @@ def _evaluate_seed(
             participant for participant, fold in assignment.items() if fold == outer_index
         }
         evaluation = _participant_mask(participants, evaluation_ids)
-        training = ~evaluation
+        training = (~evaluation) & supervised_eligibility
         if set(np.unique(labels[training]).tolist()) != {0, 1, 2}:
             raise ValueError("outer training partition lacks a core class")
         inner = _inner_oof_and_selection(
@@ -777,6 +790,9 @@ def _evaluate_seed(
                 "outer_fold": outer_index,
                 "training_participants": sorted(np.unique(participants[training]).tolist()),
                 "evaluation_participants": sorted(evaluation_ids),
+                "evaluation_candidate_window_count": int(evaluation.sum()),
+                "evaluation_scored_window_count": int((evaluation & supervised_eligibility).sum()),
+                "context_event_population": "all supplied observable candidates of evaluation participants",
                 "selected_ctgr_candidate": str(inner.selected_candidate["id"]),
                 "selected_cage_expert": str(inner.selected_expert_candidate["id"]),
                 "top_three_hera_candidates": [
@@ -807,12 +823,16 @@ def _evaluate_seed(
                 "hera_v2_route_selection": v2_selection,
                 "hera_v2_semantic_training_disagreements": semantic_disagreements,
                 "hera_v1_strict_veto_count": int(strict_vetoed.sum()),
-                "outer_evaluation_labels_used_before_predictions_fixed": False,
+                "outer_evaluation_labels_used_for_training_or_selection": False,
+                "evaluation_annotations_preloaded_for_scoring_eligibility": True,
             }
         )
     if any(not np.isfinite(values).all() for values in probability.values()):
         raise ValueError("outer OOF probability coverage is incomplete")
-    return probability, {"seed": seed, "folds": fold_records}
+    return (
+        {method: values[scoring_indices] for method, values in probability.items()},
+        {"seed": seed, "folds": fold_records},
+    )
 
 
 def evaluate_external_development(
@@ -945,6 +965,7 @@ def evaluate_external_development(
     result = {
         "schema_version": "1.0.0",
         "experiment_id": "cross-dataset-har-rnd-v1",
+        "observable_context_protocol": OBSERVABLE_CONTEXT_PROTOCOL,
         "dataset": data.summary(),
         "evidence_status": "EXTERNAL_DEVELOPMENT_NOT_CONFIRMATORY",
         "method_lane": "derived-gravity adaptations",
@@ -961,78 +982,15 @@ def evaluate_external_development(
             "state_of_the_art_claim_allowed": False,
             "native_and_derived_lane_pooling_allowed": False,
             "wear_gait_opened": False,
-            "outer_labels_used_before_prediction_freeze": False,
+            "outer_evaluation_labels_used_for_training_or_selection": False,
+            "evaluation_annotations_preloaded_for_scoring_eligibility": True,
+            "participant_context_is_noncausal_and_not_matched_window_inference": True,
         },
     }
     from inclusive_shift_har.evaluation.external_statistics import seed_evidence
 
     result["primary_seed_averaged"], seed_predictions = seed_evidence(data, seed_probabilities)
     return result, {**ensemble, **seed_predictions}
-
-
-def _write_json_create_only(path: Path, value: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8", newline="\n") as stream:
-        json.dump(value, stream, indent=2, sort_keys=True)
-        stream.write("\n")
-
-
-def _git_state(repository_root: Path) -> dict[str, Any]:
-    commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=repository_root,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    status = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=repository_root,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.splitlines()
-    return {"commit": commit, "worktree_dirty": bool(status), "status_entries": status}
-
-
-def _source_input_manifest(repository_root: Path) -> dict[str, Any]:
-    """Hash executable source and the declared external protocol at run start."""
-
-    if Path(__file__).resolve().parents[3] != repository_root.resolve():
-        raise ValueError(
-            "executed research package does not belong to the declared repository root"
-        )
-    candidates = list((repository_root / "src").rglob("*.py"))
-    candidates.extend((repository_root / "configs").rglob("*.yaml"))
-    candidates.extend((repository_root / "configs").rglob("*.json"))
-    candidates.extend((repository_root / "docs/research").glob("*.md"))
-    candidates.extend(
-        repository_root / relative
-        for relative in (
-            "configs/datasets/external_har_portfolio_v1.yaml",
-            "configs/experiments/cross_dataset_har_rnd_v1.yaml",
-            "docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
-            "docs/research/EXTERNAL_HAR_PHYSICAL_GRID_V2_CORRECTION.md",
-            "configs/protocols/external_har_physical_grid_v2.yaml",
-            "configs/datasets/evidence_roles_20260905_v2.yaml",
-            "pyproject.toml",
-            "uv.lock",
-            "requirements/external-har-research.in",
-            "requirements/external-har-research.lock",
-        )
-    )
-    files = {
-        path.relative_to(repository_root).as_posix(): sha256_file(path)
-        for path in sorted(set(candidates))
-        if path.is_file()
-    }
-    return {
-        "protocol_id": "external-har-session-grid-v3",
-        "file_count": len(files),
-        "files": files,
-        "manifest_sha256": canonical_json_sha256(files),
-        "captured_at": datetime.now(UTC).isoformat(),
-    }
 
 
 def run_and_write(
@@ -1189,8 +1147,8 @@ def main(argv: list[str] | None = None) -> int:
         include_classical=not args.skip_classical,
     )
     summary = {
-        name: values["primary"]["mean_participant_macro_f1"]
-        for name, values in cast(dict[str, dict[str, Any]], result["reports"]).items()
+        name: values["mean_participant_macro_f1"]
+        for name, values in result["primary_seed_averaged"]["methods"].items()
     }
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0

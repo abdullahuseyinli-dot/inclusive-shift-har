@@ -213,7 +213,7 @@ def run_and_write(
             "created_at": started,
             "dataset": data.summary(),
             "source_receipts": [receipt.to_dict() for receipt in data.receipts],
-            "raw_local_mirror": False,
+            "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
             "source_input_manifest": source_input_manifest,
             "git_at_launch": git_at_launch,
         },

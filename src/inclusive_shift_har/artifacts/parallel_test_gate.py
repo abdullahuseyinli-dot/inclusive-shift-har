@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from inclusive_shift_har.artifacts.publication_checkpoint import record_command
-from inclusive_shift_har.experiments.cross_dataset_har import _write_json_create_only
+from inclusive_shift_har.artifacts.research_provenance import _write_json_create_only
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 
 

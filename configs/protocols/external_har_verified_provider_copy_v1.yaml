@@ -1,0 +1,33 @@
+protocol_id: external-har-verified-provider-copy-v1
+declared_at_utc: '2026-09-05T08:45:41Z'
+status: frozen_before_local_copy_model_fitting
+purpose: >-
+  Recover the failed HAR-PMD HTTPS acquisition without disabling TLS or
+  redownloading the full selected cohort for every technical retry.
+dataset_id: har_pmd_v1
+provider_record: 7939223
+provider_version: '2'
+source_url: https://zenodo.org/api/records/7939223/files/data_publish.zip/content
+archive_size_bytes: 7288182191
+archive_md5: cdc7b79aaa0450d68d94f430f2a2de63
+archive_sha256: 3dd04d8239540ebc1eb50c569f0c421ce54875b6b14a69dddc6f3459b6f0d665
+license: CC-BY-4.0
+verified_acquisition_receipt: .audit/phase2_external_v3/har_pmd_verified_provider_archive_20260905/acquisition_complete.json
+changes:
+  - Optional verified local ZIP transport; default remote transport remains unchanged.
+  - Hash the complete local file before ZIP parsing and read the same open handle.
+  - Preserve source URL, each member SHA-256, declared size and CRC validation.
+  - Disclose raw_local_mirror true and full provider-copy audit in local-mode results.
+  - Permit only this explicitly verified storage contract in the artifact validator.
+  - Keep raw archive under ignored preserved evidence; never include it in Git or software releases.
+unchanged:
+  - Dataset bytes, participant selection, five-class endpoint and channel lanes.
+  - Member parsing, timestamps, interpolation, finite runs and window construction.
+  - Seeds, folds, supervision, neural backend, epochs and model parameters.
+scientific_retry_budget: >-
+  This consumes the previously declared HAR-PMD neural acquisition retry,
+  not another model/configuration trial. It grants no score-based selection.
+comparison_rule: >-
+  Storage location alone does not define a new dataset, but source code and
+  materialization equivalence still require evidence. Do not weaken the
+  existing table comparison gate or silently pool incompatible runs.

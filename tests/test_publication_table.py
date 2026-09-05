@@ -171,3 +171,94 @@ def test_nested_primary_suite_keeps_enclosing_campaign_failure(
     result = table.reconstruct_matched_table([run], tmp_path)
     assert result["evidence_status"].endswith("with_runtime_qualification")
     assert len(result["runtime_qualifications"]) == 1
+
+
+def test_partial_validation_keeps_context_diagnostic_and_valid_control_separate(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(
+        table,
+        "validate_run_directory",
+        lambda *_: {
+            "publication_evidence_ready": False,
+            "publication_evidence_ready_for_unqualified_methods": True,
+            "unqualified_method_names": ["RandomForest-6ch"],
+        },
+    )
+    control = _fixture(tmp_path, "base", "RandomForest-6ch")
+    context = _fixture(tmp_path, "context", "HERA-DG-full")
+    result = table.reconstruct_matched_table([control, context], tmp_path)
+    assert result["evidence_status"] == "mixed_validated_and_diagnostic_methods"
+    assert "diagnostic" in result["method_evidence_statuses"]["HERA-DG-full"]
+    assert "diagnostic" not in result["method_evidence_statuses"]["RandomForest-6ch"]
+    markdown = table.table_markdown(result)
+    assert "noncausal participant batch; 9 input channels" in markdown
+    assert "independent fixed window; 6 input channels" in markdown
+
+
+def test_unknown_channel_group_is_not_silently_nine_channels(
+    tmp_path: Path, validated: None
+) -> None:
+    control = _fixture(tmp_path, "base", "RandomForest-6ch")
+    unknown = _fixture(tmp_path, "unknown", "unrecognized")
+    result = table.reconstruct_matched_table([control, unknown], tmp_path)
+    assert "unknown input channels" in table.table_markdown(result)
+
+
+def _add_materialization_witness(directory: Path, *, different_source: bool) -> None:
+    path = directory / "result.json"
+    result = json.loads(path.read_text())
+    result["dataset"]["preprocessing_audit"] = [
+        {
+            name: "f" * 64
+            for name in (
+                "signals_sha256",
+                "gravity_sha256",
+                "source_timestamps_sha256",
+                "timestamps_sha256",
+                "candidate_grid_sha256",
+            )
+        }
+    ]
+    if different_source:
+        result["source_input_manifest"]["files"]["src/inclusive_shift_har/data/external_har.py"] = (
+            "e" * 64
+        )
+    path.write_text(json.dumps(result), encoding="utf-8")
+
+
+def test_complete_observed_fog_witness_allows_unrelated_loader_source_changes(
+    tmp_path: Path, validated: None
+) -> None:
+    left = _fixture(tmp_path, "left", "RandomForest-6ch")
+    right = _fixture(tmp_path, "right", "TinyHAR-6ch")
+    _add_materialization_witness(left, different_source=False)
+    _add_materialization_witness(right, different_source=True)
+    record = table.reconstruct_matched_table([left, right], tmp_path)
+    assert record["comparison_contract"]["preprocessing_equivalence"]["equivalence_basis"] == (
+        "complete_observed_fog_segment_tensors_and_grids"
+    )
+    assert len({source["preprocessing_source_sha256"] for source in record["sources"]}) == 2
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ["signals", "gravity", "source_timestamps", "timestamps", "candidate_grid", "missing"],
+)
+def test_fog_materialization_witness_cannot_conceal_input_changes(
+    tmp_path: Path, validated: None, mutation: str
+) -> None:
+    left = _fixture(tmp_path, "left", "RandomForest-6ch")
+    right = _fixture(tmp_path, "right", "TinyHAR-6ch")
+    _add_materialization_witness(left, different_source=False)
+    _add_materialization_witness(right, different_source=True)
+    path = right / "result.json"
+    result = json.loads(path.read_text())
+    witness = result["dataset"]["preprocessing_audit"][0]
+    if mutation == "missing":
+        del witness["gravity_sha256"]
+    else:
+        witness[f"{mutation}_sha256"] = "a" * 64
+    path.write_text(json.dumps(result), encoding="utf-8")
+    with pytest.raises(ValueError, match="non-comparable"):
+        table.reconstruct_matched_table([left, right], tmp_path)

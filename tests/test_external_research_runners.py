@@ -129,6 +129,9 @@ def test_zero_shot_runner_keeps_target_labels_out_of_fit_and_preserves_each_seed
         include_classical=True,
     )
     assert result["primary_seed_averaged"]["participant_count"] == 12
+    assert result["claim_policy"]["target_labels_read_only_after_all_probabilities_fixed"] is False
+    assert result["claim_policy"]["target_annotations_preloaded_for_scoring_eligibility"] is True
+    assert result["claim_policy"]["target_numeric_scoring_after_full_candidate_prediction"] is True
     assert (tmp_path / "transfer/result.json").is_file()
     validation = validate_run_directory(tmp_path / "transfer", Path(__file__).resolve().parents[1])
     assert validation["integrity_passed"] is True

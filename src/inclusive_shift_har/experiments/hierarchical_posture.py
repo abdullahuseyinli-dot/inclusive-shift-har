@@ -271,7 +271,11 @@ def run_and_write(
         or canonical_json_sha256(unhashed) != protocol["record_sha256"]
     ):
         raise ValueError("frozen R&D declaration hash/identifier differs")
-    if not validate_run_directory(reference_run, repository_root)["publication_evidence_ready"]:
+    reference_validation = validate_run_directory(reference_run, repository_root)
+    if not reference_validation["publication_evidence_ready"] and not (
+        reference_validation.get("publication_evidence_ready_for_unqualified_methods", False)
+        and "RandomForest-6ch" in reference_validation.get("unqualified_method_names", [])
+    ):
         raise ValueError("baseline reference must be a validated corrected result package")
     reference_result = json.loads((reference_run / "result.json").read_text(encoding="utf-8"))
     reference_path = reference_run / reference_result["prediction_artifact"]["path"]

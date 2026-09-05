@@ -15,9 +15,10 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field, replace
 from fractions import Fraction
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 from typing import Any, cast
 from urllib.parse import urlencode
+from zipfile import ZipFile
 
 import numpy as np
 import pandas as pd  # type: ignore[import-untyped]
@@ -25,6 +26,8 @@ import requests
 from numpy.typing import NDArray
 from remotezip import RemoteZip  # type: ignore[import-untyped]
 from scipy.signal import resample_poly  # type: ignore[import-untyped]
+
+from inclusive_shift_har.data.provider_copy import verified_har_pmd_archive
 
 FloatArray = NDArray[np.float64]
 Float32Array = NDArray[np.float32]
@@ -61,6 +64,66 @@ class SourceReceipt:
 
 
 @dataclass(frozen=True, slots=True)
+class ObservableWindowPool:
+    """All signal-only candidate windows; deliberately contains no annotations."""
+
+    signals: Float32Array
+    gravity: Float32Array
+    participant_ids: StringArray
+    session_ids: StringArray
+    trial_ids: StringArray
+    window_ids: StringArray
+
+    def validate(self) -> None:
+        count = self.window_ids.size
+        if (
+            self.signals.ndim != 3
+            or self.signals.shape[0] != count
+            or self.signals.shape[2] != 6
+            or self.gravity.shape != (*self.signals.shape[:2], 3)
+            or not np.isfinite(self.signals).all()
+            or not np.isfinite(self.gravity).all()
+            or any(
+                values.shape != (count,) or np.any(np.char.str_len(values) == 0)
+                for values in (
+                    self.participant_ids,
+                    self.session_ids,
+                    self.trial_ids,
+                    self.window_ids,
+                )
+            )
+            or len(set(self.window_ids.tolist())) != count
+        ):
+            raise ValueError(
+                "observable candidates must be finite, aligned and uniquely identified"
+            )
+
+    def audit(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "protocol_id": "external-har-observable-context-v1",
+            "window_count": int(self.window_ids.size),
+            "participant_window_counts": {
+                str(participant): int(np.sum(self.participant_ids == participant))
+                for participant in np.unique(self.participant_ids)
+            },
+            "annotation_fields_present": False,
+            "construction": "all fixed physical-segment candidates before annotation admission",
+            "arrays": {
+                name: _array_sha256(getattr(self, name))
+                for name in (
+                    "signals",
+                    "gravity",
+                    "participant_ids",
+                    "session_ids",
+                    "trial_ids",
+                    "window_ids",
+                )
+            },
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class ExternalHARWindows:
     """Aligned core-HAR windows plus non-feature grouping/provenance metadata."""
 
@@ -82,6 +145,8 @@ class ExternalHARWindows:
     gravity_cutoff_hz: float | None = None
     preprocessing_audit: tuple[dict[str, Any], ...] = ()
     cohort_audit: dict[str, Any] | None = None
+    observable_candidates: ObservableWindowPool | None = None
+    source_storage_audit: dict[str, Any] | None = None
 
     def validate(self, *, require_all_classes: bool = True) -> None:
         """Fail closed on alignment, units, identifiers, or lane ambiguity."""
@@ -129,6 +194,16 @@ class ExternalHARWindows:
             raise ValueError("external HAR identifiers must be non-empty")
         if not self.receipts:
             raise ValueError("external HAR data require at least one source receipt")
+        if self.observable_candidates is not None:
+            pool = self.observable_candidates
+            pool.validate()
+            positions = {name: index for index, name in enumerate(pool.window_ids.tolist())}
+            if any(name not in positions for name in self.window_ids.tolist()):
+                raise ValueError("scored windows are not a subset of the observable candidate pool")
+            indices = np.asarray([positions[name] for name in self.window_ids.tolist()])
+            for name in ("signals", "gravity", "participant_ids", "session_ids", "trial_ids"):
+                if not np.array_equal(getattr(self, name), getattr(pool, name)[indices]):
+                    raise ValueError(f"scored and observable candidate values differ: {name}")
 
     @property
     def nine_channel_signals(self) -> Float32Array:
@@ -183,11 +258,59 @@ class ExternalHARWindows:
                 "causal_lowpass_cutoff_hz": self.gravity_cutoff_hz,
             },
             "preprocessing_audit": list(self.preprocessing_audit),
-            "raw_local_mirror": False,
+            "raw_local_mirror": any(receipt.raw_local_mirror for receipt in self.receipts),
         }
         if self.cohort_audit is not None:
             summary["cohort_audit"] = self.cohort_audit
+        if self.observable_candidates is not None:
+            summary["observable_candidate_pool"] = self.observable_candidates.audit()
+        if self.source_storage_audit is not None:
+            summary["source_storage_audit"] = self.source_storage_audit
         return summary
+
+
+def observable_modelling_pool(
+    data: ExternalHARWindows, *, include_supervised_labels: bool
+) -> tuple[ExternalHARWindows, IntArray, NDArray[np.bool_]]:
+    """Separate inference candidates, scoring positions and supervised eligibility.
+
+    Placeholder labels in the modelling container are never supervision: callers
+    must intersect every training mask with the returned eligibility mask. Target
+    mode installs no real labels at all. Scripted-trial loaders without an explicit
+    continuous candidate pool retain their declared, limited input population.
+    """
+    pool = data.observable_candidates
+    if pool is None:
+        indices = np.arange(data.labels.size, dtype=np.int64)
+        return (
+            data if include_supervised_labels else replace(data, labels=np.zeros_like(data.labels)),
+            indices,
+            np.ones(data.labels.size, dtype=np.bool_),
+        )
+    data.validate(require_all_classes=False)
+    # A participant with no scored example is not a cross-validation observation.
+    # Within each retained participant, no annotation-based candidate filtering occurs.
+    retained = np.isin(pool.participant_ids, np.unique(data.participant_ids))
+    identifiers = pool.window_ids[retained]
+    positions = {name: index for index, name in enumerate(identifiers.tolist())}
+    indices = np.asarray([positions[name] for name in data.window_ids.tolist()], dtype=np.int64)
+    eligibility = np.zeros(identifiers.size, dtype=np.bool_)
+    eligibility[indices] = True
+    labels = np.zeros(identifiers.size, dtype=np.int64)
+    if include_supervised_labels:
+        labels[indices] = data.labels
+    modelling = replace(
+        data,
+        signals=pool.signals[retained],
+        gravity=pool.gravity[retained],
+        labels=labels,
+        participant_ids=pool.participant_ids[retained],
+        session_ids=pool.session_ids[retained],
+        trial_ids=pool.trial_ids[retained],
+        window_ids=identifiers,
+        observable_candidates=None,
+    )
+    return modelling, indices, eligibility
 
 
 @dataclass(frozen=True, slots=True)
@@ -212,10 +335,50 @@ class _WindowAccumulator:
     windows: list[str]
     preprocessing_audit: list[dict[str, Any]] = field(default_factory=list)
     exclusions: list[dict[str, Any]] = field(default_factory=list)
+    candidate_signals: list[Float32Array] = field(default_factory=list)
+    candidate_gravity: list[Float32Array] = field(default_factory=list)
+    candidate_participants: list[str] = field(default_factory=list)
+    candidate_sessions: list[str] = field(default_factory=list)
+    candidate_trials: list[str] = field(default_factory=list)
+    candidate_windows: list[str] = field(default_factory=list)
 
     @classmethod
     def empty(cls) -> _WindowAccumulator:
         return cls([], [], [], [], [], [], [])
+
+    def add_physical_candidates(
+        self,
+        segment: UniformPhysicalSegment,
+        *,
+        participant: str,
+        session: str,
+        trial: str,
+        run_index: int,
+    ) -> None:
+        """Retain inference candidates through a label-free interface."""
+        for window_index, start in enumerate(segment.candidate_starts):
+            stop = int(start) + segment.window_samples
+            self.candidate_signals.append(np.asarray(segment.signals[start:stop], dtype=np.float32))
+            self.candidate_gravity.append(np.asarray(segment.gravity[start:stop], dtype=np.float32))
+            self.candidate_participants.append(participant)
+            self.candidate_sessions.append(session)
+            self.candidate_trials.append(trial)
+            self.candidate_windows.append(
+                f"{participant}/{session}/{trial}/run-{run_index:04d}-finite-000/"
+                f"window-{window_index:06d}"
+            )
+
+    def observable_pool(self) -> ObservableWindowPool | None:
+        if not self.candidate_signals:
+            return None
+        return ObservableWindowPool(
+            signals=np.stack(self.candidate_signals),
+            gravity=np.stack(self.candidate_gravity),
+            participant_ids=np.asarray(self.candidate_participants, dtype=np.str_),
+            session_ids=np.asarray(self.candidate_sessions, dtype=np.str_),
+            trial_ids=np.asarray(self.candidate_trials, dtype=np.str_),
+            window_ids=np.asarray(self.candidate_windows, dtype=np.str_),
+        )
 
     def add_annotated_segment(
         self,
@@ -235,6 +398,9 @@ class _WindowAccumulator:
         transition or a missing annotation. No rejected candidate shifts the grid.
         """
 
+        self.add_physical_candidates(
+            segment, participant=participant, session=session, trial=trial, run_index=run_index
+        )
         if source_labels.shape != segment.source_timestamps.shape:
             raise ValueError("annotations must align with the physical source segment")
         source_indices = (
@@ -404,6 +570,7 @@ class _WindowAccumulator:
             gravity_source=gravity_source,
             gravity_cutoff_hz=gravity_cutoff_hz,
             preprocessing_audit=tuple(self.preprocessing_audit),
+            observable_candidates=self.observable_pool(),
         )
         result.validate(require_all_classes=require_all_classes)
         return result
@@ -580,14 +747,17 @@ def participant_fold_assignment(
 
 
 def concatenate_external_windows(
-    datasets: tuple[ExternalHARWindows, ...], *, dataset_id: str
+    datasets: tuple[ExternalHARWindows, ...],
+    *,
+    dataset_id: str,
+    require_all_classes_per_dataset: bool = True,
 ) -> ExternalHARWindows:
     """Concatenate only measurement-compatible evidence-lane datasets."""
 
     if not datasets:
         raise ValueError("at least one external HAR dataset is required")
     for item in datasets:
-        item.validate()
+        item.validate(require_all_classes=require_all_classes_per_dataset)
     lanes = {item.channel_lane for item in datasets}
     rates = {item.sampling_rate_hz for item in datasets}
     lengths = {item.signals.shape[1] for item in datasets}
@@ -1297,6 +1467,7 @@ def _interpolate_to_rate(
 
 def load_har_pmd_native(
     *,
+    source_archive: Path | None = None,
     participant_limit: int | None = None,
     environments: tuple[str, ...] = ("indoor", "outdoor"),
     activities: tuple[str, ...] = ("still", "walking", "crutches", "walker", "manual"),
@@ -1341,7 +1512,16 @@ def load_har_pmd_native(
         "GraY",
         "GraZ",
     ]
-    with RemoteZip(url) as archive:
+    storage_audit: dict[str, Any] | None = None
+    # Both readers expose the same ZIP member interface. Local mode requires the
+    # exact pinned full archive before parsing any member; it is never an unchecked cache.
+    reader = RemoteZip(url) if source_archive is None else verified_har_pmd_archive(source_archive)
+    archive: ZipFile
+    with reader as opened:
+        if source_archive is None:
+            archive = cast(ZipFile, opened)
+        else:
+            archive, storage_audit = cast(tuple[ZipFile, dict[str, Any]], opened)
         names = sorted(
             name for name in archive.namelist() if name.endswith(".csv") and "/phone/" in name
         )
@@ -1365,15 +1545,18 @@ def load_har_pmd_native(
                     selected_names.append(expected)
         for member in selected_names:
             info = archive.getinfo(member)
-            payload = cast(bytes, archive.read(member))
+            payload = archive.read(member)
             receipts.append(
-                _receipt(
-                    dataset_id=dataset_id,
-                    locator=url,
-                    member=member,
-                    payload=payload,
-                    declared_size=int(info.file_size),
-                    archive_crc32=int(info.CRC),
+                replace(
+                    _receipt(
+                        dataset_id=dataset_id,
+                        locator=url,
+                        member=member,
+                        payload=payload,
+                        declared_size=int(info.file_size),
+                        archive_crc32=int(info.CRC),
+                    ),
+                    raw_local_mirror=storage_audit is not None,
                 )
             )
             frame = pd.read_csv(io.BytesIO(payload), usecols=columns)
@@ -1440,6 +1623,7 @@ def load_har_pmd_native(
         class_names=tuple(display_name[name] for name in activities),
         gravity_source="provider_native_gravity_vector",
         gravity_cutoff_hz=None,
+        source_storage_audit=storage_audit,
     )
     count = result.labels.size
     if (

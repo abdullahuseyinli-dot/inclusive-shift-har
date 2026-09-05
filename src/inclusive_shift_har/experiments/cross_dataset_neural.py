@@ -599,7 +599,7 @@ def run_and_write_neural(
             "created_at": started,
             "dataset": data.summary(),
             "source_receipts": [receipt.to_dict() for receipt in data.receipts],
-            "raw_local_mirror": False,
+            "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
             "source_input_manifest": source_input_manifest,
             "git_at_launch": git_at_launch,
             "model_input": {
@@ -720,8 +720,8 @@ def main(argv: list[str] | None = None) -> int:
     print(
         json.dumps(
             {
-                name: report["primary"]["mean_participant_macro_f1"]
-                for name, report in result["reports"].items()
+                name: report["mean_participant_macro_f1"]
+                for name, report in result["primary_seed_averaged"]["methods"].items()
             },
             indent=2,
             sort_keys=True,

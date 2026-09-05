@@ -14,11 +14,17 @@ from typing import Any, cast
 
 import numpy as np
 
+from inclusive_shift_har.artifacts.research_provenance import _write_json_create_only
+from inclusive_shift_har.data.provider_copy import provider_copy_storage_errors
 from inclusive_shift_har.evaluation.external_statistics import (
     ParticipantMetricInputs,
     seed_evidence,
 )
-from inclusive_shift_har.experiments.cross_dataset_har import _write_json_create_only
+from inclusive_shift_har.evaluation.inference_contracts import (
+    OBSERVABLE_CONTEXT_PROTOCOL,
+    annotation_selected_context_methods,
+    method_inference_contracts,
+)
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 
 
@@ -198,6 +204,56 @@ def _method_contract_errors(result: dict[str, Any], audit: dict[str, Any]) -> li
             admitted_total += len(admitted)
         if admitted_total != summary.get("window_count"):
             errors.append("FoG admitted candidates do not match retained windows")
+        if result.get("observable_context_protocol") == OBSERVABLE_CONTEXT_PROTOCOL:
+            pool = summary.get("observable_candidate_pool", {})
+            if (
+                pool.get("protocol_id") != OBSERVABLE_CONTEXT_PROTOCOL
+                or pool.get("annotation_fields_present") is not False
+                or pool.get("window_count")
+                != sum(item.get("candidate_window_count", 0) for item in segments)
+                or sum(pool.get("participant_window_counts", {}).values())
+                != pool.get("window_count")
+                or any(
+                    re.fullmatch(r"[0-9a-f]{64}", str(pool.get("arrays", {}).get(name))) is None
+                    for name in (
+                        "signals",
+                        "gravity",
+                        "participant_ids",
+                        "session_ids",
+                        "trial_ids",
+                        "window_ids",
+                    )
+                )
+            ):
+                errors.append("FoG observable inference pool is incomplete or label-bearing")
+            records = (
+                result.get("seed_records", [])
+                if "target_dataset" in result
+                else [
+                    fold
+                    for seed in result.get("fold_records", [])
+                    for fold in seed.get("folds", [])
+                ]
+            )
+            if not records:
+                errors.append("FoG observable inference population is not recorded per fit")
+            for record in records:
+                transfer = "target_dataset" in result
+                names = record.get(
+                    "target_participants" if transfer else "evaluation_participants", []
+                )
+                expected = sum(
+                    pool.get("participant_window_counts", {}).get(name, 0) for name in names
+                )
+                actual = record.get(
+                    "target_inference_candidate_window_count"
+                    if transfer
+                    else "evaluation_candidate_window_count"
+                )
+                if expected <= 0 or actual != expected:
+                    errors.append(
+                        "FoG fit did not evaluate every observable candidate of its held-out participants"
+                    )
     if result.get("seeds") != [11, 23, 47] or not isinstance(
         result.get("primary_seed_averaged"), dict
     ):
@@ -313,7 +369,22 @@ def validate_run_directory(run_directory: Path, repository_root: Path) -> dict[s
             receipt_errors.append(f"invalid byte count: {receipt.get('member')}")
         if receipt.get("declared_digest_verified") is False:
             receipt_errors.append(f"declared digest mismatch: {receipt.get('member')}")
-        if receipt.get("raw_local_mirror") is not False:
+        if receipt.get("raw_local_mirror") is True:
+            storage: Any = next(
+                (
+                    summary.get("source_storage_audit", {})
+                    for key in ("dataset", "source_dataset", "target_dataset")
+                    if isinstance(summary := audit.get(key), dict)
+                    and summary.get("dataset_id") == receipt.get("dataset_id")
+                ),
+                {},
+            )
+            receipt_errors.extend(
+                provider_copy_storage_errors(
+                    storage, dataset_id=receipt.get("dataset_id"), locator=receipt.get("locator")
+                )
+            )
+        elif receipt.get("raw_local_mirror") is not False:
             receipt_errors.append(f"storage disclosure mismatch: {receipt.get('member')}")
     check("source_receipts_valid", bool(receipts) and not receipt_errors, receipt_errors)
 
@@ -478,19 +549,31 @@ def validate_run_directory(run_directory: Path, repository_root: Path) -> dict[s
         and not metric_errors
         and manifest_v2
     )
+    common_scientific_contract = scientific_contract
+    qualified_methods = annotation_selected_context_methods(result)
+    inference_contracts = method_inference_contracts(result)
+    unqualified_methods = sorted(set(inference_contracts) - set(qualified_methods))
+    scientific_contract = common_scientific_contract and not qualified_methods
     ready = integrity and scientific_contract
+    partially_ready = integrity and common_scientific_contract and bool(unqualified_methods)
     return {
         "schema_version": "1.0.0",
         "validated_at": datetime.now(UTC).isoformat(),
         "run_directory": str(run_directory),
         "status": "VALIDATED"
         if ready
+        else "PARTIALLY_VALIDATED_METHODS"
+        if partially_ready
         else "PROVISIONAL"
         if integrity
         else "INVALID_EVIDENCE_PACKAGE",
         "checks": checks,
         "integrity_passed": integrity,
         "publication_evidence_ready": ready,
+        "publication_evidence_ready_for_unqualified_methods": partially_ready,
+        "unqualified_method_names": unqualified_methods if partially_ready else [],
+        "method_inference_contracts": inference_contracts,
+        "annotation_selected_context_methods": qualified_methods,
         "scientific_contract_passed": scientific_contract,
         "scientific_contract_checks": {
             "clean_git_at_launch": clean_launch,
@@ -498,6 +581,7 @@ def validate_run_directory(run_directory: Path, repository_root: Path) -> dict[s
             "launch_manifest_commit_errors": commit_errors,
             "method_contract_errors": method_errors,
             "metric_reconstruction_errors": metric_errors,
+            "annotation_selected_context_methods": qualified_methods,
         },
         "limitation": "Contract validation is not a general proof of scientific validity or deployability.",
         "claim_scope": "development evidence only; not confirmatory and not SOTA",

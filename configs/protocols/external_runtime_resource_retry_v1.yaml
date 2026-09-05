@@ -1,0 +1,46 @@
+protocol_id: external-runtime-resource-retry-v1
+declared_at_utc: '2026-09-05T07:59:23Z'
+status: frozen_before_retry_launch_and_outcomes
+reason: >-
+  The available-trial IMU classical run failed with Windows error 1450 before
+  producing scores. A later resource probe observed only 11 MiB available RAM
+  and 86,452,903,936 committed bytes against an 87,929,950,208 byte limit.
+  This supports resource pressure, not proof of the exact failing allocation.
+preserved_failed_run:
+  path: .audit/phase2_external_v3/imu_available_3seed_b2dae
+  failure_file_sha256: 9febf809db496576afc0f11617840f93d06626e05ea2550aa1db579327703562
+retry_budget:
+  scientific_campaign_retries: 1
+  dataset: imu_har_il_v1
+  selection_policy: available_valid_trials
+  requested_participants: 50
+  expected_eligible_participants_if_source_unchanged: 47
+  expected_retained_trials_if_source_unchanged: 457
+  expected_windows_if_source_unchanged: 20390
+  repetitions: [1, 2, 3, 4]
+  seeds: [11, 23, 47]
+  outer_folds: 5
+  inner_folds: 4
+  neural_epochs: 40
+  neural_backend_protocol: external-neural-cuda-nocudnn-v2
+  classical_n_jobs: 1
+  concurrent_new_large_campaigns: 1
+  model_or_selection_changes: 0
+  score_based_retry_selection: false
+context_linkage: >-
+  Execute from the committed observable-context-v1 repair. Its transfer stage
+  consumes that correction's one available-trial IMU-to-FoG replacement budget;
+  do not launch another copy or substitute the complete-case cohort.
+orchestration: >-
+  Queue behind currently running large jobs until sufficient physical and
+  commit headroom is observed. Keep source checks at actual launch. Use a
+  lightweight command recorder and single-worker local repository gates.
+  Reducing concurrency does not change estimator count, seeds, folds or epochs.
+failure_policy: >-
+  Preserve every launch, failure and incomplete stage. A failed retry remains
+  incomplete, not a lower-cohort result and not a score-based stop decision.
+har_pmd_acquisition_failure: >-
+  The separate no-cuDNN HAR-PMD run failed in HTTPS acquisition with a TLS
+  hostname mismatch, before model fitting. Never disable TLS verification.
+  Retry acquisition only through the same authenticated official endpoint or
+  a verified retained local provider copy; scientific settings remain frozen.

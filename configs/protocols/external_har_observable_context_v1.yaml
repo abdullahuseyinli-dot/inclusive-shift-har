@@ -1,0 +1,57 @@
+protocol_id: external-har-observable-context-v1
+declared_at_utc: '2026-09-05T07:16:07Z'
+status: frozen_before_observable_pool_replacement_outcomes
+parent_signal_protocol: external-har-session-grid-v3
+reason: >-
+  HERA-DG-context-safe and HERA-DG-full pool evaluation probabilities over
+  participant windows after annotation-based admission. Removing annotations
+  can therefore change context features even though signal resampling is fixed.
+counterexample:
+  path: .audit/phase2_external_v3/annotation_context_counterexample_20260905/counterexample.json
+  record_sha256: 559d29247e225734e97624f4bb2abd13420de271e548ae1fcfb84d83b5248b89
+correction:
+  - Retain the full signal-only FoG candidate pool without labels.
+  - Fit supervised models only on eligible outer-training windows.
+  - Predict all observable candidates of each held-out participant before scoring admission.
+  - Form evaluation participant context from all those candidates, including unsupported or unannotated windows.
+  - Project predictions back to the original eligible scoring indices only after inference.
+  - Preserve the 1213-window scoring grid and all raw/segment hashes if provider bytes match.
+  - Keep participant-batch context distinct from independent-window and causal-streaming inference.
+  - Keep scripted selected-trial IMU context distinct from natural continuous-recording deployment.
+frozen_budget:
+  seeds: [11, 23, 47]
+  outer_folds: 5
+  inner_folds: 4
+  hyperparameter_search_changes: 0
+  model_architecture_changes: 0
+  gravity_or_resampling_changes: 0
+  permitted_replacement_runs:
+    - One FoG classical/invention suite, same methods and seeds.
+    - One complete-case IMU-to-FoG transfer replacement.
+    - One available-trial IMU-to-FoG transfer replacement.
+  no_neural_or_posture_forest_retraining_required_for_this_context_only_correction: true
+parity_checks:
+  local_window_features_and_candidate_grid: bitwise_identical_when_annotations_change
+  unaffected_window_local_class_decisions: exact
+  unaffected_probability_absolute_tolerance: 1.0e-12
+  probability_tolerance_basis: >-
+    The earlier fixed FoG duplicate already recorded accumulation differences
+    no larger than 8.22e-15 while all decisions and primary F1 values matched.
+  parity_differences: preserve_and_investigate_never_select_the_better_score
+reporting:
+  old_context_lanes: >-
+    Superseded for annotation-independent continuous-recording inference;
+    retained only as annotation-selected participant-batch diagnostics.
+  old_window_local_lanes: >-
+    Not invalidated by this context-specific finding. Preserve their numerical,
+    source and runtime qualifications.
+  primary_contrast: >-
+    Retain the original HERA-full versus XGBoost contrast and its failure record.
+    Participant-batch and independent-window inference have different context
+    budgets; do not advertise that contrast as matched-window superiority.
+    The repaired context contrast is descriptive, not a replacement primary test.
+  prospective_posture_candidate: >-
+    PB-HPF already failed its preregistered matched-window gate. No expansion,
+    alternative headline selection or extra candidate search is authorized by
+    this validity correction.
+  independent_confirmation_or_sota_claim: false

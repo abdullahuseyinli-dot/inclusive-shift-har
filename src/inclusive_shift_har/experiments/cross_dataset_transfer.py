@@ -26,7 +26,9 @@ from inclusive_shift_har.data.external_har import (
     concatenate_external_windows,
     load_fog_star,
     load_imu_har_il,
+    observable_modelling_pool,
 )
+from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
 from inclusive_shift_har.experiments.cage_har import _report
 from inclusive_shift_har.experiments.cage_har_retrospective import (
     _outer_context,
@@ -145,8 +147,14 @@ def _fit_apply_seed(
     n_jobs: int,
     include_classical: bool,
 ) -> tuple[dict[str, FloatArray], dict[str, Any]]:
+    source.validate()
+    target, scoring_indices, _target_supervised_eligibility = observable_modelling_pool(
+        target, include_supervised_labels=False
+    )
     combined = concatenate_external_windows(
-        (source, target), dataset_id=f"{source.dataset_id}_to_{target.dataset_id}"
+        (source, target),
+        dataset_id=f"{source.dataset_id}_to_{target.dataset_id}",
+        require_all_classes_per_dataset=False,
     )
     source_count = source.labels.size
     # This replacement makes target-label leakage through any imported fitting helper
@@ -485,6 +493,9 @@ def _fit_apply_seed(
         "seed": seed,
         "source_participants": sorted(np.unique(participants[training]).tolist()),
         "target_participants": sorted(np.unique(participants[evaluation]).tolist()),
+        "target_inference_candidate_window_count": int(target.labels.size),
+        "target_scored_window_count": int(scoring_indices.size),
+        "context_event_population": "all supplied observable candidates of target participants",
         "selected_ctgr_candidate": str(inner.selected_candidate["id"]),
         "selected_cage_expert": str(inner.selected_expert_candidate["id"]),
         "top_three_hera_candidates": [
@@ -516,7 +527,7 @@ def _fit_apply_seed(
         "real_target_labels_present_in_modelling_container": False,
         "target_labels_used_for_fit_selection_or_calibration": False,
     }
-    return probabilities, record
+    return {method: values[scoring_indices] for method, values in probabilities.items()}, record
 
 
 def evaluate_zero_shot_transfer(
@@ -559,7 +570,9 @@ def evaluate_zero_shot_transfer(
         method: np.mean(np.stack([per_seed[seed][method] for seed in seeds], axis=0), axis=0)
         for method in per_seed[seeds[0]]
     }
-    # This is the first point at which real FoG-STAR target labels are consumed.
+    # Numerical scoring begins here. Annotation admission was established by the
+    # loader, but the full observable target pool is predicted before that subset
+    # is selected; admission does not determine the participant context population.
     reports = {
         method: _report(target.labels, values, target.participant_ids)
         for method, values in ensemble.items()
@@ -584,6 +597,7 @@ def evaluate_zero_shot_transfer(
     result = {
         "schema_version": "1.0.0",
         "experiment_id": "imu-har-il-to-fog-star-zero-shot-v1",
+        "observable_context_protocol": OBSERVABLE_CONTEXT_PROTOCOL,
         "evidence_status": "EXTERNAL_ZERO_SHOT_DEVELOPMENT_NOT_CONFIRMATORY",
         "source_dataset": source.summary(),
         "target_dataset": target.summary(),
@@ -595,7 +609,10 @@ def evaluate_zero_shot_transfer(
         "descriptive_strongest_classical_control": strongest_control,
         "claim_policy": {
             "target_labels_used_for_fit_selection_or_calibration": False,
-            "target_labels_read_only_after_all_probabilities_fixed": True,
+            "target_labels_read_only_after_all_probabilities_fixed": False,
+            "target_annotations_preloaded_for_scoring_eligibility": True,
+            "target_numeric_scoring_after_full_candidate_prediction": True,
+            "participant_context_is_noncausal_and_not_matched_window_inference": True,
             "confirmatory_claim_allowed": False,
             "state_of_the_art_claim_allowed": False,
             "wear_gait_opened": False,
@@ -710,6 +727,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", type=int, nargs="+", default=[11, 23, 47])
     parser.add_argument("--source-participant-limit", type=int)
     parser.add_argument("--source-repetition-limit", type=int, default=4)
+    parser.add_argument(
+        "--source-selection-policy",
+        choices=("complete_requested_core", "available_valid_trials"),
+        default="complete_requested_core",
+    )
     parser.add_argument("--target-participant-limit", type=int)
     parser.add_argument(
         "--gravity-cutoff-hz",
@@ -743,6 +765,7 @@ def main(argv: list[str] | None = None) -> int:
     source = load_imu_har_il(
         participant_limit=args.source_participant_limit,
         repetition_limit=args.source_repetition_limit,
+        selection_policy=args.source_selection_policy,
         target_rate_hz=target_rate_hz,
         window_samples=window_samples,
         gravity_cutoff_hz=gravity_cutoff_hz,
@@ -765,8 +788,8 @@ def main(argv: list[str] | None = None) -> int:
     print(
         json.dumps(
             {
-                name: report["primary"]["mean_participant_macro_f1"]
-                for name, report in result["reports"].items()
+                name: report["mean_participant_macro_f1"]
+                for name, report in result["primary_seed_averaged"]["methods"].items()
             },
             indent=2,
             sort_keys=True,

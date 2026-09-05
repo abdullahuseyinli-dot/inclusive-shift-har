@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-from inclusive_shift_har.experiments.cross_dataset_har import (
+from inclusive_shift_har.artifacts.research_provenance import (
     _git_state,
     _source_input_manifest,
     _write_json_create_only,
@@ -71,7 +71,12 @@ def record_command(directory: Path, command: list[str], repository_root: Path) -
     return record
 
 
-def quality_gates(directory: Path, repository_root: Path, uv: Path) -> dict[str, Any]:
+def quality_gates(
+    directory: Path, repository_root: Path, uv: Path, *, workers: int = 4
+) -> dict[str, Any]:
+    if workers < 1:
+        raise ValueError("quality gate workers must be positive")
+    launch_manifest = _source_input_manifest(repository_root)
     directory.mkdir(parents=True, exist_ok=False)
     python = sys.executable
     prefix = [python, "-m", "inclusive_shift_har.cli"]
@@ -83,7 +88,7 @@ def quality_gates(directory: Path, repository_root: Path, uv: Path) -> dict[str,
             "--output",
             str(directory / "full_test_shards"),
             "--workers",
-            "4",
+            str(workers),
         ],
         "lint": [python, "-m", "ruff", "check", "src", "tests"],
         "format": [python, "-m", "ruff", "format", "--check", "src", "tests"],
@@ -107,7 +112,7 @@ def quality_gates(directory: Path, repository_root: Path, uv: Path) -> dict[str,
         "lock": [str(uv), "lock", "--check", "--offline"],
         "git_fsck": ["git", "fsck", "--full"],
     }
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
             name: executor.submit(record_command, directory / name, command, repository_root)
             for name, command in commands.items()
@@ -123,10 +128,20 @@ def quality_gates(directory: Path, repository_root: Path, uv: Path) -> dict[str,
                 yaml.safe_load(stream) if path.suffix == ".yaml" else json.load(stream)
         except (ValueError, yaml.YAMLError) as error:
             configuration_errors.append({"file": str(path), "error": str(error)})
+    final_manifest = _source_input_manifest(repository_root)
+    source_unchanged = launch_manifest["manifest_sha256"] == final_manifest[
+        "manifest_sha256"
+    ] and all(
+        record["source_input_manifest"]["manifest_sha256"] == launch_manifest["manifest_sha256"]
+        for record in records.values()
+    )
     summary = {
         "created_at_utc": datetime.now(UTC).isoformat(),
+        "orchestration_workers": workers,
         "status": "PASS"
-        if not configuration_errors and all(item["exit_code"] == 0 for item in records.values())
+        if source_unchanged
+        and not configuration_errors
+        and all(item["exit_code"] == 0 for item in records.values())
         else "FAILED_PRESERVED",
         "gates": {
             name: {"exit_code": item["exit_code"], "record_sha256": item["record_sha256"]}
@@ -139,7 +154,9 @@ def quality_gates(directory: Path, repository_root: Path, uv: Path) -> dict[str,
             for dist in importlib.metadata.distributions()
             if "Name" in dist.metadata
         },
-        "source_input_manifest": _source_input_manifest(repository_root),
+        "source_input_manifest": final_manifest,
+        "source_manifest_at_gate_start": launch_manifest,
+        "source_unchanged_across_all_gate_launches_and_completion": source_unchanged,
         "security_note": "index/history secret and license checks are separate required command receipts",
     }
     summary["record_sha256"] = canonical_json_sha256(summary)
@@ -222,13 +239,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repository-root", type=Path, default=Path.cwd())
     parser.add_argument("--uv", type=Path)
+    parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--command", nargs=argparse.REMAINDER)
     args = parser.parse_args(argv)
     root, output = args.repository_root.resolve(), args.output.resolve()
     if args.action == "gates":
         if args.uv is None:
             parser.error("--uv is required for the lock gate")
-        result = quality_gates(output, root, args.uv)
+        result = quality_gates(output, root, args.uv, workers=args.workers)
         return 0 if result["status"] == "PASS" else 1
     if args.action == "supersession":
         supersession_snapshot(output, root)

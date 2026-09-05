@@ -1,0 +1,43 @@
+protocol_id: external-runtime-resource-retry-v2
+declared_at_utc: '2026-09-05T08:08:08Z'
+parent: external-runtime-resource-retry-v1
+status: frozen_before_additional_retry_launch_and_outcomes
+unchanged: >-
+  Preserve v1 and its single available-trial IMU retry. No scientific model,
+  participant selection, seed, epoch, batch size or hyperparameter changes.
+additional_failed_run:
+  path: .audit/phase2_external_v3/imu_complete_neural_nocudnn_3seed_b2dae
+  failure_file_sha256: 09fe3115ee68c75bbea961e50a6968ff2f4f33d58a76e8002a27269f7d526046
+  failure_at_utc: '2026-09-05T07:39:48.059808+00:00'
+  failure: CUDA out of memory during backward; no completed result
+  retained_checkpoints: 6
+  manual_intervention: >-
+    Exact failed process 38348 was terminated after preserving the failure,
+    full traceback and checkpoints; it remained alive more than 24 minutes.
+    This is not a successful native process exit.
+complete_case_neural_retry:
+  count: 1
+  selection_policy: complete_requested_core
+  expected_participants_if_source_unchanged: 19
+  expected_windows_if_source_unchanged: 9817
+  requested_repetitions: [1, 2, 3, 4]
+  seeds: [11, 23, 47]
+  neural_epochs: 40
+  runtime_backend_protocol: external-neural-cuda-nocudnn-v2
+  parameter_or_batch_size_changes: 0
+  resume_partial_checkpoints: false
+  competing_neural_experiments_at_launch: 0
+  source_and_scoring_identity_parity_required: true
+har_pmd_neural_acquisition_retry:
+  count: 1
+  expected_participants_if_source_unchanged: 120
+  seeds: [11, 23, 47]
+  neural_epochs: 40
+  lanes: [6ch, native_9ch]
+  runtime_backend_protocol: external-neural-cuda-nocudnn-v2
+  ssl_verification: required
+  data_version_changes: 0
+stop_policy: >-
+  These are technical retries, not additional research configurations or
+  optional score selection. Preserve any further failure and investigate;
+  never treat an incomplete run or subset as full-cohort evidence.
