@@ -1,0 +1,5 @@
+# Additive environment overlay for the external-HAR portfolio.
+# Install only after the repository's locked research group.
+h5py==3.16.0
+numpy==2.3.5
+requests==2.34.2

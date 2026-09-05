@@ -1,0 +1,2592 @@
+{
+  "claim_policy": {
+    "confirmatory_claim_allowed": false,
+    "proposed_method": false,
+    "state_of_the_art_claim_allowed": false
+  },
+  "created_at": "2026-09-04T23:02:26.429290+00:00",
+  "dataset": {
+    "channel_lane": "derived-gravity-9ch",
+    "class_window_counts": {
+      "mobility": 1154,
+      "sitting": 89,
+      "standing": 221
+    },
+    "dataset_id": "fog_star_v3",
+    "exclusion_count": 0,
+    "exclusions": [],
+    "participant_class_support": {
+      "mobility": 22,
+      "sitting": 17,
+      "standing": 20
+    },
+    "participant_count": 22,
+    "participants_with_all_classes": 16,
+    "perfect_prediction_mean_participant_macro_f1_ceiling": 0.8939393939393939,
+    "raw_local_mirror": false,
+    "receipt_count": 1,
+    "sampling_rate_hz": 50.0,
+    "session_count": 31,
+    "source_issue_count": 0,
+    "source_issues": [],
+    "trial_count": 95,
+    "window_count": 1464,
+    "window_samples": 128
+  },
+  "device": "cuda",
+  "evidence_status": "EXTERNAL_DEVELOPMENT_NOT_CONFIRMATORY",
+  "experiment_id": "cross-dataset-har-neural-controls-v1",
+  "fold_records": [
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-0__deepconvlstm.pt",
+        "sha256": "46470d521a86f3eded4303d2a9400a5074031c6dbce3789896871efaba4763dc"
+      },
+      "epochs_completed": 21,
+      "evaluation_participants": [
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:018"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 13,
+      "selected_validation_mean_participant_macro_f1": 0.5287942455193558,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:011",
+        "fogstar:014",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-0__tinyhar.pt",
+        "sha256": "997cbde21257ee64e1e005b223e318f3fa8f515a0f12b17418f567d9659705c2"
+      },
+      "epochs_completed": 20,
+      "evaluation_participants": [
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:018"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 12,
+      "selected_validation_mean_participant_macro_f1": 0.5668328621768832,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:011",
+        "fogstar:014",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-1__deepconvlstm.pt",
+        "sha256": "e0c4872abcc0e0c2d0bce787f9b7837e3148c694a12e4c34af62614a3f2e4cb6"
+      },
+      "epochs_completed": 14,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:020"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 6,
+      "selected_validation_mean_participant_macro_f1": 0.5389228710893794,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:010",
+        "fogstar:012",
+        "fogstar:018"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-1__tinyhar.pt",
+        "sha256": "3201f33843b6b00683f4b9bbb180c288b665e09f68a8652d0507f970bb4a54fa"
+      },
+      "epochs_completed": 28,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:020"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 20,
+      "selected_validation_mean_participant_macro_f1": 0.6278731355672421,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:010",
+        "fogstar:012",
+        "fogstar:018"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-2__deepconvlstm.pt",
+        "sha256": "75d908b24894b3ecca0f0b3fbd7754bb7e5ece55e427156929521ecbd0ca2f5e"
+      },
+      "epochs_completed": 33,
+      "evaluation_participants": [
+        "fogstar:006",
+        "fogstar:010",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 25,
+      "selected_validation_mean_participant_macro_f1": 0.5307303542452317,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:011",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-2__tinyhar.pt",
+        "sha256": "d1e412fb50cc53883c51dd0104dde65b2fc88f93c26addbad1399df038daa2a4"
+      },
+      "epochs_completed": 20,
+      "evaluation_participants": [
+        "fogstar:006",
+        "fogstar:010",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 12,
+      "selected_validation_mean_participant_macro_f1": 0.5279392439686055,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:011",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-3__deepconvlstm.pt",
+        "sha256": "6c3d73300cad3a589e83a2700477aa6148d5396a8b4d6415afa8e179a4407ca9"
+      },
+      "epochs_completed": 22,
+      "evaluation_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:009",
+        "fogstar:011"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 14,
+      "selected_validation_mean_participant_macro_f1": 0.5430690050959779,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:016",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-3__tinyhar.pt",
+        "sha256": "33d2231f848cd231a7b64c890f67d3f5cfd17c313f4be11734a9b581deed3429"
+      },
+      "epochs_completed": 21,
+      "evaluation_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:009",
+        "fogstar:011"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 13,
+      "selected_validation_mean_participant_macro_f1": 0.6164110428620055,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:016",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-4__deepconvlstm.pt",
+        "sha256": "42823af6b48e4f955f28fc6e6283490adbe1830114876281b31e6cabdfddd4cb"
+      },
+      "epochs_completed": 35,
+      "evaluation_participants": [
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:013",
+        "fogstar:022"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 27,
+      "selected_validation_mean_participant_macro_f1": 0.4607744750543151,
+      "training_participants": [
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-4__tinyhar.pt",
+        "sha256": "9c6e26debccfee5e1b9c1c01c51dd72df519800c89489b6b1b9e89c6de6de1e0"
+      },
+      "epochs_completed": 29,
+      "evaluation_participants": [
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:013",
+        "fogstar:022"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 21,
+      "selected_validation_mean_participant_macro_f1": 0.5870234043666254,
+      "training_participants": [
+        "fogstar:003",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-0__deepconvlstm.pt",
+        "sha256": "d497dc9b122f3cc76965cce9866b57b9abeb8bc83ca5345996422fce20ef6ec4"
+      },
+      "epochs_completed": 38,
+      "evaluation_participants": [
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:016",
+        "fogstar:022"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 30,
+      "selected_validation_mean_participant_macro_f1": 0.5310811914973828,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:007",
+        "fogstar:014",
+        "fogstar:019",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-0__tinyhar.pt",
+        "sha256": "f159fb03e19b913dc0ffa266b2accfa2c68b2822855e75a809fb49020f041aae"
+      },
+      "epochs_completed": 15,
+      "evaluation_participants": [
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:016",
+        "fogstar:022"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 7,
+      "selected_validation_mean_participant_macro_f1": 0.6072605922882536,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:007",
+        "fogstar:014",
+        "fogstar:019",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-1__deepconvlstm.pt",
+        "sha256": "acdc19a065b17c0616401f0db38875dcaefa9057a1dfa7f11f755caa3e401eee"
+      },
+      "epochs_completed": 13,
+      "evaluation_participants": [
+        "fogstar:004",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 5,
+      "selected_validation_mean_participant_macro_f1": 0.4986525211722195,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-1__tinyhar.pt",
+        "sha256": "1471e388e06aa7709a7ddfccaebd50d4f18b7e08f462d015264502202cdb1da9"
+      },
+      "epochs_completed": 17,
+      "evaluation_participants": [
+        "fogstar:004",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:019",
+        "fogstar:021"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 9,
+      "selected_validation_mean_participant_macro_f1": 0.4970908746959881,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-2__deepconvlstm.pt",
+        "sha256": "3df705644a9d1fdd63d03dae957b852d9279ccbae0520cb2d70f790a1f42d4ba"
+      },
+      "epochs_completed": 16,
+      "evaluation_participants": [
+        "fogstar:007",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 8,
+      "selected_validation_mean_participant_macro_f1": 0.471516459195077,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:009",
+        "fogstar:016",
+        "fogstar:021"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-2__tinyhar.pt",
+        "sha256": "5a26ede441c1e4a21517e4bfbfa3dead873df65b14ae0d1e4476ea6ea03e1aa5"
+      },
+      "epochs_completed": 35,
+      "evaluation_participants": [
+        "fogstar:007",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 27,
+      "selected_validation_mean_participant_macro_f1": 0.6471528184563724,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:014",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:003",
+        "fogstar:009",
+        "fogstar:016",
+        "fogstar:021"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-3__deepconvlstm.pt",
+        "sha256": "efd5b7709eb446694e4a24f315ca4a247d7883d6a0212caa8281f47c0f6446ea"
+      },
+      "epochs_completed": 18,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:020"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 10,
+      "selected_validation_mean_participant_macro_f1": 0.5183028934844378,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:021"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-3__tinyhar.pt",
+        "sha256": "2cf93c013812d39207d402f4addedae9608381aac3b531b9fa6d1235fbb8a9eb"
+      },
+      "epochs_completed": 22,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:020"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 14,
+      "selected_validation_mean_participant_macro_f1": 0.6120139152797107,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:021"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-4__deepconvlstm.pt",
+        "sha256": "d5d6471533b88540f69497e78074738fafff5cc9fd6fdb384740c953116a55c5"
+      },
+      "epochs_completed": 16,
+      "evaluation_participants": [
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:014",
+        "fogstar:018"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 8,
+      "selected_validation_mean_participant_macro_f1": 0.5178485759903757,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:005",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:022"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-4__tinyhar.pt",
+        "sha256": "6533dcca407bf9d3ca38660460e552c3f4f4e32c66c1e3851d5381c2e18ac9c1"
+      },
+      "epochs_completed": 21,
+      "evaluation_participants": [
+        "fogstar:003",
+        "fogstar:006",
+        "fogstar:014",
+        "fogstar:018"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 13,
+      "selected_validation_mean_participant_macro_f1": 0.6119704490344466,
+      "training_participants": [
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:001",
+        "fogstar:005",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:022"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-0__deepconvlstm.pt",
+        "sha256": "19fcbd55a1a24725027ebbb61174f6539152afb4f376f40c5bd73d9b148370cf"
+      },
+      "epochs_completed": 15,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:006",
+        "fogstar:009",
+        "fogstar:010"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 7,
+      "selected_validation_mean_participant_macro_f1": 0.5634157156063849,
+      "training_participants": [
+        "fogstar:003",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:022"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-0__tinyhar.pt",
+        "sha256": "8ed8020c47f4879dbb84caeafcc3f8b5305a81bd1f16f809692c8f3f1444fa89"
+      },
+      "epochs_completed": 25,
+      "evaluation_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:006",
+        "fogstar:009",
+        "fogstar:010"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 17,
+      "selected_validation_mean_participant_macro_f1": 0.5550629345312525,
+      "training_participants": [
+        "fogstar:003",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:005",
+        "fogstar:012",
+        "fogstar:016",
+        "fogstar:022"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-1__deepconvlstm.pt",
+        "sha256": "c5874c951b47abfad09dd94b42e0dc11846dbb13d70230f8fb09c4e89f56c0c7"
+      },
+      "epochs_completed": 26,
+      "evaluation_participants": [
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:018",
+        "fogstar:022"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 18,
+      "selected_validation_mean_participant_macro_f1": 0.5840784052221649,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:019",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-1__tinyhar.pt",
+        "sha256": "f70893ba9a608b3f2bdb5f819ece08e49916cd6e1cd7805b8400f4400aa2b487"
+      },
+      "epochs_completed": 11,
+      "evaluation_participants": [
+        "fogstar:005",
+        "fogstar:007",
+        "fogstar:012",
+        "fogstar:018",
+        "fogstar:022"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 3,
+      "selected_validation_mean_participant_macro_f1": 0.5252013031155912,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:011",
+        "fogstar:013",
+        "fogstar:015",
+        "fogstar:017",
+        "fogstar:021"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:019",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-2__deepconvlstm.pt",
+        "sha256": "93c21550e34a0f17f5725aec7d365051eb08bc4d5482f58b28b2fb6a43b7bdff"
+      },
+      "epochs_completed": 9,
+      "evaluation_participants": [
+        "fogstar:004",
+        "fogstar:011",
+        "fogstar:016",
+        "fogstar:019"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 1,
+      "selected_validation_mean_participant_macro_f1": 0.49461193540135684,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:017",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:015",
+        "fogstar:018",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-2__tinyhar.pt",
+        "sha256": "3ed009749138ac8a7c3b957e43ade886a64adc85c3cd7f7e61958fad9042db68"
+      },
+      "epochs_completed": 20,
+      "evaluation_participants": [
+        "fogstar:004",
+        "fogstar:011",
+        "fogstar:016",
+        "fogstar:019"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 12,
+      "selected_validation_mean_participant_macro_f1": 0.5689340188458071,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:008",
+        "fogstar:010",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:017",
+        "fogstar:021",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:015",
+        "fogstar:018",
+        "fogstar:020"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-3__deepconvlstm.pt",
+        "sha256": "fe2d823b5d5ca1afd0a663985a9bf693bf82c7b5a863699b42bde6dd10debe2f"
+      },
+      "epochs_completed": 20,
+      "evaluation_participants": [
+        "fogstar:003",
+        "fogstar:015",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 12,
+      "selected_validation_mean_participant_macro_f1": 0.5204401329384674,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:010",
+        "fogstar:011"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-3__tinyhar.pt",
+        "sha256": "e8ba72dec2cae8667d8e90c255e5ae0156a8e8b151c181ab15a44d6797da00c1"
+      },
+      "epochs_completed": 15,
+      "evaluation_participants": [
+        "fogstar:003",
+        "fogstar:015",
+        "fogstar:020",
+        "fogstar:021"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 7,
+      "selected_validation_mean_participant_macro_f1": 0.5399504784390388,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:005",
+        "fogstar:008",
+        "fogstar:009",
+        "fogstar:012",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:016",
+        "fogstar:017",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:010",
+        "fogstar:011"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-4__deepconvlstm.pt",
+        "sha256": "753ae5da060fe7f217ec4cd26d9d4ee815a8f0edd84826654c4eee4f71394c43"
+      },
+      "epochs_completed": 19,
+      "evaluation_participants": [
+        "fogstar:008",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:017"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 11,
+      "selected_validation_mean_participant_macro_f1": 0.4908202323991798,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:015",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:021"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-4__tinyhar.pt",
+        "sha256": "4af405868e8329c5f279bb3e3b094643076d7bfd7707d4c338d2ac24888c0d63"
+      },
+      "epochs_completed": 27,
+      "evaluation_participants": [
+        "fogstar:008",
+        "fogstar:013",
+        "fogstar:014",
+        "fogstar:017"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 19,
+      "selected_validation_mean_participant_macro_f1": 0.7209794741885942,
+      "training_participants": [
+        "fogstar:001",
+        "fogstar:002",
+        "fogstar:004",
+        "fogstar:006",
+        "fogstar:007",
+        "fogstar:011",
+        "fogstar:012",
+        "fogstar:015",
+        "fogstar:016",
+        "fogstar:018",
+        "fogstar:019",
+        "fogstar:020",
+        "fogstar:022"
+      ],
+      "validation_participants": [
+        "fogstar:003",
+        "fogstar:005",
+        "fogstar:009",
+        "fogstar:010",
+        "fogstar:021"
+      ]
+    }
+  ],
+  "git": {
+    "commit": "f7f15972bf387697aed25c8a213580c1482275e1",
+    "status_entries": [
+      " M pyproject.toml",
+      " M src/inclusive_shift_har/models/__init__.py",
+      " M src/inclusive_shift_har/models/baselines.py",
+      " M src/inclusive_shift_har/preprocessing/features.py",
+      " M tests/test_engineered_features.py",
+      " M uv.lock",
+      "?? configs/datasets/external_har_portfolio_v1.yaml",
+      "?? configs/experiments/cross_dataset_har_rnd_v1.yaml",
+      "?? docs/research/CONTROLLED_DATA_ACCESS_CHECKLIST.md",
+      "?? docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
+      "?? results/research/",
+      "?? src/inclusive_shift_har/data/external_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_neural.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_transfer.py",
+      "?? src/inclusive_shift_har/experiments/har_pmd_stress.py",
+      "?? src/inclusive_shift_har/experiments/sole_harmony_temporal.py",
+      "?? tests/test_external_har.py"
+    ],
+    "worktree_dirty": true
+  },
+  "input_channels": 6,
+  "method_suffix": "6ch",
+  "paired_model_comparison": {
+    "bottom_30_percent_difference": 0.03665244858153072,
+    "bottom_30_percent_difference_95_percent_bootstrap_interval": [
+      -0.0597494597519157,
+      0.13594537776435528
+    ],
+    "mean_difference": 0.06812847691834717,
+    "mean_difference_95_percent_bootstrap_interval": [
+      0.008924143702939617,
+      0.1240848438099544
+    ],
+    "negative_participant_count": 7,
+    "participant_count": 22,
+    "positive_participant_count": 13,
+    "resamples": 20000,
+    "seed": 20260904,
+    "zero_participant_count": 2
+  },
+  "prediction_artifact": {
+    "path": "predictions.npz",
+    "sha256": "b3f74f3dd66556fb604a522a20df5634d1752d658ff144227970d3efe7f61fb9"
+  },
+  "reports": {
+    "DeepConvLSTM-6ch": {
+      "calibration": {
+        "ece": 0.12361446999094852,
+        "ece_bins": 15,
+        "ece_status": "secondary_diagnostic",
+        "multiclass_brier_score": 0.3209044821578904,
+        "negative_log_likelihood": 0.6458864837011355
+      },
+      "class_names": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "cohorts": null,
+      "independence_note": "windows are not treated as independent statistical units",
+      "participant_count": 22,
+      "participants": [
+        {
+          "balanced_accuracy": 0.519298245614035,
+          "cohort": null,
+          "macro_f1": 0.36000000000000004,
+          "participant_id": "fogstar:001",
+          "window_count": 116
+        },
+        {
+          "balanced_accuracy": 0.5766394099727433,
+          "cohort": null,
+          "macro_f1": 0.4820564030164251,
+          "participant_id": "fogstar:002",
+          "window_count": 190
+        },
+        {
+          "balanced_accuracy": 0.6296296296296297,
+          "cohort": null,
+          "macro_f1": 0.5690446391322487,
+          "participant_id": "fogstar:003",
+          "window_count": 101
+        },
+        {
+          "balanced_accuracy": 0.6488095238095238,
+          "cohort": null,
+          "macro_f1": 0.5914823914823915,
+          "participant_id": "fogstar:004",
+          "window_count": 76
+        },
+        {
+          "balanced_accuracy": 0.6470588235294118,
+          "cohort": null,
+          "macro_f1": 0.5732323232323232,
+          "participant_id": "fogstar:005",
+          "window_count": 36
+        },
+        {
+          "balanced_accuracy": 0.5761904761904763,
+          "cohort": null,
+          "macro_f1": 0.4158730158730159,
+          "participant_id": "fogstar:006",
+          "window_count": 32
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.25,
+          "participant_id": "fogstar:007",
+          "window_count": 81
+        },
+        {
+          "balanced_accuracy": 0.6666666666666666,
+          "cohort": null,
+          "macro_f1": 0.5238095238095238,
+          "participant_id": "fogstar:008",
+          "window_count": 19
+        },
+        {
+          "balanced_accuracy": 0.6363636363636364,
+          "cohort": null,
+          "macro_f1": 0.4386724386724386,
+          "participant_id": "fogstar:009",
+          "window_count": 69
+        },
+        {
+          "balanced_accuracy": 0.5,
+          "cohort": null,
+          "macro_f1": 0.5052012663952962,
+          "participant_id": "fogstar:010",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.6572769953051644,
+          "cohort": null,
+          "macro_f1": 0.5785714285714286,
+          "participant_id": "fogstar:011",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.3010752688172043,
+          "participant_id": "fogstar:012",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.6405228758169934,
+          "cohort": null,
+          "macro_f1": 0.48639455782312924,
+          "participant_id": "fogstar:013",
+          "window_count": 53
+        },
+        {
+          "balanced_accuracy": 0.6274509803921569,
+          "cohort": null,
+          "macro_f1": 0.615546218487395,
+          "participant_id": "fogstar:014",
+          "window_count": 46
+        },
+        {
+          "balanced_accuracy": 0.589247311827957,
+          "cohort": null,
+          "macro_f1": 0.5448028673835125,
+          "participant_id": "fogstar:015",
+          "window_count": 76
+        },
+        {
+          "balanced_accuracy": 0.6458333333333334,
+          "cohort": null,
+          "macro_f1": 0.6327794069729554,
+          "participant_id": "fogstar:016",
+          "window_count": 64
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.3333333333333333,
+          "participant_id": "fogstar:017",
+          "window_count": 3
+        },
+        {
+          "balanced_accuracy": 0.6666666666666666,
+          "cohort": null,
+          "macro_f1": 0.6296296296296297,
+          "participant_id": "fogstar:018",
+          "window_count": 65
+        },
+        {
+          "balanced_accuracy": 0.5761616161616162,
+          "cohort": null,
+          "macro_f1": 0.5596801287056096,
+          "participant_id": "fogstar:019",
+          "window_count": 133
+        },
+        {
+          "balanced_accuracy": 0.6538461538461539,
+          "cohort": null,
+          "macro_f1": 0.526797385620915,
+          "participant_id": "fogstar:020",
+          "window_count": 57
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.3333333333333333,
+          "participant_id": "fogstar:021",
+          "window_count": 8
+        },
+        {
+          "balanced_accuracy": 0.6666666666666666,
+          "cohort": null,
+          "macro_f1": 0.6666666666666666,
+          "participant_id": "fogstar:022",
+          "window_count": 17
+        }
+      ],
+      "primary": {
+        "bottom_30_percent_participant_macro_f1": 0.3474696271470465,
+        "lower_decile_participant_macro_f1": 0.3333333333333333,
+        "mean_participant_macro_f1": 0.4962719194072171,
+        "worst_participant_macro_f1": 0.25
+      },
+      "sample_count": 1464,
+      "schema_version": "1.0.0",
+      "selective_risk": {
+        "aurc": 0.08949457807318684,
+        "points": [
+          {
+            "coverage": 0.0006830601092896175,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.010245901639344262,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.020491803278688523,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.030054644808743168,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.040300546448087435,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.050546448087431695,
+            "risk": 0.013513513513513514
+          },
+          {
+            "coverage": 0.060109289617486336,
+            "risk": 0.045454545454545456
+          },
+          {
+            "coverage": 0.0703551912568306,
+            "risk": 0.04854368932038835
+          },
+          {
+            "coverage": 0.08060109289617487,
+            "risk": 0.05084745762711865
+          },
+          {
+            "coverage": 0.09016393442622951,
+            "risk": 0.06060606060606061
+          },
+          {
+            "coverage": 0.10040983606557377,
+            "risk": 0.061224489795918366
+          },
+          {
+            "coverage": 0.10997267759562841,
+            "risk": 0.07453416149068323
+          },
+          {
+            "coverage": 0.12021857923497267,
+            "risk": 0.10227272727272728
+          },
+          {
+            "coverage": 0.13046448087431695,
+            "risk": 0.10471204188481675
+          },
+          {
+            "coverage": 0.14002732240437157,
+            "risk": 0.1073170731707317
+          },
+          {
+            "coverage": 0.15027322404371585,
+            "risk": 0.11363636363636363
+          },
+          {
+            "coverage": 0.16051912568306012,
+            "risk": 0.11914893617021277
+          },
+          {
+            "coverage": 0.17008196721311475,
+            "risk": 0.13253012048192772
+          },
+          {
+            "coverage": 0.18032786885245902,
+            "risk": 0.125
+          },
+          {
+            "coverage": 0.18989071038251365,
+            "risk": 0.11870503597122302
+          },
+          {
+            "coverage": 0.20013661202185792,
+            "risk": 0.11604095563139932
+          },
+          {
+            "coverage": 0.2103825136612022,
+            "risk": 0.11363636363636363
+          },
+          {
+            "coverage": 0.21994535519125682,
+            "risk": 0.10869565217391304
+          },
+          {
+            "coverage": 0.2301912568306011,
+            "risk": 0.10385756676557864
+          },
+          {
+            "coverage": 0.24043715846994534,
+            "risk": 0.09943181818181818
+          },
+          {
+            "coverage": 0.25,
+            "risk": 0.09562841530054644
+          },
+          {
+            "coverage": 0.26024590163934425,
+            "risk": 0.09186351706036745
+          },
+          {
+            "coverage": 0.27049180327868855,
+            "risk": 0.08838383838383838
+          },
+          {
+            "coverage": 0.28005464480874315,
+            "risk": 0.08536585365853659
+          },
+          {
+            "coverage": 0.29030054644808745,
+            "risk": 0.08470588235294117
+          },
+          {
+            "coverage": 0.2998633879781421,
+            "risk": 0.08200455580865604
+          },
+          {
+            "coverage": 0.31010928961748635,
+            "risk": 0.07929515418502203
+          },
+          {
+            "coverage": 0.3203551912568306,
+            "risk": 0.07889125799573561
+          },
+          {
+            "coverage": 0.32991803278688525,
+            "risk": 0.07660455486542443
+          },
+          {
+            "coverage": 0.3401639344262295,
+            "risk": 0.07630522088353414
+          },
+          {
+            "coverage": 0.35040983606557374,
+            "risk": 0.07407407407407407
+          },
+          {
+            "coverage": 0.3599726775956284,
+            "risk": 0.07400379506641366
+          },
+          {
+            "coverage": 0.3702185792349727,
+            "risk": 0.07195571955719557
+          },
+          {
+            "coverage": 0.3797814207650273,
+            "risk": 0.07014388489208633
+          },
+          {
+            "coverage": 0.3900273224043716,
+            "risk": 0.06830122591943957
+          },
+          {
+            "coverage": 0.40027322404371585,
+            "risk": 0.06825938566552901
+          },
+          {
+            "coverage": 0.4098360655737705,
+            "risk": 0.06833333333333333
+          },
+          {
+            "coverage": 0.42008196721311475,
+            "risk": 0.06666666666666667
+          },
+          {
+            "coverage": 0.430327868852459,
+            "risk": 0.06666666666666667
+          },
+          {
+            "coverage": 0.43989071038251365,
+            "risk": 0.06521739130434782
+          },
+          {
+            "coverage": 0.4501366120218579,
+            "risk": 0.0637329286798179
+          },
+          {
+            "coverage": 0.45969945355191255,
+            "risk": 0.06240713224368499
+          },
+          {
+            "coverage": 0.46994535519125685,
+            "risk": 0.061046511627906974
+          },
+          {
+            "coverage": 0.4801912568306011,
+            "risk": 0.059743954480796585
+          },
+          {
+            "coverage": 0.48975409836065575,
+            "risk": 0.058577405857740586
+          },
+          {
+            "coverage": 0.5,
+            "risk": 0.05737704918032787
+          },
+          {
+            "coverage": 0.5102459016393442,
+            "risk": 0.05622489959839357
+          },
+          {
+            "coverage": 0.519808743169399,
+            "risk": 0.05519053876478318
+          },
+          {
+            "coverage": 0.5300546448087432,
+            "risk": 0.05412371134020619
+          },
+          {
+            "coverage": 0.5403005464480874,
+            "risk": 0.05309734513274336
+          },
+          {
+            "coverage": 0.549863387978142,
+            "risk": 0.05217391304347826
+          },
+          {
+            "coverage": 0.5601092896174863,
+            "risk": 0.05121951219512195
+          },
+          {
+            "coverage": 0.569672131147541,
+            "risk": 0.050359712230215826
+          },
+          {
+            "coverage": 0.5799180327868853,
+            "risk": 0.050647820965842166
+          },
+          {
+            "coverage": 0.5901639344262295,
+            "risk": 0.05092592592592592
+          },
+          {
+            "coverage": 0.5997267759562842,
+            "risk": 0.05353075170842825
+          },
+          {
+            "coverage": 0.6099726775956285,
+            "risk": 0.05263157894736842
+          },
+          {
+            "coverage": 0.6202185792349727,
+            "risk": 0.05286343612334802
+          },
+          {
+            "coverage": 0.6297814207650273,
+            "risk": 0.052060737527114966
+          },
+          {
+            "coverage": 0.6400273224043715,
+            "risk": 0.051227321237993596
+          },
+          {
+            "coverage": 0.6495901639344263,
+            "risk": 0.05152471083070452
+          },
+          {
+            "coverage": 0.6598360655737705,
+            "risk": 0.056935817805383024
+          },
+          {
+            "coverage": 0.6700819672131147,
+            "risk": 0.059123343527013254
+          },
+          {
+            "coverage": 0.6796448087431693,
+            "risk": 0.06532663316582915
+          },
+          {
+            "coverage": 0.6898907103825137,
+            "risk": 0.07227722772277227
+          },
+          {
+            "coverage": 0.700136612021858,
+            "risk": 0.08097560975609756
+          },
+          {
+            "coverage": 0.7096994535519126,
+            "risk": 0.0875842155919153
+          },
+          {
+            "coverage": 0.7199453551912568,
+            "risk": 0.09108159392789374
+          },
+          {
+            "coverage": 0.7295081967213115,
+            "risk": 0.0945692883895131
+          },
+          {
+            "coverage": 0.7397540983606558,
+            "risk": 0.09695290858725762
+          },
+          {
+            "coverage": 0.75,
+            "risk": 0.10109289617486339
+          },
+          {
+            "coverage": 0.7595628415300546,
+            "risk": 0.10701438848920863
+          },
+          {
+            "coverage": 0.769808743169399,
+            "risk": 0.11446317657497782
+          },
+          {
+            "coverage": 0.7800546448087432,
+            "risk": 0.11733800350262696
+          },
+          {
+            "coverage": 0.7896174863387978,
+            "risk": 0.12197231833910034
+          },
+          {
+            "coverage": 0.799863387978142,
+            "risk": 0.1263877028181042
+          },
+          {
+            "coverage": 0.8101092896174863,
+            "risk": 0.12900505902192244
+          },
+          {
+            "coverage": 0.819672131147541,
+            "risk": 0.13083333333333333
+          },
+          {
+            "coverage": 0.8299180327868853,
+            "risk": 0.13415637860082305
+          },
+          {
+            "coverage": 0.8394808743169399,
+            "risk": 0.1383238405207486
+          },
+          {
+            "coverage": 0.8497267759562842,
+            "risk": 0.1422829581993569
+          },
+          {
+            "coverage": 0.8599726775956285,
+            "risk": 0.14614773629864972
+          },
+          {
+            "coverage": 0.869535519125683,
+            "risk": 0.15239591516103693
+          },
+          {
+            "coverage": 0.8797814207650273,
+            "risk": 0.15683229813664595
+          },
+          {
+            "coverage": 0.8900273224043715,
+            "risk": 0.15656178050652342
+          },
+          {
+            "coverage": 0.8995901639344263,
+            "risk": 0.15793470007593013
+          },
+          {
+            "coverage": 0.9098360655737705,
+            "risk": 0.15990990990990991
+          },
+          {
+            "coverage": 0.9193989071038251,
+            "risk": 0.16047548291233285
+          },
+          {
+            "coverage": 0.9296448087431693,
+            "risk": 0.16164584864070536
+          },
+          {
+            "coverage": 0.9398907103825137,
+            "risk": 0.16569767441860464
+          },
+          {
+            "coverage": 0.9494535519125683,
+            "risk": 0.1669064748201439
+          },
+          {
+            "coverage": 0.9596994535519126,
+            "risk": 0.1693950177935943
+          },
+          {
+            "coverage": 0.9699453551912568,
+            "risk": 0.17183098591549295
+          },
+          {
+            "coverage": 0.9795081967213115,
+            "risk": 0.17573221757322174
+          },
+          {
+            "coverage": 0.9897540983606558,
+            "risk": 0.17805383022774326
+          },
+          {
+            "coverage": 1.0,
+            "risk": 0.18169398907103826
+          }
+        ]
+      },
+      "window_level_diagnostics": {
+        "accuracy": 0.8183060109289617,
+        "balanced_accuracy": 0.5689993629108246,
+        "confusion_matrix": [
+          [
+            1017,
+            0,
+            137
+          ],
+          [
+            25,
+            1,
+            63
+          ],
+          [
+            41,
+            0,
+            180
+          ]
+        ],
+        "macro_f1": 0.5101591168590217,
+        "per_class_recall": {
+          "mobility": 0.8812824956672444,
+          "sitting": 0.011235955056179775,
+          "standing": 0.8144796380090498
+        }
+      }
+    },
+    "TinyHAR-6ch": {
+      "calibration": {
+        "ece": 0.07128973135331096,
+        "ece_bins": 15,
+        "ece_status": "secondary_diagnostic",
+        "multiclass_brier_score": 0.2849093498444401,
+        "negative_log_likelihood": 0.529845502541079
+      },
+      "class_names": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "cohorts": null,
+      "independence_note": "windows are not treated as independent statistical units",
+      "participant_count": 22,
+      "participants": [
+        {
+          "balanced_accuracy": 0.662155388471178,
+          "cohort": null,
+          "macro_f1": 0.5451112877583466,
+          "participant_id": "fogstar:001",
+          "window_count": 116
+        },
+        {
+          "balanced_accuracy": 0.6331569664902998,
+          "cohort": null,
+          "macro_f1": 0.5633962264150943,
+          "participant_id": "fogstar:002",
+          "window_count": 190
+        },
+        {
+          "balanced_accuracy": 0.6296296296296297,
+          "cohort": null,
+          "macro_f1": 0.5611977257546877,
+          "participant_id": "fogstar:003",
+          "window_count": 101
+        },
+        {
+          "balanced_accuracy": 0.7333333333333334,
+          "cohort": null,
+          "macro_f1": 0.7817805383022775,
+          "participant_id": "fogstar:004",
+          "window_count": 76
+        },
+        {
+          "balanced_accuracy": 0.8216619981325862,
+          "cohort": null,
+          "macro_f1": 0.8009506833036246,
+          "participant_id": "fogstar:005",
+          "window_count": 36
+        },
+        {
+          "balanced_accuracy": 0.6923076923076922,
+          "cohort": null,
+          "macro_f1": 0.5324675324675324,
+          "participant_id": "fogstar:006",
+          "window_count": 32
+        },
+        {
+          "balanced_accuracy": 0.5575396825396826,
+          "cohort": null,
+          "macro_f1": 0.4846096096096096,
+          "participant_id": "fogstar:007",
+          "window_count": 81
+        },
+        {
+          "balanced_accuracy": 0.611111111111111,
+          "cohort": null,
+          "macro_f1": 0.6,
+          "participant_id": "fogstar:008",
+          "window_count": 19
+        },
+        {
+          "balanced_accuracy": 0.6666666666666666,
+          "cohort": null,
+          "macro_f1": 0.6,
+          "participant_id": "fogstar:009",
+          "window_count": 69
+        },
+        {
+          "balanced_accuracy": 0.7170940170940171,
+          "cohort": null,
+          "macro_f1": 0.7021779254337394,
+          "participant_id": "fogstar:010",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.30985915492957744,
+          "cohort": null,
+          "macro_f1": 0.3142857142857143,
+          "participant_id": "fogstar:011",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.28940568475452194,
+          "participant_id": "fogstar:012",
+          "window_count": 74
+        },
+        {
+          "balanced_accuracy": 0.5816993464052288,
+          "cohort": null,
+          "macro_f1": 0.3630755673055739,
+          "participant_id": "fogstar:013",
+          "window_count": 53
+        },
+        {
+          "balanced_accuracy": 0.7941176470588235,
+          "cohort": null,
+          "macro_f1": 0.7696969696969697,
+          "participant_id": "fogstar:014",
+          "window_count": 46
+        },
+        {
+          "balanced_accuracy": 0.503225806451613,
+          "cohort": null,
+          "macro_f1": 0.4049382716049383,
+          "participant_id": "fogstar:015",
+          "window_count": 76
+        },
+        {
+          "balanced_accuracy": 0.7083333333333334,
+          "cohort": null,
+          "macro_f1": 0.7297314496627211,
+          "participant_id": "fogstar:016",
+          "window_count": 64
+        },
+        {
+          "balanced_accuracy": 0.3333333333333333,
+          "cohort": null,
+          "macro_f1": 0.3333333333333333,
+          "participant_id": "fogstar:017",
+          "window_count": 3
+        },
+        {
+          "balanced_accuracy": 0.49393939393939396,
+          "cohort": null,
+          "macro_f1": 0.4992063492063492,
+          "participant_id": "fogstar:018",
+          "window_count": 65
+        },
+        {
+          "balanced_accuracy": 0.5357575757575758,
+          "cohort": null,
+          "macro_f1": 0.547979797979798,
+          "participant_id": "fogstar:019",
+          "window_count": 133
+        },
+        {
+          "balanced_accuracy": 0.8205128205128206,
+          "cohort": null,
+          "macro_f1": 0.7712418300653594,
+          "participant_id": "fogstar:020",
+          "window_count": 57
+        },
+        {
+          "balanced_accuracy": 0.5,
+          "cohort": null,
+          "macro_f1": 0.5555555555555555,
+          "participant_id": "fogstar:021",
+          "window_count": 8
+        },
+        {
+          "balanced_accuracy": 0.6666666666666666,
+          "cohort": null,
+          "macro_f1": 0.6666666666666666,
+          "participant_id": "fogstar:022",
+          "window_count": 17
+        }
+      ],
+      "primary": {
+        "bottom_30_percent_participant_macro_f1": 0.3841220757285772,
+        "lower_decile_participant_macro_f1": 0.3363075567305574,
+        "mean_participant_macro_f1": 0.5644003963255642,
+        "worst_participant_macro_f1": 0.28940568475452194
+      },
+      "sample_count": 1464,
+      "schema_version": "1.0.0",
+      "selective_risk": {
+        "aurc": 0.059520935531493464,
+        "points": [
+          {
+            "coverage": 0.0006830601092896175,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.010245901639344262,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.020491803278688523,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.030054644808743168,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.040300546448087435,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.050546448087431695,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.060109289617486336,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.0703551912568306,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.08060109289617487,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.09016393442622951,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.10040983606557377,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.10997267759562841,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.12021857923497267,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.13046448087431695,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.14002732240437157,
+            "risk": 0.00975609756097561
+          },
+          {
+            "coverage": 0.15027322404371585,
+            "risk": 0.00909090909090909
+          },
+          {
+            "coverage": 0.16051912568306012,
+            "risk": 0.00851063829787234
+          },
+          {
+            "coverage": 0.17008196721311475,
+            "risk": 0.008032128514056224
+          },
+          {
+            "coverage": 0.18032786885245902,
+            "risk": 0.007575757575757576
+          },
+          {
+            "coverage": 0.18989071038251365,
+            "risk": 0.007194244604316547
+          },
+          {
+            "coverage": 0.20013661202185792,
+            "risk": 0.006825938566552901
+          },
+          {
+            "coverage": 0.2103825136612022,
+            "risk": 0.006493506493506494
+          },
+          {
+            "coverage": 0.21994535519125682,
+            "risk": 0.006211180124223602
+          },
+          {
+            "coverage": 0.2301912568306011,
+            "risk": 0.005934718100890208
+          },
+          {
+            "coverage": 0.24043715846994534,
+            "risk": 0.005681818181818182
+          },
+          {
+            "coverage": 0.25,
+            "risk": 0.00546448087431694
+          },
+          {
+            "coverage": 0.26024590163934425,
+            "risk": 0.005249343832020997
+          },
+          {
+            "coverage": 0.27049180327868855,
+            "risk": 0.005050505050505051
+          },
+          {
+            "coverage": 0.28005464480874315,
+            "risk": 0.004878048780487805
+          },
+          {
+            "coverage": 0.29030054644808745,
+            "risk": 0.004705882352941176
+          },
+          {
+            "coverage": 0.2998633879781421,
+            "risk": 0.00683371298405467
+          },
+          {
+            "coverage": 0.31010928961748635,
+            "risk": 0.006607929515418502
+          },
+          {
+            "coverage": 0.3203551912568306,
+            "risk": 0.006396588486140725
+          },
+          {
+            "coverage": 0.32991803278688525,
+            "risk": 0.006211180124223602
+          },
+          {
+            "coverage": 0.3401639344262295,
+            "risk": 0.006024096385542169
+          },
+          {
+            "coverage": 0.35040983606557374,
+            "risk": 0.005847953216374269
+          },
+          {
+            "coverage": 0.3599726775956284,
+            "risk": 0.007590132827324478
+          },
+          {
+            "coverage": 0.3702185792349727,
+            "risk": 0.007380073800738007
+          },
+          {
+            "coverage": 0.3797814207650273,
+            "risk": 0.007194244604316547
+          },
+          {
+            "coverage": 0.3900273224043716,
+            "risk": 0.0070052539404553416
+          },
+          {
+            "coverage": 0.40027322404371585,
+            "risk": 0.006825938566552901
+          },
+          {
+            "coverage": 0.4098360655737705,
+            "risk": 0.008333333333333333
+          },
+          {
+            "coverage": 0.42008196721311475,
+            "risk": 0.00975609756097561
+          },
+          {
+            "coverage": 0.430327868852459,
+            "risk": 0.011111111111111112
+          },
+          {
+            "coverage": 0.43989071038251365,
+            "risk": 0.012422360248447204
+          },
+          {
+            "coverage": 0.4501366120218579,
+            "risk": 0.013657056145675266
+          },
+          {
+            "coverage": 0.45969945355191255,
+            "risk": 0.01337295690936107
+          },
+          {
+            "coverage": 0.46994535519125685,
+            "risk": 0.014534883720930232
+          },
+          {
+            "coverage": 0.4801912568306011,
+            "risk": 0.01422475106685633
+          },
+          {
+            "coverage": 0.48975409836065575,
+            "risk": 0.016736401673640166
+          },
+          {
+            "coverage": 0.5,
+            "risk": 0.017759562841530054
+          },
+          {
+            "coverage": 0.5102459016393442,
+            "risk": 0.018741633199464525
+          },
+          {
+            "coverage": 0.519808743169399,
+            "risk": 0.023653088042049936
+          },
+          {
+            "coverage": 0.5300546448087432,
+            "risk": 0.029639175257731958
+          },
+          {
+            "coverage": 0.5403005464480874,
+            "risk": 0.03413400758533502
+          },
+          {
+            "coverage": 0.549863387978142,
+            "risk": 0.03975155279503106
+          },
+          {
+            "coverage": 0.5601092896174863,
+            "risk": 0.045121951219512194
+          },
+          {
+            "coverage": 0.569672131147541,
+            "risk": 0.049160671462829736
+          },
+          {
+            "coverage": 0.5799180327868853,
+            "risk": 0.05535924617196702
+          },
+          {
+            "coverage": 0.5901639344262295,
+            "risk": 0.061342592592592594
+          },
+          {
+            "coverage": 0.5997267759562842,
+            "risk": 0.06264236902050115
+          },
+          {
+            "coverage": 0.6099726775956285,
+            "risk": 0.06270996640537514
+          },
+          {
+            "coverage": 0.6202185792349727,
+            "risk": 0.0671806167400881
+          },
+          {
+            "coverage": 0.6297814207650273,
+            "risk": 0.06941431670281996
+          },
+          {
+            "coverage": 0.6400273224043715,
+            "risk": 0.07470651013874066
+          },
+          {
+            "coverage": 0.6495901639344263,
+            "risk": 0.08096740273396424
+          },
+          {
+            "coverage": 0.6598360655737705,
+            "risk": 0.08592132505175984
+          },
+          {
+            "coverage": 0.6700819672131147,
+            "risk": 0.08664627930682976
+          },
+          {
+            "coverage": 0.6796448087431693,
+            "risk": 0.0914572864321608
+          },
+          {
+            "coverage": 0.6898907103825137,
+            "risk": 0.09306930693069307
+          },
+          {
+            "coverage": 0.700136612021858,
+            "risk": 0.10146341463414635
+          },
+          {
+            "coverage": 0.7096994535519126,
+            "risk": 0.1068334937439846
+          },
+          {
+            "coverage": 0.7199453551912568,
+            "risk": 0.10910815939278938
+          },
+          {
+            "coverage": 0.7295081967213115,
+            "risk": 0.11610486891385768
+          },
+          {
+            "coverage": 0.7397540983606558,
+            "risk": 0.11911357340720222
+          },
+          {
+            "coverage": 0.75,
+            "risk": 0.12386156648451731
+          },
+          {
+            "coverage": 0.7595628415300546,
+            "risk": 0.12589928057553956
+          },
+          {
+            "coverage": 0.769808743169399,
+            "risk": 0.1313220940550133
+          },
+          {
+            "coverage": 0.7800546448087432,
+            "risk": 0.13222416812609458
+          },
+          {
+            "coverage": 0.7896174863387978,
+            "risk": 0.13667820069204153
+          },
+          {
+            "coverage": 0.799863387978142,
+            "risk": 0.13834329632792486
+          },
+          {
+            "coverage": 0.8101092896174863,
+            "risk": 0.14080944350758853
+          },
+          {
+            "coverage": 0.819672131147541,
+            "risk": 0.14416666666666667
+          },
+          {
+            "coverage": 0.8299180327868853,
+            "risk": 0.1440329218106996
+          },
+          {
+            "coverage": 0.8394808743169399,
+            "risk": 0.14564686737184704
+          },
+          {
+            "coverage": 0.8497267759562842,
+            "risk": 0.14630225080385853
+          },
+          {
+            "coverage": 0.8599726775956285,
+            "risk": 0.14773629864972201
+          },
+          {
+            "coverage": 0.869535519125683,
+            "risk": 0.14846818538884524
+          },
+          {
+            "coverage": 0.8797814207650273,
+            "risk": 0.1513975155279503
+          },
+          {
+            "coverage": 0.8900273224043715,
+            "risk": 0.1557943207981581
+          },
+          {
+            "coverage": 0.8995901639344263,
+            "risk": 0.15793470007593013
+          },
+          {
+            "coverage": 0.9098360655737705,
+            "risk": 0.1629129129129129
+          },
+          {
+            "coverage": 0.9193989071038251,
+            "risk": 0.1664190193164933
+          },
+          {
+            "coverage": 0.9296448087431693,
+            "risk": 0.1704628949301984
+          },
+          {
+            "coverage": 0.9398907103825137,
+            "risk": 0.17587209302325582
+          },
+          {
+            "coverage": 0.9494535519125683,
+            "risk": 0.1776978417266187
+          },
+          {
+            "coverage": 0.9596994535519126,
+            "risk": 0.1786476868327402
+          },
+          {
+            "coverage": 0.9699453551912568,
+            "risk": 0.18380281690140846
+          },
+          {
+            "coverage": 0.9795081967213115,
+            "risk": 0.18479776847977686
+          },
+          {
+            "coverage": 0.9897540983606558,
+            "risk": 0.18840579710144928
+          },
+          {
+            "coverage": 1.0,
+            "risk": 0.19330601092896174
+          }
+        ]
+      },
+      "window_level_diagnostics": {
+        "accuracy": 0.8066939890710383,
+        "balanced_accuracy": 0.6106626482261791,
+        "confusion_matrix": [
+          [
+            1004,
+            5,
+            145
+          ],
+          [
+            18,
+            24,
+            47
+          ],
+          [
+            42,
+            26,
+            153
+          ]
+        ],
+        "macro_f1": 0.5930964946472502,
+        "per_class_recall": {
+          "mobility": 0.8700173310225303,
+          "sitting": 0.2696629213483146,
+          "standing": 0.6923076923076923
+        }
+      }
+    }
+  },
+  "schema_version": "1.0.0",
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "started_at": "2026-09-04T22:59:13.937654+00:00"
+}

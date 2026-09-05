@@ -1,0 +1,4375 @@
+{
+  "claim_policy": {
+    "confirmatory_claim_allowed": false,
+    "proposed_method": false,
+    "state_of_the_art_claim_allowed": false
+  },
+  "created_at": "2026-09-04T22:43:54.896607+00:00",
+  "dataset": {
+    "channel_lane": "derived-gravity-9ch",
+    "class_window_counts": {
+      "mobility": 2379,
+      "sitting": 2064,
+      "standing": 2099
+    },
+    "dataset_id": "imu_har_il_v1",
+    "exclusion_count": 3,
+    "exclusions": [
+      {
+        "action": "participant excluded before windowing to retain complete core support",
+        "missing_folders": [
+          "HAR_IMU_IL/P_46/Repetition_1/Walk",
+          "HAR_IMU_IL/P_46/Repetition_1/Sit",
+          "HAR_IMU_IL/P_46/Repetition_1/Stand"
+        ],
+        "participant_id": "imuharil:P_46",
+        "reason": "missing Body-WT.csv in at least one requested core trial"
+      },
+      {
+        "action": "participant excluded before any of their trials were windowed",
+        "invalid_trials": [
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 4501
+          },
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 4501
+          },
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 7620
+          }
+        ],
+        "participant_id": "imuharil:P_18",
+        "reason": "one or more requested core trials failed the pre-window data-quality gate"
+      },
+      {
+        "action": "participant excluded before any of their trials were windowed",
+        "invalid_trials": [
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 7320
+          },
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 6521
+          },
+          {
+            "finite_sensor_row_count": 0,
+            "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+            "reason": "no finite segment can produce one complete analysis window",
+            "row_count": 7260
+          }
+        ],
+        "participant_id": "imuharil:P_19",
+        "reason": "one or more requested core trials failed the pre-window data-quality gate"
+      }
+    ],
+    "participant_count": 47,
+    "raw_local_mirror": false,
+    "receipt_count": 147,
+    "sampling_rate_hz": 50.0,
+    "session_count": 47,
+    "source_issue_count": 90,
+    "source_issues": [
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_11/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_11/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_11/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_12/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_12/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_12/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_13/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_13/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_13/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_14/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_14/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_14/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_15/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_15/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_15/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_16/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_16/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_16/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_17/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_17/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_17/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_18/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_18/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_18/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_19/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_19/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_19/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_20/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_20/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_20/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_21/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_21/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_21/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_22/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_22/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_22/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_23/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_23/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_23/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_24/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_24/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_24/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_25/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_25/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_25/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_26/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_26/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_26/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_27/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_27/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_27/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_28/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_28/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_28/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_29/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_29/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_29/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_30/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_30/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_30/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_31/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_31/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_31/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_32/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_32/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_32/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_33/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_33/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_33/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_34/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_34/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_34/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_35/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_35/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_35/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_36/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_36/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_36/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_37/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_37/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_37/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_38/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_38/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_38/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_39/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_39/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_39/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_40/Repetition_1/Sit/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_40/Repetition_1/Stand/Body-WT.csv",
+        "observed_column": "Activity Label"
+      },
+      {
+        "action": "provider numeric label was validated against the activity folder",
+        "canonical_column": "Activity_label",
+        "issue": "activity-label column uses the documented schema variant",
+        "member": "HAR_IMU_IL/P_40/Repetition_1/Walk/Body-WT.csv",
+        "observed_column": "Activity Label"
+      }
+    ],
+    "trial_count": 141,
+    "window_count": 6542,
+    "window_samples": 128
+  },
+  "device": "cuda",
+  "evidence_status": "EXTERNAL_DEVELOPMENT_NOT_CONFIRMATORY",
+  "experiment_id": "cross-dataset-har-neural-controls-v1",
+  "fold_records": [
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-0__deepconvlstm.pt",
+        "sha256": "15bd63b40a4a5ec8f5ee9959a05309328b0e653a6c781b3a38a466cf64889e54"
+      },
+      "epochs_completed": 23,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_36",
+        "imuharil:P_37"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 15,
+      "selected_validation_mean_participant_macro_f1": 0.7734866418158517,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_31",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_11",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_41",
+        "imuharil:P_44",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-0__tinyhar.pt",
+        "sha256": "f2707ade799d97c77b749956f4879795e9b3aa7fd31254d2b349dc177b9e650c"
+      },
+      "epochs_completed": 28,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_36",
+        "imuharil:P_37"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 20,
+      "selected_validation_mean_participant_macro_f1": 0.8658553173678332,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_31",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_11",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_41",
+        "imuharil:P_44",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-1__deepconvlstm.pt",
+        "sha256": "c4299a08a9a4d1b2fd2fcacb09d05ee8330796eea31913bc3c48a93e032e08fe"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_03",
+        "imuharil:P_15",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_29",
+        "imuharil:P_35",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_47"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 36,
+      "selected_validation_mean_participant_macro_f1": 0.8697758445915114,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_38",
+        "imuharil:P_44",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-1__tinyhar.pt",
+        "sha256": "5c1c6636357549bbada556ff8f34367a93a4cdb11582ee5b4dc52a56251e78a1"
+      },
+      "epochs_completed": 25,
+      "evaluation_participants": [
+        "imuharil:P_03",
+        "imuharil:P_15",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_29",
+        "imuharil:P_35",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_47"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 17,
+      "selected_validation_mean_participant_macro_f1": 0.8488909167743668,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_38",
+        "imuharil:P_44",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-2__deepconvlstm.pt",
+        "sha256": "82d7d71bb23d0783c32da2b28dadde0662ca905699851291f01452ecbb771863"
+      },
+      "epochs_completed": 36,
+      "evaluation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_27",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_44",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 28,
+      "selected_validation_mean_participant_macro_f1": 0.8808511417984739,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_48"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_29",
+        "imuharil:P_34",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-2__tinyhar.pt",
+        "sha256": "c43c628130bb69143abc0f10513ff108a1f05fdd8f06eccedbfc5b425222c883"
+      },
+      "epochs_completed": 28,
+      "evaluation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_27",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_44",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 20,
+      "selected_validation_mean_participant_macro_f1": 0.8740917316789915,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_48"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_29",
+        "imuharil:P_34",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-3__deepconvlstm.pt",
+        "sha256": "0fae698f2f4faa6b1760264b0baf3984b59aa56c7643e798ffe8b7c99c38257b"
+      },
+      "epochs_completed": 39,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_31",
+        "imuharil:P_38",
+        "imuharil:P_48"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 31,
+      "selected_validation_mean_participant_macro_f1": 0.8896840645599899,
+      "training_participants": [
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_22",
+        "imuharil:P_26",
+        "imuharil:P_30",
+        "imuharil:P_35",
+        "imuharil:P_40",
+        "imuharil:P_45",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-3__tinyhar.pt",
+        "sha256": "7c7c631c4778c7ea74832a72494fb662d378e5edb3514a0626d7dd06cb4e6fc2"
+      },
+      "epochs_completed": 22,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_31",
+        "imuharil:P_38",
+        "imuharil:P_48"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 14,
+      "selected_validation_mean_participant_macro_f1": 0.8916128029679868,
+      "training_participants": [
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_22",
+        "imuharil:P_26",
+        "imuharil:P_30",
+        "imuharil:P_35",
+        "imuharil:P_40",
+        "imuharil:P_45",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-4__deepconvlstm.pt",
+        "sha256": "535d36523f57997f69a2b28590b9993d4cfd875a64b0a40dc381b821206867d3"
+      },
+      "epochs_completed": 26,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_34",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_45"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 11,
+      "selected_epoch": 18,
+      "selected_validation_mean_participant_macro_f1": 0.8020539876806222,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_11",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_41",
+        "imuharil:P_44"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-11__fold-4__tinyhar.pt",
+        "sha256": "841b51d9907bfcab29203a7ab84ad3e82caab4019846122d2eccaa6e4a152008"
+      },
+      "epochs_completed": 26,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_34",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_45"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 11,
+      "selected_epoch": 18,
+      "selected_validation_mean_participant_macro_f1": 0.8368284491900161,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_11",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_14",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_41",
+        "imuharil:P_44"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-0__deepconvlstm.pt",
+        "sha256": "d354f08330a222cb9d3015e77862ee05970f1a526d442afc7cef690160e4cea2"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_11",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 36,
+      "selected_validation_mean_participant_macro_f1": 0.8403197091681284,
+      "training_participants": [
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_16",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_38",
+        "imuharil:P_42",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-0__tinyhar.pt",
+        "sha256": "1e33da5b9e1162c3307e15096c8fe8da6de8966637a893c5bcd9773ff0ab9c96"
+      },
+      "epochs_completed": 21,
+      "evaluation_participants": [
+        "imuharil:P_11",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 13,
+      "selected_validation_mean_participant_macro_f1": 0.8591636276572012,
+      "training_participants": [
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_37",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_06",
+        "imuharil:P_16",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_38",
+        "imuharil:P_42",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-1__deepconvlstm.pt",
+        "sha256": "690926274eac90d2eb8506985e761242ae38c12541f327fd661cbc69672ef968"
+      },
+      "epochs_completed": 33,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_34",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 25,
+      "selected_validation_mean_participant_macro_f1": 0.8245129773758058,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_37",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_10",
+        "imuharil:P_13",
+        "imuharil:P_23",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_36",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-1__tinyhar.pt",
+        "sha256": "b6a0d2d0096fa9d39ce4384cbdcb1853db2015577eb582c5e520197bd1e204fe"
+      },
+      "epochs_completed": 38,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_34",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_41",
+        "imuharil:P_42"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 30,
+      "selected_validation_mean_participant_macro_f1": 0.8321913587611693,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_37",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_10",
+        "imuharil:P_13",
+        "imuharil:P_23",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_36",
+        "imuharil:P_45"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-2__deepconvlstm.pt",
+        "sha256": "15d1fbc45d319170211570ebfd5c57658fe7fb702d812a8d444870d656fd4e2d"
+      },
+      "epochs_completed": 25,
+      "evaluation_participants": [
+        "imuharil:P_12",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_26",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_45",
+        "imuharil:P_50"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 17,
+      "selected_validation_mean_participant_macro_f1": 0.7409691503005449,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_08",
+        "imuharil:P_11",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-2__tinyhar.pt",
+        "sha256": "f4972791cc25d3c24dd3b2bf063adb7037e575f374af5facd73681316f3afb6a"
+      },
+      "epochs_completed": 17,
+      "evaluation_participants": [
+        "imuharil:P_12",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_26",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_45",
+        "imuharil:P_50"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 9,
+      "selected_validation_mean_participant_macro_f1": 0.864883337966187,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_32",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_08",
+        "imuharil:P_11",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-3__deepconvlstm.pt",
+        "sha256": "1f7e23900cf1241e7817bca9b63474fb82143686905256dc3e3407b9a3be45a1"
+      },
+      "epochs_completed": 29,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_15",
+        "imuharil:P_29",
+        "imuharil:P_40",
+        "imuharil:P_43"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 21,
+      "selected_validation_mean_participant_macro_f1": 0.8508032032040752,
+      "training_participants": [
+        "imuharil:P_07",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_32",
+        "imuharil:P_39",
+        "imuharil:P_42"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-3__tinyhar.pt",
+        "sha256": "d61e1a50229ccd08f39baccc15fb1ad60af9efdacb4cff54d496dc3614863f25"
+      },
+      "epochs_completed": 26,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_15",
+        "imuharil:P_29",
+        "imuharil:P_40",
+        "imuharil:P_43"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 18,
+      "selected_validation_mean_participant_macro_f1": 0.8907814733565287,
+      "training_participants": [
+        "imuharil:P_07",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_28",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_48",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_32",
+        "imuharil:P_39",
+        "imuharil:P_42"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-4__deepconvlstm.pt",
+        "sha256": "9e3a92791ea3c19b639be43caff21a5086c08bdbc36b9b7b4bc210b1e2b7b50b"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_14",
+        "imuharil:P_32",
+        "imuharil:P_37",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 23,
+      "selected_epoch": 37,
+      "selected_validation_mean_participant_macro_f1": 0.81743259401175,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_34",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_48"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-23__fold-4__tinyhar.pt",
+        "sha256": "08455820d2df1c84cd863837c798f8dc6309e93716672fb462ead42b9bd7db95"
+      },
+      "epochs_completed": 28,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_14",
+        "imuharil:P_32",
+        "imuharil:P_37",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 23,
+      "selected_epoch": 20,
+      "selected_validation_mean_participant_macro_f1": 0.8870115433143984,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_11",
+        "imuharil:P_21",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_34",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_48"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-0__deepconvlstm.pt",
+        "sha256": "ed623cd45a001189da6a3275965c46aec2fea11d3a8b410c015e7715fe1e7f8a"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_12",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_45"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 38,
+      "selected_validation_mean_participant_macro_f1": 0.8331463830663275,
+      "training_participants": [
+        "imuharil:P_02",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_28",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_47",
+        "imuharil:P_50"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-0__tinyhar.pt",
+        "sha256": "b4fe37281bd8f00ead12f1f1c80c481de3364173e2328dc332b32eb95cb680d3"
+      },
+      "epochs_completed": 33,
+      "evaluation_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_12",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_45"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 0,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 25,
+      "selected_validation_mean_participant_macro_f1": 0.8344730592678612,
+      "training_participants": [
+        "imuharil:P_02",
+        "imuharil:P_07",
+        "imuharil:P_08",
+        "imuharil:P_09",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_40",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_48",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_06",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_28",
+        "imuharil:P_39",
+        "imuharil:P_42",
+        "imuharil:P_47",
+        "imuharil:P_50"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-1__deepconvlstm.pt",
+        "sha256": "c69a5ebc1c1ccfa9528d9244aa603db81fefce4ff352b08bff97eadc98a7d262"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_34",
+        "imuharil:P_40",
+        "imuharil:P_42",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 37,
+      "selected_validation_mean_participant_macro_f1": 0.843130768564319,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_31",
+        "imuharil:P_39",
+        "imuharil:P_48"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-1__tinyhar.pt",
+        "sha256": "a84c1a762633abfa24ac2a2117b5018a2cc5e056faebb2d4d92e349d6dde1f30"
+      },
+      "epochs_completed": 25,
+      "evaluation_participants": [
+        "imuharil:P_04",
+        "imuharil:P_22",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_34",
+        "imuharil:P_40",
+        "imuharil:P_42",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 1,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 17,
+      "selected_validation_mean_participant_macro_f1": 0.8743215466591184,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_06",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_24",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_41",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_49",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_05",
+        "imuharil:P_08",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_23",
+        "imuharil:P_31",
+        "imuharil:P_39",
+        "imuharil:P_48"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-2__deepconvlstm.pt",
+        "sha256": "bccea8b1cbda996c99960555353d7973c344a1ac8f91a805615df4f256858de7"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_28",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_36"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 40,
+      "selected_validation_mean_participant_macro_f1": 0.8464366379250654,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_25",
+        "imuharil:P_29",
+        "imuharil:P_39",
+        "imuharil:P_44",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-2__tinyhar.pt",
+        "sha256": "3c218ea54cf673e892327144f3b9d18d4ea22313702c59b7db61e0a827c4fa5a"
+      },
+      "epochs_completed": 28,
+      "evaluation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_13",
+        "imuharil:P_17",
+        "imuharil:P_21",
+        "imuharil:P_28",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_36"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 2,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 20,
+      "selected_validation_mean_participant_macro_f1": 0.8324753726004778,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_12",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_24",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_33",
+        "imuharil:P_34",
+        "imuharil:P_35",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_45",
+        "imuharil:P_47",
+        "imuharil:P_49"
+      ],
+      "validation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_25",
+        "imuharil:P_29",
+        "imuharil:P_39",
+        "imuharil:P_44",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-3__deepconvlstm.pt",
+        "sha256": "74118d0adf8ce6dd29e76dfe8fb9e8f9ea827f4a682aa862dfd39bb483a90902"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_05",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_24",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_43",
+        "imuharil:P_49"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 34,
+      "selected_validation_mean_participant_macro_f1": 0.8279921305032607,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_31",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_17",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_32",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-3__tinyhar.pt",
+        "sha256": "fa830da83235e18c90931e2227c1fa480538c76618590ff75cef3fa021d819e9"
+      },
+      "epochs_completed": 22,
+      "evaluation_participants": [
+        "imuharil:P_02",
+        "imuharil:P_05",
+        "imuharil:P_14",
+        "imuharil:P_15",
+        "imuharil:P_24",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_43",
+        "imuharil:P_49"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 3,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 14,
+      "selected_validation_mean_participant_macro_f1": 0.8806707564564453,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_16",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_22",
+        "imuharil:P_23",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_28",
+        "imuharil:P_29",
+        "imuharil:P_31",
+        "imuharil:P_34",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_42",
+        "imuharil:P_44",
+        "imuharil:P_45",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ],
+      "validation_participants": [
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_11",
+        "imuharil:P_17",
+        "imuharil:P_27",
+        "imuharil:P_30",
+        "imuharil:P_32",
+        "imuharil:P_38",
+        "imuharil:P_39",
+        "imuharil:P_47"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-4__deepconvlstm.pt",
+        "sha256": "fef36a8d4cd67cbe90a2c61e38034abb4a409ebb10f61ab5b87106eb46a8d54b"
+      },
+      "epochs_completed": 40,
+      "evaluation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_39",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ],
+      "model": "DeepConvLSTM-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 200867,
+      "seed": 47,
+      "selected_epoch": 37,
+      "selected_validation_mean_participant_macro_f1": 0.8691319569312388,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "validation_participants": [
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_28",
+        "imuharil:P_34",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_45",
+        "imuharil:P_49"
+      ]
+    },
+    {
+      "checkpoint": {
+        "path": "seed-47__fold-4__tinyhar.pt",
+        "sha256": "94b8901f04488bea9bb0973e3c80a4bfb9579d69797eb7f28310215f84c9a618"
+      },
+      "epochs_completed": 15,
+      "evaluation_participants": [
+        "imuharil:P_06",
+        "imuharil:P_08",
+        "imuharil:P_10",
+        "imuharil:P_11",
+        "imuharil:P_29",
+        "imuharil:P_30",
+        "imuharil:P_39",
+        "imuharil:P_48",
+        "imuharil:P_50"
+      ],
+      "model": "TinyHAR-6ch",
+      "outer_fold": 4,
+      "outer_labels_used_for_training_or_selection": false,
+      "parameter_count": 88421,
+      "seed": 47,
+      "selected_epoch": 7,
+      "selected_validation_mean_participant_macro_f1": 0.8400521659417317,
+      "training_participants": [
+        "imuharil:P_01",
+        "imuharil:P_02",
+        "imuharil:P_03",
+        "imuharil:P_04",
+        "imuharil:P_05",
+        "imuharil:P_07",
+        "imuharil:P_09",
+        "imuharil:P_12",
+        "imuharil:P_13",
+        "imuharil:P_14",
+        "imuharil:P_16",
+        "imuharil:P_17",
+        "imuharil:P_22",
+        "imuharil:P_24",
+        "imuharil:P_25",
+        "imuharil:P_26",
+        "imuharil:P_27",
+        "imuharil:P_31",
+        "imuharil:P_32",
+        "imuharil:P_33",
+        "imuharil:P_35",
+        "imuharil:P_36",
+        "imuharil:P_37",
+        "imuharil:P_38",
+        "imuharil:P_42",
+        "imuharil:P_43",
+        "imuharil:P_44",
+        "imuharil:P_47"
+      ],
+      "validation_participants": [
+        "imuharil:P_15",
+        "imuharil:P_20",
+        "imuharil:P_21",
+        "imuharil:P_23",
+        "imuharil:P_28",
+        "imuharil:P_34",
+        "imuharil:P_40",
+        "imuharil:P_41",
+        "imuharil:P_45",
+        "imuharil:P_49"
+      ]
+    }
+  ],
+  "git": {
+    "commit": "f7f15972bf387697aed25c8a213580c1482275e1",
+    "status_entries": [
+      " M pyproject.toml",
+      " M src/inclusive_shift_har/models/__init__.py",
+      " M src/inclusive_shift_har/models/baselines.py",
+      " M src/inclusive_shift_har/preprocessing/features.py",
+      " M tests/test_engineered_features.py",
+      " M uv.lock",
+      "?? configs/datasets/external_har_portfolio_v1.yaml",
+      "?? configs/experiments/cross_dataset_har_rnd_v1.yaml",
+      "?? docs/research/CONTROLLED_DATA_ACCESS_CHECKLIST.md",
+      "?? docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
+      "?? results/research/",
+      "?? src/inclusive_shift_har/data/external_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_neural.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_transfer.py",
+      "?? src/inclusive_shift_har/experiments/har_pmd_stress.py",
+      "?? src/inclusive_shift_har/experiments/sole_harmony_temporal.py",
+      "?? tests/test_external_har.py"
+    ],
+    "worktree_dirty": true
+  },
+  "paired_model_comparison": {
+    "bottom_30_percent_difference": 0.05032242361437844,
+    "bottom_30_percent_difference_95_percent_bootstrap_interval": [
+      0.0011685517223844575,
+      0.09537729267633374
+    ],
+    "mean_difference": 0.028739663247500068,
+    "mean_difference_95_percent_bootstrap_interval": [
+      0.004369896656540813,
+      0.05288093295550166
+    ],
+    "negative_participant_count": 19,
+    "participant_count": 47,
+    "positive_participant_count": 28,
+    "resamples": 20000,
+    "seed": 20260904,
+    "zero_participant_count": 0
+  },
+  "prediction_artifact": {
+    "path": "predictions.npz",
+    "sha256": "94ada21cc3d40439575e674b5ae073706ecd5a727b6db6dfd88705fccab654c5"
+  },
+  "reports": {
+    "DeepConvLSTM-6ch": {
+      "calibration": {
+        "ece": 0.04281260227753512,
+        "ece_bins": 15,
+        "ece_status": "secondary_diagnostic",
+        "multiclass_brier_score": 0.2010262809433878,
+        "negative_log_likelihood": 0.3214490551383972
+      },
+      "class_names": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "cohorts": null,
+      "independence_note": "windows are not treated as independent statistical units",
+      "participant_count": 47,
+      "participants": [
+        {
+          "balanced_accuracy": 0.8064949006977992,
+          "cohort": null,
+          "macro_f1": 0.7995982206916343,
+          "participant_id": "imuharil:P_01",
+          "window_count": 150
+        },
+        {
+          "balanced_accuracy": 0.8819444444444445,
+          "cohort": null,
+          "macro_f1": 0.8772189911430418,
+          "participant_id": "imuharil:P_02",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.7391304347826088,
+          "cohort": null,
+          "macro_f1": 0.6934065934065935,
+          "participant_id": "imuharil:P_03",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.6832907075873829,
+          "cohort": null,
+          "macro_f1": 0.6171632289279348,
+          "participant_id": "imuharil:P_04",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.9710144927536232,
+          "cohort": null,
+          "macro_f1": 0.9703557312252965,
+          "participant_id": "imuharil:P_05",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.9729950900163667,
+          "cohort": null,
+          "macro_f1": 0.9729950900163667,
+          "participant_id": "imuharil:P_06",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.8752352004631639,
+          "cohort": null,
+          "macro_f1": 0.8744838738259791,
+          "participant_id": "imuharil:P_07",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.8853508248857086,
+          "cohort": null,
+          "macro_f1": 0.8805560901310779,
+          "participant_id": "imuharil:P_08",
+          "window_count": 140
+        },
+        {
+          "balanced_accuracy": 0.8445626477541371,
+          "cohort": null,
+          "macro_f1": 0.8397943427444821,
+          "participant_id": "imuharil:P_09",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.8333333333333334,
+          "cohort": null,
+          "macro_f1": 0.8222222222222223,
+          "participant_id": "imuharil:P_10",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.8563698206555349,
+          "cohort": null,
+          "macro_f1": 0.8459718443156276,
+          "participant_id": "imuharil:P_11",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.9056360708534621,
+          "cohort": null,
+          "macro_f1": 0.9027537097411095,
+          "participant_id": "imuharil:P_12",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.9674796747967479,
+          "cohort": null,
+          "macro_f1": 0.9674603174603175,
+          "participant_id": "imuharil:P_13",
+          "window_count": 131
+        },
+        {
+          "balanced_accuracy": 0.8117408906882592,
+          "cohort": null,
+          "macro_f1": 0.7971743295019157,
+          "participant_id": "imuharil:P_14",
+          "window_count": 125
+        },
+        {
+          "balanced_accuracy": 0.8824786324786325,
+          "cohort": null,
+          "macro_f1": 0.8527308322346078,
+          "participant_id": "imuharil:P_15",
+          "window_count": 128
+        },
+        {
+          "balanced_accuracy": 0.7690058479532164,
+          "cohort": null,
+          "macro_f1": 0.7316203048876316,
+          "participant_id": "imuharil:P_16",
+          "window_count": 133
+        },
+        {
+          "balanced_accuracy": 0.834920634920635,
+          "cohort": null,
+          "macro_f1": 0.8263727459702492,
+          "participant_id": "imuharil:P_17",
+          "window_count": 125
+        },
+        {
+          "balanced_accuracy": 0.7984705353126406,
+          "cohort": null,
+          "macro_f1": 0.8116883116883117,
+          "participant_id": "imuharil:P_20",
+          "window_count": 108
+        },
+        {
+          "balanced_accuracy": 0.7866666666666666,
+          "cohort": null,
+          "macro_f1": 0.7557055609128898,
+          "participant_id": "imuharil:P_21",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.911303284416492,
+          "cohort": null,
+          "macro_f1": 0.9071134626690182,
+          "participant_id": "imuharil:P_22",
+          "window_count": 138
+        },
+        {
+          "balanced_accuracy": 0.7700680272108844,
+          "cohort": null,
+          "macro_f1": 0.7320578973829748,
+          "participant_id": "imuharil:P_23",
+          "window_count": 112
+        },
+        {
+          "balanced_accuracy": 0.9635676492819351,
+          "cohort": null,
+          "macro_f1": 0.9634337407533285,
+          "participant_id": "imuharil:P_24",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.9108156028368795,
+          "cohort": null,
+          "macro_f1": 0.9045506291418189,
+          "participant_id": "imuharil:P_25",
+          "window_count": 122
+        },
+        {
+          "balanced_accuracy": 0.9298245614035089,
+          "cohort": null,
+          "macro_f1": 0.9477124183006537,
+          "participant_id": "imuharil:P_26",
+          "window_count": 116
+        },
+        {
+          "balanced_accuracy": 0.8333333333333334,
+          "cohort": null,
+          "macro_f1": 0.7883597883597884,
+          "participant_id": "imuharil:P_27",
+          "window_count": 110
+        },
+        {
+          "balanced_accuracy": 0.8379084967320262,
+          "cohort": null,
+          "macro_f1": 0.8233549697680765,
+          "participant_id": "imuharil:P_28",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.8972934472934474,
+          "cohort": null,
+          "macro_f1": 0.9002568127107798,
+          "participant_id": "imuharil:P_29",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.7953086419753087,
+          "cohort": null,
+          "macro_f1": 0.7754881758414287,
+          "participant_id": "imuharil:P_30",
+          "window_count": 156
+        },
+        {
+          "balanced_accuracy": 0.7638888888888888,
+          "cohort": null,
+          "macro_f1": 0.7419354838709676,
+          "participant_id": "imuharil:P_31",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.8914728682170542,
+          "cohort": null,
+          "macro_f1": 0.8927609427609428,
+          "participant_id": "imuharil:P_32",
+          "window_count": 143
+        },
+        {
+          "balanced_accuracy": 0.9185807656395891,
+          "cohort": null,
+          "macro_f1": 0.9123677715684494,
+          "participant_id": "imuharil:P_33",
+          "window_count": 120
+        },
+        {
+          "balanced_accuracy": 0.9146464646464647,
+          "cohort": null,
+          "macro_f1": 0.9222484896243762,
+          "participant_id": "imuharil:P_34",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.7943355119825708,
+          "cohort": null,
+          "macro_f1": 0.7845117845117845,
+          "participant_id": "imuharil:P_35",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.9238095238095237,
+          "cohort": null,
+          "macro_f1": 0.9233615221987316,
+          "participant_id": "imuharil:P_36",
+          "window_count": 146
+        },
+        {
+          "balanced_accuracy": 0.7905723905723905,
+          "cohort": null,
+          "macro_f1": 0.7900235928547353,
+          "participant_id": "imuharil:P_37",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.8604651162790699,
+          "cohort": null,
+          "macro_f1": 0.8576944291230006,
+          "participant_id": "imuharil:P_38",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.7578682170542635,
+          "cohort": null,
+          "macro_f1": 0.7499151790711892,
+          "participant_id": "imuharil:P_39",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.921031746031746,
+          "cohort": null,
+          "macro_f1": 0.9114409040205635,
+          "participant_id": "imuharil:P_40",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.8630539311241066,
+          "cohort": null,
+          "macro_f1": 0.8606655210975642,
+          "participant_id": "imuharil:P_41",
+          "window_count": 161
+        },
+        {
+          "balanced_accuracy": 0.8623188405797101,
+          "cohort": null,
+          "macro_f1": 0.8574515800203873,
+          "participant_id": "imuharil:P_42",
+          "window_count": 140
+        },
+        {
+          "balanced_accuracy": 0.9420289855072465,
+          "cohort": null,
+          "macro_f1": 0.9415873015873015,
+          "participant_id": "imuharil:P_43",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.8723404255319149,
+          "cohort": null,
+          "macro_f1": 0.865828618040157,
+          "participant_id": "imuharil:P_44",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.888695652173913,
+          "cohort": null,
+          "macro_f1": 0.8848934550989345,
+          "participant_id": "imuharil:P_45",
+          "window_count": 171
+        },
+        {
+          "balanced_accuracy": 0.8506012950971323,
+          "cohort": null,
+          "macro_f1": 0.8452630773475923,
+          "participant_id": "imuharil:P_47",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.9104996837444655,
+          "cohort": null,
+          "macro_f1": 0.9055973266499583,
+          "participant_id": "imuharil:P_48",
+          "window_count": 168
+        },
+        {
+          "balanced_accuracy": 0.9057971014492754,
+          "cohort": null,
+          "macro_f1": 0.9053855827349805,
+          "participant_id": "imuharil:P_49",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.900709219858156,
+          "cohort": null,
+          "macro_f1": 0.899109897013461,
+          "participant_id": "imuharil:P_50",
+          "window_count": 143
+        }
+      ],
+      "primary": {
+        "bottom_30_percent_participant_macro_f1": 0.7553808988746101,
+        "lower_decile_participant_macro_f1": 0.7467233009911006,
+        "mean_participant_macro_f1": 0.8517796318121326,
+        "worst_participant_macro_f1": 0.6171632289279348
+      },
+      "sample_count": 6542,
+      "schema_version": "1.0.0",
+      "selective_risk": {
+        "aurc": 0.03706769060240229,
+        "points": [
+          {
+            "coverage": 0.0001528584530724549,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.010088657902782024,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.020024457352491594,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.030113115255273618,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.04004891470498319,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.05013757260776521,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.06007337205747478,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.07000917150718435,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.08009782940996638,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.09003362885967595,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.10012228676245796,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.11005808621216753,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1199938856618771,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.13008254356465912,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1400183430143687,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1501070009171507,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.16004280036686028,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.16997859981656985,
+            "risk": 0.0008992805755395684
+          },
+          {
+            "coverage": 0.1800672577193519,
+            "risk": 0.0008488964346349745
+          },
+          {
+            "coverage": 0.19000305716906146,
+            "risk": 0.0008045052292839903
+          },
+          {
+            "coverage": 0.20009171507184348,
+            "risk": 0.0007639419404125286
+          },
+          {
+            "coverage": 0.21002751452155305,
+            "risk": 0.000727802037845706
+          },
+          {
+            "coverage": 0.22011617242433507,
+            "risk": 0.0006944444444444445
+          },
+          {
+            "coverage": 0.23005197187404464,
+            "risk": 0.000664451827242525
+          },
+          {
+            "coverage": 0.2399877713237542,
+            "risk": 0.0006369426751592356
+          },
+          {
+            "coverage": 0.2500764292265362,
+            "risk": 0.0006112469437652812
+          },
+          {
+            "coverage": 0.2600122286762458,
+            "risk": 0.0005878894767783657
+          },
+          {
+            "coverage": 0.2701008865790278,
+            "risk": 0.0005659309564233164
+          },
+          {
+            "coverage": 0.2800366860287374,
+            "risk": 0.0005458515283842794
+          },
+          {
+            "coverage": 0.28997248547844695,
+            "risk": 0.0005271481286241434
+          },
+          {
+            "coverage": 0.30006114338122897,
+            "risk": 0.0005094243504839531
+          },
+          {
+            "coverage": 0.30999694283093854,
+            "risk": 0.0004930966469428008
+          },
+          {
+            "coverage": 0.32008560073372055,
+            "risk": 0.0004775549188156638
+          },
+          {
+            "coverage": 0.3300214001834301,
+            "risk": 0.0009263547938860583
+          },
+          {
+            "coverage": 0.3399571996331397,
+            "risk": 0.0008992805755395684
+          },
+          {
+            "coverage": 0.3500458575359217,
+            "risk": 0.002183406113537118
+          },
+          {
+            "coverage": 0.3599816569856313,
+            "risk": 0.0021231422505307855
+          },
+          {
+            "coverage": 0.37007031488841335,
+            "risk": 0.0020652622883106154
+          },
+          {
+            "coverage": 0.3800061143381229,
+            "risk": 0.002413515687851971
+          },
+          {
+            "coverage": 0.3899419137878325,
+            "risk": 0.00431203449627597
+          },
+          {
+            "coverage": 0.4000305716906145,
+            "risk": 0.0045854031333588076
+          },
+          {
+            "coverage": 0.4099663711403241,
+            "risk": 0.005219985085756898
+          },
+          {
+            "coverage": 0.4200550290431061,
+            "risk": 0.005822416302765648
+          },
+          {
+            "coverage": 0.42999082849281567,
+            "risk": 0.0067543547813722
+          },
+          {
+            "coverage": 0.4400794863955977,
+            "risk": 0.008336227856894755
+          },
+          {
+            "coverage": 0.45001528584530726,
+            "risk": 0.012567934782608696
+          },
+          {
+            "coverage": 0.4599510852950168,
+            "risk": 0.015952143569292122
+          },
+          {
+            "coverage": 0.47003974319779884,
+            "risk": 0.0175609756097561
+          },
+          {
+            "coverage": 0.4799755426475084,
+            "risk": 0.020063694267515923
+          },
+          {
+            "coverage": 0.49006420055029043,
+            "risk": 0.021210230817217717
+          },
+          {
+            "coverage": 0.5,
+            "risk": 0.022317334148578418
+          },
+          {
+            "coverage": 0.5099357994497096,
+            "risk": 0.024580335731414868
+          },
+          {
+            "coverage": 0.5200244573524916,
+            "risk": 0.02821869488536155
+          },
+          {
+            "coverage": 0.5299602568022012,
+            "risk": 0.0282665128353043
+          },
+          {
+            "coverage": 0.5400489147049832,
+            "risk": 0.028304557033682422
+          },
+          {
+            "coverage": 0.5499847141546927,
+            "risk": 0.0311284046692607
+          },
+          {
+            "coverage": 0.5599205136044023,
+            "risk": 0.03385203385203385
+          },
+          {
+            "coverage": 0.5700091715071843,
+            "risk": 0.03593456690801824
+          },
+          {
+            "coverage": 0.5799449709568939,
+            "risk": 0.03742751713231418
+          },
+          {
+            "coverage": 0.5900336288596759,
+            "risk": 0.039119170984455956
+          },
+          {
+            "coverage": 0.5999694283093855,
+            "risk": 0.04178343949044586
+          },
+          {
+            "coverage": 0.6100580862121675,
+            "risk": 0.04434978702079679
+          },
+          {
+            "coverage": 0.6199938856618771,
+            "risk": 0.04585798816568047
+          },
+          {
+            "coverage": 0.6299296851115866,
+            "risk": 0.04707595243872846
+          },
+          {
+            "coverage": 0.6400183430143687,
+            "risk": 0.0480057320277048
+          },
+          {
+            "coverage": 0.6499541424640782,
+            "risk": 0.049153339604891814
+          },
+          {
+            "coverage": 0.6600428003668602,
+            "risk": 0.049791570171375636
+          },
+          {
+            "coverage": 0.6699785998165698,
+            "risk": 0.05201916495550993
+          },
+          {
+            "coverage": 0.6799143992662794,
+            "risk": 0.05373201438848921
+          },
+          {
+            "coverage": 0.6900030571690614,
+            "risk": 0.05737704918032787
+          },
+          {
+            "coverage": 0.699938856618771,
+            "risk": 0.060493557545315574
+          },
+          {
+            "coverage": 0.710027514521553,
+            "risk": 0.0620021528525296
+          },
+          {
+            "coverage": 0.7199633139712626,
+            "risk": 0.06305732484076433
+          },
+          {
+            "coverage": 0.7298991134209721,
+            "risk": 0.06408376963350786
+          },
+          {
+            "coverage": 0.7399877713237542,
+            "risk": 0.06713488948564346
+          },
+          {
+            "coverage": 0.7499235707734637,
+            "risk": 0.06869139828781085
+          },
+          {
+            "coverage": 0.7600122286762458,
+            "risk": 0.07139983909895414
+          },
+          {
+            "coverage": 0.7699480281259554,
+            "risk": 0.07365495334524519
+          },
+          {
+            "coverage": 0.779883827575665,
+            "risk": 0.07546060368482947
+          },
+          {
+            "coverage": 0.789972485478447,
+            "risk": 0.07681888544891641
+          },
+          {
+            "coverage": 0.7999082849281566,
+            "risk": 0.07758455952608447
+          },
+          {
+            "coverage": 0.8099969428309386,
+            "risk": 0.07888280807699566
+          },
+          {
+            "coverage": 0.8199327422806482,
+            "risk": 0.08053691275167785
+          },
+          {
+            "coverage": 0.8300214001834302,
+            "risk": 0.08176795580110498
+          },
+          {
+            "coverage": 0.8399571996331398,
+            "risk": 0.08425841674249318
+          },
+          {
+            "coverage": 0.8498929990828493,
+            "risk": 0.08776978417266187
+          },
+          {
+            "coverage": 0.8599816569856313,
+            "risk": 0.0902950586562389
+          },
+          {
+            "coverage": 0.8699174564353409,
+            "risk": 0.09260235459497453
+          },
+          {
+            "coverage": 0.8800061143381229,
+            "risk": 0.09431995831162064
+          },
+          {
+            "coverage": 0.8899419137878325,
+            "risk": 0.09790450017176228
+          },
+          {
+            "coverage": 0.8998777132375421,
+            "risk": 0.09988109393579073
+          },
+          {
+            "coverage": 0.9099663711403241,
+            "risk": 0.10314127330757601
+          },
+          {
+            "coverage": 0.9199021705900337,
+            "risk": 0.10701229644400133
+          },
+          {
+            "coverage": 0.9299908284928157,
+            "risk": 0.10979618671926364
+          },
+          {
+            "coverage": 0.9399266279425252,
+            "risk": 0.11351439258416003
+          },
+          {
+            "coverage": 0.9498624273922348,
+            "risk": 0.11667203089797232
+          },
+          {
+            "coverage": 0.9599510852950168,
+            "risk": 0.12022292993630573
+          },
+          {
+            "coverage": 0.9698868847447264,
+            "risk": 0.12308904649330181
+          },
+          {
+            "coverage": 0.9799755426475084,
+            "risk": 0.12603338012790516
+          },
+          {
+            "coverage": 0.989911342097218,
+            "risk": 0.12924644842495367
+          },
+          {
+            "coverage": 1.0,
+            "risk": 0.1332925710791807
+          }
+        ]
+      },
+      "window_level_diagnostics": {
+        "accuracy": 0.8667074289208193,
+        "balanced_accuracy": 0.8610964745093437,
+        "confusion_matrix": [
+          [
+            2349,
+            0,
+            30
+          ],
+          [
+            4,
+            1698,
+            362
+          ],
+          [
+            21,
+            455,
+            1623
+          ]
+        ],
+        "macro_f1": 0.8609177733344442,
+        "per_class_recall": {
+          "mobility": 0.987389659520807,
+          "sitting": 0.8226744186046512,
+          "standing": 0.7732253454025727
+        }
+      }
+    },
+    "TinyHAR-6ch": {
+      "calibration": {
+        "ece": 0.02375840686194639,
+        "ece_bins": 15,
+        "ece_status": "secondary_diagnostic",
+        "multiclass_brier_score": 0.16985501625251373,
+        "negative_log_likelihood": 0.2966422081604034
+      },
+      "class_names": [
+        "mobility",
+        "sitting",
+        "standing"
+      ],
+      "cohorts": null,
+      "independence_note": "windows are not treated as independent statistical units",
+      "participant_count": 47,
+      "participants": [
+        {
+          "balanced_accuracy": 0.8785507246376811,
+          "cohort": null,
+          "macro_f1": 0.8814805077926403,
+          "participant_id": "imuharil:P_01",
+          "window_count": 150
+        },
+        {
+          "balanced_accuracy": 0.9720744680851063,
+          "cohort": null,
+          "macro_f1": 0.9725505647491463,
+          "participant_id": "imuharil:P_02",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.8126356925749022,
+          "cohort": null,
+          "macro_f1": 0.8037196679438058,
+          "participant_id": "imuharil:P_03",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.8518755328218243,
+          "cohort": null,
+          "macro_f1": 0.851840858667626,
+          "participant_id": "imuharil:P_04",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.9210763356726089,
+          "cohort": null,
+          "macro_f1": 0.9213669787331243,
+          "participant_id": "imuharil:P_05",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.9176213857064921,
+          "cohort": null,
+          "macro_f1": 0.9185185185185185,
+          "participant_id": "imuharil:P_06",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.8406426400347372,
+          "cohort": null,
+          "macro_f1": 0.8402604449267499,
+          "participant_id": "imuharil:P_07",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.7410256410256411,
+          "cohort": null,
+          "macro_f1": 0.723827827827828,
+          "participant_id": "imuharil:P_08",
+          "window_count": 140
+        },
+        {
+          "balanced_accuracy": 0.936613475177305,
+          "cohort": null,
+          "macro_f1": 0.9363133107494009,
+          "participant_id": "imuharil:P_09",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.8434782608695652,
+          "cohort": null,
+          "macro_f1": 0.8447928331466965,
+          "participant_id": "imuharil:P_10",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.9508348794063081,
+          "cohort": null,
+          "macro_f1": 0.9499077754396904,
+          "participant_id": "imuharil:P_11",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.9000644122383252,
+          "cohort": null,
+          "macro_f1": 0.9004988931361572,
+          "participant_id": "imuharil:P_12",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.8793761407001824,
+          "cohort": null,
+          "macro_f1": 0.8754886946561083,
+          "participant_id": "imuharil:P_13",
+          "window_count": 131
+        },
+        {
+          "balanced_accuracy": 0.8902665317139001,
+          "cohort": null,
+          "macro_f1": 0.887177667796049,
+          "participant_id": "imuharil:P_14",
+          "window_count": 125
+        },
+        {
+          "balanced_accuracy": 0.9588675213675214,
+          "cohort": null,
+          "macro_f1": 0.9496283909327388,
+          "participant_id": "imuharil:P_15",
+          "window_count": 128
+        },
+        {
+          "balanced_accuracy": 0.92046783625731,
+          "cohort": null,
+          "macro_f1": 0.920020254705853,
+          "participant_id": "imuharil:P_16",
+          "window_count": 133
+        },
+        {
+          "balanced_accuracy": 0.8380952380952381,
+          "cohort": null,
+          "macro_f1": 0.8373462783171521,
+          "participant_id": "imuharil:P_17",
+          "window_count": 125
+        },
+        {
+          "balanced_accuracy": 0.9914529914529915,
+          "cohort": null,
+          "macro_f1": 0.9871239871239871,
+          "participant_id": "imuharil:P_20",
+          "window_count": 108
+        },
+        {
+          "balanced_accuracy": 0.885925925925926,
+          "cohort": null,
+          "macro_f1": 0.8793650793650795,
+          "participant_id": "imuharil:P_21",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.8929769392033543,
+          "cohort": null,
+          "macro_f1": 0.8922347300396081,
+          "participant_id": "imuharil:P_22",
+          "window_count": 138
+        },
+        {
+          "balanced_accuracy": 0.8683673469387755,
+          "cohort": null,
+          "macro_f1": 0.8535098267164946,
+          "participant_id": "imuharil:P_23",
+          "window_count": 112
+        },
+        {
+          "balanced_accuracy": 0.9555555555555556,
+          "cohort": null,
+          "macro_f1": 0.9554560357261033,
+          "participant_id": "imuharil:P_24",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.8978723404255319,
+          "cohort": null,
+          "macro_f1": 0.8911976911976911,
+          "participant_id": "imuharil:P_25",
+          "window_count": 122
+        },
+        {
+          "balanced_accuracy": 0.9336212555197517,
+          "cohort": null,
+          "macro_f1": 0.9381128496917971,
+          "participant_id": "imuharil:P_26",
+          "window_count": 116
+        },
+        {
+          "balanced_accuracy": 0.8708133971291866,
+          "cohort": null,
+          "macro_f1": 0.8458931047166341,
+          "participant_id": "imuharil:P_27",
+          "window_count": 110
+        },
+        {
+          "balanced_accuracy": 0.763834422657952,
+          "cohort": null,
+          "macro_f1": 0.7263203317910484,
+          "participant_id": "imuharil:P_28",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.8406485671191554,
+          "cohort": null,
+          "macro_f1": 0.838355689455795,
+          "participant_id": "imuharil:P_29",
+          "window_count": 148
+        },
+        {
+          "balanced_accuracy": 0.8701329534662868,
+          "cohort": null,
+          "macro_f1": 0.8625565130964935,
+          "participant_id": "imuharil:P_30",
+          "window_count": 156
+        },
+        {
+          "balanced_accuracy": 0.905446623093682,
+          "cohort": null,
+          "macro_f1": 0.9071644795416716,
+          "participant_id": "imuharil:P_31",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.9689922480620154,
+          "cohort": null,
+          "macro_f1": 0.9704642241227607,
+          "participant_id": "imuharil:P_32",
+          "window_count": 143
+        },
+        {
+          "balanced_accuracy": 0.8891690009337068,
+          "cohort": null,
+          "macro_f1": 0.8797893638319171,
+          "participant_id": "imuharil:P_33",
+          "window_count": 120
+        },
+        {
+          "balanced_accuracy": 0.8811665037471489,
+          "cohort": null,
+          "macro_f1": 0.8836130516667131,
+          "participant_id": "imuharil:P_34",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.8601307189542484,
+          "cohort": null,
+          "macro_f1": 0.860020720617014,
+          "participant_id": "imuharil:P_35",
+          "window_count": 145
+        },
+        {
+          "balanced_accuracy": 0.8954084835440769,
+          "cohort": null,
+          "macro_f1": 0.8959432048681543,
+          "participant_id": "imuharil:P_36",
+          "window_count": 146
+        },
+        {
+          "balanced_accuracy": 0.8808080808080808,
+          "cohort": null,
+          "macro_f1": 0.8798833859052614,
+          "participant_id": "imuharil:P_37",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.8851835600409537,
+          "cohort": null,
+          "macro_f1": 0.8851248332380409,
+          "participant_id": "imuharil:P_38",
+          "window_count": 139
+        },
+        {
+          "balanced_accuracy": 0.7611692506459948,
+          "cohort": null,
+          "macro_f1": 0.7627154995830984,
+          "participant_id": "imuharil:P_39",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.9157345013477088,
+          "cohort": null,
+          "macro_f1": 0.9175027586792294,
+          "participant_id": "imuharil:P_40",
+          "window_count": 136
+        },
+        {
+          "balanced_accuracy": 0.874100064977258,
+          "cohort": null,
+          "macro_f1": 0.8740350363538769,
+          "participant_id": "imuharil:P_41",
+          "window_count": 161
+        },
+        {
+          "balanced_accuracy": 0.9565217391304347,
+          "cohort": null,
+          "macro_f1": 0.956501182033097,
+          "participant_id": "imuharil:P_42",
+          "window_count": 140
+        },
+        {
+          "balanced_accuracy": 0.942608695652174,
+          "cohort": null,
+          "macro_f1": 0.9428282828282827,
+          "participant_id": "imuharil:P_43",
+          "window_count": 142
+        },
+        {
+          "balanced_accuracy": 0.7727745430580496,
+          "cohort": null,
+          "macro_f1": 0.7707531830035282,
+          "participant_id": "imuharil:P_44",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.873719806763285,
+          "cohort": null,
+          "macro_f1": 0.8596685453569511,
+          "participant_id": "imuharil:P_45",
+          "window_count": 171
+        },
+        {
+          "balanced_accuracy": 0.8449299547139238,
+          "cohort": null,
+          "macro_f1": 0.8374388212935205,
+          "participant_id": "imuharil:P_47",
+          "window_count": 144
+        },
+        {
+          "balanced_accuracy": 0.9450769555133882,
+          "cohort": null,
+          "macro_f1": 0.9409613375130617,
+          "participant_id": "imuharil:P_48",
+          "window_count": 168
+        },
+        {
+          "balanced_accuracy": 0.927536231884058,
+          "cohort": null,
+          "macro_f1": 0.9258695348057923,
+          "participant_id": "imuharil:P_49",
+          "window_count": 141
+        },
+        {
+          "balanced_accuracy": 0.7591547257200753,
+          "cohort": null,
+          "macro_f1": 0.7492641156007492,
+          "participant_id": "imuharil:P_50",
+          "window_count": 143
+        }
+      ],
+      "primary": {
+        "bottom_30_percent_participant_macro_f1": 0.8065252012430087,
+        "lower_decile_participant_macro_f1": 0.7905330739676948,
+        "mean_participant_macro_f1": 0.8805192950596326,
+        "worst_participant_macro_f1": 0.723827827827828
+      },
+      "sample_count": 6542,
+      "schema_version": "1.0.0",
+      "selective_risk": {
+        "aurc": 0.028022470888722114,
+        "points": [
+          {
+            "coverage": 0.0001528584530724549,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.010088657902782024,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.020024457352491594,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.030113115255273618,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.04004891470498319,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.05013757260776521,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.06007337205747478,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.07000917150718435,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.08009782940996638,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.09003362885967595,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.10012228676245796,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.11005808621216753,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1199938856618771,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.13008254356465912,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1400183430143687,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1501070009171507,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.16004280036686028,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.16997859981656985,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.1800672577193519,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.19000305716906146,
+            "risk": 0.0
+          },
+          {
+            "coverage": 0.20009171507184348,
+            "risk": 0.0007639419404125286
+          },
+          {
+            "coverage": 0.21002751452155305,
+            "risk": 0.000727802037845706
+          },
+          {
+            "coverage": 0.22011617242433507,
+            "risk": 0.001388888888888889
+          },
+          {
+            "coverage": 0.23005197187404464,
+            "risk": 0.00132890365448505
+          },
+          {
+            "coverage": 0.2399877713237542,
+            "risk": 0.001910828025477707
+          },
+          {
+            "coverage": 0.2500764292265362,
+            "risk": 0.0018337408312958435
+          },
+          {
+            "coverage": 0.2600122286762458,
+            "risk": 0.0023515579071134627
+          },
+          {
+            "coverage": 0.2701008865790278,
+            "risk": 0.0022637238256932655
+          },
+          {
+            "coverage": 0.2800366860287374,
+            "risk": 0.0027292576419213972
+          },
+          {
+            "coverage": 0.28997248547844695,
+            "risk": 0.002635740643120717
+          },
+          {
+            "coverage": 0.30006114338122897,
+            "risk": 0.003056546102903719
+          },
+          {
+            "coverage": 0.30999694283093854,
+            "risk": 0.0034516765285996054
+          },
+          {
+            "coverage": 0.32008560073372055,
+            "risk": 0.0033428844317096467
+          },
+          {
+            "coverage": 0.3300214001834301,
+            "risk": 0.0041685965724872626
+          },
+          {
+            "coverage": 0.3399571996331397,
+            "risk": 0.0049460431654676255
+          },
+          {
+            "coverage": 0.3500458575359217,
+            "risk": 0.00611353711790393
+          },
+          {
+            "coverage": 0.3599816569856313,
+            "risk": 0.007643312101910828
+          },
+          {
+            "coverage": 0.37007031488841335,
+            "risk": 0.00784799669558034
+          },
+          {
+            "coverage": 0.3800061143381229,
+            "risk": 0.008045052292839904
+          },
+          {
+            "coverage": 0.3899419137878325,
+            "risk": 0.00862406899255194
+          },
+          {
+            "coverage": 0.4000305716906145,
+            "risk": 0.008406572411157814
+          },
+          {
+            "coverage": 0.4099663711403241,
+            "risk": 0.00820283370618941
+          },
+          {
+            "coverage": 0.4200550290431061,
+            "risk": 0.008733624454148471
+          },
+          {
+            "coverage": 0.42999082849281567,
+            "risk": 0.009242801279772485
+          },
+          {
+            "coverage": 0.4400794863955977,
+            "risk": 0.009725599166377214
+          },
+          {
+            "coverage": 0.45001528584530726,
+            "risk": 0.010190217391304348
+          },
+          {
+            "coverage": 0.4599510852950168,
+            "risk": 0.010634762379528082
+          },
+          {
+            "coverage": 0.47003974319779884,
+            "risk": 0.012032520325203253
+          },
+          {
+            "coverage": 0.4799755426475084,
+            "risk": 0.013694267515923567
+          },
+          {
+            "coverage": 0.49006420055029043,
+            "risk": 0.01372426699937617
+          },
+          {
+            "coverage": 0.5,
+            "risk": 0.01467441149495567
+          },
+          {
+            "coverage": 0.5099357994497096,
+            "risk": 0.015887290167865706
+          },
+          {
+            "coverage": 0.5200244573524916,
+            "risk": 0.01646090534979424
+          },
+          {
+            "coverage": 0.5299602568022012,
+            "risk": 0.01903663109316412
+          },
+          {
+            "coverage": 0.5400489147049832,
+            "risk": 0.019247098782904048
+          },
+          {
+            "coverage": 0.5499847141546927,
+            "risk": 0.02028904947192885
+          },
+          {
+            "coverage": 0.5599205136044023,
+            "risk": 0.021294021294021293
+          },
+          {
+            "coverage": 0.5700091715071843,
+            "risk": 0.02252614641995173
+          },
+          {
+            "coverage": 0.5799449709568939,
+            "risk": 0.024512387981022666
+          },
+          {
+            "coverage": 0.5900336288596759,
+            "risk": 0.02538860103626943
+          },
+          {
+            "coverage": 0.5999694283093855,
+            "risk": 0.025987261146496816
+          },
+          {
+            "coverage": 0.6100580862121675,
+            "risk": 0.02681032322726134
+          },
+          {
+            "coverage": 0.6199938856618771,
+            "risk": 0.027859960552268245
+          },
+          {
+            "coverage": 0.6299296851115866,
+            "risk": 0.02911914583838874
+          },
+          {
+            "coverage": 0.6400183430143687,
+            "risk": 0.03152615237640315
+          },
+          {
+            "coverage": 0.6499541424640782,
+            "risk": 0.032455315145813735
+          },
+          {
+            "coverage": 0.6600428003668602,
+            "risk": 0.03427512737378416
+          },
+          {
+            "coverage": 0.6699785998165698,
+            "risk": 0.036504677161761354
+          },
+          {
+            "coverage": 0.6799143992662794,
+            "risk": 0.03732014388489208
+          },
+          {
+            "coverage": 0.6900030571690614,
+            "risk": 0.03810367744793974
+          },
+          {
+            "coverage": 0.699938856618771,
+            "risk": 0.038654728106573485
+          },
+          {
+            "coverage": 0.710027514521553,
+            "risk": 0.0411194833153929
+          },
+          {
+            "coverage": 0.7199633139712626,
+            "risk": 0.04267515923566879
+          },
+          {
+            "coverage": 0.7298991134209721,
+            "risk": 0.044607329842931934
+          },
+          {
+            "coverage": 0.7399877713237542,
+            "risk": 0.04668456930386284
+          },
+          {
+            "coverage": 0.7499235707734637,
+            "risk": 0.0474928658785161
+          },
+          {
+            "coverage": 0.7600122286762458,
+            "risk": 0.04927594529364441
+          },
+          {
+            "coverage": 0.7699480281259554,
+            "risk": 0.05002977963073258
+          },
+          {
+            "coverage": 0.779883827575665,
+            "risk": 0.05115640925127401
+          },
+          {
+            "coverage": 0.789972485478447,
+            "risk": 0.05243808049535604
+          },
+          {
+            "coverage": 0.7999082849281566,
+            "risk": 0.05465316262182304
+          },
+          {
+            "coverage": 0.8099969428309386,
+            "risk": 0.056425740705793544
+          },
+          {
+            "coverage": 0.8199327422806482,
+            "risk": 0.058351976137211034
+          },
+          {
+            "coverage": 0.8300214001834302,
+            "risk": 0.06022099447513812
+          },
+          {
+            "coverage": 0.8399571996331398,
+            "risk": 0.06278434940855324
+          },
+          {
+            "coverage": 0.8498929990828493,
+            "risk": 0.06510791366906475
+          },
+          {
+            "coverage": 0.8599816569856313,
+            "risk": 0.06701030927835051
+          },
+          {
+            "coverage": 0.8699174564353409,
+            "risk": 0.06940783693551221
+          },
+          {
+            "coverage": 0.8800061143381229,
+            "risk": 0.07087024491922876
+          },
+          {
+            "coverage": 0.8899419137878325,
+            "risk": 0.0747165922363449
+          },
+          {
+            "coverage": 0.8998777132375421,
+            "risk": 0.07830813657210803
+          },
+          {
+            "coverage": 0.9099663711403241,
+            "risk": 0.08163950949101294
+          },
+          {
+            "coverage": 0.9199021705900337,
+            "risk": 0.08624127617148554
+          },
+          {
+            "coverage": 0.9299908284928157,
+            "risk": 0.09023668639053255
+          },
+          {
+            "coverage": 0.9399266279425252,
+            "risk": 0.09302325581395349
+          },
+          {
+            "coverage": 0.9498624273922348,
+            "risk": 0.09542967492758288
+          },
+          {
+            "coverage": 0.9599510852950168,
+            "risk": 0.09824840764331211
+          },
+          {
+            "coverage": 0.9698868847447264,
+            "risk": 0.10212765957446808
+          },
+          {
+            "coverage": 0.9799755426475084,
+            "risk": 0.10622367805334582
+          },
+          {
+            "coverage": 0.989911342097218,
+            "risk": 0.10978999382334774
+          },
+          {
+            "coverage": 1.0,
+            "risk": 0.11433812289819627
+          }
+        ]
+      },
+      "window_level_diagnostics": {
+        "accuracy": 0.8856618771018038,
+        "balanced_accuracy": 0.882368260194661,
+        "confusion_matrix": [
+          [
+            2276,
+            6,
+            97
+          ],
+          [
+            16,
+            1778,
+            270
+          ],
+          [
+            47,
+            312,
+            1740
+          ]
+        ],
+        "macro_f1": 0.8823375785966849,
+        "per_class_recall": {
+          "mobility": 0.9567044976881043,
+          "sitting": 0.8614341085271318,
+          "standing": 0.828966174368747
+        }
+      }
+    }
+  },
+  "schema_version": "1.0.0",
+  "seeds": [
+    11,
+    23,
+    47
+  ],
+  "started_at": "2026-09-04T22:23:12.357779+00:00"
+}

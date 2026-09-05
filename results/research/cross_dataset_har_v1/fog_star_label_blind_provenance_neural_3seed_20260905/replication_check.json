@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0.0",
+  "comparison_purpose": "Verify that a label-free neural inference dataset and launch-time provenance hardening do not change the corrected FoG-STAR neural controls.",
+  "reference_run": "fog_star_trial_continuous_gravity_neural_3seed_20260904",
+  "replacement_run": "fog_star_label_blind_provenance_neural_3seed_20260905",
+  "methods_compared": 2,
+  "labels_exactly_equal": true,
+  "participant_ids_exactly_equal": true,
+  "all_hard_predictions_exactly_equal": true,
+  "maximum_probability_absolute_difference": 0.0,
+  "reports_exactly_equal": true,
+  "fold_records_exactly_equal": true,
+  "paired_model_comparison_exactly_equal": true,
+  "interpretation": "Bitwise-identical probabilities and unchanged scientific scores; the replacement adds a label-free inference path, exact source/environment provenance, a result self-hash, window identifiers, and evidence validation."
+}

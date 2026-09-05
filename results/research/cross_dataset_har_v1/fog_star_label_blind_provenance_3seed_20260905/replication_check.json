@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "comparison_purpose": "Verify that label-free held-out inference and launch-time provenance hardening do not change the corrected FoG-STAR conclusion.",
+  "reference_run": "fog_star_trial_continuous_gravity_3seed_20260904",
+  "replacement_run": "fog_star_label_blind_provenance_3seed_20260905",
+  "methods_compared": 13,
+  "labels_exactly_equal": true,
+  "participant_ids_exactly_equal": true,
+  "all_hard_predictions_exactly_equal": true,
+  "maximum_probability_absolute_difference": 1.4988010832439613e-15,
+  "paired_participant_bootstrap_exactly_equal": true,
+  "interpretation": "Numerically replicated to floating-point precision; scientific scores and decisions are unchanged. The replacement adds strict label-free inference, exact source/environment provenance, a result self-hash, and evidence validation."
+}

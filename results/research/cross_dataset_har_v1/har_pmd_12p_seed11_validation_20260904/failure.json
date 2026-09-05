@@ -1,0 +1,31 @@
+{
+  "exception_message": "the primary feature schema requires six unique inertial channels",
+  "exception_type": "ValueError",
+  "failed_at": "2026-09-04T22:32:25.689956+00:00",
+  "git": {
+    "commit": "f7f15972bf387697aed25c8a213580c1482275e1",
+    "status_entries": [
+      " M pyproject.toml",
+      " M src/inclusive_shift_har/models/__init__.py",
+      " M src/inclusive_shift_har/models/baselines.py",
+      " M uv.lock",
+      "?? configs/datasets/external_har_portfolio_v1.yaml",
+      "?? configs/experiments/cross_dataset_har_rnd_v1.yaml",
+      "?? docs/research/CONTROLLED_DATA_ACCESS_CHECKLIST.md",
+      "?? docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
+      "?? results/research/",
+      "?? src/inclusive_shift_har/data/external_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_neural.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_transfer.py",
+      "?? src/inclusive_shift_har/experiments/har_pmd_stress.py",
+      "?? src/inclusive_shift_har/experiments/sole_harmony_temporal.py",
+      "?? tests/test_external_har.py"
+    ],
+    "worktree_dirty": true
+  },
+  "schema_version": "1.0.0",
+  "started_at": "2026-09-04T22:30:56.291252+00:00",
+  "status": "FAILED_PRESERVED",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\experiments\\har_pmd_stress.py\", line 221, in run_and_write\n    result, predictions = evaluate_har_pmd_stress(data, seeds=seeds)\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\experiments\\har_pmd_stress.py\", line 142, in evaluate_har_pmd_stress\n    per_seed = {seed: _evaluate_seed(data, seed=seed) for seed in seeds}\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\experiments\\har_pmd_stress.py\", line 142, in <dictcomp>\n    per_seed = {seed: _evaluate_seed(data, seed=seed) for seed in seeds}\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\experiments\\har_pmd_stress.py\", line 102, in _evaluate_seed\n    fitted = fit_classical_model(\n             ^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\models\\classical.py\", line 138, in fit_classical_model\n    features = extract_engineered_features(train_windows, channel_names=channel_names)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\user\\Desktop\\Thesis\\codex_full_system_finish_20260711-085848\\.codex_tmp\\publication_audit_20260903\\inclusive-shift-har\\src\\inclusive_shift_har\\preprocessing\\features.py\", line 45, in extract_engineered_features\n    raise ValueError(\"the primary feature schema requires six unique inertial channels\")\nValueError: the primary feature schema requires six unique inertial channels\n"
+}

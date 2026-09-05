@@ -25,3 +25,14 @@ def test_feature_extraction_is_byte_deterministic() -> None:
     second = extract_engineered_features(windows, channel_names=CHANNELS)
     assert first.names == second.names
     assert first.values.tobytes() == second.values.tobytes()
+
+
+def test_native_nine_channel_schema_adds_gravity_summaries() -> None:
+    names = (*CHANNELS, "gravity_x", "gravity_y", "gravity_z")
+    windows = np.random.default_rng(10).normal(size=(2, 128, 9)).astype(np.float32)
+    batch = extract_engineered_features(windows, channel_names=names)
+    assert batch.values.shape == (2, 120)
+    assert len(batch.names) == len(set(batch.names)) == 120
+    assert "gravity_norm__p95" in batch.names
+    assert "gravity_x__gravity_y__correlation" in batch.names
+    assert np.isfinite(batch.values).all()

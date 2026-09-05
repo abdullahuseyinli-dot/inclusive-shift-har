@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "checked_on": "2026-09-04",
+  "reference_run": "../imu_har_il_rep1_full_3seed_audited_20260904",
+  "reference_prediction_sha256": "d2ef1d697ff932d8df1c371e8d0f1b0d17c8e3ec9a27f31b52750781bbfe93f4",
+  "quality_gated_prediction_sha256": "2f55a9a6e905600f26388097c0e2c52857fcd997a3f2d2bbd045bde6b1bd11d6",
+  "array_keys_equal": true,
+  "metadata_arrays_equal": true,
+  "hard_predictions_equal_for_every_method": true,
+  "maximum_probability_absolute_difference": 3.9968028886505635e-15,
+  "aggregate_scores_equal_at_reported_precision": true,
+  "archive_bytes_equal": false,
+  "interpretation": "The corrected adapter made the P_18 and P_19 all-empty sensor exclusions explicit. It retained the identical 47-participant window cohort and reproduced every hard prediction; only floating-point roundoff at or below 4e-15 changed in routed probabilities. The quality-gated run is authoritative."
+}

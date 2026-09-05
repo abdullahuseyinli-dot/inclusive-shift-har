@@ -1,0 +1,96 @@
+schema_version: "1.0.0"
+experiment_id: "cross-dataset-har-rnd-v1"
+declared_on: "2026-09-04"
+status: "prospective_external_development"
+portfolio_config: "configs/datasets/external_har_portfolio_v1.yaml"
+amendments:
+  - amended_on: "2026-09-05"
+    kind: "leakage-control and provenance hardening"
+    changes:
+      - "physical recording segmentation is explicitly label-independent even when annotations are missing"
+      - "held-out prediction APIs and neural inference loaders do not accept labels"
+      - "each new run hashes the executable source and protocol present at launch"
+      - "external-HAR dependencies use a separately hashed additive overlay while the base uv.lock remains unchanged"
+    outcome_parameter_changed: false
+
+ontology:
+  core_class_names: [mobility, sitting, standing]
+  class_indices: {mobility: 0, sitting: 1, standing: 2}
+  transitions_are_core_training_labels: false
+  protected_metadata_are_model_inputs: false
+
+preprocessing:
+  target_sampling_rate_hz: 50.0
+  window_samples: 128
+  window_overlap_samples: 0
+  partition_participants_before_windowing: true
+  cross_trial_windows_allowed: false
+  cross_session_windows_allowed: false
+  interpolation_across_timestamp_gap_allowed: false
+  held_out_prediction_api_accepts_labels: false
+  maximum_timestamp_gap_factor: 3.0
+  acceleration_unit: "m/s^2"
+  gyroscope_unit: "rad/s"
+  derived_gravity:
+    implementation: "per-trial causal first-order low-pass initialized from first sample"
+    cutoff_hz: 0.30
+    cutoff_sensitivity_hz: [0.20, 0.30, 0.40]
+    sensitivity_is_secondary: true
+
+development_order:
+  - "FoG-STAR and IMU-HAR-IL data audit"
+  - "per-dataset participant-exclusive development"
+  - "IMU-HAR-IL to FoG-STAR zero-shot transfer"
+  - "HAR-PMD native-interface stress"
+  - "Sole-HARmony ordered-session temporal evaluation"
+  - "method and threshold freeze"
+  - "single WearGait-PD confirmation after authorized access"
+
+split_protocol:
+  development_outer_folds: 5
+  development_inner_folds: 4
+  participant_is_inference_unit: true
+  deterministic_group_assignment: "seeded balanced participant folds"
+  fixed_seeds: [11, 23, 47]
+  final_seed_ensemble_reported_separately: true
+
+model_matrix:
+  classical: [random_forest, xgboost]
+  neural: [deepconvlstm, tinyhar]
+  inventions:
+    - RMRP-DG
+    - CTGR-DG
+    - CAGE-DG
+    - HERA-DG
+    - HERA-DG-v2
+  ctgr_candidate_source: "locked 121-candidate family, selected on outer-training inner OOF only"
+  neural_epochs: 40
+  neural_patience: 8
+  neural_minimum_epochs: 8
+
+primary_metrics:
+  - mean_participant_macro_f1
+  - bottom_30_percent_participant_macro_f1
+  - worst_participant_macro_f1
+  - per_class_recall
+  - negative_log_likelihood
+  - multiclass_brier_score
+
+temporal_protocol:
+  minimum_participants: 12
+  minimum_sessions_per_participant: 2
+  causal_bout_widths: [3, 5, 7]
+  causal_operator: "per-class trailing arithmetic probability mean with renormalization"
+  reset_boundary: "camera bout or timestamp-contiguous segment"
+  shuffled_time_negative_control_required: true
+  shuffled_time_replicates_per_width: 100
+  width_selection_on_sole_harmony_allowed: false
+
+claim_policy:
+  development_results_are_confirmatory: false
+  native_and_derived_lanes_may_be_pooled: false
+  diagnostic_oracle_is_scientific_method: false
+  wear_gait_may_be_opened_before_freeze: false
+  inaccessible_dataset_results_may_be_invented: false
+  state_of_the_art_claim_allowed_by_this_protocol_alone: false
+  exact_source_input_manifest_required: true

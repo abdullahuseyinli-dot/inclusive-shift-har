@@ -1,0 +1,128 @@
+schema_version: "1.0.0"
+portfolio_id: "external-har-portfolio-v1"
+declared_on: "2026-09-04"
+status: "development_sources_registered_confirmatory_sources_access_gated"
+storage_policy:
+  raw_local_mirror: false
+  reason: "The evidence volumes exceed currently available local storage."
+  transport: "immutable HTTPS source, streamed in memory"
+  receipt_requirement: "record immutable locator, declared size/checksum, bytes received, and computed digest"
+  raw_evidence_deletion_allowed: false
+
+datasets:
+  fog_star_v3:
+    role: "ability-relevant clinical development"
+    record_doi: "10.5281/zenodo.17838806"
+    record_url: "https://zenodo.org/records/17838806"
+    content_url: "https://zenodo.org/api/records/17838806/files/sensor_data.csv/content"
+    artifact_name: "sensor_data.csv"
+    artifact_size_bytes: 119629580
+    artifact_md5: "952a37ab147da35e6d4e7a1e9bac44cb"
+    licence: "CC-BY-4.0"
+    participants_reported: 22
+    sampling_rate_hz: 60.0
+    selected_sensor: "back IMU"
+    source_acceleration_unit: "g"
+    source_gyroscope_unit: "degree/s"
+    core_label_map:
+      "1": mobility
+      "2": sitting
+      "3": standing
+      "6": mobility
+      "7": mobility
+    auxiliary_labels:
+      "4": sit_to_stand_transition
+      "5": stand_to_sit_transition
+    channel_lane: "derived-gravity-9ch"
+    evidence_status: "development_only"
+
+  imu_har_il_v1:
+    role: "large participant-diverse development"
+    record_doi: "10.25919/d7xf-n080"
+    record_url: "https://data.csiro.au/collection/csiro:74700"
+    api_url: "https://data.csiro.au/dap/ws/v2/collections/74700"
+    licence: "CC-BY-NC-4.0"
+    participants_reported: 50
+    repetitions_reported: 4
+    sampling_rate_hz: 60.0
+    selected_sensor: "Body-WT waist IMU"
+    selected_filename: "Body-WT.csv"
+    source_acceleration_unit: "m/s^2"
+    source_gyroscope_unit: "degree/s"
+    core_label_map:
+      Walk: mobility
+      Sit: sitting
+      Stand: standing
+    auxiliary_labels:
+      Stairs: mobility_stress
+      Sit_stand: transition
+      Lay_sit: transition
+    channel_lane: "derived-gravity-9ch"
+    evidence_status: "development_only"
+
+  har_pmd_v1:
+    role: "native phone-interface and mobility-mode stress"
+    record_doi: "10.5281/zenodo.7939223"
+    record_url: "https://zenodo.org/records/7939223"
+    content_url: "https://zenodo.org/api/records/7939223/files/data_publish.zip/content"
+    artifact_name: "data_publish.zip"
+    artifact_size_bytes: 7288182191
+    artifact_md5: "cdc7b79aaa0450d68d94f430f2a2de63"
+    licence: "CC-BY-4.0"
+    phone_participants_reported: 120
+    native_channels: [LAccX, LAccY, LAccZ, GyrX, GyrY, GyrZ, GraX, GraY, GraZ]
+    primary_endpoint: "five-class participant-exclusive mobility-mode stress"
+    primary_classes: [stationary, walking, crutches, walker, manual_wheelchair]
+    excluded_primary_class: "electric_wheelchair"
+    posture_limitation: "source label 'still' merges sitting and standing"
+    channel_lane: "native-gravity-9ch"
+    evidence_status: "development_stress_only"
+
+  sole_harmony_v1:
+    role: "ordered multi-session temporal development"
+    record_doi: "10.5281/zenodo.19242395"
+    record_url: "https://zenodo.org/records/19242395"
+    content_url_template: "https://zenodo.org/api/records/19242395/files/{participant}.zip/content"
+    licence: "CC-BY-4.0"
+    participants_reported: 13
+    sessions_per_participant_reported: 5
+    sampling_rate_hz: 270.0
+    selected_sensor: "right insole IMU"
+    acceleration_derivation: "user_acceleration=lin_acc; gravity=raw_acc-lin_acc"
+    core_label_map:
+      "0": sitting
+      "1": standing
+      "2": mobility
+      "3": mobility
+      "4": mobility
+    undefined_label: -1
+    channel_lane: "derived-gravity-9ch"
+    evidence_status: "development_temporal_only"
+
+  wear_gait_pd:
+    role: "sealed final ability-relevant confirmation"
+    record_url: "https://www.synapse.org/Synapse:syn52540892"
+    descriptor_url: "https://www.nature.com/articles/s41597-026-06806-2"
+    access: "controlled_registration_and_pledge_required"
+    access_available: false
+    selected_sensor: "L4/L5 IMU"
+    channel_lane: "derived-gravity-9ch_after_unit_and_frame_audit"
+    evidence_status: "SEALED_BLOCKED_NO_AUTHORIZED_ACCESS"
+
+  parkinson_at_home:
+    role: "future longitudinal clinical extension"
+    descriptor_url: "https://www.jmir.org/2020/10/e19068"
+    access: "data_request_and_steward_approval_required"
+    access_available: false
+    selected_sensor: "lower-back IMU"
+    evidence_status: "BLOCKED_NO_AUTHORIZED_ACCESS"
+
+lane_policy:
+  pooled_primary_metrics_allowed: false
+  lanes:
+    native-gravity-9ch:
+      method_names: [RandomForest-N9, XGBoost-N9, DeepConvLSTM-N9, TinyHAR-N9]
+      restriction: "three-class posture routers are not applied to HAR-PMD's five-class endpoint"
+    derived-gravity-9ch:
+      method_names: [RMRP-DG, CTGR-DG, CAGE-DG, HERA-DG, HERA-DG-v2]
+  rationale: "Derived gravity is not measurement-equivalent to a native gravity channel."

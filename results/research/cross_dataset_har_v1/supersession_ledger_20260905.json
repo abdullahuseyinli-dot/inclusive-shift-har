@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "created_at": "2026-09-04T23:03:17Z",
+  "purpose": "Prevent exploratory, failed, or protocol-invalid runs from being cited as publication evidence while preserving every artifact.",
+  "policy": {
+    "artifacts_deleted": false,
+    "superseded_metrics_may_be_published": false,
+    "failed_runs_remain_visible": true
+  },
+  "entries": [
+    {
+      "run_directory": "fog_star_seed11_method_validation_20260904",
+      "status": "SUPERSEDED_PROTOCOL_INVALID",
+      "reason": "The causal gravity estimate was restarted at ground-truth activity-label boundaries. Those boundaries are unavailable at inference time and therefore influenced preprocessing.",
+      "replacement": "fog_star_publication_checkpoint_classical_3seed_20260905",
+      "allowed_use": "historical debugging only"
+    },
+    {
+      "run_directory": "fog_star_full_3seed_20260904",
+      "status": "SUPERSEDED_PROTOCOL_INVALID",
+      "reason": "The causal gravity estimate was restarted at ground-truth activity-label boundaries. Those boundaries are unavailable at inference time and therefore influenced preprocessing.",
+      "replacement": "fog_star_publication_checkpoint_classical_3seed_20260905",
+      "allowed_use": "historical debugging only"
+    },
+    {
+      "run_directory": "fog_star_neural_3seed_20260904",
+      "status": "SUPERSEDED_PROTOCOL_INVALID",
+      "reason": "The neural controls consumed FoG-STAR signals produced by the label-boundary-dependent gravity preprocessing implementation.",
+      "replacement": "fog_star_publication_checkpoint_neural_3seed_20260905",
+      "allowed_use": "historical debugging only"
+    },
+    {
+      "run_directory": "fog_star_trial_continuous_gravity_3seed_20260904",
+      "status": "SUPERSEDED_STRICT_API_AUDIT",
+      "reason": "Physical filtering no longer reset at label changes, but the classical prediction helper still accepted held-out labels to construct a discarded report. Predictions were label-independent; the stricter replacement removes labels from the prediction API and adds launch-time source hashes.",
+      "replacement": "fog_star_publication_checkpoint_classical_3seed_20260905",
+      "allowed_use": "numerical replication comparison only"
+    },
+    {
+      "run_directory": "fog_star_trial_continuous_gravity_neural_3seed_20260904",
+      "status": "SUPERSEDED_STRICT_API_AUDIT",
+      "reason": "The selected model did not use held-out labels, but its inference loader unnecessarily computed label-derived sample weights that were then ignored. The replacement inference dataset has no label or weight channel and adds launch-time source hashes.",
+      "replacement": "fog_star_publication_checkpoint_neural_3seed_20260905",
+      "allowed_use": "numerical replication comparison only"
+    },
+    {
+      "run_directory": "fog_star_label_blind_provenance_3seed_20260905",
+      "status": "SUPERSEDED_SOURCE_SNAPSHOT",
+      "reason": "The run passed strict label isolation and evidence validation, but preceded the repository formatter gate. The formatted-source replacement reproduced all hard predictions and scores; probability differences were no larger than floating-point roundoff.",
+      "replacement": "fog_star_publication_checkpoint_classical_3seed_20260905",
+      "replication_evidence": "fog_star_publication_checkpoint_classical_3seed_20260905/replication_check.json",
+      "allowed_use": "numerical replication comparison only"
+    },
+    {
+      "run_directory": "fog_star_label_blind_provenance_neural_3seed_20260905",
+      "status": "SUPERSEDED_SOURCE_SNAPSHOT",
+      "reason": "The run passed strict label isolation and evidence validation, but preceded the repository formatter gate. The formatted-source replacement reproduced every neural probability exactly.",
+      "replacement": "fog_star_publication_checkpoint_neural_3seed_20260905",
+      "replication_evidence": "fog_star_publication_checkpoint_neural_3seed_20260905/replication_check.json",
+      "allowed_use": "numerical replication comparison only"
+    },
+    {
+      "run_directory": "imu_rep1_to_fog_zero_shot_seed11_validation_20260904",
+      "status": "SUPERSEDED_PROTOCOL_INVALID",
+      "reason": "Although no FoG-STAR labels were used to fit or select models, target preprocessing restarted its gravity state at target ground-truth label boundaries.",
+      "replacement": "imu_rep1_to_fog_trial_continuous_seed11_validation_20260905",
+      "allowed_use": "runner-mechanics validation only"
+    },
+    {
+      "run_directory": "imu_har_il_rep1_full_3seed_audited_20260904",
+      "status": "SUPERSEDED_AUDIT_INCOMPLETE",
+      "reason": "The audit did not expose the all-empty sensor files for participants P18 and P19 as explicit participant exclusions.",
+      "replacement": "imu_har_il_rep1_quality_gated_3seed_20260904",
+      "replication_evidence": "imu_har_il_rep1_quality_gated_3seed_20260904/replication_check.json",
+      "allowed_use": "reproducibility comparison only"
+    },
+    {
+      "run_directory": "imu_har_il_rep1_full_3seed_20260904",
+      "status": "FAILED_PRESERVED",
+      "reason": "Initial schema assumptions did not cover provider-valid column variants.",
+      "replacement": "imu_har_il_rep1_quality_gated_3seed_20260904",
+      "allowed_use": "failure analysis only"
+    },
+    {
+      "run_directory": "imu_har_il_rep1_full_3seed_completecase_20260904",
+      "status": "FAILED_PRESERVED",
+      "reason": "Intermediate complete-case implementation still encountered source data-quality edge cases.",
+      "replacement": "imu_har_il_rep1_quality_gated_3seed_20260904",
+      "allowed_use": "failure analysis only"
+    },
+    {
+      "run_directory": "har_pmd_12p_seed11_validation_20260904",
+      "status": "FAILED_PRESERVED",
+      "reason": "The first native nine-channel stress run exposed a fixed-six-channel engineered-feature assumption.",
+      "replacement": "har_pmd_12p_seed11_schema_fixed_20260904",
+      "allowed_use": "failure analysis only"
+    }
+  ]
+}

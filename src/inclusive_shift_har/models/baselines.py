@@ -150,6 +150,39 @@ class DeepConvLSTM(nn.Module):
         return HAROutput(logits=self.classifier(embedding), content=embedding)
 
 
+class TinyHAR(nn.Module):
+    """Clean-room TinyHAR-style neural baseline with a standalone classifier head."""
+
+    def __init__(
+        self,
+        num_classes: int,
+        *,
+        input_channels: int = 6,
+        hidden_channels: int = 64,
+        embedding_dim: int = 96,
+        dropout: float = 0.2,
+    ) -> None:
+        super().__init__()
+        # Import lazily because the FuSE module imports the domain-adversarial model,
+        # which in turn imports this baseline module.
+        from inclusive_shift_har.models.fuse_reframe import TinyHAREncoder
+
+        self.input_channels = input_channels
+        self.encoder = TinyHAREncoder(
+            input_channels,
+            hidden_channels=hidden_channels,
+            embedding_dim=embedding_dim,
+            dropout=dropout,
+            normalization="group",
+        )
+        self.classifier = nn.Linear(embedding_dim, num_classes)
+
+    def forward(self, x: Tensor) -> HAROutput:
+        require_window_tensor(x, channels=self.input_channels)
+        _, embedding = self.encoder(x.transpose(1, 2))
+        return HAROutput(logits=self.classifier(embedding), content=embedding)
+
+
 class CompactResidualHAR(nn.Module):
     """Repository-authored compact residual temporal baseline."""
 
@@ -228,6 +261,7 @@ def build_baseline(name: str, *, num_classes: int, input_channels: int = 6) -> n
             classes, input_channels=channels
         ),
         "deepconvlstm": lambda classes, channels: DeepConvLSTM(classes, input_channels=channels),
+        "tinyhar": lambda classes, channels: TinyHAR(classes, input_channels=channels),
         "compact_residual_96": lambda classes, channels: CompactResidualHAR(
             classes, input_channels=channels, width=96, blocks=5
         ),

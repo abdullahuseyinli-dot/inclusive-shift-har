@@ -1,0 +1,38 @@
+{
+  "created_at": "2026-09-04T21:44:45.117895+00:00",
+  "dataset": {
+    "channel_lane": "derived-gravity-9ch",
+    "class_window_counts": {
+      "mobility": 1154,
+      "sitting": 89,
+      "standing": 221
+    },
+    "dataset_id": "fog_star_v3",
+    "participant_count": 22,
+    "raw_local_mirror": false,
+    "receipt_count": 1,
+    "sampling_rate_hz": 50.0,
+    "session_count": 31,
+    "trial_count": 95,
+    "window_count": 1464,
+    "window_samples": 128
+  },
+  "raw_local_mirror": false,
+  "schema_version": "1.0.0",
+  "source_receipts": [
+    {
+      "archive_crc32": null,
+      "computed_declared_digest": "952a37ab147da35e6d4e7a1e9bac44cb",
+      "computed_sha256": "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477",
+      "dataset_id": "fog_star_v3",
+      "declared_digest": "952a37ab147da35e6d4e7a1e9bac44cb",
+      "declared_digest_algorithm": "md5",
+      "declared_digest_verified": true,
+      "declared_size_bytes": 119629580,
+      "locator": "https://zenodo.org/api/records/17838806/files/sensor_data.csv/content",
+      "member": null,
+      "raw_local_mirror": false,
+      "received_size_bytes": 119629580
+    }
+  ]
+}

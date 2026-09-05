@@ -166,6 +166,24 @@ def predict_classical_model(
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], dict[str, Any]]:
     """Predict with explicit probability-column verification and participant metrics."""
 
+    logits, probabilities = predict_classical_probabilities(fitted, windows)
+    if probabilities.shape != (labels.size, fitted.config.num_classes):
+        raise ValueError("classical predictions are not aligned with labels/classes")
+    report = classification_report(
+        labels,
+        probabilities,
+        participant_ids,
+        class_names=class_names,
+    )
+    return logits, probabilities, report
+
+
+def predict_classical_probabilities(
+    fitted: FittedClassicalModel,
+    windows: NDArray[np.float32],
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Predict without accepting labels, for strictly label-blind evaluation paths."""
+
     features = extract_engineered_features(windows, channel_names=fitted.channel_names)
     if features.names != fitted.feature_names:
         raise ValueError("engineered feature schema changed after model fitting")
@@ -182,15 +200,9 @@ def predict_classical_model(
     expected_classes = np.arange(fitted.config.num_classes, dtype=np.int64)
     if not np.array_equal(_estimator_classes(estimator), expected_classes):
         raise ValueError("estimator probability columns no longer match the locked class order")
-    if probabilities.shape != (labels.size, fitted.config.num_classes):
-        raise ValueError("classical predictions are not aligned with labels/classes")
-    report = classification_report(
-        labels,
-        probabilities,
-        participant_ids,
-        class_names=class_names,
-    )
-    return logits, probabilities, report
+    if probabilities.shape != (windows.shape[0], fitted.config.num_classes):
+        raise ValueError("classical probabilities are not aligned with windows/classes")
+    return logits, probabilities
 
 
 def save_classical_checkpoint_create_only(

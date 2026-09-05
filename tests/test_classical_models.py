@@ -9,6 +9,7 @@ from inclusive_shift_har.models.classical import (
     fit_classical_model,
     load_classical_checkpoint,
     predict_classical_model,
+    predict_classical_probabilities,
     save_classical_checkpoint_create_only,
 )
 
@@ -45,6 +46,8 @@ def test_logistic_baseline_probability_alignment_and_checkpoint(tmp_path: Path) 
     assert probabilities.shape == (12, 3)
     assert np.allclose(probabilities.sum(axis=1), 1.0)
     assert report["participant_count"] == 2
+    _, label_blind_probabilities = predict_classical_probabilities(fitted, validation_windows)
+    assert np.array_equal(probabilities, label_blind_probabilities)
     record = save_classical_checkpoint_create_only(fitted, tmp_path / "model.pkl")
     assert len(record["sha256"]) == 64
     restored = load_classical_checkpoint(tmp_path / "model.pkl")

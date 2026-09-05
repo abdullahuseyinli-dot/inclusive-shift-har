@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "comparison_purpose": "Bind the formatted repository source snapshot while verifying unchanged FoG-STAR neural-control outcomes.",
+  "reference_run": "fog_star_label_blind_provenance_neural_3seed_20260905",
+  "replacement_run": "fog_star_publication_checkpoint_neural_3seed_20260905",
+  "methods_compared": 2,
+  "labels_exactly_equal": true,
+  "participant_ids_exactly_equal": true,
+  "all_hard_predictions_exactly_equal": true,
+  "maximum_probability_absolute_difference": 0.0,
+  "interpretation": "Probabilities, hard predictions, and scientific scores are bitwise identical. This replacement's source manifest matches the formatted source selected for the repository checkpoint."
+}

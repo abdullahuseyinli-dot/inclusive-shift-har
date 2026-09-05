@@ -1,0 +1,89 @@
+{
+  "created_at": "2026-09-04T22:48:16.798585+00:00",
+  "dataset": {
+    "channel_lane": "derived-gravity-9ch",
+    "class_window_counts": {
+      "mobility": 843,
+      "sitting": 5340,
+      "standing": 212
+    },
+    "dataset_id": "sole_harmony_v1",
+    "exclusion_count": 0,
+    "exclusions": [],
+    "participant_class_support": {
+      "mobility": 1,
+      "sitting": 1,
+      "standing": 1
+    },
+    "participant_count": 1,
+    "participants_with_all_classes": 1,
+    "perfect_prediction_mean_participant_macro_f1_ceiling": 1.0,
+    "raw_local_mirror": false,
+    "receipt_count": 2,
+    "sampling_rate_hz": 50.0,
+    "session_count": 1,
+    "source_issue_count": 0,
+    "source_issues": [],
+    "trial_count": 172,
+    "window_count": 6395,
+    "window_samples": 128
+  },
+  "git": {
+    "commit": "f7f15972bf387697aed25c8a213580c1482275e1",
+    "status_entries": [
+      " M pyproject.toml",
+      " M src/inclusive_shift_har/models/__init__.py",
+      " M src/inclusive_shift_har/models/baselines.py",
+      " M src/inclusive_shift_har/preprocessing/features.py",
+      " M tests/test_engineered_features.py",
+      " M uv.lock",
+      "?? configs/datasets/external_har_portfolio_v1.yaml",
+      "?? configs/experiments/cross_dataset_har_rnd_v1.yaml",
+      "?? docs/research/CONTROLLED_DATA_ACCESS_CHECKLIST.md",
+      "?? docs/research/CROSS_DATASET_HAR_RND_V1_PROTOCOL.md",
+      "?? results/research/",
+      "?? src/inclusive_shift_har/data/external_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_har.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_neural.py",
+      "?? src/inclusive_shift_har/experiments/cross_dataset_transfer.py",
+      "?? src/inclusive_shift_har/experiments/har_pmd_stress.py",
+      "?? src/inclusive_shift_har/experiments/sole_harmony_temporal.py",
+      "?? tests/test_external_har.py"
+    ],
+    "worktree_dirty": true
+  },
+  "raw_local_mirror": false,
+  "schema_version": "1.0.0",
+  "source_receipts": [
+    {
+      "archive_crc32": "569e6e72",
+      "computed_declared_digest": null,
+      "computed_sha256": "0465980f70f3a94cea5652c194ca8b438c2ff36a22870a0ec71e9891f1c0786a",
+      "dataset_id": "sole_harmony_v1",
+      "declared_digest": null,
+      "declared_digest_algorithm": null,
+      "declared_digest_verified": null,
+      "declared_size_bytes": 528,
+      "locator": "https://zenodo.org/api/records/19242395/files/C001.zip/content",
+      "member": "C001/C001_1658420327/meta.json",
+      "raw_local_mirror": false,
+      "received_size_bytes": 528
+    },
+    {
+      "archive_crc32": "ac1a4dd2",
+      "computed_declared_digest": null,
+      "computed_sha256": "6aa10577a2363265a911fec1a2a7f2a69cb2e91a7b17bc30b20445de274f596d",
+      "dataset_id": "sole_harmony_v1",
+      "declared_digest": null,
+      "declared_digest_algorithm": null,
+      "declared_digest_verified": null,
+      "declared_size_bytes": 967541775,
+      "locator": "https://zenodo.org/api/records/19242395/files/C001.zip/content",
+      "member": "C001/C001_1658420327/DataStruct.mat",
+      "raw_local_mirror": false,
+      "received_size_bytes": 967541775
+    }
+  ],
+  "started_at": "2026-09-04T22:45:02.408683+00:00",
+  "status": "DATA_AUDIT_COMPLETE_NO_MODELS_RUN"
+}

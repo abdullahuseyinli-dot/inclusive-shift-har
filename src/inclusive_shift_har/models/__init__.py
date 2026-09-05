@@ -7,6 +7,7 @@ from inclusive_shift_har.models.baselines import (
     DeepConvLSTM,
     JointCNNBiLSTM,
     StaticDualBranchHAR,
+    TinyHAR,
     build_baseline,
 )
 from inclusive_shift_har.models.cage_har import (
@@ -92,6 +93,7 @@ __all__ = [
     "RidgeAdvantageModel",
     "SemanticGaugeResult",
     "StaticDualBranchHAR",
+    "TinyHAR",
     "apply_cage_trust_region",
     "apply_soft_semantic_gauge",
     "build_advantage_router_features",

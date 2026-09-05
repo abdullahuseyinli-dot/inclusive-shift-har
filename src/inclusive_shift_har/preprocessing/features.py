@@ -41,8 +41,8 @@ def extract_engineered_features(
         raise ValueError("feature extraction expects [window,128,channel] and aligned names")
     if array.shape[0] == 0 or not np.isfinite(array).all():
         raise ValueError("feature extraction input must be non-empty and finite")
-    if len(channel_names) != 6 or len(set(channel_names)) != 6:
-        raise ValueError("the primary feature schema requires six unique inertial channels")
+    if len(channel_names) not in {6, 9} or len(set(channel_names)) != len(channel_names):
+        raise ValueError("the feature schema requires six or nine unique inertial channels")
 
     feature_columns: list[NDArray[np.float64]] = []
     feature_names: list[str] = []
@@ -69,7 +69,13 @@ def extract_engineered_features(
             feature_columns.append(np.asarray(values, dtype=np.float64))
             feature_names.append(f"{channel_name}__{statistic}")
 
-    for modality_name, indices in (("accelerometer", (0, 1, 2)), ("gyroscope", (3, 4, 5))):
+    modalities = [
+        ("accelerometer", (0, 1, 2)),
+        ("gyroscope", (3, 4, 5)),
+    ]
+    if len(channel_names) == 9:
+        modalities.append(("gravity", (6, 7, 8)))
+    for modality_name, indices in modalities:
         vector_norm = np.linalg.vector_norm(array[:, :, indices], axis=2)
         norm_summaries = (
             ("mean", vector_norm.mean(axis=1)),

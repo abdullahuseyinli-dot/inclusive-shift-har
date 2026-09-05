@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0.0",
+  "status": "FAILED_PRESERVED",
+  "stage": "streamed CSV schema validation",
+  "dataset_id": "imu_har_il_v1",
+  "exception_type": "ValueError",
+  "exception_message": "Usecols do not match columns: a streamed Body-WT.csv omitted Activity_label",
+  "model_training_started": false,
+  "performance_result_available": false,
+  "resolution": "The adapter now requires all six sensor columns, treats Activity_label as a redundant optional column, records its absence, and uses the provider activity-folder name as the trial label.",
+  "evidence_note": "No missing sensor channel is tolerated and no label is inferred from signal values."
+}

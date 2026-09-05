@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "checked_on": "2026-09-04",
+  "wear_gait_pd": {
+    "role": "sealed final confirmation",
+    "provider_id": "syn52540892",
+    "access_status": "SEALED_BLOCKED_NO_AUTHORIZED_ACCESS",
+    "local_artifact_present": false,
+    "performance_metric_emitted": false,
+    "required_next_actor": "authorized human account holder",
+    "opening_allowed_before_method_and_analysis_freeze": false
+  },
+  "parkinson_at_home": {
+    "role": "future longitudinal clinical extension",
+    "access_status": "BLOCKED_NO_AUTHORIZED_ACCESS",
+    "local_artifact_present": false,
+    "performance_metric_emitted": false,
+    "required_next_actor": "authorized investigator and data steward"
+  },
+  "synthetic_substitution_allowed": false,
+  "claim_effect": "No confirmatory or SOTA claim is available while the sealed confirmation is blocked."
+}

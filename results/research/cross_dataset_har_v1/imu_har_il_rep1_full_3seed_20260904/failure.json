@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0.0",
+  "status": "FAILED_PRESERVED",
+  "stage": "pre-window source inventory",
+  "dataset_id": "imu_har_il_v1",
+  "requested_participants": 50,
+  "requested_repetitions": 1,
+  "exception_type": "ValueError",
+  "exception_message": "expected one Body-WT.csv in HAR_IMU_IL/P_46/Repetition_1/Walk, found 0",
+  "model_training_started": false,
+  "performance_result_available": false,
+  "resolution": "Adapter changed to inventory all missing core files and exclude an affected participant before windowing only when complete three-class participant support cannot be retained.",
+  "evidence_note": "The provider folder contains 15 object-mounted files and no Body-WT.csv for P_46 Sit, Stand, or Walk in Repetition_1. This failure is retained and is not a model result."
+}
