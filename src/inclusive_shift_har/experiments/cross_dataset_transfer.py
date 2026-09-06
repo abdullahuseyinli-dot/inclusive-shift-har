@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import platform
 import traceback
 from dataclasses import replace
 from datetime import UTC, datetime
@@ -20,6 +19,16 @@ from typing import Any, cast
 import numpy as np
 from numpy.typing import NDArray
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
+    _publication_artifact_contract,
+    _publication_launch_context_binding,
+    _resolve_publication_launch_context,
+    _runtime_environment,
+    _source_manifest_commit_errors,
+    _write_launch_failure_envelope,
+    _write_self_hashed_json_create_only,
+)
 from inclusive_shift_har.data.external_har import (
     CORE_CLASS_NAMES,
     ExternalHARWindows,
@@ -28,7 +37,10 @@ from inclusive_shift_har.data.external_har import (
     load_imu_har_il,
     observable_modelling_pool,
 )
-from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
+from inclusive_shift_har.evaluation.inference_contracts import (
+    OBSERVABLE_CONTEXT_PROTOCOL,
+    OBSERVABLE_CONTEXT_TRAINING_PROTOCOL,
+)
 from inclusive_shift_har.experiments.cage_har import _report
 from inclusive_shift_har.experiments.cage_har_retrospective import (
     _outer_context,
@@ -52,6 +64,9 @@ from inclusive_shift_har.experiments.cross_dataset_har import (
     _source_input_manifest,
     _three_probabilities,
     _write_json_create_only,
+)
+from inclusive_shift_har.experiments.external_evidence_validate import (
+    validate_and_record_run_directory,
 )
 from inclusive_shift_har.experiments.hera_ctgr_retrospective import (
     _apply_calibration,
@@ -148,6 +163,22 @@ def _fit_apply_seed(
     include_classical: bool,
 ) -> tuple[dict[str, FloatArray], dict[str, Any]]:
     source.validate()
+    target.validate()
+    if source.dataset_id != "imu_har_il_v1" or target.dataset_id != "fog_star_v3":
+        raise ValueError("zero-shot runner is bound to IMU-HAR-IL source and FoG-STAR target")
+    if source.participant_partition_plan is None:
+        raise PermissionError("zero-shot source requires a pre-window participant plan")
+    source_partition_plan = source.participant_partition_plan
+    source_partition_plan.validate()
+    if target.participant_partition_plan is None:
+        raise PermissionError("zero-shot target requires a pre-window participant plan")
+    target_partition_plan = target.participant_partition_plan
+    target_partition_plan.validate()
+    if set(source_partition_plan.participant_roster) & set(
+        target_partition_plan.participant_roster
+    ):
+        raise PermissionError("zero-shot source and target participant rosters overlap")
+    scored_target = target
     target, scoring_indices, _target_supervised_eligibility = observable_modelling_pool(
         target, include_supervised_labels=False
     )
@@ -158,7 +189,8 @@ def _fit_apply_seed(
     )
     source_count = source.labels.size
     # This replacement makes target-label leakage through any imported fitting helper
-    # impossible.  The real target labels remain only in `target` for final scoring.
+    # impossible. The real target labels remain only in `scored_target`, which is not
+    # passed to any fitting helper.
     modelling = replace(
         combined,
         labels=np.concatenate(
@@ -206,11 +238,15 @@ def _fit_apply_seed(
         labels=labels,
         participants=participants,
         outer_training=training,
+        outer_training_candidates=training,
         candidates=candidates,
         outer_index=0,
         seed=seed,
         inner_fold_count=4,
         n_jobs=n_jobs,
+        partition_plan=source_partition_plan,
+        prewindow_training_ids=source_partition_plan.participant_roster,
+        assignment_role="transfer_inner",
     )
     base_model = _fit_base(
         rmrp,
@@ -491,10 +527,18 @@ def _fit_apply_seed(
         probabilities.update(_classical_zero_shot(source, target, seed=seed))
     record = {
         "seed": seed,
-        "source_participants": sorted(np.unique(participants[training]).tolist()),
-        "target_participants": sorted(np.unique(participants[evaluation]).tolist()),
+        "source_participants": list(source_partition_plan.participant_roster),
+        "source_participants_with_supervision": sorted(np.unique(participants[training]).tolist()),
+        "target_participants": list(target_partition_plan.participant_roster),
+        "target_participants_with_candidates": sorted(np.unique(participants[evaluation]).tolist()),
+        "target_participants_with_scoring": sorted(
+            np.unique(scored_target.participant_ids).tolist()
+        ),
         "target_inference_candidate_window_count": int(target.labels.size),
         "target_scored_window_count": int(scoring_indices.size),
+        "participant_partition_plan_sha256": source_partition_plan.audit()["plan_sha256"],
+        "source_participant_partition_plan_sha256": source_partition_plan.audit()["plan_sha256"],
+        "target_participant_partition_plan_sha256": target_partition_plan.audit()["plan_sha256"],
         "context_event_population": "all supplied observable candidates of target participants",
         "selected_ctgr_candidate": str(inner.selected_candidate["id"]),
         "selected_cage_expert": str(inner.selected_expert_candidate["id"]),
@@ -541,6 +585,14 @@ def evaluate_zero_shot_transfer(
 ) -> tuple[dict[str, Any], dict[str, FloatArray]]:
     source.validate()
     target.validate()
+    if source.dataset_id != "imu_har_il_v1" or target.dataset_id != "fog_star_v3":
+        raise ValueError("zero-shot runner is bound to IMU-HAR-IL source and FoG-STAR target")
+    if source.participant_partition_plan is None or target.participant_partition_plan is None:
+        raise PermissionError("zero-shot transfer requires source and target pre-window plans")
+    if set(source.participant_partition_plan.participant_roster) & set(
+        target.participant_partition_plan.participant_roster
+    ):
+        raise PermissionError("zero-shot source and target participant rosters overlap")
     if (
         source.channel_lane != "derived-gravity-9ch"
         or target.channel_lane != source.channel_lane
@@ -598,6 +650,7 @@ def evaluate_zero_shot_transfer(
         "schema_version": "1.0.0",
         "experiment_id": "imu-har-il-to-fog-star-zero-shot-v1",
         "observable_context_protocol": OBSERVABLE_CONTEXT_PROTOCOL,
+        "observable_context_training_protocol": OBSERVABLE_CONTEXT_TRAINING_PROTOCOL,
         "evidence_status": "EXTERNAL_ZERO_SHOT_DEVELOPMENT_NOT_CONFIRMATORY",
         "source_dataset": source.summary(),
         "target_dataset": target.summary(),
@@ -635,28 +688,46 @@ def run_and_write_transfer(
     seeds: tuple[int, ...],
     n_jobs: int,
     include_classical: bool,
+    inherited_launch_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    git_at_launch = _git_state(repository_root)
-    source_input_manifest = _source_input_manifest(repository_root)
+    if seeds != (11, 23, 47):
+        raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+    if not include_classical:
+        raise ValueError("publication transfer evidence requires the complete classical controls")
+    git_at_launch, source_input_manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=repository_root,
+        output_directory=output_directory,
+        current_git_state=_git_state(repository_root),
+        current_source_manifest=_source_input_manifest(repository_root),
+        manifest_commit_validator=_source_manifest_commit_errors,
+        inherited_launch_context=inherited_launch_context,
+    )
+    launch_context_binding = _publication_launch_context_binding(launch_context)
     output_directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
-    _write_json_create_only(
-        output_directory / "data_audit.json",
-        {
-            "schema_version": "1.0.0",
-            "created_at": started,
-            "source_dataset": source.summary(),
-            "target_dataset": target.summary(),
-            "source_receipts": [item.to_dict() for item in source.receipts],
-            "target_receipts": [item.to_dict() for item in target.receipts],
-            "storage_disclosure": {
-                "raw_local_mirror": False,
-                "processing": "streamed provider bytes and in-memory materialization",
-            },
-            "source_input_manifest": source_input_manifest,
-            "git_at_launch": git_at_launch,
+    source_summary = source.summary()
+    target_summary = target.summary()
+    evidence_status = _external_evidence_status(source_summary, target_summary)
+    audit = {
+        "schema_version": "1.0.0",
+        "created_at": started,
+        "source_dataset": source_summary,
+        "target_dataset": target_summary,
+        "artifact_evidence_status": evidence_status,
+        "source_receipts": [item.to_dict() for item in source.receipts],
+        "target_receipts": [item.to_dict() for item in target.receipts],
+        "storage_disclosure": {
+            "raw_local_mirror": False,
+            "processing": "streamed provider bytes and in-memory materialization",
         },
+        "source_input_manifest": source_input_manifest,
+        "git_at_launch": git_at_launch,
+        "publication_launch_context": launch_context_binding,
+    }
+    data_audit_artifact = _write_self_hashed_json_create_only(
+        output_directory / "data_audit.json", audit
     )
+    artifact_contract = _publication_artifact_contract(source_input_manifest, data_audit_artifact)
     try:
         result, predictions = evaluate_zero_shot_transfer(
             source,
@@ -678,16 +749,24 @@ def run_and_write_transfer(
                 f"probability__{name}": value for name, value in predictions.items()
             },
         )
+        _resolve_publication_launch_context(
+            repository_root=repository_root,
+            output_directory=output_directory,
+            current_git_state=_git_state(repository_root),
+            current_source_manifest=_source_input_manifest(repository_root),
+            manifest_commit_validator=_source_manifest_commit_errors,
+            inherited_launch_context=launch_context,
+        )
         result["started_at"] = started
         result["created_at"] = datetime.now(UTC).isoformat()
         result["git"] = _git_state(repository_root)
         result["git_at_launch"] = git_at_launch
         result["source_input_manifest"] = source_input_manifest
-        result["environment"] = {
-            "python": platform.python_version(),
-            "platform": platform.platform(),
-            "numpy": np.__version__,
-        }
+        result["publication_launch_context"] = launch_context_binding
+        result["environment"] = _runtime_environment()
+        result["artifact_evidence_status"] = evidence_status
+        result["data_audit_artifact"] = data_audit_artifact
+        result["artifact_contract"] = artifact_contract
         result["inputs"] = {
             name: {"path": path, "sha256": sha256_file(repository_root / path)}
             for name, path in {
@@ -701,9 +780,8 @@ def run_and_write_transfer(
         }
         result["result_payload_sha256_before_serialization"] = canonical_json_sha256(result)
         _write_json_create_only(output_directory / "result.json", result)
-        return result
     except Exception as exc:
-        _write_json_create_only(
+        _write_self_hashed_json_create_only(
             output_directory / "failure.json",
             {
                 "schema_version": "1.0.0",
@@ -715,9 +793,19 @@ def run_and_write_transfer(
                 "traceback": traceback.format_exc(),
                 "git": _git_state(repository_root),
                 "git_at_launch": git_at_launch,
+                "source_input_manifest": source_input_manifest,
+                "publication_launch_context": launch_context_binding,
+                "environment": _runtime_environment(),
+                "artifact_evidence_status": evidence_status,
+                "data_audit_artifact": data_audit_artifact,
+                "artifact_contract": artifact_contract,
             },
+            hash_field="failure_payload_sha256_before_serialization",
         )
+        validate_and_record_run_directory(output_directory, repository_root)
         raise
+    validate_and_record_run_directory(output_directory, repository_root)
+    return result
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -746,45 +834,74 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     root = args.repository_root.resolve()
-    experiment = _read_mapping(root / "configs/experiments/cross_dataset_har_rnd_v1.yaml")
-    preprocessing = cast(dict[str, Any], experiment["preprocessing"])
-    derived = cast(dict[str, Any], preprocessing["derived_gravity"])
-    target_rate_hz = float(preprocessing["target_sampling_rate_hz"])
-    window_samples = int(preprocessing["window_samples"])
-    declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
-    gravity_cutoff_hz = (
-        float(derived["cutoff_hz"])
-        if args.gravity_cutoff_hz is None
-        else float(args.gravity_cutoff_hz)
-    )
-    if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
-        raise ValueError(
-            f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
-            f"{declared_cutoffs}"
-        )
-    source = load_imu_har_il(
-        participant_limit=args.source_participant_limit,
-        repetition_limit=args.source_repetition_limit,
-        selection_policy=args.source_selection_policy,
-        target_rate_hz=target_rate_hz,
-        window_samples=window_samples,
-        gravity_cutoff_hz=gravity_cutoff_hz,
-    )
-    target = load_fog_star(
-        participant_limit=args.target_participant_limit,
-        target_rate_hz=target_rate_hz,
-        window_samples=window_samples,
-        gravity_cutoff_hz=gravity_cutoff_hz,
-    )
-    result = run_and_write_transfer(
-        source=source,
-        target=target,
-        output_directory=args.output_directory.resolve(),
+    output_directory = args.output_directory.resolve()
+    _launch, _manifest, launch_context = _resolve_publication_launch_context(
         repository_root=root,
-        seeds=tuple(args.seeds),
-        n_jobs=args.n_jobs,
-        include_classical=not args.skip_classical,
+        output_directory=output_directory,
+        current_git_state=_git_state(root),
+        current_source_manifest=_source_input_manifest(root),
+        manifest_commit_validator=_source_manifest_commit_errors,
     )
+    started = datetime.now(UTC).isoformat()
+    stage = "configuration"
+    try:
+        if tuple(args.seeds) != (11, 23, 47):
+            raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+        experiment = _read_mapping(root / "configs/experiments/cross_dataset_har_rnd_v1.yaml")
+        preprocessing = cast(dict[str, Any], experiment["preprocessing"])
+        derived = cast(dict[str, Any], preprocessing["derived_gravity"])
+        target_rate_hz = float(preprocessing["target_sampling_rate_hz"])
+        window_samples = int(preprocessing["window_samples"])
+        declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
+        gravity_cutoff_hz = (
+            float(derived["cutoff_hz"])
+            if args.gravity_cutoff_hz is None
+            else float(args.gravity_cutoff_hz)
+        )
+        if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
+            raise ValueError(
+                f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
+                f"{declared_cutoffs}"
+            )
+        stage = "source_dataset_acquisition"
+        source = load_imu_har_il(
+            participant_limit=args.source_participant_limit,
+            repetition_limit=args.source_repetition_limit,
+            selection_policy=args.source_selection_policy,
+            target_rate_hz=target_rate_hz,
+            window_samples=window_samples,
+            gravity_cutoff_hz=gravity_cutoff_hz,
+        )
+        stage = "target_dataset_acquisition"
+        target = load_fog_star(
+            participant_limit=args.target_participant_limit,
+            target_rate_hz=target_rate_hz,
+            window_samples=window_samples,
+            gravity_cutoff_hz=gravity_cutoff_hz,
+        )
+        stage = "experiment_writer"
+        result = run_and_write_transfer(
+            source=source,
+            target=target,
+            output_directory=output_directory,
+            repository_root=root,
+            seeds=tuple(args.seeds),
+            n_jobs=args.n_jobs,
+            include_classical=not args.skip_classical,
+            inherited_launch_context=launch_context,
+        )
+    except Exception as error:
+        if not output_directory.exists():
+            _write_launch_failure_envelope(
+                repository_root=root,
+                output_directory=output_directory,
+                launch_context=launch_context,
+                started_at=started,
+                stage=stage,
+                exception=error,
+                traceback_text=traceback.format_exc(),
+            )
+        raise
     print(
         json.dumps(
             {

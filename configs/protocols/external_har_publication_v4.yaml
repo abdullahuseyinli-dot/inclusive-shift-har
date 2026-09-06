@@ -1,0 +1,104 @@
+schema_version: "4.0.0"
+protocol_id: "external-har-publication-v4"
+declared_at_utc: "2026-09-05T17:07:37Z"
+last_validity_amendment_at_utc: "2026-09-05T23:58:49Z"
+status: "frozen_composite_protocol_before_v4_replacement_outcomes"
+purpose: >-
+  Bind replacement external-HAR runs to every currently applicable validity
+  correction without changing the frozen signal-grid or model protocols.
+composes:
+  signal_grid:
+    protocol_id: "external-har-session-grid-v3"
+    path: "configs/protocols/external_har_session_grid_v3.yaml"
+  observable_context:
+    protocol_id: "external-har-observable-context-v1"
+    path: "configs/protocols/external_har_observable_context_v1.yaml"
+  observable_context_training_population:
+    protocol_id: "external-har-observable-context-training-population-v1"
+    path: "configs/protocols/external_har_observable_context_training_population_v1.yaml"
+  provider_boundary_audit:
+    protocol_id: "external-har-provider-boundary-audit-v1"
+    path: "configs/protocols/external_har_provider_boundary_audit_v1.yaml"
+  imu_har_il_fixed_inventory:
+    protocol_id: "imu-har-il-fixed-inventory-v1"
+    path: "configs/protocols/imu_har_il_fixed_inventory_v1.yaml"
+  prewindow_participant_partitions:
+    protocol_id: "external-har-prewindow-partitions-v1"
+    implementation: "src/inclusive_shift_har/data/participant_partitions.py"
+    required_result_binding: "participant_partition_plan_sha256"
+evidence_governance:
+  repository_rules: "AGENTS.md"
+  locked_protocol: "docs/LOCKED_PROTOCOL.md"
+  hashed_protocol_record_scope: "results/protocol/**/*.json"
+  evidence_role_ledger:
+    ledger_id: "external-evidence-roles-20260905-v3"
+    path: "configs/datasets/evidence_roles_20260905_v3.yaml"
+  supersession_context:
+    record_kind: "external_har_create_only_supersession_ledger"
+    path: "results/research/cross_dataset_har_v4/context_training_population_supersession_20260905.json"
+    record_sha256: "e2704a6158f6578de858f5974719895b81f660261a9c2eb31fb1964893dba449"
+  sole_harmony_retained_interruption:
+    record_kind: "sole_harmony_interrupted_oracle_materialization_receipt"
+    path: "results/research/cross_dataset_har_v4/sole_harmony_oracle_materialization_interruption_20260906.json"
+    file_sha256: "7cd969b609323e1388a5c8dd35ee7bcc0d12713c6349b2e5a9b871c162ab54f8"
+    record_sha256: "8075b08da583ef0a5b1b50ecfcb0866210d28e765b65cac2b55ed9618ed82152"
+    status: "INTERRUPTED_AFTER_DATA_AUDIT_NO_MODEL_RESULT"
+    allowed_use: "materialized coverage and interruption provenance only; no model, score, deployment, confirmation, or before/after claim"
+declaration_scope:
+  earlier_development_outcomes_known: true
+  v4_replacement_outcomes_examined_before_declaration: false
+  validity_corrections_selected_from_score_optimization: false
+  replacement_fog_imu_har_pmd_architecture_or_hyperparameters_changed: false
+  sole_temporal_method_bank_governed_by_separate_pre_outcome_protocol: true
+required_run_contract:
+  source_input_manifest_protocol_id: "external-har-publication-v4"
+  clean_git_at_launch: true
+  full_plan_roster_preserved_when_participants_retain_zero_windows: true
+  full_fog_star_provider_roster_and_scored_participant_coverage_required: true
+  full_imu_har_il_provider_roster_and_lane_specific_inventory_required: true
+  imu_har_il_source_receipt_inventory_hash_reconstruction_required: true
+  imu_har_il_repetitions_do_not_increase_independent_n: true
+  assigned_folds_may_not_be_reconstructed_from_scored_participants: true
+  provider_presegmentation_and_oracle_boundaries_remain_explicit: true
+  segment_transform_annotation_dependency_is_scoped_and_boundary_dependency_is_explicit: true
+  inner_and_outer_context_event_populations_are_annotation_independent: true
+  matched_reference_dataset_summary_and_stable_source_receipts_exact: true
+  matched_reference_probability_absolute_tolerance: 1.0e-12
+  historical_parity_reference_must_match_frozen_hashes_and_remain_superseded: true
+  replacement_side_of_parity_must_be_current_fully_validated_evidence: true
+  historical_parity_allows_only_predeclared_audit_schema_migrations: true
+  hierarchy_reference_witness_and_fold_main_probability_identity_required: true
+  sole_full_stream_temporal_derivation_and_seed_ensemble_reconstruction_required: true
+  sole_observable_and_oracle_reset_sequences_bound_to_physical_segment_audit: true
+  sole_lane_boundary_temporal_comparison_and_claim_contracts_exact: true
+  sole_retained_interrupted_materialization_may_not_be_promoted_to_a_result: true
+  scored_label_identity_and_ordered_ontology_hash_binding_required: true
+  exact_frozen_seed_and_method_matrix_required: true
+  seed_ensemble_and_claim_bearing_report_reconstruction_required: true
+  supported_publication_runner_experiment_allowlist_required: true
+  neural_cuda_fp16_backend_must_be_observed_not_requested: true
+  neural_budget_and_canonical_representation_required: true
+  retained_checkpoint_and_fold_artifact_integrity_required: true
+  standalone_and_nested_scientific_run_writers_retain_validation: true
+  orchestration_roots_are_non_run_create_only_indexes: true
+  orchestration_terminal_indexes_are_self_hashed: true
+  orchestration_terminal_indexes_bind_their_create_only_plan: true
+  orchestration_terminal_indexes_bind_every_existing_child_terminal_and_validation_artifact: true
+  orchestration_completion_requires_complete_planned_child_bindings: true
+  orchestration_root_run_validation_claim_allowed: false
+  pre_writer_failures_retain_validated_failure_envelope: true
+  post_data_audit_failures_retain_validated_failure_envelope: true
+  result_and_prediction_validation_required: true
+  data_audit_self_hash_and_result_binding_required: true
+  recorded_participant_split_audit_required: true
+  runtime_environment_inventory_required: true
+  evidence_role_and_supersession_linkage_required: true
+preservation:
+  parent_protocol_files_modified: false
+  historical_results_deleted_or_overwritten: false
+  legacy_manifest_protocol: "external-har-session-grid-v3"
+  legacy_artifact_disposition: "readable but superseded for v4 publication evidence"
+claims:
+  confirmation_allowed: false
+  state_of_the_art_allowed: false
+  protocol_integrity_is_scientific_validity: false

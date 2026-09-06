@@ -1,0 +1,116 @@
+schema_version: "1.0.0"
+protocol_id: "sole-harmony-observable-session-temporal-v1"
+declared_at_utc: "2026-09-05T16:42:02.7557997Z"
+status: "FROZEN_BEFORE_SESSION_OBSERVABLE_IMPLEMENTATION_OR_OUTCOMES"
+motivation: >-
+  Historical Sole-HARmony evaluation reset resampling, window phase, and temporal
+  state at camera-labelled bouts. Those oracle boundaries are not available at
+  inference. The corrected loader can instead expose complete session,
+  timestamp-gap, and finite-sensor runs before annotations are projected.
+hypothesis: >-
+  On a fixed annotation-independent session grid, a short causal history of the
+  fixed predeclared six-channel base probabilities can reduce isolated activity
+  errors without materially harming the participant lower tail.
+evidence_role:
+  dataset: "Sole-HARmony Zenodo record 19242395"
+  dataset_role: "development"
+  evidence_status: "diagnostic"
+  role: "development temporal diagnostic"
+  confirmation_allowed: false
+  clinical_claim_allowed: false
+  deployable_claim_allowed: false
+  lanes:
+    session_observable:
+      role: "development"
+      evidence_status: "diagnostic"
+      confirmation_allowed: false
+      deployable_claim_allowed: false
+    camera_bout_oracle:
+      role: "oracle_diagnostic"
+      evidence_status: "diagnostic"
+      confirmation_allowed: false
+      deployable_claim_allowed: false
+  camera_bout_lane_role: "oracle-boundary upper-bound diagnostic only"
+  cross_lane_numeric_comparison_allowed: false
+cohort:
+  participants: "ordered provider participants C001-C012"
+  sessions_per_participant: "first two ordered sessions"
+  independent_unit: "participant"
+  repetitions_or_sessions_increase_independent_n: false
+preprocessing:
+  observable_lane: "session_observable"
+  segment_boundaries:
+    - "provider participant/session boundary"
+    - "timestamp discontinuity"
+    - "finite-sensor run"
+  annotations: "project camera intervals only after resampling and candidate-grid construction"
+  window_samples: 128
+  target_sampling_rate_hz: 50
+  stride_samples: 128
+  caveat: >-
+    Polyphase resampling is offline and symmetric. Passing this experiment does not
+    establish zero-lookahead end-to-end streaming deployment.
+base_model:
+  primary: "XGBoost-6ch"
+  rationale: >-
+    Representative high-capacity six-channel tree control fixed before v4
+    replacement outcomes; this predeclaration makes no strongest-control claim.
+  fitting: "unchanged nested participant-exclusive external-HAR implementation"
+  outer_training_participant_labels_used_for_supervised_fit: true
+  outer_evaluation_participant_labels_used_for_fit_selection_or_calibration: false
+methods:
+  primary_candidate: "XGBoost-6ch-causal-probability-w5"
+  primary_control: "XGBoost-6ch-unsmoothed"
+  fixed_controls:
+    - "causal probability means with widths 3, 5, and 7"
+    - "causal hard-label majority filters with widths 3, 5, and 7"
+    - "causal hysteresis requiring 2 and 3 consecutive challenger windows"
+    - "within-observable-block shuffled-time negative control for each probability width"
+    - "separately materialized camera-bout oracle lane; never a matched numerical comparator"
+  reset_rule: "only provider session, timestamp gap/reset, or finite-sensor-run boundary"
+  future_window_access: false
+  ineligible_candidates: >-
+    Predict and update temporal state on every annotation-independent candidate;
+    select homogeneous labelled windows only after all predictions are fixed.
+budget:
+  seeds: [11, 23, 47]
+  outer_folds: 5
+  hyperparameter_trials: 0
+  candidate_redesigns_after_outcomes: 0
+  shuffled_time_replicates_per_probability_width: 100
+  temporal_widths: [3, 5, 7]
+  hysteresis_confirmation_windows: [2, 3]
+statistics:
+  primary_metric: >-
+    mean across seeds of equally weighted participant fixed-three-class macro-F1
+  uncertainty: "paired participant-cluster bootstrap, 10000 draws"
+  lower_tail:
+    per_method_summary: "bottom ceil(0.30*N) participant macro-F1"
+    advancement_contrast: >-
+      Secondary jointly participant-resampled, independently ranked difference
+      between candidate and control bottom-ceil(0.30*N) means. This is a
+      lower-tail distribution contrast, not a paired fixed-participant effect.
+  secondary:
+    - "present-class participant sensitivity"
+    - "per-class participant-balanced precision, recall, and F1"
+    - "participant-normalized confusion"
+    - "participant-mean NLL, Brier score, and ECE"
+    - "worst participant, quartiles, rescue, harm, and ties"
+multiplicity: >-
+  One primary width and an intersection gate. All other widths, majority filters,
+  hysteresis settings, base methods, individual seeds, and oracle results are
+  descriptive; no alternate winner is selected after a primary failure.
+advancement_gate:
+  - "primary paired mean 95-percent CI lower bound strictly greater than zero"
+  - "secondary independently ranked bottom-30-percent distribution-contrast 95-percent CI lower bound at least zero"
+  - "mobility and sitting recall do not worsen"
+  - "participant-mean NLL does not worsen"
+  - "causal result exceeds the median of its shuffled-time negative controls"
+  - "no oracle-boundary or excluded-window shortcut contributes to the result"
+selection_and_stop_rule: >-
+  If any advancement criterion fails, stop expansion and retain the negative or
+  tradeoff result. Do not tune widths, reset rules, or base models on Sole-HARmony.
+comparison_rule: >-
+  Only the session-observable methods sharing the full preprocessing and inference
+  tuple are before/after comparable. Camera-bout results occupy a separate oracle
+  row regardless of their numerical value.

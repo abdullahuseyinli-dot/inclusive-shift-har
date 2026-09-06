@@ -61,7 +61,12 @@ def test_verified_copy_and_remote_reader_have_identical_member_processing(
     ):
         np.testing.assert_array_equal(getattr(remote, name), getattr(local, name))
     assert remote.receipts == tuple(
-        replace(receipt, raw_local_mirror=False) for receipt in local.receipts
+        replace(
+            receipt,
+            raw_local_mirror=False,
+            accessed_at_utc=remote.receipts[index].accessed_at_utc,
+        )
+        for index, receipt in enumerate(local.receipts)
     )
     assert remote.summary()["raw_local_mirror"] is False
     assert local.summary()["raw_local_mirror"] is True

@@ -1,0 +1,368 @@
+schema_version: "1.2.0"
+ledger_id: "external-evidence-roles-20260905-v3"
+created_at_utc: "2026-09-05T16:19:47Z"
+last_validity_amendment_at_utc: "2026-09-05T23:58:49Z"
+immutable: true
+supersedes: "configs/datasets/evidence_roles_20260905_v2.yaml"
+correction_protocol: "configs/protocols/external_har_provider_boundary_audit_v1.yaml"
+policy: >-
+  This create-only ledger narrows claims after a provider-boundary and split-timing
+  audit. It never upgrades consumed evidence to confirmation and does not erase v2.
+source_registry: "configs/datasets/external_har_portfolio_v1.yaml"
+hash_policy: >-
+  Dataset-level hashes below identify immutable public artifacts when known. Exact
+  downloaded-object SHA-256 values and access timestamps remain bound by each run's
+  data_audit.json and source-input manifest; unavailable hashes are stated as such.
+datasets:
+  inclusivehar_v4_source:
+    role: development
+    participants: "P1-P10; development-consumed"
+    sessions: "unrecoverable from the released table"
+    record_url: "https://data.mendeley.com/datasets/r78dn3f6nc/4"
+    version: "Mendeley Data version 4, DOI 10.17632/r78dn3f6nc.4"
+    accessed_on: "2026-08-23"
+    sensor_data_sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+    license: "CC-BY-4.0"
+    redistribution: "raw data excluded from Git; attribution required"
+    placement: "smartphone; exact body placement is not encoded in the released table"
+    channels: "six primary inertial channels; native-gravity sensitivity is a separate lane"
+    ontology: "locked functional-core and inclusive-native endpoints"
+    boundary_status: "released subject-label blocks; hidden physical joins unrecoverable"
+    bias: "group-associated activity realization and unrecoverable trial/session provenance"
+    evidence_reference: "results/protocol/protocol_lock_v1_2.json"
+  inclusivehar_v4_target:
+    role: replication
+    participants: "P11-P20; opening 1 consumed"
+    sessions: "unrecoverable from the released table"
+    record_url: "https://data.mendeley.com/datasets/r78dn3f6nc/4"
+    version: "Mendeley Data version 4, DOI 10.17632/r78dn3f6nc.4"
+    accessed_on: "2026-08-23"
+    sensor_data_sha256: "0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34"
+    license: "CC-BY-4.0"
+    redistribution: "raw data excluded from Git; attribution required"
+    placement: "smartphone; exact body placement is not encoded in the released table"
+    channels: "six primary inertial channels; native-gravity sensitivity is a separate lane"
+    ontology: "locked functional-core and inclusive-native endpoints"
+    boundary_status: "released subject-label blocks; hidden physical joins unrecoverable"
+    bias: "group-associated activity realization and unrecoverable trial/session provenance"
+    access_rule: "Never reopen for tuning or relabel as confirmation."
+    evidence_reference: "results/confirmatory/zero_shot_v1/locked_target_evaluation_index.json"
+  daghar_v2:
+    role: replication
+    status: "consumed provider-prewindowed evidence"
+    participants: "153 in the retained functional-core evaluation; provider domains have user-disjoint partitions"
+    sessions: "not exposed by the standardized prewindowed view"
+    record_url: "https://zenodo.org/records/13987073"
+    version: "Zenodo record 13987073 version 2, DOI 10.5281/zenodo.13987073"
+    accessed_on: "2026-09-03"
+    standardized_view_sha256: "e018334c57c4fed0913591e68c3007e85b13767a37b2db3ae0d79978363831e8"
+    license: "CC-BY-4.0"
+    redistribution: "raw standardized archive excluded from Git; attribution required"
+    placement: "mixed provider domains and placements, including thigh and waist"
+    channels: "six inertial channels; provider-derived gravity removal"
+    ontology: [sitting, standing, mobility]
+    preprocessing: "provider-prewindowed 60-sample, 20 Hz standardized arrays"
+    boundary_status: "original continuous boundaries unavailable"
+    bias: "heterogeneous public source datasets, placements, devices, and provider preprocessing"
+    evidence_reference: "configs/experiments/daghar_external_evaluation_v1.yaml"
+  fog_star_v3:
+    role: development
+    participants: 22
+    participant_roster:
+      - "fogstar:001"
+      - "fogstar:002"
+      - "fogstar:003"
+      - "fogstar:004"
+      - "fogstar:005"
+      - "fogstar:006"
+      - "fogstar:007"
+      - "fogstar:008"
+      - "fogstar:009"
+      - "fogstar:010"
+      - "fogstar:011"
+      - "fogstar:012"
+      - "fogstar:013"
+      - "fogstar:014"
+      - "fogstar:015"
+      - "fogstar:016"
+      - "fogstar:017"
+      - "fogstar:018"
+      - "fogstar:019"
+      - "fogstar:020"
+      - "fogstar:021"
+      - "fogstar:022"
+    sessions: "recorded sessionID; exact coverage is audited per run"
+    record_url: "https://zenodo.org/records/17838806"
+    version: "Zenodo record 17838806 v3"
+    accessed_on: "2026-09-05"
+    sensor_data_sha256: "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477"
+    license: "CC-BY-4.0"
+    redistribution: "raw data excluded from Git; attribution required"
+    placement: "back IMU"
+    channels: "six inertial channels; derived gravity is a separately named lane"
+    ontology: [mobility, sitting, standing]
+    boundary_status: "repository session-grid-v3 is annotation-independent; upstream acquisition continuity and zero-lookahead streaming unproven"
+    split_status: "requires participant assignments frozen from the observable roster before window extraction"
+    bias: "Parkinson disease cohort, elicitation tasks, severe imbalance, and missing participant classes; repeatedly development-consumed"
+    confirmation_allowed: false
+  imu_har_il_v1:
+    role: development
+    status: "diagnostic_provider_presegmented"
+    participants: "50 reported; repetitions reuse people and do not increase independent N"
+    participant_roster:
+      - "imuharil:P_01"
+      - "imuharil:P_02"
+      - "imuharil:P_03"
+      - "imuharil:P_04"
+      - "imuharil:P_05"
+      - "imuharil:P_06"
+      - "imuharil:P_07"
+      - "imuharil:P_08"
+      - "imuharil:P_09"
+      - "imuharil:P_10"
+      - "imuharil:P_11"
+      - "imuharil:P_12"
+      - "imuharil:P_13"
+      - "imuharil:P_14"
+      - "imuharil:P_15"
+      - "imuharil:P_16"
+      - "imuharil:P_17"
+      - "imuharil:P_18"
+      - "imuharil:P_19"
+      - "imuharil:P_20"
+      - "imuharil:P_21"
+      - "imuharil:P_22"
+      - "imuharil:P_23"
+      - "imuharil:P_24"
+      - "imuharil:P_25"
+      - "imuharil:P_26"
+      - "imuharil:P_27"
+      - "imuharil:P_28"
+      - "imuharil:P_29"
+      - "imuharil:P_30"
+      - "imuharil:P_31"
+      - "imuharil:P_32"
+      - "imuharil:P_33"
+      - "imuharil:P_34"
+      - "imuharil:P_35"
+      - "imuharil:P_36"
+      - "imuharil:P_37"
+      - "imuharil:P_38"
+      - "imuharil:P_39"
+      - "imuharil:P_40"
+      - "imuharil:P_41"
+      - "imuharil:P_42"
+      - "imuharil:P_43"
+      - "imuharil:P_44"
+      - "imuharil:P_45"
+      - "imuharil:P_46"
+      - "imuharil:P_47"
+      - "imuharil:P_48"
+      - "imuharil:P_49"
+      - "imuharil:P_50"
+    sessions: "one reported collection visit; four repetitions per participant"
+    record_url: "https://data.csiro.au/collection/csiro:74700"
+    version: "CSIRO collection 74700 dataVersion 1, DOI 10.25919/d7xf-n080"
+    accessed_on: "2026-09-05 metadata and run-source audit"
+    hashes: "no single provider archive hash; exact Body-WT object hashes are recorded in run receipts"
+    license: "CC-BY-NC-4.0; provider re-verification remains required before redistribution"
+    redistribution: "noncommercial restrictions apply to data and derived artifacts; Apache repository licensing does not relicense them"
+    placement: "Body-WT waist IMU"
+    channels: "six inertial channels; derived gravity is a separately named lane"
+    ontology: [mobility, sitting, standing]
+    boundary_status: >-
+      Provider segmented originally continuous repetitions into label-defined activity
+      CSVs and removed breaks; the public Body-WT.csv has no timestamp or continuous offset.
+    bias: "scripted activities, provider label-defined segmentation, repeated observations, and no participant-N inflation"
+    fixed_inventory_protocol: "configs/protocols/imu_har_il_fixed_inventory_v1.yaml"
+    requested_inventory: "50 participants x 4 repetitions x 3 core activities = 600 requested trials"
+    missing_data_views:
+      complete_requested_core:
+        retained_participants: 19
+        retained_trials: 228
+        selected_source_files: 264
+        missing_requested_trials: 110
+        quarantined_trials: 30
+        evidence_status: "diagnostic_provider_presegmented_development"
+      available_valid_trials:
+        retained_participants: 47
+        retained_trials: 457
+        selected_source_files: 490
+        missing_requested_trials: 110
+        quarantined_trials: 33
+        evidence_status: "diagnostic_provider_presegmented_development"
+      relationship: >-
+        Both lanes are missing-data views of the same planned 50 people; they are
+        not independent cohorts and are not a matched before/after comparison.
+    continuous_stream_claim_allowed: false
+    independent_confirmation_allowed: false
+    source_to_fog_claim_limit: "target-label-blind provider-presegmented development transfer only"
+    blocker: "original continuous repetitions plus timestamps/annotation intervals unavailable"
+  har_pmd_v1:
+    role: stress_test
+    participants: "120 reported; participants 1-12 consumed as pilot"
+    sessions: "provider scripted indoor/outdoor activity files"
+    record_url: "https://zenodo.org/records/7939223"
+    version: "provider Zenodo v2; repository identifier retained for compatibility"
+    accessed_on: "2026-09-05"
+    archive_md5: "cdc7b79aaa0450d68d94f430f2a2de63"
+    license: "CC-BY-4.0"
+    redistribution: "raw data excluded from Git; attribution required"
+    placement: "smartphone; heterogeneous Android devices"
+    channels: "six inertial and provider-native nine-channel lanes, never pooled"
+    ontology: [stationary, walking, crutches, walker, manual_wheelchair]
+    boundary_status: "timestamped provider scripted activity/environment recording files"
+    lanes: [six_channel, native_gravity_nine_channel]
+    limitation: "simulated aid use; stationary merges sitting and standing; no clinical/posture validation"
+  sole_harmony_v1:
+    role: development
+    evidence_status: diagnostic
+    confirmation_allowed: false
+    clinical_claim_allowed: false
+    deployable_claim_allowed: false
+    participants: "13 reported"
+    sessions: >-
+      Five per participant reported; the frozen temporal development diagnostic uses
+      ordered participants C001-C012 and their first two ordered sessions.
+    record_url: "https://zenodo.org/records/19242395"
+    version: "Zenodo record 19242395"
+    accessed_on: "2026-09-05 metadata audit"
+    hashes: "participant-archive hashes are recorded in run receipts; no single collection hash asserted"
+    license: "CC-BY-4.0"
+    redistribution: "raw data excluded from Git; attribution required"
+    placement: "right insole"
+    channels: "linear acceleration, gyroscope, and provider raw-minus-linear derived gravity"
+    ontology: [mobility, sitting, standing]
+    lanes:
+      session_observable:
+        role: development
+        evidence_status: diagnostic
+        boundaries: "participant/session, timestamp-gap or reset, and finite-sensor run"
+        interpretation: "consumed session-observable temporal development diagnostic"
+        confirmation_allowed: false
+        deployable_claim_allowed: false
+        limitation: "offline symmetric resampling does not establish zero-lookahead streaming"
+      camera_bout_oracle:
+        role: oracle_diagnostic
+        evidence_status: diagnostic
+        boundaries: "camera-annotation bout and finite-sensor run"
+        interpretation: "annotation-boundary upper-bound diagnostic only"
+        confirmation_allowed: false
+        deployable_claim_allowed: false
+    cross_lane_numeric_comparison_allowed: false
+    historical_boundary_status: "camera-bout resampling and reset is annotation-defined oracle information"
+    retained_interrupted_oracle_materialization:
+      record_kind: "sole_harmony_interrupted_oracle_materialization_receipt"
+      status: "INTERRUPTED_AFTER_DATA_AUDIT_NO_MODEL_RESULT"
+      evidence_status: "diagnostic_interrupted_no_score"
+      path: "results/research/cross_dataset_har_v4/sole_harmony_oracle_materialization_interruption_20260906.json"
+      file_sha256: "7cd969b609323e1388a5c8dd35ee7bcc0d12713c6349b2e5a9b871c162ab54f8"
+      record_sha256: "8075b08da583ef0a5b1b50ecfcb0866210d28e765b65cac2b55ed9618ed82152"
+      scope: >-
+        The retained v3 oracle lane materialized C001-C012 and their first two
+        ordered sessions, but it stopped after data_audit.json and produced no
+        model result, predictions, validation, or score.
+      deployable_claim_allowed: false
+      confirmation_allowed: false
+      numerical_before_after_comparison_allowed: false
+    deployable_status: >-
+      Neither lane establishes deployment: camera-bout boundaries are oracle
+      information, while the session-observable lane still uses offline symmetric
+      resampling and is retained only as development diagnostic evidence.
+    bias: "healthy young adults, sitting dominance, and camera-label oracle boundaries"
+  wear_gait_pd:
+    role: sealed_confirmation
+    access: "BLOCKED_NO_AUTHORIZED_ACCESS"
+    metadata_accessed_on: "2026-09-05"
+    public_metadata_only: true
+    local_authorized_data_receipt: false
+    controlled_data_bytes_accessed: false
+    access_terms_accepted: false
+    participants: >-
+      Public cross-sectional descriptor reports 100 people with Parkinson's disease
+      and 85 age-matched controls (N=185); controlled-file roster not locally verified.
+    sessions: >-
+      Public descriptor reports a cross-sectional laboratory assessment battery, and
+      the Synapse project tree separately identifies a longitudinal branch; exact
+      controlled-file session coverage not locally verified.
+    record_url: "https://www.synapse.org/Synapse:syn52540892"
+    descriptor_url: "https://www.nature.com/articles/s41597-026-06806-2"
+    doi: "10.7303/syn52540892"
+    version: >-
+      Public metadata identifies project syn52540892, Version 1 (Cross-sectional)
+      branch syn55052683, and Version 2 (Longitudinal) branch syn74686228; no local
+      frozen data release or authorized file receipt exists.
+    hashes: null
+    license: >-
+      Public Synapse project metadata states CC-BY-4.0; file access additionally
+      requires an account and user acceptance of applicable Synapse terms, privacy
+      policy, code of conduct, and data pledge, none of which was accepted here.
+    redistribution: "controlled files unavailable; no local redistribution authorization assessed"
+    placement: >-
+      Public descriptor reports Xsens IMUs on the forehead, sternum, L4/L5, and
+      bilateral wrists, thighs, shanks, ankles, and dorsal feet, plus bilateral
+      Moticon insoles.
+    channels: >-
+      Public descriptor reports Xsens acceleration, angular velocity, magnetic field,
+      orientation, and free acceleration at 100 Hz; insoles provide pressure plus
+      accelerometer and gyroscope channels at 100 Hz.
+    ontology: >-
+      Public descriptor reports gait, turning, tandem gait, timed-up-and-go, balance,
+      doorway, free-walk, and frame-level general/clinical events; no frozen mapping
+      to this repository's three-class endpoint exists.
+    bias: >-
+      Clinical cross-sectional cohort and multimodal laboratory tasks are publicly
+      described; participant-level controlled bytes remain sealed and unassessed.
+    rule: "Do not accept agreements, impersonate the user, discover credentials, or bypass controls."
+  parkinson_at_home:
+    role: sealed_confirmation
+    access: "BLOCKED_NO_AUTHORIZED_ACCESS"
+    metadata_accessed_on: "2026-09-05"
+    public_metadata_only: true
+    local_authorized_data_receipt: false
+    data_bytes_accessed: false
+    access_terms_accepted: false
+    participants: >-
+      Original study reports 25 people with Parkinson's disease and 25 controls; the
+      separate public tremor subset reports 25 and 24 respectively, while its paper
+      analyzes 24 and 24 after technical exclusions.
+    sessions: >-
+      Original study reports unscripted home recordings, with the Parkinson group
+      recorded in off- and on-medication states; exact request-gated activity-session
+      coverage is not locally verified.
+    descriptor_url: "https://www.jmir.org/2020/10/e19068"
+    public_tremor_subset_url: "https://doi.org/10.34973/2xxa-g520"
+    version: >-
+      Full multimodal activity release/version not frozen; the distinct public tremor
+      subset is DOI 10.34973/2xxa-g520, version 2, approximately 4 GB across 13 files,
+      and is not a substitute for the full activity corpus.
+    hashes: null
+    license: >-
+      Full activity-data license/terms are not frozen; public metadata states CC0 for
+      the separate tremor subset. No full-data terms were accepted and no bytes from
+      either evidence object were acquired locally.
+    redistribution: >-
+      Full activity-data redistribution is not authorized; the separately CC0 tremor
+      subset remains out of scope for HAR confirmation and was not downloaded.
+    placement: >-
+      Public study article reports Physilog units on both wrists, both ankles, and the
+      lower back, alongside smartwatch, smartphone, and Empatica devices.
+    channels: >-
+      Full request-gated channel inventory is not locally verified; the separate public
+      tremor subset reports bilateral wrist accelerometer and gyroscope at 200 Hz.
+    ontology: >-
+      Public articles report sitting, standing, walking, postural transitions,
+      running/exercise, cycling, and motorized driving; the public tremor subset uses
+      tremor annotations and is not a general-activity endpoint.
+    bias: >-
+      Small longitudinal clinical/control cohorts and medication-state observations
+      are publicly described; the sealed activity bytes remain unassessed.
+    rule: "Steward approval and user-authorized terms are required."
+independent_unit_policy:
+  unit: participant
+  repeated_sessions_or_repetitions_increase_independent_n: false
+  participant_level_inference_required: true
+promotion_policy:
+  valid_statuses: [validated, provisional, superseded, diagnostic, blocked, failed, confirmatory]
+  untouched_confirmation_available: false
+  sota_claim_allowed: false

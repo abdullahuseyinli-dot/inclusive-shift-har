@@ -1,0 +1,121 @@
+schema_version: "1.1.0"
+protocol_id: "external-har-observable-context-training-population-v1"
+declared_at_utc: "2026-09-05T17:56:13Z"
+last_amended_at_utc: "2026-09-05T22:47:03Z"
+status: "frozen_before_v4_replacement_outcomes"
+inherits: "configs/protocols/external_har_observable_context_v1.yaml"
+discovery:
+  timing: "after retained v3 development outcomes, before any v4 replacement outcome"
+  numerical_outcomes_used_to_define_correction: false
+  finding: >-
+    The outer-test path predicted every annotation-independent candidate before
+    participant-context pooling, but inner participant-held-out predictions and
+    responder-training signatures used only annotation-eligible windows. This made
+    the learned context population annotation-selected and mismatched to inference.
+    The CAGE sensor-health channel scale was likewise fitted on annotation-eligible
+    outer-training windows rather than every observable outer-training candidate.
+    A final review also found that the HERA physics-reference threshold was fitted
+    on annotation-eligible outer-training windows. That threshold changes physics
+    reliability and trust decisions for both training and evaluation candidates.
+affected_methods:
+  - "CAGE-DG"
+  - "HERA-DG-context-safe"
+  - "HERA-DG-full"
+  - "HERA-DG-strict"
+  - "HERA-DG-v2-full"
+unaffected_method_classes:
+  - "independent-window methods whose prediction neither pools candidate events nor uses candidate-population-fitted context features"
+  - "neural independent-window controls"
+correction:
+  supervised_fit_and_selection_population: >-
+    Homogeneous, supported, annotation-eligible windows from the current training
+    participants only.
+  inner_prediction_population: >-
+    Every annotation-independent candidate from each inner-held-out participant,
+    including candidates that are ineligible for supervision or scoring.
+  responder_training_context_population: >-
+    Every annotation-independent candidate from each outer-training participant.
+  context_feature_scale_fit_population: >-
+    Every annotation-independent candidate from each outer-training participant;
+    never a mask selected by label presence, support, or homogeneity.
+  physics_reference_fit_population: >-
+    Every annotation-independent candidate from each outer-training participant.
+    The internal valid-pair-fraction rule may exclude windows using signal quality
+    only; label presence, support, homogeneity, and scoring eligibility may not.
+  outer_evaluation_context_population: >-
+    Every annotation-independent candidate from each outer-held-out participant.
+  label_application: >-
+    Labels and scoring eligibility may define supervised utility, calibration,
+    selection, and reported metrics only; they may not define either context-event
+    population.
+  zero_supervision_participant_rule: >-
+    Retain the participant's candidates in the context population, but exclude its
+    signature from label-dependent utility/router fitting and report that exclusion.
+  participant_partition_source: "frozen pre-window provider roster"
+  target_labels_used_for_fit_selection_or_context: false
+required_run_evidence:
+  - "training and evaluation candidate/scored counts per outer fold"
+  - "candidate and scored counts per inner validation fold"
+  - "complete inner candidate prediction coverage"
+  - "outer-training candidate count used to fit context-feature channel scale"
+  - "outer-training candidate and signal-valid counts used to fit the physics reference"
+  - "fitted physics-reference threshold"
+  - "participant rosters with candidates and supervision reported separately"
+  - "explicit result binding to this protocol identifier"
+historical_parity_reference:
+  purpose: >-
+    Exact, integrity-valid v3 witness used only to prove that methods outside the
+    corrected context population are numerically unchanged. Superseded evidence
+    is never promoted or treated as a publication result.
+  current_validation_status: "SUPERSEDED_PROTOCOL"
+  launch_commit: "ecafde4c2712d01c6f59435ef5537787f91b6946"
+  dataset_id: "fog_star_v3"
+  observable_context_protocol: "external-har-observable-context-v1"
+  observable_context_training_protocol: null
+  source_manifest_protocol_id: "external-har-session-grid-v3"
+  source_manifest_sha256: "ea79bda0143a8b5a3137b8bbe659c3ba23835ace243f1ce1319bfbd70a1d729c"
+  result_payload_sha256_before_serialization: "87e52738efeb1e7bb58c468abb020c64a88103d63121d6c7adb22e5ba10d485b"
+  artifact_sha256:
+    result.json: "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d"
+    predictions.npz: "09140171d14aedbc168feb0a5de9bc3159f087d80dead30112131addc5fffe1b"
+    data_audit.json: "56ef9abb9dd8c1a5ed28c7da8f200cb3570034f8e23f8b99a84b435c597d98ff"
+  required_current_validation_flags:
+    integrity_passed: true
+    publication_evidence_ready: false
+    publication_evidence_ready_for_unqualified_methods: false
+    diagnostic_contract_passed: false
+  allowed_metadata_only_schema_migrations:
+    new_summary_audit_fields:
+      - "boundary_provenance"
+      - "participant_partition_observation"
+      - "participant_partition_plan"
+      - "retained_array_hashes"
+    segment_key_replacement: >-
+      annotation_dependency=false is replaced by both
+      within_declared_segment_transform_annotation_dependency=false and
+      segment_boundary_annotation_conditioned=false.
+    candidate_pool_addition: "arrays.nine_channel_signals SHA-256"
+  fields_required_exact_after_normalization: >-
+    Every other dataset-summary field, every pre-existing observable-candidate
+    array hash, every segment signal/gravity/timestamp/grid/admission/exclusion
+    field, every scored identity, and every unaffected-method probability.
+  allowed_use: "historical parity witness only"
+metamorphic_acceptance:
+  - >-
+    Holding candidate signals, fixed predictors, and observable boundaries constant,
+    changing annotation eligibility cannot change inner/outer context membership,
+    fitted channel scale, fitted physics-reference threshold, context features,
+    physics trust decisions, or reliability features.
+  - >-
+    Ineligible placeholder labels cannot enter fitting, utility, calibration,
+    candidate selection, or scoring.
+  - "Every candidate is predicted exactly once by a participant-held-out inner model."
+preservation:
+  historical_results_deleted_or_overwritten: false
+  v3_context_results_status: "superseded development evidence"
+  before_after_numerical_improvement_claim_allowed: false
+claims:
+  evidence_role: "development"
+  confirmation_allowed: false
+  state_of_the_art_allowed: false
+  zero_lookahead_streaming_allowed: false

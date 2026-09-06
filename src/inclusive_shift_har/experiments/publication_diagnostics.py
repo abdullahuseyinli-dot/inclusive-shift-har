@@ -12,13 +12,27 @@ from typing import Any, cast
 import numpy as np
 
 from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
     _git_state,
     _source_input_manifest,
+    _typed_path_locator,
     _write_json_create_only,
 )
 from inclusive_shift_har.evaluation.inference_contracts import method_inference_contracts
 from inclusive_shift_har.experiments.external_evidence_validate import validate_run_directory
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
+
+_VALIDATION_BOOLEAN_FIELDS = (
+    "integrity_passed",
+    "publication_evidence_ready",
+    "publication_evidence_ready_for_unqualified_methods",
+    "diagnostic_contract_passed",
+)
+_ACCEPTED_VALIDATION_MODES = {
+    "VALIDATED": (True, True, False, False),
+    "PARTIALLY_VALIDATED_METHODS": (True, False, True, False),
+    "DIAGNOSTIC": (True, False, False, True),
+}
 
 
 def mechanism_summary(result: dict[str, Any]) -> dict[str, Any]:
@@ -204,34 +218,126 @@ def write_distribution_figure(result: dict[str, Any], output: Path, *, status: s
     return paths
 
 
+def _derived_evidence_status(result: dict[str, Any]) -> str:
+    """Derive the run role from the exact frozen dataset summaries."""
+
+    summaries = [
+        value
+        for name in ("source_dataset", "target_dataset", "dataset")
+        if isinstance(value := result.get(name), dict)
+    ]
+    if not summaries:
+        raise ValueError("diagnostic input lacks frozen dataset summaries")
+    return _external_evidence_status(*summaries)
+
+
+def _accepted_validation_mode(validation: dict[str, Any], evidence_status: str) -> str:
+    """Require one exact current-result acceptance tuple and compatible role."""
+
+    mode_value = validation.get("status")
+    mode = mode_value if isinstance(mode_value, str) else ""
+    expected = _ACCEPTED_VALIDATION_MODES.get(mode)
+    if expected is None or any(
+        validation.get(name) is not value
+        for name, value in zip(_VALIDATION_BOOLEAN_FIELDS, expected, strict=True)
+    ):
+        raise ValueError(
+            "diagnostic input is not accepted current-protocol evidence: "
+            f"validator={mode_value!r}, frozen_evidence_status={evidence_status!r}"
+        )
+    expected_prefix = "diagnostic_" if mode == "DIAGNOSTIC" else "validated_"
+    if not evidence_status.startswith(expected_prefix):
+        raise ValueError(
+            f"validator mode {mode!r} cannot promote evidence status {evidence_status!r}"
+        )
+    if mode == "DIAGNOSTIC":
+        reasons = validation.get("diagnostic_scope_reasons")
+        if not (
+            isinstance(reasons, list)
+            and reasons
+            and all(isinstance(reason, str) and reason for reason in reasons)
+            and len(reasons) == len(set(reasons))
+        ):
+            raise ValueError("diagnostic evidence requires explicit unique scope reasons")
+    if mode == "PARTIALLY_VALIDATED_METHODS":
+        unqualified = validation.get("unqualified_method_names")
+        annotation_selected = validation.get("annotation_selected_context_methods")
+        if not (
+            isinstance(unqualified, list)
+            and unqualified
+            and all(isinstance(name, str) and name for name in unqualified)
+            and len(unqualified) == len(set(unqualified))
+            and isinstance(annotation_selected, list)
+            and annotation_selected
+            and all(isinstance(name, str) and name for name in annotation_selected)
+            and len(annotation_selected) == len(set(annotation_selected))
+            and set(unqualified).isdisjoint(annotation_selected)
+        ):
+            raise ValueError(
+                "partially validated diagnostics require distinct non-empty unqualified "
+                "and annotation-selected method sets"
+            )
+    return mode
+
+
+def _bound_evidence_status(result: dict[str, Any], validation: dict[str, Any]) -> tuple[str, str]:
+    """Bind canonical run status to both frozen data and independent validation."""
+
+    derived = _derived_evidence_status(result)
+    mode = _accepted_validation_mode(validation, derived)
+    recorded = result.get("artifact_evidence_status")
+    if not isinstance(recorded, str) or recorded != derived:
+        raise ValueError(
+            "diagnostic input artifact evidence status differs from its frozen dataset role"
+        )
+    return recorded, mode
+
+
+def _runtime_qualification_records(directory: Path, repository_root: Path) -> list[dict[str, Any]]:
+    """Bind enclosing runtime notices with typed, deterministic path locators."""
+
+    notices: dict[Path, dict[str, Any]] = {}
+    for parent in (directory, *directory.parents[:3]):
+        for path in sorted(parent.glob("runtime_termination_failure*.json")):
+            if path.is_symlink() or not path.is_file():
+                raise ValueError(
+                    f"runtime qualification must be a regular non-symlink file: {path}"
+                )
+            resolved = path.resolve(strict=True)
+            notices[resolved] = {
+                "locator": _typed_path_locator(resolved, repository_root),
+                "sha256": sha256_file(resolved),
+            }
+        if (parent / "campaign_plan.json").is_file() or parent.name in {".audit", "results"}:
+            break
+    return [notices[path] for path in sorted(notices, key=lambda item: str(item))]
+
+
 def write_diagnostics(directory: Path, output: Path, repository_root: Path) -> dict[str, Any]:
     validation = validate_run_directory(directory, repository_root)
-    if not validation["integrity_passed"]:
-        raise ValueError("diagnostic input failed artifact integrity")
     result = json.loads((directory / "result.json").read_text(encoding="utf-8"))
-    dataset = result.get("target_dataset", result.get("dataset", {}))
-    oracle = dataset.get("dataset_id") == "sole_harmony_v1"
-    if (
-        not oracle
-        and not validation["publication_evidence_ready"]
-        and not validation.get("publication_evidence_ready_for_unqualified_methods", False)
-    ):
-        raise ValueError("non-oracle input failed the scientific evidence contract")
+    if not isinstance(result, dict):
+        raise ValueError("diagnostic result artifact is not an object")
+    status, validation_mode = _bound_evidence_status(result, validation)
+    runtime_qualifications = _runtime_qualification_records(directory, repository_root)
     output.mkdir(parents=True, exist_ok=False)
-    status = (
-        "oracle diagnostic"
-        if oracle
-        else "validated stress test"
-        if dataset["dataset_id"] == "har_pmd_v1"
-        else "validated development"
-    )
-    if validation.get("annotation_selected_context_methods"):
-        status = "mixed validated and diagnostic methods"
+    figure_status = status
+    if validation_mode == "PARTIALLY_VALIDATED_METHODS":
+        figure_status += " | contains annotation-selected diagnostic methods"
+    if runtime_qualifications:
+        figure_status += " | runtime-qualified"
     record: dict[str, Any] = {
+        "schema_version": "2.0.0",
         "record_kind": "external_publication_diagnostics",
         "created_at_utc": datetime.now(UTC).isoformat(),
         "evidence_status": status,
-        "run_directory": str(directory.resolve()),
+        "validation_mode": validation_mode,
+        "evidence_status_binding": {
+            "result_field": "artifact_evidence_status",
+            "derived_from_frozen_dataset_summaries": True,
+            "independent_validation_acceptance_tuple_passed": True,
+        },
+        "run_directory": _typed_path_locator(directory, repository_root),
         "result_sha256": sha256_file(directory / "result.json"),
         "data_audit_sha256": sha256_file(directory / "data_audit.json"),
         "prediction_sha256": sha256_file(directory / result["prediction_artifact"]["path"]),
@@ -244,22 +350,10 @@ def write_diagnostics(directory: Path, output: Path, repository_root: Path) -> d
         "git_at_analysis": _git_state(repository_root),
         "analysis_source_manifest": _source_input_manifest(repository_root),
         "inference_status": "descriptive; no new test, model selection or prospective claim",
+        "runtime_qualifications": runtime_qualifications,
+        "runtime_qualification_present": bool(runtime_qualifications),
     }
-    notices: dict[str, str] = {}
-    for parent in (directory, *directory.parents[:3]):
-        notices.update(
-            {
-                str(path.resolve()): sha256_file(path)
-                for path in parent.glob("runtime_termination_failure*.json")
-            }
-        )
-        if (parent / "campaign_plan.json").is_file() or parent.name in {".audit", "results"}:
-            break
-    record["runtime_qualifications"] = notices
-    if notices:
-        status += "; runtime-qualified"
-        record["evidence_status"] = status
-    figures = write_distribution_figure(result, output, status=status)
+    figures = write_distribution_figure(result, output, status=figure_status)
     record["figure_files"] = {path.name: sha256_file(path) for path in figures}
     record["record_sha256"] = canonical_json_sha256(record)
     _write_json_create_only(output / "diagnostics.json", record)

@@ -3,29 +3,41 @@
 ## Current external research checkpoint — 5 September 2026
 
 The FoG-STAR audit confirmed annotation-dependent resampling/window phase and,
-subsequently, annotation-selected context aggregation in two HERA variants.
-Both paths are repaired under versioned protocols. Earlier FoG-derived and
-FoG-target scores remain superseded or explicitly qualified; artifact integrity
-alone did not detect these semantic defects. See the
-[signal-grid amendment](docs/research/EXTERNAL_HAR_SESSION_GRID_V3_AMENDMENT.md)
-and [observable-context correction](docs/research/EXTERNAL_HAR_OBSERVABLE_CONTEXT_V1_CORRECTION.md).
+subsequently, annotation-selected context populations and feature scaling in CAGE
+and HERA, plus an annotation-selected physics-reference threshold affecting HERA
+strict and three routing variants.
+Both paths are repaired under versioned protocols. A later audit also found that
+external participant fold plans were serialized only after window materialization,
+that public IMU-HAR-IL files were segmented upstream using activity labels, and
+that FoG inner-held-out context training still omitted annotation-ineligible
+candidate windows and fitted the CAGE channel scale and HERA physics reference on
+the eligible subset even after outer evaluation had been corrected.
+All earlier FoG-derived, FoG-target, and pre-window-plan external scores are now
+superseded or diagnostic; artifact integrity alone did not detect these semantic
+defects. See the
+[signal-grid amendment](docs/research/EXTERNAL_HAR_SESSION_GRID_V3_AMENDMENT.md),
+the [observable-context correction](docs/research/EXTERNAL_HAR_OBSERVABLE_CONTEXT_V1_CORRECTION.md),
+the [training-population amendment](docs/research/EXTERNAL_HAR_CONTEXT_TRAINING_POPULATION_CORRECTION_20260905.md),
+and the [provider-boundary/split correction](docs/research/EXTERNAL_HAR_PROVIDER_BOUNDARY_AND_SPLIT_CORRECTION_20260905.md).
 
-The current completed FoG package uses 22 development-consumed participants,
+The last retained FoG package uses 22 development-consumed participants,
 1,939 label-independent candidate windows and 1,213 homogeneous scoring windows.
 Only 16 participants support all three classes. Results use fixed-class
 participant macro-F1 averaged over seeds 11/23/47, not probability-ensemble F1.
 The [generated table](results/research/cross_dataset_har_v3/observable_context_tables_20260905/table.md)
 separates six-channel, derived-nine-channel and noncausal participant-context
-budgets. No independent-confirmation, clinical-validity, SOTA or breakthrough
-claim is supported.
+budgets. Those values remain useful reconstruction evidence but are scientifically
+superseded by the stricter pre-window partition-plan correction. No replacement
+score is current until a clean-commit rerun validates. No independent-confirmation,
+clinical-validity, SOTA or breakthrough claim is supported.
 
 | Matched six-channel, independent-window result | Participant macro-F1 | Evidence status |
 |---|---:|---|
-| Random Forest | 0.570950 | Validated development |
-| XGBoost | 0.565904 | Validated development |
-| Finite PB-HPF candidate | 0.550761 | Validated negative result; primary/tail gate failed |
+| Random Forest | 0.570950 | Superseded; pre-window plan absent |
+| XGBoost | 0.565904 | Superseded; pre-window plan absent |
+| Finite PB-HPF candidate | 0.550761 | Superseded negative result; original primary/tail gate failed |
 
-All three completed packages and validations are indexed in the
+All three preserved packages and their former structural validations are indexed in the
 [create-only evidence checkpoint](results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/).
 Its binary predictions are retained locally but deliberately excluded from Git
 by the repository's release policy. A Git-only clone is not sufficient to
@@ -33,18 +45,28 @@ reconstruct metrics: the separately supplied, hash-verified
 [prediction payload](docs/research/EXTERNAL_HAR_PREDICTION_PAYLOAD_V1.md) is required.
 No public payload release or download location is claimed at this checkpoint.
 PB-HPF expansion stopped after its predeclared failure; its derived-gravity
-diagnostic is not substituted as a new headline. The context correction's FoG
-run exited normally from clean commit `ecafde4c2712d01c6f59435ef5537787f91b6946`;
-all 11 unaffected methods passed the frozen parity check.
+diagnostic is not substituted as a new headline. The earlier context-correction
+FoG run exited normally from clean commit
+`ecafde4c2712d01c6f59435ef5537787f91b6946`; its parity record is preserved, but
+the later CAGE context-scale and HERA physics-reference population findings
+narrowed which methods can be called unaffected. The v3 parity result is therefore
+historical rather than a v4 publication gate. Any new v4 parity record must compare
+against the exact hash-pinned, still-superseded historical payload and may promote
+only the fully validated replacement side.
 
-This is not the final publication freeze. Complete IMU evidence reconstruction,
-the full HAR-PMD model campaign and the expanded Sole-HARmony oracle diagnostic
+This is not the final publication freeze. Corrected FoG reconstruction, diagnostic
+IMU evidence reconstruction, the full HAR-PMD model campaign, and the expanded
+Sole-HARmony observable-session and oracle diagnostics
 remain tracked separately until their final gates pass. More repetitions do not
 increase independent participant N. InclusiveHAR target participants P11-P20
 are not reopened for tuning. See the immutable
-[evidence-role ledger](configs/datasets/evidence_roles_20260905_v2.yaml).
+[evidence-role ledger](configs/datasets/evidence_roles_20260905_v3.yaml) and the
+[current literature/comparability audit](docs/research/EXTERNAL_HAR_LITERATURE_AND_COMPARABILITY_AUDIT_20260905.md).
+The create-only
+[v4 supersession ledger](results/research/cross_dataset_har_v4/context_training_population_supersession_20260905.json)
+binds the exact preserved checkpoint hashes and does not claim a replacement result.
 
-### Reconstruct the completed core table without raw data or training
+### Reconstruct the preserved superseded core table without raw data or training
 
 Start from a clean checkout containing this evidence checkpoint. Install the
 locked CPU research environment and hashed external-reader overlay. Restore
@@ -56,11 +78,17 @@ Use a new output directory; do not overwrite earlier reproductions.
 uv sync --locked --extra training-cpu --group research
 uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock
 $env:PYTHONPATH = Join-Path (Get-Location) 'src'
-.venv/Scripts/python.exe -m inclusive_shift_har.experiments.publication_table --repository-root . --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn --output .audit/core_table_reproduction_01
+.venv/Scripts/python.exe -m inclusive_shift_har.experiments.publication_table --repository-root . --superseded-only --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context --run-directory results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn --output .audit/core_table_reproduction_01
 ```
 
-This reconstructs metrics from hash-verified predictions; it does not retrain
-models or prove universal cross-hardware bitwise equivalence. Full fitting uses
+The explicit `--superseded-only` gate accepts an input only when the current
+validator reports `SUPERSEDED_PROTOCOL` and artifact integrity remains intact;
+it rejects current, provisional, and diagnostic evidence and cannot be mixed
+with them. The generated JSON and Markdown mark every method and the table itself
+as superseded and prohibit promotion to current evidence. This reconstructs
+historical metrics from hash-verified predictions; it neither supplies a
+corrected replacement result nor retrains models or proves universal
+cross-hardware bitwise equivalence. Full fitting uses
 the frozen source and campaign commands in the protocols, serializing large
 jobs. Preserve all failures and technical retry receipts. FoG-derived artifacts
 retain [CC BY 4.0 attribution](results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/DATA_LICENSE_AND_SCOPE.md);

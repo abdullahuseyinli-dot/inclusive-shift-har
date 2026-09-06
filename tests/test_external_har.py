@@ -10,9 +10,9 @@ import inclusive_shift_har.data.external_har as external_har
 from inclusive_shift_har.data.external_har import (
     ExternalHARWindows,
     SourceReceipt,
-    _contiguous_label_runs,
     _contiguous_signal_runs,
     _IMUSourceFile,
+    _resampled_sample_count,
     _sole_session_arrays,
     _WindowAccumulator,
     causal_gravity_lowpass,
@@ -86,14 +86,6 @@ def test_causal_gravity_state_is_not_reset_at_an_activity_boundary() -> None:
     assert label_reset[64, 2] == pytest.approx(9.80665)
 
 
-def test_contiguous_runs_break_on_label_reset_and_timestamp_gap() -> None:
-    timestamps = np.array([0.0, 0.02, 0.04, 0.06, 0.50, 0.52, 0.01, 0.03])
-    labels = np.array([0, 0, 1, 1, 1, 1, 1, 1], dtype=np.int64)
-    assert _contiguous_label_runs(
-        timestamps, labels, nominal_rate_hz=50.0, maximum_gap_factor=3.0
-    ) == [(0, 2), (2, 4), (4, 6), (6, 8)]
-
-
 def test_physical_signal_runs_do_not_use_activity_boundaries() -> None:
     timestamps = np.arange(8, dtype=np.float64) / 50.0
     signals = np.ones((8, 3), dtype=np.float64)
@@ -136,6 +128,7 @@ def test_uniform_windowing_never_crosses_the_supplied_trial() -> None:
         trial="source:p1:s1:t1",
         run_index=0,
         window_samples=128,
+        segment_boundary_annotation_conditioned=True,
     )
     assert len(accumulator.windows) == 2
     assert all("source:p1:s1:t1" in item for item in accumulator.windows)
@@ -219,7 +212,96 @@ def test_uniform_resampling_uses_expected_length() -> None:
     values = np.arange(600, dtype=np.float64).reshape(200, 3)
     result = resample_uniform(values, source_rate_hz=60.0, target_rate_hz=50.0)
     assert result.shape == (167, 3)
+    assert _resampled_sample_count(200, source_rate_hz=60.0, target_rate_hz=50.0) == 167
     assert np.isfinite(result).all()
+
+
+def test_uniform_trial_resamples_all_channels_once(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    samples = 360
+    total = np.column_stack((np.zeros(samples), np.zeros(samples), np.full(samples, 9.80665)))
+    gyro = np.zeros_like(total)
+    original = external_har.resample_uniform
+    expected_gravity = causal_gravity_lowpass(total, sampling_rate_hz=60.0, cutoff_hz=0.3)
+    expected_primary = original(
+        np.column_stack((total - expected_gravity, gyro)),
+        source_rate_hz=60.0,
+        target_rate_hz=50.0,
+    )
+    expected_gravity = original(expected_gravity, source_rate_hz=60.0, target_rate_hz=50.0)
+    calls: list[tuple[int, ...]] = []
+
+    def counted(
+        values: external_har.FloatArray, *, source_rate_hz: float, target_rate_hz: float
+    ) -> external_har.FloatArray:
+        calls.append(values.shape)
+        return original(values, source_rate_hz=source_rate_hz, target_rate_hz=target_rate_hz)
+
+    monkeypatch.setattr(external_har, "resample_uniform", counted)
+    accumulator = _WindowAccumulator.empty()
+    accumulator.add_uniform_trial(
+        total_acceleration=total,
+        gyroscope=gyro,
+        gravity=None,
+        source_rate_hz=60.0,
+        target_rate_hz=50.0,
+        gravity_cutoff_hz=0.3,
+        label=1,
+        participant="source:p1",
+        session="source:p1:s1",
+        trial="source:p1:s1:t1",
+        run_index=0,
+        window_samples=128,
+        segment_boundary_annotation_conditioned=True,
+    )
+
+    assert calls == [(samples, 9)]
+    assert accumulator.preprocessing_audit[0]["resampling_passes"] == 1
+    np.testing.assert_array_equal(
+        np.stack(accumulator.signals),
+        np.asarray(expected_primary[:256], dtype=np.float32).reshape(2, 128, 6),
+    )
+    np.testing.assert_array_equal(
+        np.stack(accumulator.gravity),
+        np.asarray(expected_gravity[:256], dtype=np.float32).reshape(2, 128, 3),
+    )
+
+
+def test_uniform_trial_accounts_for_nonfinite_short_runs_and_tail() -> None:
+    samples = 400
+    total = np.column_stack((np.zeros(samples), np.zeros(samples), np.full(samples, 9.80665)))
+    total[[2, 5], 0] = np.nan
+    accumulator = _WindowAccumulator.empty()
+    accumulator.add_uniform_trial(
+        total_acceleration=total,
+        gyroscope=np.zeros_like(total),
+        gravity=None,
+        source_rate_hz=60.0,
+        target_rate_hz=50.0,
+        gravity_cutoff_hz=0.3,
+        label=1,
+        participant="source:p1",
+        session="source:p1:s1",
+        trial="source:p1:s1:t1",
+        run_index=0,
+        window_samples=128,
+        segment_boundary_annotation_conditioned=True,
+    )
+
+    reasons = [item["reason"] for item in accumulator.exclusions]
+    assert reasons.count("nonfinite_sensor") == 1
+    assert reasons.count("short_finite_signal_run") == 2
+    assert reasons.count("incomplete_resampled_tail") == 1
+    audited_source_rows = sum(
+        int(item["source_samples"]) for item in accumulator.preprocessing_audit
+    )
+    excluded_source_rows = sum(
+        int(item["source_rows"])
+        for item in accumulator.exclusions
+        if item["reason"] in {"nonfinite_sensor", "short_finite_signal_run"}
+    )
+    assert audited_source_rows + excluded_source_rows == samples
 
 
 def test_tinyhar_standalone_baseline_contract() -> None:
@@ -294,8 +376,11 @@ def test_imu_loader_excludes_an_entire_participant_before_windowing(
     result = external_har.load_imu_har_il(download_workers=1)
     assert set(result.participant_ids.tolist()) == {"imuharil:P_01"}
     assert set(result.labels.tolist()) == {0, 1, 2}
-    assert result.exclusions[0]["participant_id"] == "imuharil:P_02"
-    assert len(result.exclusions[0]["invalid_trials"]) == 3
+    participant_exclusion = next(
+        item for item in result.exclusions if item.get("participant_id") == "imuharil:P_02"
+    )
+    assert participant_exclusion["participant_id"] == "imuharil:P_02"
+    assert len(participant_exclusion["invalid_trials"]) == 3
     assert len(result.source_issues) == 6
 
 

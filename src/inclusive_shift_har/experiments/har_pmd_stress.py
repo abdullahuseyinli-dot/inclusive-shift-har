@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import platform
 import traceback
 from datetime import UTC, datetime
 from pathlib import Path
@@ -13,10 +12,19 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
+    _publication_artifact_contract,
+    _publication_launch_context_binding,
+    _resolve_publication_launch_context,
+    _runtime_environment,
+    _source_manifest_commit_errors,
+    _write_launch_failure_envelope,
+    _write_self_hashed_json_create_only,
+)
 from inclusive_shift_har.data.external_har import (
     ExternalHARWindows,
     load_har_pmd_native,
-    participant_fold_assignment,
 )
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.experiments.cross_dataset_har import (
@@ -24,6 +32,9 @@ from inclusive_shift_har.experiments.cross_dataset_har import (
     _paired_bootstrap,
     _source_input_manifest,
     _write_json_create_only,
+)
+from inclusive_shift_har.experiments.external_evidence_validate import (
+    validate_and_record_run_directory,
 )
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 from inclusive_shift_har.models.classical import (
@@ -70,10 +81,18 @@ def _report(
     return result
 
 
-def _evaluate_seed(data: ExternalHARWindows, *, seed: int) -> dict[str, FloatArray]:
+def _evaluate_seed(
+    data: ExternalHARWindows, *, seed: int
+) -> tuple[dict[str, FloatArray], list[dict[str, Any]]]:
+    if data.participant_partition_plan is None:
+        raise PermissionError("HAR-PMD evaluation requires a pre-window participant plan")
+    partition_plan = data.participant_partition_plan
     participants = data.participant_ids
-    assignment = participant_fold_assignment(
-        np.unique(participants).tolist(), fold_count=5, seed=seed
+    assignment = partition_plan.resolve(
+        partition_plan.participant_roster,
+        fold_count=5,
+        seed=seed,
+        role="outer",
     )
     probabilities = {
         method: np.full((data.labels.size, len(data.class_names)), np.nan, dtype=np.float64)
@@ -81,6 +100,7 @@ def _evaluate_seed(data: ExternalHARWindows, *, seed: int) -> dict[str, FloatArr
     }
     six = data.signals
     nine = data.nine_channel_signals
+    fold_records: list[dict[str, Any]] = []
     for fold in range(5):
         evaluation_ids = {
             participant for participant, assigned in assignment.items() if assigned == fold
@@ -120,9 +140,19 @@ def _evaluate_seed(data: ExternalHARWindows, *, seed: int) -> dict[str, FloatArr
                     windows[evaluation],
                 )
                 probabilities[f"{prefix}-{suffix}"][evaluation] = fold_probability
+        fold_records.append(
+            {
+                "seed": seed,
+                "outer_fold": fold,
+                "training_participants": sorted(set(assignment) - evaluation_ids),
+                "evaluation_participants": sorted(evaluation_ids),
+                "participant_partition_plan_sha256": partition_plan.audit()["plan_sha256"],
+                "outer_evaluation_labels_used_for_training_or_selection": False,
+            }
+        )
     if any(not np.isfinite(value).all() for value in probabilities.values()):
         raise ValueError("HAR-PMD outer predictions are incomplete")
-    return probabilities
+    return probabilities, fold_records
 
 
 def evaluate_har_pmd_stress(
@@ -133,9 +163,14 @@ def evaluate_har_pmd_stress(
     data.validate()
     if data.dataset_id != "har_pmd_v1" or data.channel_lane != "native-gravity-9ch":
         raise ValueError("native stress runner requires HAR-PMD's native lane")
-    if np.unique(data.participant_ids).size < 12:
+    if data.participant_partition_plan is None:
+        raise PermissionError("HAR-PMD evaluation requires a pre-window participant plan")
+    data.participant_partition_plan.validate()
+    if len(data.participant_partition_plan.participant_roster) < 12:
         raise ValueError("HAR-PMD stress evaluation requires at least 12 participants")
-    per_seed = {seed: _evaluate_seed(data, seed=seed) for seed in seeds}
+    evaluated = {seed: _evaluate_seed(data, seed=seed) for seed in seeds}
+    per_seed = {seed: values[0] for seed, values in evaluated.items()}
+    fold_records = [record for values in evaluated.values() for record in values[1]]
     ensemble = {
         method: np.mean(np.stack([per_seed[seed][method] for seed in seeds], axis=0), axis=0)
         for method in _METHODS
@@ -178,6 +213,7 @@ def evaluate_har_pmd_stress(
         "reports": reports,
         "environment_reports": environment_reports,
         "paired_native_gravity_comparisons": comparisons,
+        "fold_records": fold_records,
         "endpoint_restriction": (
             "The source 'still' class merges sitting and standing. This five-class "
             "mobility-mode endpoint cannot validate the three-class posture invention."
@@ -201,23 +237,38 @@ def run_and_write(
     output_directory: Path,
     repository_root: Path,
     seeds: tuple[int, ...],
+    inherited_launch_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    git_at_launch = _git_state(repository_root)
-    source_input_manifest = _source_input_manifest(repository_root)
+    if seeds != (11, 23, 47):
+        raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+    git_at_launch, source_input_manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=repository_root,
+        output_directory=output_directory,
+        current_git_state=_git_state(repository_root),
+        current_source_manifest=_source_input_manifest(repository_root),
+        manifest_commit_validator=_source_manifest_commit_errors,
+        inherited_launch_context=inherited_launch_context,
+    )
+    launch_context_binding = _publication_launch_context_binding(launch_context)
     output_directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
-    _write_json_create_only(
-        output_directory / "data_audit.json",
-        {
-            "schema_version": "1.0.0",
-            "created_at": started,
-            "dataset": data.summary(),
-            "source_receipts": [receipt.to_dict() for receipt in data.receipts],
-            "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
-            "source_input_manifest": source_input_manifest,
-            "git_at_launch": git_at_launch,
-        },
+    dataset_summary = data.summary()
+    evidence_status = _external_evidence_status(dataset_summary)
+    audit = {
+        "schema_version": "1.0.0",
+        "created_at": started,
+        "dataset": dataset_summary,
+        "artifact_evidence_status": evidence_status,
+        "source_receipts": [receipt.to_dict() for receipt in data.receipts],
+        "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
+        "source_input_manifest": source_input_manifest,
+        "git_at_launch": git_at_launch,
+        "publication_launch_context": launch_context_binding,
+    }
+    data_audit_artifact = _write_self_hashed_json_create_only(
+        output_directory / "data_audit.json", audit
     )
+    artifact_contract = _publication_artifact_contract(source_input_manifest, data_audit_artifact)
     try:
         result, predictions = evaluate_har_pmd_stress(data, seeds=seeds)
         prediction_path = output_directory / "predictions.npz"
@@ -232,16 +283,24 @@ def run_and_write(
                 f"probability__{name}": value for name, value in predictions.items()
             },
         )
+        _resolve_publication_launch_context(
+            repository_root=repository_root,
+            output_directory=output_directory,
+            current_git_state=_git_state(repository_root),
+            current_source_manifest=_source_input_manifest(repository_root),
+            manifest_commit_validator=_source_manifest_commit_errors,
+            inherited_launch_context=launch_context,
+        )
         result["started_at"] = started
         result["created_at"] = datetime.now(UTC).isoformat()
         result["git"] = _git_state(repository_root)
         result["git_at_launch"] = git_at_launch
         result["source_input_manifest"] = source_input_manifest
-        result["environment"] = {
-            "python": platform.python_version(),
-            "platform": platform.platform(),
-            "numpy": np.__version__,
-        }
+        result["publication_launch_context"] = launch_context_binding
+        result["environment"] = _runtime_environment()
+        result["artifact_evidence_status"] = evidence_status
+        result["data_audit_artifact"] = data_audit_artifact
+        result["artifact_contract"] = artifact_contract
         result["inputs"] = {
             name: {"path": path, "sha256": sha256_file(repository_root / path)}
             for name, path in {
@@ -255,9 +314,8 @@ def run_and_write(
         }
         result["result_payload_sha256_before_serialization"] = canonical_json_sha256(result)
         _write_json_create_only(output_directory / "result.json", result)
-        return result
     except Exception as exc:
-        _write_json_create_only(
+        _write_self_hashed_json_create_only(
             output_directory / "failure.json",
             {
                 "schema_version": "1.0.0",
@@ -269,9 +327,19 @@ def run_and_write(
                 "traceback": traceback.format_exc(),
                 "git": _git_state(repository_root),
                 "git_at_launch": git_at_launch,
+                "source_input_manifest": source_input_manifest,
+                "publication_launch_context": launch_context_binding,
+                "environment": _runtime_environment(),
+                "artifact_evidence_status": evidence_status,
+                "data_audit_artifact": data_audit_artifact,
+                "artifact_contract": artifact_contract,
             },
+            hash_field="failure_payload_sha256_before_serialization",
         )
+        validate_and_record_run_directory(output_directory, repository_root)
         raise
+    validate_and_record_run_directory(output_directory, repository_root)
+    return result
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -279,6 +347,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-directory", type=Path, required=True)
     parser.add_argument("--repository-root", type=Path, default=Path.cwd())
     parser.add_argument("--participant-limit", type=int)
+    parser.add_argument("--har-pmd-source-archive", type=Path)
     parser.add_argument("--seeds", type=int, nargs="+", default=[11, 23, 47])
     parser.add_argument("--with-neural", action="store_true")
     parser.add_argument("--neural-epochs", type=int, default=40)
@@ -287,38 +356,74 @@ def _parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    data = load_har_pmd_native(participant_limit=args.participant_limit)
-    result = run_and_write(
-        data=data,
-        output_directory=args.output_directory.resolve(),
-        repository_root=args.repository_root.resolve(),
-        seeds=tuple(args.seeds),
+    root = args.repository_root.resolve()
+    output = args.output_directory.resolve()
+    _launch, _manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=root,
+        output_directory=output,
+        current_git_state=_git_state(root),
+        current_source_manifest=_source_input_manifest(root),
+        manifest_commit_validator=_source_manifest_commit_errors,
     )
-    neural_summary = None
-    if args.with_neural:
-        from inclusive_shift_har.experiments.cross_dataset_neural import (
-            run_and_write_neural,
+    started = datetime.now(UTC).isoformat()
+    stage = "configuration"
+    try:
+        if tuple(args.seeds) != (11, 23, 47):
+            raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+        if args.with_neural and args.neural_epochs != 40:
+            raise ValueError("external publication neural evidence requires the frozen 40 epochs")
+        stage = "dataset_acquisition"
+        data = load_har_pmd_native(
+            participant_limit=args.participant_limit,
+            source_archive=args.har_pmd_source_archive,
         )
+        stage = "classical_experiment_writer"
+        result = run_and_write(
+            data=data,
+            output_directory=output,
+            repository_root=root,
+            seeds=tuple(args.seeds),
+            inherited_launch_context=launch_context,
+        )
+        neural_summary = None
+        if args.with_neural:
+            from inclusive_shift_har.experiments.cross_dataset_neural import (
+                run_and_write_neural,
+            )
 
-        neural_summary = {}
-        for suffix, signals in (("6ch", data.signals), ("N9", data.nine_channel_signals)):
-            neural = run_and_write_neural(
-                data=data,
-                signals=signals,
-                class_names=data.class_names,
-                method_suffix=suffix,
-                experiment_id="har-pmd-native-interface-neural-controls-v1",
-                output_directory=(args.output_directory.resolve() / f"neural_{suffix}"),
-                repository_root=args.repository_root.resolve(),
-                seeds=tuple(args.seeds),
-                epochs=args.neural_epochs,
+            neural_summary = {}
+            stage = "neural_experiment_writers"
+            for suffix, signals in (("6ch", data.signals), ("N9", data.nine_channel_signals)):
+                neural = run_and_write_neural(
+                    data=data,
+                    signals=signals,
+                    class_names=data.class_names,
+                    method_suffix=suffix,
+                    experiment_id="har-pmd-native-interface-neural-controls-v1",
+                    output_directory=output / f"neural_{suffix}",
+                    repository_root=root,
+                    seeds=tuple(args.seeds),
+                    epochs=args.neural_epochs,
+                    inherited_launch_context=launch_context,
+                )
+                neural_summary.update(
+                    {
+                        name: report["primary"]["mean_participant_macro_f1"]
+                        for name, report in neural["reports"].items()
+                    }
+                )
+    except Exception as error:
+        if not output.exists():
+            _write_launch_failure_envelope(
+                repository_root=root,
+                output_directory=output,
+                launch_context=launch_context,
+                started_at=started,
+                stage=stage,
+                exception=error,
+                traceback_text=traceback.format_exc(),
             )
-            neural_summary.update(
-                {
-                    name: report["primary"]["mean_participant_macro_f1"]
-                    for name, report in neural["reports"].items()
-                }
-            )
+        raise
     print(
         json.dumps(
             {

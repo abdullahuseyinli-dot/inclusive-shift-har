@@ -1,0 +1,182 @@
+schema_version: "1.0.0"
+protocol_id: "imu-har-il-fixed-inventory-v1"
+declared_at_utc: "2026-09-05T22:55:18Z"
+status: "frozen_before_external_har_v4_replacement_outcomes"
+purpose: >-
+  Fail closed when the IMU-HAR-IL provider roster, selected Body-WT input
+  inventory, downloaded bytes, or lane-specific missing-data cohort differs
+  from the audited dataVersion-1 source. This is an input-validity amendment,
+  not a score-selected cohort change.
+dataset:
+  dataset_id: "imu_har_il_v1"
+  record_url: "https://data.csiro.au/collection/csiro:74700"
+  version: "CSIRO collection 74700 dataVersion 1, DOI 10.25919/d7xf-n080"
+  license: "CC-BY-NC-4.0; re-verification required before redistribution"
+  provider_reported_participant_count: 50
+  participant_id_format: "imuharil:P_01 through imuharil:P_50 inclusive"
+  requested_repetitions: [Repetition_1, Repetition_2, Repetition_3, Repetition_4]
+  requested_activities: [Walk, Sit, Stand]
+  requested_sensor_file: "Body-WT.csv"
+  requested_trial_count: 600
+  independent_unit: "participant; repetitions do not increase independent N"
+frozen_inventory:
+  missing_requested_trial_count: 110
+  missing_requested_trial_folders_sha256: "651857292b0e4a66a52a7d124016c8871c1a96aa010c71d05d476c16d0f50719"
+  inventory_incomplete_participants:
+    - imuharil:P_01
+    - imuharil:P_02
+    - imuharil:P_04
+    - imuharil:P_06
+    - imuharil:P_07
+    - imuharil:P_09
+    - imuharil:P_13
+    - imuharil:P_14
+    - imuharil:P_15
+    - imuharil:P_16
+    - imuharil:P_27
+    - imuharil:P_28
+    - imuharil:P_29
+    - imuharil:P_30
+    - imuharil:P_34
+    - imuharil:P_35
+    - imuharil:P_36
+    - imuharil:P_37
+    - imuharil:P_38
+    - imuharil:P_39
+    - imuharil:P_40
+    - imuharil:P_41
+    - imuharil:P_43
+    - imuharil:P_44
+    - imuharil:P_45
+    - imuharil:P_46
+    - imuharil:P_49
+    - imuharil:P_50
+  hash_profile:
+    source_inventory_sha256: >-
+      Repository canonical JSON SHA-256 of sorted participant, repetition,
+      activity, file_id, filename, file_size, and locator records.
+    source_payload_inventory_sha256: >-
+      Repository canonical JSON SHA-256 of sorted locator, member,
+      declared_size_bytes, received_size_bytes, and computed_sha256 records.
+    missing_requested_trial_folders_sha256: >-
+      Repository canonical JSON SHA-256 of the sorted missing provider-folder paths.
+lanes:
+  complete_requested_core:
+    selection_protocol_id: "imu-har-il-complete-requested-core-v1"
+    selected_source_file_count: 264
+    source_inventory_sha256: "060748891b6869712c7323ab4b0a754b2d57703b6cccb2ef574434676e70c7cc"
+    source_payload_inventory_sha256: "cba6f7bb1dcaea8fc60a319d73e9123aeb478f9f09752c462a6bd94086b4d78c"
+    data_quality_affected_participants: [imuharil:P_18, imuharil:P_19, imuharil:P_22]
+    quarantined_trial_count: 30
+    participant_exclusion_record_count: 31
+    retained_source_file_count: 228
+    retained_trial_count: 228
+    retained_participant_count: 19
+    retained_participants:
+      - imuharil:P_03
+      - imuharil:P_05
+      - imuharil:P_08
+      - imuharil:P_10
+      - imuharil:P_11
+      - imuharil:P_12
+      - imuharil:P_17
+      - imuharil:P_20
+      - imuharil:P_21
+      - imuharil:P_23
+      - imuharil:P_24
+      - imuharil:P_25
+      - imuharil:P_26
+      - imuharil:P_31
+      - imuharil:P_32
+      - imuharil:P_33
+      - imuharil:P_42
+      - imuharil:P_47
+      - imuharil:P_48
+  available_valid_trials:
+    selection_protocol_id: "imu-har-il-available-trials-v1"
+    selected_source_file_count: 490
+    source_inventory_sha256: "b7aa481380224e756e39ad28156d94961d49d659d106bf69f8cac358b0271385"
+    source_payload_inventory_sha256: "ca81875cd3bcab424aa3821b7723c8b6f42d170ea8931a507dad47a16e1b1c25"
+    data_quality_affected_participants:
+      [imuharil:P_04, imuharil:P_18, imuharil:P_19, imuharil:P_22]
+    quarantined_trial_count: 33
+    participant_exclusion_record_count: 32
+    retained_source_file_count: 457
+    retained_trial_count: 457
+    retained_participant_count: 47
+    retained_participants:
+      - imuharil:P_01
+      - imuharil:P_02
+      - imuharil:P_03
+      - imuharil:P_04
+      - imuharil:P_05
+      - imuharil:P_06
+      - imuharil:P_07
+      - imuharil:P_08
+      - imuharil:P_09
+      - imuharil:P_10
+      - imuharil:P_11
+      - imuharil:P_12
+      - imuharil:P_13
+      - imuharil:P_14
+      - imuharil:P_15
+      - imuharil:P_16
+      - imuharil:P_17
+      - imuharil:P_20
+      - imuharil:P_21
+      - imuharil:P_22
+      - imuharil:P_23
+      - imuharil:P_24
+      - imuharil:P_25
+      - imuharil:P_26
+      - imuharil:P_27
+      - imuharil:P_28
+      - imuharil:P_29
+      - imuharil:P_30
+      - imuharil:P_31
+      - imuharil:P_32
+      - imuharil:P_33
+      - imuharil:P_34
+      - imuharil:P_35
+      - imuharil:P_36
+      - imuharil:P_37
+      - imuharil:P_38
+      - imuharil:P_39
+      - imuharil:P_40
+      - imuharil:P_41
+      - imuharil:P_42
+      - imuharil:P_43
+      - imuharil:P_44
+      - imuharil:P_45
+      - imuharil:P_47
+      - imuharil:P_48
+      - imuharil:P_49
+      - imuharil:P_50
+    participants_with_no_retained_windows:
+      [imuharil:P_18, imuharil:P_19, imuharil:P_46]
+comparison_and_claim_policy:
+  lanes_are_matched_before_after_comparisons: false
+  reason: >-
+    The complete-core and available-valid-trial lanes contain different
+    observations and different subsets of the same reported 50 people.
+  repetitions_increase_independent_participant_n: false
+  evidence_role: "development missing-data sensitivity"
+  provider_presegmented_diagnostic_status_preserved: true
+  continuous_stream_claim_allowed: false
+  confirmation_allowed: false
+evidence_basis:
+  scope: >-
+    The two .audit files are preserved local evidence and are intentionally not
+    committed or required in a clean clone. Their SHA-256 values document the
+    derivation; the committed protocol and implementation carry the resulting
+    exact rosters and normalized inventory hashes.
+  complete_core_data_audit:
+    path: ".audit/phase2_external_v3/imu_all_3seed_5a585e9/primary_suite/imu_har_il_all_repetitions_3seed/data_audit.json"
+    sha256: "04e259bb84967bf888141308566842f3ff79edca60cee7795d76213e7dd1f471"
+  available_trial_data_audit:
+    path: ".audit/phase2_external_v3/imu_available_retry_3seed_ecafde4_20260905/primary_suite/imu_har_il_available_trials_3seed/data_audit.json"
+    sha256: "a667b55b5cc9f6c24e3b86435fe7149a7705eefeaf4e318eb5199cceb99741d6"
+  outcome_use: >-
+    Only provider identities, byte receipts, missingness, finite-window
+    eligibility, and participant/trial counts were used for this guard. Model
+    scores do not select either lane.

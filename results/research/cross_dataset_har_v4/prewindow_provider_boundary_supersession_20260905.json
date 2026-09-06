@@ -1,0 +1,84 @@
+{
+  "schema_version": "4.0.0",
+  "record_kind": "external_har_create_only_supersession_ledger",
+  "created_at_utc": "2026-09-05T17:01:14.3496119Z",
+  "status": "CORRECTION_FROZEN_REPLACEMENT_RUNS_NOT_YET_COMPLETE",
+  "correction_protocol": "configs/protocols/external_har_provider_boundary_audit_v1.yaml",
+  "evidence_role_ledger": "configs/datasets/evidence_roles_20260905_v3.yaml",
+  "parent_ledger": {
+    "path": "results/research/cross_dataset_har_v3/supersession_observable_context_checkpoint_20260905.json",
+    "file_sha256": "4f40f609cb13969aefbbc523d18708494d23faa81931a4e3b32de149bdafff47"
+  },
+  "preservation": {
+    "files_deleted_or_overwritten": false,
+    "earlier_ledgers_edited": false,
+    "failed_and_partial_runs_retained": true,
+    "prior_artifact_validation_equated_with_scientific_validity": false
+  },
+  "corrections": [
+    {
+      "finding": "External participant assignments were historically derived after window materialization instead of being frozen from the observable provider roster before segmentation/windowing.",
+      "scope": "All external within-dataset, neural, posture, transfer, and stress packages launched before this correction.",
+      "disposition": "Superseded for the new pre-window-plan publication contract; retain for reconstruction or debugging only until an exact clean-commit replacement validates.",
+      "numerical_before_after_claim_allowed": false
+    },
+    {
+      "finding": "Public IMU-HAR-IL Body-WT files are provider activity-label segments from originally continuous repetitions, without timestamps or offsets needed to reconstruct the continuous grid.",
+      "scope": "All IMU-HAR-IL within-dataset and IMU-HAR-IL-source transfer packages, including any later artifact-valid rerun on the same public file hierarchy.",
+      "disposition": "Provider-presegmented development diagnostic only; never continuous-stream, label-free, or confirmatory evidence.",
+      "smallest_clearance_action": "Obtain an authorized release of original continuous repetitions with timestamps/sample offsets and annotation intervals."
+    }
+  ],
+  "newly_superseded_checkpoint_entries": [
+    {
+      "run_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "result_file_sha256": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+      "previous_status": "validated corrected-protocol development evidence",
+      "current_status": "SUPERSEDED_PREWINDOW_PARTITION_PLAN_ABSENT",
+      "replacement_directory": null,
+      "allowed_use": "historical numerical reconstruction and regression comparison only"
+    },
+    {
+      "run_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_neural_nocudnn",
+      "result_file_sha256": "69a5ba46c4680044804b8018cd3d49722beb87f410be856539ac4baeeda11cbb",
+      "previous_status": "validated corrected-protocol development evidence",
+      "current_status": "SUPERSEDED_PREWINDOW_PARTITION_PLAN_ABSENT",
+      "replacement_directory": null,
+      "allowed_use": "historical numerical reconstruction and regression comparison only"
+    },
+    {
+      "run_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_posture_forest_negative",
+      "result_file_sha256": "6cc3916e660cf00044422465c3a63b20f8c05b393db165015a9aca08e4a54079",
+      "previous_status": "validated negative result",
+      "current_status": "SUPERSEDED_PREWINDOW_PARTITION_PLAN_ABSENT_NEGATIVE_RESULT_RETAINED",
+      "replacement_directory": null,
+      "allowed_use": "historical failed-hypothesis evidence only; no candidate substitution"
+    }
+  ],
+  "inherited_historical_fog_status": {
+    "source": "parent_ledger.historical_fog_updates",
+    "status": "All earlier FoG-derived and FoG-target entries remain superseded; this ledger does not restore or replace any of them."
+  },
+  "missing_claimed_transfer_replacement": {
+    "path": "results/research/cross_dataset_har_v1/imu_rep1_to_fog_trial_continuous_seed11_validation_20260905",
+    "exists": false,
+    "status": "ABSENT_NOT_FABRICATED",
+    "required_disposition": "Create a new corrected diagnostic transfer directory or an explicit failed-run record after the clean correction commit."
+  },
+  "runs_already_in_progress_at_correction_time": {
+    "status": "PROVISIONAL_OR_DIAGNOSTIC_NOT_REPLACEMENTS",
+    "reason": "They launched from earlier frozen commits and do not bind this correction's pre-window plan and provider-boundary status.",
+    "directories": [
+      ".audit/phase2_external_v3/imu_available_retry_3seed_ecafde4_20260905",
+      ".audit/phase2_external_v3/serial_recovery_v1_20260905"
+    ]
+  },
+  "replacement_rule": "A replacement must launch from a clean commit containing this correction, bind the participant plan and source manifest, complete all frozen seeds/controls, retain predictions, and pass artifact plus split validation. A later create-only ledger must name its exact path and hashes.",
+  "publication_state": {
+    "current_replacement_scores_available": false,
+    "untouched_confirmation_available": false,
+    "sota_claim_allowed": false,
+    "release_or_doi_created": false
+  },
+  "record_sha256": "21bd83e5347fd707f129ac3b3856af396e82a8ce8ff50a790c210a1a1acc9fe7"
+}

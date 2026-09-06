@@ -1,0 +1,70 @@
+{
+  "schema_version": "4.2.0",
+  "record_kind": "external_har_create_only_supersession_ledger",
+  "created_at_utc": "2026-09-05T17:56:13Z",
+  "last_amended_at_utc": "2026-09-05T22:49:00Z",
+  "status": "CONTEXT_TRAINING_CORRECTION_FROZEN_REPLACEMENT_NOT_YET_COMPLETE",
+  "parent_ledger": {
+    "path": "results/research/cross_dataset_har_v4/prewindow_provider_boundary_supersession_20260905.json",
+    "file_sha256": "ed39ca8bbcd767b7d39dda2c0f2d6e12887628a7ee544e83875778ea922df469"
+  },
+  "correction_protocol": "configs/protocols/external_har_observable_context_training_population_v1.yaml",
+  "finding": {
+    "summary": "FoG outer evaluation context used every observable candidate, but inner OOF prediction, responder-training context, CAGE channel-scale fitting, and HERA physics-reference fitting used annotation-eligible windows only.",
+    "scientific_effect": "The learned HERA participant-context population, CAGE context-feature scale, and HERA physics-reference threshold were annotation-selected and mismatched to the intended inference population.",
+    "score_optimization_motivated": false,
+    "discovered_after_v3_outcomes": true,
+    "discovered_before_v4_replacement_outcomes": true
+  },
+  "affected_checkpoint_entries": [
+    {
+      "run_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+      "result_file_sha256": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+      "affected_methods": [
+        "CAGE-DG",
+        "HERA-DG-context-safe",
+        "HERA-DG-full",
+        "HERA-DG-strict",
+        "HERA-DG-v2-full"
+      ],
+      "current_status": "SUPERSEDED_ANNOTATION_SELECTED_TRAINING_CONTEXT",
+      "replacement_directory": null,
+      "allowed_use": "historical reconstruction and validity-regression evidence only"
+    }
+  ],
+  "historical_parity_witness": {
+    "run_directory": "results/research/cross_dataset_har_v3/observable_context_checkpoint_20260905/fog_classical_observable_context",
+    "launch_commit": "ecafde4c2712d01c6f59435ef5537787f91b6946",
+    "source_manifest_protocol_id": "external-har-session-grid-v3",
+    "source_manifest_sha256": "ea79bda0143a8b5a3137b8bbe659c3ba23835ace243f1ce1319bfbd70a1d729c",
+    "result_file_sha256": "09cc71b1147ac783655897544282a72c7ca1ef313da75267e17b09af23d5ba6d",
+    "predictions_file_sha256": "09140171d14aedbc168feb0a5de9bc3159f087d80dead30112131addc5fffe1b",
+    "data_audit_file_sha256": "56ef9abb9dd8c1a5ed28c7da8f200cb3570034f8e23f8b99a84b435c597d98ff",
+    "required_current_status": "SUPERSEDED_PROTOCOL",
+    "allowed_use": "exact historical witness for unaffected-method parity only; never promotion",
+    "schema_normalization_scope": "only the enumerated v4 governance/audit additions in the correction protocol; all scientific signal/grid/identity fields remain exact"
+  },
+  "correction": {
+    "supervised_fit_selection_and_utility_population": "annotation-eligible outer-training windows only",
+    "inner_prediction_population": "all candidates of each inner-held-out participant",
+    "responder_training_context_population": "all candidates of every outer-training participant",
+    "context_feature_scale_fit_population": "all candidates of every outer-training participant",
+    "physics_reference_fit_population": "all candidates of every outer-training participant, with only the signal-derived minimum-valid-pair-fraction rule applied internally",
+    "outer_evaluation_context_population": "all candidates of every outer-held-out participant",
+    "zero_supervision_participant_rule": "retain candidates in context; exclude the signature only from label-dependent utility/router fitting and report it",
+    "ineligible_placeholder_labels_used": false
+  },
+  "preservation": {
+    "historical_files_deleted_or_overwritten": false,
+    "parent_ledger_modified": false,
+    "numerical_before_after_improvement_claim_allowed": false
+  },
+  "replacement_rule": "A replacement must launch from a clean commit, bind external-har-publication-v4 and the context-training protocol, record complete inner and outer candidate populations plus the physics-reference fit population and threshold, retain predictions, and pass artifact plus split validation.",
+  "publication_state": {
+    "replacement_scores_available": false,
+    "independent_confirmation_available": false,
+    "sota_claim_allowed": false,
+    "release_or_doi_created": false
+  },
+  "record_sha256": "e2704a6158f6578de858f5974719895b81f660261a9c2eb31fb1964893dba449"
+}

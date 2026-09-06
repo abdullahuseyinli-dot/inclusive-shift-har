@@ -1,0 +1,171 @@
+schema_version: "1.0.0"
+protocol_id: "external-har-provider-boundary-audit-v1"
+declared_at_utc: "2026-09-05T16:19:47Z"
+status: "post_outcome_validity_correction_claim_narrowing_only"
+inherits: "configs/protocols/external_har_session_grid_v3.yaml"
+supersedes_metadata_claims_in:
+  - "docs/research/EXTERNAL_HAR_PHYSICAL_GRID_V2_CORRECTION.md"
+  - "configs/datasets/evidence_roles_20260905_v2.yaml"
+preservation:
+  earlier_protocols_edited: false
+  earlier_results_deleted_or_replaced: false
+  result_status_changes_are_create_only: true
+  numerical_outcomes_used_to_define_correction: false
+discovery:
+  discovered_after_external_outcomes: true
+  source: "Independent repository and provider-boundary audit"
+  consequence: >-
+    Existing IMU-HAR-IL within-dataset and IMU-HAR-IL-to-FoG results retain
+    artifact-integrity value but are not continuous-stream, label-free publication
+    evidence. They are provider-presegmented scripted-activity development diagnostics.
+imu_har_il:
+  dataset_id: "imu_har_il_v1"
+  provider_collection: "CSIRO collection 74700, DOI 10.25919/d7xf-n080"
+  collection_api_version: 1
+  collection_data_version: 1
+  collection_file_count: 83409
+  collection_total_size_bytes: 49771532800
+  provider_license: "CC-BY-NC-4.0"
+  official_repository:
+    url: "https://github.com/mmsandhu/IMU-HAR-IL"
+    commit: "7d8244db71f5f15e094664df1ebb02315769f0ba"
+    readme_sha256: "1dfcca279400537367b4aa4bbe776a64587c5f7d72a21a1fb2ebe61e2fc81579"
+  official_paper:
+    url: "https://arxiv.org/html/2608.07502v2"
+    version: "arXiv v2"
+  provider_processing_facts:
+    - "Sensors originally remained active through a continuous repetition/session."
+    - "The provider then split repetitions into activity segments using labels."
+    - "Break periods were removed and segments were manually inspected/corrected."
+    - "The public hierarchy is participant/repetition/activity/sensor CSV."
+    - "Published Body-WT.csv has no timestamp, sample index, continuous-session offset, or stream identifier."
+  repository_behavior:
+    file_unit: "one provider activity-segment Body-WT.csv"
+    resets_per_file:
+      - "causal gravity state"
+      - "polyphase-resampling edge state"
+      - "window origin and phase"
+    numeric_activity_column_used_as_model_feature: false
+    source_file_boundary_annotation_independent: false
+  scientific_disposition:
+    evidence_role: "development"
+    evidence_status: "diagnostic_provider_presegmented"
+    artifact_integrity_may_be_valid: true
+    label_free_continuous_inference_claim_allowed: false
+    streaming_claim_allowed: false
+    confirmatory_claim_allowed: false
+    matched_within_provider_endpoint_reporting_allowed: true
+    source_to_target_transfer_claim: >-
+      Target-label-blind fitting may be reported, but the source preprocessing is
+      provider-label-boundary-conditioned; do not call the full transfer pipeline
+      label-free or a continuous-stream deployment validation.
+  blocker:
+    status: "BLOCKED_PUBLIC_CONTINUOUS_SOURCE_UNAVAILABLE"
+    smallest_clearance_action: >-
+      Obtain an authorized provider release of the original continuous repetition/session
+      files with timestamps or sample offsets and activity intervals, then resample each
+      observable continuous segment once and project annotations post hoc.
+participant_partition_timing:
+  finding: >-
+    External loaders historically materialized windows before experiment runners created
+    participant fold assignments, contrary to AGENTS.md and the experiment declaration.
+  participant_overlap_observed: false
+  learned_preprocessing_leakage_observed: false
+  artifact_partition_records_observed_disjoint: true
+  scientific_disposition: "protocol-governance defect requiring pre-window plans and rerun"
+  correction_contract:
+    roster_basis: "observable provider inventory before any segmentation/window extraction"
+    assignments_frozen_before_windowing: true
+    annotations_may_not_change_roster_or_assignments: true
+    result_must_bind_roster_assignment_hashes: true
+sole_harmony:
+  dataset_role: "development"
+  evidence_status: "diagnostic"
+  confirmation_allowed: false
+  clinical_claim_allowed: false
+  deployable_claim_allowed: false
+  historical_boundary_mode: "camera-annotation bout"
+  historical_status: "oracle_diagnostic"
+  lanes:
+    session_observable:
+      role: "development"
+      evidence_status: "diagnostic"
+      boundary_mode: "participant/session plus timestamp-gap/reset and finite-sensor runs"
+      deployable_claim_allowed: false
+    camera_bout_oracle:
+      role: "oracle_diagnostic"
+      evidence_status: "diagnostic"
+      boundary_mode: "camera-annotation bout plus finite-sensor runs"
+      deployable_claim_allowed: false
+  cross_lane_numeric_comparison_allowed: false
+  deployable_mode_requirement: >-
+    Resample and window complete observable session/gap/finite runs, project camera
+    intervals afterwards, and reset temporal state only at observable session or gap
+    boundaries. The present offline symmetric-resampling implementation remains a
+    development diagnostic and does not yet satisfy zero-lookahead deployment.
+har_pmd:
+  boundary_mode: "provider scripted recording file with timestamps"
+  status: "participant-exclusive mobility-mode stress only"
+  streaming_claim_allowed: false
+  posture_claim_allowed: false
+fog_star:
+  boundary_mode: "released participant/session stream plus timestamp gaps and finite runs"
+  annotation_independent_repository_pipeline: true
+  streaming_claim_allowed: false
+  required_additional_correction: "pre-window participant partition plan"
+audited_loader_inventory:
+  inclusivehar_v4:
+    modules:
+      - "src/inclusive_shift_har/data/inclusivehar.py"
+      - "src/inclusive_shift_har/data/windowing.py"
+      - "src/inclusive_shift_har/data/materialize.py"
+      - "src/inclusive_shift_har/data/auxiliary.py"
+    released_representation: "one table ordered in participant/activity blocks"
+    local_label_dependency: >-
+      The locked deviation deliberately constructs and validates windows inside released
+      participant/activity blocks. No filtering, resampling, gravity estimation, padding,
+      or temporal reset is newly introduced by this correction.
+    upstream_boundary_status: "timestamps, sessions, trials, and hidden joins unavailable"
+    disposition: "historical participant-exclusive released-block evidence; not trial-safe or streaming-valid"
+  uci_har_v1:
+    module: "src/inclusive_shift_har/data/uci_har.py"
+    released_representation: "provider-prewindowed 128-sample arrays with 64-sample stride"
+    local_label_dependency: "ontology filtering selects already-created provider windows only"
+    upstream_boundary_status: "raw sample/trial continuity is unavailable to the repository loader"
+    disposition: "development-consumed provider-window evidence; no local continuous-grid claim"
+  daghar_v2:
+    module: "src/inclusive_shift_har/data/daghar.py"
+    released_representation: "provider-prewindowed 60-sample standardized CSV rows"
+    local_label_dependency: "functional-core filtering selects already-created provider windows only"
+    upstream_boundary_status: "original continuous boundaries and provider window phase unavailable"
+    disposition: "consumed replication under provider preprocessing; no local continuous-grid claim"
+  fog_star_v3:
+    module: "src/inclusive_shift_har/data/external_har.py"
+    local_label_dependency: "none before the fixed candidate grid; annotations affect post hoc eligibility only"
+    observable_resets: [participant, session, timestamp_gap_or_reset, nonfinite_run]
+    disposition: "development evidence after clean-commit rerun; offline resampling prevents zero-lookahead claim"
+  imu_har_il_v1:
+    module: "src/inclusive_shift_har/data/external_har.py"
+    local_label_dependency: "numeric Activity_label is audit-only and cannot alter local signals or grid"
+    upstream_boundary_status: "provider activity-label segmentation is irreversible in the public release"
+    disposition: "provider-presegmented development diagnostic only"
+  har_pmd_v1:
+    module: "src/inclusive_shift_har/data/external_har.py"
+    local_label_dependency: "none inside each timestamped scripted recording"
+    observable_resets: [participant_recording, timestamp_gap_or_reset, nonfinite_run]
+    disposition: "scripted mobility-mode stress evidence; not continuous free-living or posture evidence"
+  sole_harmony_v1:
+    module: "src/inclusive_shift_har/data/external_har.py"
+    historical_mode: "camera-bout grid/reset is an explicitly retained oracle diagnostic"
+    corrected_mode: "session/gap/finite-run grid fixed before camera annotation projection"
+    disposition: >-
+      Dataset role is consumed development. The session-observable lane is a
+      development temporal diagnostic and the separate camera-bout lane is an oracle
+      diagnostic; neither is confirmatory, clinical, or deployable, and they are not
+      before/after comparable. Offline resampling is not zero-lookahead.
+trainable_preprocessing_audit:
+  normalization_scope: "training participants only in every audited publication runner"
+  calibration_scope: "training/inner-validation participants only; no outer-test labels"
+  padding: "no external loader pads incomplete tails into scored windows"
+  feature_inputs: "signals and declared gravity lane only; labels/identity/timestamps are excluded"
+evidence_role_ledger: "configs/datasets/evidence_roles_20260905_v3.yaml"

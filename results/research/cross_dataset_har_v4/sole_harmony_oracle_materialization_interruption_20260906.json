@@ -1,0 +1,155 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "sole_harmony_interrupted_oracle_materialization_receipt",
+  "receipt_id": "sole-harmony-v3-oracle-materialization-interrupted-20260906",
+  "created_at_utc": "2026-09-05T23:58:49Z",
+  "immutable": true,
+  "status": "INTERRUPTED_AFTER_DATA_AUDIT_NO_MODEL_RESULT",
+  "evidence_role": "oracle_diagnostic",
+  "evidence_status": "diagnostic_interrupted_no_score",
+  "retained_run_directory": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae",
+  "frozen_launch": {
+    "protocol_id": "external-har-session-grid-v3",
+    "dataset": "sole-harmony",
+    "seeds": [11, 23, 47],
+    "n_jobs": 4,
+    "neural_epochs": 40,
+    "started_at_utc": "2026-09-05T06:41:50.882034+00:00",
+    "git_commit": "b2dae889d96d51a953289d00a20c68fcfec3f1fa",
+    "git_worktree_dirty": false,
+    "git_status_entries": [],
+    "source_manifest_protocol_id": "external-har-session-grid-v3",
+    "source_manifest_sha256": "2aac7c3e1da7269fea7dca10fd4e8f346de576f6b841ce484bd9e81c6febe99f"
+  },
+  "retained_artifact_bindings": {
+    "campaign_plan": {
+      "path": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/campaign_plan.json",
+      "file_sha256": "0b3db1820a17d7b9e4477061f9caf993f53e473ca092713c5f54621a9883a02e",
+      "declared_record_sha256": "c59fa81b34f5097a4903e4ff7af0ebad83ae50b79fb122e9029e4e6b83eb7f73",
+      "declared_record_sha256_verified": true
+    },
+    "data_audit": {
+      "path": ".audit/phase2_external_v3/sole_harmony_12p2s_3seed_b2dae/oracle_temporal/data_audit.json",
+      "file_sha256": "081c3ddeedf998e5fabca158691aa98cdfb3ff4cf09b74a0f31d477e1cf78b2d",
+      "declared_record_sha256_present": false
+    },
+    "launch_receipt": {
+      "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/launch.json",
+      "file_sha256": "74f5d901469cadc2ace6363e5c38ffac094665d73168ccde3a97ad42dacc223c"
+    },
+    "launcher_stdout": {
+      "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stdout.log",
+      "file_sha256": "be93aa2012e35415932a63e09a64804cee22c8d06e8c384cdf70e75d3e008765",
+      "only_event": "frozen_campaign_started"
+    },
+    "launcher_stderr": {
+      "path": ".audit/phase2_external_v3/commands/sole_harmony_retry_b2dae/stderr.log",
+      "file_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "empty": true
+    }
+  },
+  "materialized_data_audit": {
+    "created_at_utc": "2026-09-05T07:38:55.423145+00:00",
+    "dataset_id": "sole_harmony_v1",
+    "provider_record": "Zenodo record 19242395 v1",
+    "channel_lane": "derived-gravity-9ch",
+    "sampling_rate_hz": 50.0,
+    "window_samples": 128,
+    "participants": [
+      "C001",
+      "C002",
+      "C003",
+      "C004",
+      "C005",
+      "C006",
+      "C007",
+      "C008",
+      "C009",
+      "C010",
+      "C011",
+      "C012"
+    ],
+    "participant_count": 12,
+    "sessions": [
+      "C001_1658420327",
+      "C001_1658503124",
+      "C002_1664294172",
+      "C002_1664467881",
+      "C003_1668701944",
+      "C003_1668783622",
+      "C004_1677264630",
+      "C004_1677687630",
+      "C005_1680104194",
+      "C005_1680277210",
+      "C006_1679350219",
+      "C006_1679412041",
+      "C007_1687882716",
+      "C007_1688053718",
+      "C008_1698249389",
+      "C008_1698330104",
+      "C009_1694808483",
+      "C009_1695058694",
+      "C010_1697042162",
+      "C010_1697479613",
+      "C011_1752511995",
+      "C011_1752762088",
+      "C012_1752674229",
+      "C012_1752759378"
+    ],
+    "session_count": 24,
+    "trial_count": 3137,
+    "window_count": 137997,
+    "source_receipt_count": 48,
+    "class_window_counts": {
+      "mobility": 15964,
+      "sitting": 104810,
+      "standing": 17223
+    },
+    "participant_class_support": {
+      "mobility": 12,
+      "sitting": 12,
+      "standing": 12
+    },
+    "participants_with_all_classes": 12,
+    "perfect_prediction_mean_participant_macro_f1_ceiling": 1.0,
+    "exclusion_count": 0,
+    "source_issue_count": 134,
+    "source_issue_protocol_id": "sole-harmony-zero-duration-unknown-v1",
+    "source_issue_disposition": "zero-duration unknown camera markers omitted; positive-duration bouts unchanged",
+    "excluded_duration_ms": 0,
+    "preprocessing_audit_entry_count": 0,
+    "raw_local_mirror": false
+  },
+  "terminal_artifact_observation": {
+    "run_files_present": [
+      "campaign_plan.json",
+      "oracle_temporal/data_audit.json"
+    ],
+    "result_json_present": false,
+    "predictions_present": false,
+    "failure_json_present": false,
+    "validation_json_present": false,
+    "campaign_complete_json_present": false,
+    "exit_receipt_present": false,
+    "score_available": false
+  },
+  "claim_contract": {
+    "boundary_lane": "camera_bout_oracle",
+    "annotation_boundaries_observable_at_inference": false,
+    "oracle_diagnostic_only": true,
+    "deployable_claim_allowed": false,
+    "confirmation_allowed": false,
+    "population_performance_claim_allowed": false,
+    "numerical_before_after_comparison_allowed": false,
+    "publication_table_score_row_allowed": false,
+    "materialized_coverage_may_be_reported": true,
+    "materialized_coverage_is_a_model_result": false
+  },
+  "preservation": {
+    "historical_files_deleted_or_overwritten": false,
+    "retained_audit_paths_are_local_evidence_not_release_payload": true,
+    "this_receipt_creates_a_score_or_validation": false
+  },
+  "smallest_clearance_action": "Launch a new create-only external-har-publication-v4 session-observable development temporal run and a separate camera-bout oracle diagnostic from a clean frozen commit; do not resume or overwrite this retained v3 directory.",
+  "record_sha256": "8075b08da583ef0a5b1b50ecfcb0866210d28e765b65cac2b55ed9618ed82152"
+}

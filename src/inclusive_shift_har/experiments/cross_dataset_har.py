@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import platform
 import sys
 import traceback
 from dataclasses import dataclass
@@ -21,6 +20,16 @@ import numpy as np
 import yaml
 from numpy.typing import NDArray
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
+    _publication_artifact_contract,
+    _publication_launch_context_binding,
+    _resolve_publication_launch_context,
+    _runtime_environment,
+    _source_manifest_commit_errors,
+    _write_launch_failure_envelope,
+    _write_self_hashed_json_create_only,
+)
 from inclusive_shift_har.artifacts.research_provenance import (
     _git_state as _git_state,
 )
@@ -36,23 +45,35 @@ from inclusive_shift_har.data.external_har import (
     load_fog_star,
     load_imu_har_il,
     observable_modelling_pool,
-    participant_fold_assignment,
 )
-from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
+from inclusive_shift_har.data.participant_partitions import ParticipantPartitionPlan
+from inclusive_shift_har.evaluation.inference_contracts import (
+    OBSERVABLE_CONTEXT_PROTOCOL,
+    OBSERVABLE_CONTEXT_TRAINING_PROTOCOL,
+)
 from inclusive_shift_har.experiments.cage_har import _report
 from inclusive_shift_har.experiments.cage_har_retrospective import (
-    _outer_context,
+    _outer_context as _outer_context,
+)
+from inclusive_shift_har.experiments.cage_har_retrospective import (
     evaluate_cage_outer_arrays,
 )
 from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
     _ESTIMATOR_ORDER,
-    _VIEW_ORDER,
-    _candidates,
     _feature_views,
     _fit_base,
     _fit_expert,
     _gravity_probability,
     _selection_order,
+)
+from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
+    _VIEW_ORDER as _VIEW_ORDER,
+)
+from inclusive_shift_har.experiments.confidence_triggered_gravity_residual import (
+    _candidates as _candidates,
+)
+from inclusive_shift_har.experiments.external_evidence_validate import (
+    validate_and_record_run_directory,
 )
 from inclusive_shift_har.experiments.hera_ctgr_retrospective import (
     _apply_calibration,
@@ -83,6 +104,9 @@ from inclusive_shift_har.models.classical import (
     predict_classical_probabilities,
 )
 from inclusive_shift_har.models.hera_ctgr import (
+    GravityKinematicContext,
+    PhysicsReference,
+    ResponderSignatures,
     apply_physics_reference,
     apply_physics_veto,
     build_responder_signatures,
@@ -137,6 +161,23 @@ class _InnerPredictions:
     folds: tuple[dict[str, Any], ...]
 
 
+@dataclass(frozen=True, slots=True)
+class _ObservableClassicalSeedPredictions:
+    """One seed's outer-fold predictions over the complete observable pool.
+
+    Labels at positions outside ``supervised_eligibility`` are placeholders.  They
+    may not enter fitting or scoring, but their sensor windows remain in the held-out
+    inference population so downstream causal state cannot skip annotation-ineligible
+    candidates.
+    """
+
+    data: ExternalHARWindows
+    scoring_indices: IntArray
+    supervised_eligibility: BoolArray
+    probabilities: dict[str, FloatArray]
+    record: dict[str, Any]
+
+
 def _read_mapping(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(value, dict) or any(not isinstance(key, str) for key in value):
@@ -164,6 +205,64 @@ def _participant_mask(participants: StringArray, selected: set[str]) -> BoolArra
     return np.asarray(np.isin(participants, sorted(selected)), dtype=np.bool_)
 
 
+def _outer_population_masks(
+    evaluation: BoolArray, supervised_eligibility: BoolArray
+) -> tuple[BoolArray, BoolArray]:
+    """Keep inference-context membership independent of annotation eligibility."""
+
+    if (
+        evaluation.shape != supervised_eligibility.shape
+        or evaluation.ndim != 1
+        or evaluation.dtype != np.bool_
+        or supervised_eligibility.dtype != np.bool_
+    ):
+        raise ValueError("outer evaluation and eligibility masks must be aligned booleans")
+    training_candidates = np.asarray(~evaluation, dtype=np.bool_)
+    supervised_training = np.asarray(training_candidates & supervised_eligibility, dtype=np.bool_)
+    return training_candidates, supervised_training
+
+
+def _fit_observable_physics_reference(
+    context: GravityKinematicContext,
+    observable_training_candidates: BoolArray,
+    *,
+    veto_quantile: float,
+    minimum_valid_pair_fraction: float,
+) -> PhysicsReference:
+    """Fit signal-only physics thresholds on the complete observable training pool."""
+
+    if (
+        observable_training_candidates.ndim != 1
+        or observable_training_candidates.dtype != np.bool_
+        or observable_training_candidates.shape[0] != context.features.shape[0]
+        or context.normalized_residual_p90.shape != observable_training_candidates.shape
+        or context.valid_pair_fraction.shape != observable_training_candidates.shape
+    ):
+        raise ValueError("physics-reference candidate mask must align with kinematic context")
+    return fit_physics_reference(
+        _slice_context(context, observable_training_candidates),
+        veto_quantile=veto_quantile,
+        minimum_valid_pair_fraction=minimum_valid_pair_fraction,
+    )
+
+
+def _responder_supervision_rows(
+    signatures: ResponderSignatures, supervised_participants: StringArray
+) -> tuple[FloatArray, StringArray, list[str]]:
+    """Retain all context signatures but fit utilities only where labels exist."""
+
+    supervised = set(np.asarray(supervised_participants, dtype=np.str_).tolist())
+    available = set(signatures.participant_ids.tolist())
+    if not supervised or not supervised.issubset(available):
+        raise ValueError("supervised responder participant lacks an observable signature")
+    selected = np.asarray(np.isin(signatures.participant_ids, sorted(supervised)), dtype=np.bool_)
+    return (
+        np.asarray(signatures.features[selected], dtype=np.float64),
+        np.asarray(signatures.participant_ids[selected], dtype=np.str_),
+        sorted(available - supervised),
+    )
+
+
 def _inner_oof_and_selection(
     *,
     rmrp: FloatArray,
@@ -172,17 +271,28 @@ def _inner_oof_and_selection(
     labels: IntArray,
     participants: StringArray,
     outer_training: BoolArray,
+    outer_training_candidates: BoolArray,
     candidates: list[dict[str, Any]],
     outer_index: int,
     seed: int,
     inner_fold_count: int,
     n_jobs: int,
+    partition_plan: ParticipantPartitionPlan,
+    prewindow_training_ids: tuple[str, ...],
+    assignment_role: str,
 ) -> _InnerPredictions:
-    training_ids = sorted(np.unique(participants[outer_training]).tolist())
-    assignment = participant_fold_assignment(
+    if (
+        outer_training.shape != labels.shape
+        or outer_training_candidates.shape != labels.shape
+        or np.any(outer_training & ~outer_training_candidates)
+    ):
+        raise ValueError("inner supervised and observable-candidate masks do not align")
+    training_ids = list(prewindow_training_ids)
+    assignment = partition_plan.resolve(
         training_ids,
         fold_count=inner_fold_count,
         seed=seed + 10_000 + outer_index,
+        role=assignment_role,
     )
     base = np.full((labels.size, 3), np.nan, dtype=np.float64)
     keys = tuple((view, estimator) for view in _VIEW_ORDER for estimator in _ESTIMATOR_ORDER)
@@ -194,60 +304,83 @@ def _inner_oof_and_selection(
         validation_ids = {
             participant for participant, fold in assignment.items() if fold == inner_index
         }
-        validation = outer_training & _participant_mask(participants, validation_ids)
-        training = outer_training & ~validation
-        if np.any(training & validation) or not validation.any():
-            raise PermissionError("inner participant partitions overlap or are empty")
+        validation_participants = _participant_mask(participants, validation_ids)
+        validation_candidates = outer_training_candidates & validation_participants
+        validation = outer_training & validation_participants
+        training = outer_training & ~validation_participants
+        if np.any(training & validation_candidates):
+            raise PermissionError("inner participant partitions overlap")
         if set(np.unique(labels[training]).tolist()) != {0, 1, 2}:
             raise ValueError("an inner training fold lacks one of the three core classes")
-        base_model = _fit_base(
-            rmrp,
-            labels,
-            participants,
-            training,
-            seed=seed + 101 * outer_index + inner_index,
-            n_jobs=n_jobs,
-        )
-        fold_base = _three_probabilities(base_model, rmrp[validation])
-        base[validation] = fold_base
-        for key_index, (view, estimator) in enumerate(keys):
-            expert_model = _fit_expert(
-                estimator,
-                views[view],
+        if validation_candidates.any():
+            base_model = _fit_base(
+                rmrp,
                 labels,
                 participants,
                 training,
-                seed=seed + 1_000 * outer_index + 37 * key_index + inner_index,
+                seed=seed + 101 * outer_index + inner_index,
                 n_jobs=n_jobs,
             )
-            expert_by_key[(view, estimator)][validation] = _gravity_probability(
-                fold_base, expert_model, views[view][validation]
+            fold_base = _three_probabilities(base_model, rmrp[validation_candidates])
+            base[validation_candidates] = fold_base
+            for key_index, (view, estimator) in enumerate(keys):
+                expert_model = _fit_expert(
+                    estimator,
+                    views[view],
+                    labels,
+                    participants,
+                    training,
+                    seed=seed + 1_000 * outer_index + 37 * key_index + inner_index,
+                    n_jobs=n_jobs,
+                )
+                expert_by_key[(view, estimator)][validation_candidates] = _gravity_probability(
+                    fold_base, expert_model, views[view][validation_candidates]
+                )
+            dual_model = _fit_expert(
+                "extra_trees_leaf3",
+                dual_features,
+                labels,
+                participants,
+                training,
+                seed=seed + 7_001 + 101 * outer_index + inner_index,
+                n_jobs=n_jobs,
             )
-        dual_model = _fit_expert(
-            "extra_trees_leaf3",
-            dual_features,
-            labels,
-            participants,
-            training,
-            seed=seed + 7_001 + 101 * outer_index + inner_index,
-            n_jobs=n_jobs,
-        )
-        dual_expert[validation] = compose_mobility_posture_probabilities(
-            fold_base[:, 0], _positive_probability(dual_model, dual_features[validation])
-        )
-        covered[validation] = True
+            dual_expert[validation_candidates] = compose_mobility_posture_probabilities(
+                fold_base[:, 0],
+                _positive_probability(dual_model, dual_features[validation_candidates]),
+            )
+            covered[validation_candidates] = True
         fold_records.append(
             {
                 "inner_fold": inner_index,
-                "training_participants": sorted(np.unique(participants[training]).tolist()),
+                "training_participants": sorted(set(training_ids) - validation_ids),
+                "training_participants_with_supervision": sorted(
+                    np.unique(participants[training]).tolist()
+                ),
                 "validation_participants": sorted(validation_ids),
+                "validation_participants_with_supervision": sorted(
+                    np.unique(participants[validation]).tolist()
+                ),
+                "validation_participants_with_candidates": sorted(
+                    np.unique(participants[validation_candidates]).tolist()
+                ),
+                "validation_candidate_window_count": int(validation_candidates.sum()),
+                "validation_scored_window_count": int(validation.sum()),
+                "participant_partition_plan_sha256": partition_plan.audit()["plan_sha256"],
                 "outer_evaluation_labels_accessed": False,
             }
         )
-    if not np.array_equal(covered, outer_training):
-        raise PermissionError("inner folds did not cover each outer-training window exactly once")
-    if not np.isfinite(base[outer_training]).all() or any(
-        not np.isfinite(value[outer_training]).all() for value in expert_by_key.values()
+    if not np.array_equal(covered, outer_training_candidates):
+        raise PermissionError(
+            "inner folds did not cover each outer-training candidate exactly once"
+        )
+    if (
+        not np.isfinite(base[outer_training_candidates]).all()
+        or any(
+            not np.isfinite(value[outer_training_candidates]).all()
+            for value in expert_by_key.values()
+        )
+        or not np.isfinite(dual_expert[outer_training_candidates]).all()
     ):
         raise ValueError("inner OOF prediction matrix is incomplete")
 
@@ -387,12 +520,18 @@ def _classical_outer_predictions(
     training: BoolArray,
     evaluation: BoolArray,
     seed: int,
+    methods: tuple[str, ...] = _CLASSICAL_METHODS,
 ) -> dict[str, FloatArray]:
+    unknown = sorted(set(methods) - set(_CLASSICAL_METHODS))
+    if unknown or not methods:
+        raise ValueError(f"unknown or empty classical method subset: {unknown}")
     output: dict[str, FloatArray] = {}
     for model_name, result_name in (
         ("random_forest", "RandomForest-6ch"),
         ("xgboost", "XGBoost-6ch"),
     ):
+        if result_name not in methods:
+            continue
         fitted = fit_classical_model(
             data.signals[training],
             data.labels[training],
@@ -413,6 +552,131 @@ def _classical_outer_predictions(
     return output
 
 
+def _observable_classical_seed_predictions(
+    data: ExternalHARWindows,
+    *,
+    seed: int,
+    methods: tuple[str, ...] = ("XGBoost-6ch",),
+    outer_fold_count: int = 5,
+    inner_fold_count: int = 4,
+) -> _ObservableClassicalSeedPredictions:
+    """Fit fixed classical controls and predict every held-out observable candidate.
+
+    This is an internal bridge for temporal evaluation.  The established public
+    ``evaluate_external_development`` return contract remains scored-window-only.
+    The inner folds are recorded from the frozen pre-window plan for split audit,
+    but fixed classical controls perform no tuning or selection in those folds.
+    """
+
+    data.validate()
+    if data.participant_partition_plan is None:
+        raise PermissionError("external evaluation requires a pre-window participant plan")
+    partition_plan = data.participant_partition_plan
+    partition_plan.validate()
+    modelling, scoring_indices, supervised_eligibility = observable_modelling_pool(
+        data, include_supervised_labels=True
+    )
+    if (
+        scoring_indices.ndim != 1
+        or scoring_indices.size != data.labels.size
+        or np.any(np.diff(scoring_indices) <= 0)
+        or not np.array_equal(modelling.window_ids[scoring_indices], data.window_ids)
+    ):
+        raise ValueError("scored windows are not an ordered subset of the observable pool")
+    assignment = partition_plan.resolve(
+        partition_plan.participant_roster,
+        fold_count=outer_fold_count,
+        seed=seed,
+        role="outer",
+    )
+    probabilities = {
+        name: np.full((modelling.labels.size, len(data.class_names)), np.nan, dtype=np.float64)
+        for name in methods
+    }
+    plan_sha256 = str(partition_plan.audit()["plan_sha256"])
+    folds: list[dict[str, Any]] = []
+    for outer_index in range(outer_fold_count):
+        evaluation_ids = {
+            participant for participant, fold in assignment.items() if fold == outer_index
+        }
+        training_ids = tuple(sorted(set(assignment) - evaluation_ids))
+        evaluation = _participant_mask(modelling.participant_ids, evaluation_ids)
+        training = (~evaluation) & supervised_eligibility
+        if not evaluation.any():
+            raise ValueError("an outer fold has no observable inference candidates")
+        if set(np.unique(modelling.labels[training]).tolist()) != set(range(len(data.class_names))):
+            raise ValueError("outer training partition lacks a class required by the ontology")
+        fold_probability = _classical_outer_predictions(
+            modelling,
+            training=training,
+            evaluation=evaluation,
+            seed=seed + outer_index,
+            methods=methods,
+        )
+        for method, values in fold_probability.items():
+            probabilities[method][evaluation] = values
+
+        inner_assignment = partition_plan.resolve(
+            training_ids,
+            fold_count=inner_fold_count,
+            seed=seed + 10_000 + outer_index,
+            role=f"classical_inner_outer_{outer_index}",
+        )
+        inner_folds: list[dict[str, Any]] = []
+        for inner_index in range(inner_fold_count):
+            validation_ids = {
+                participant for participant, fold in inner_assignment.items() if fold == inner_index
+            }
+            inner_folds.append(
+                {
+                    "inner_fold": inner_index,
+                    "training_participants": sorted(set(training_ids) - validation_ids),
+                    "validation_participants": sorted(validation_ids),
+                    "participant_partition_plan_sha256": plan_sha256,
+                    "role": "predeclared_split_audit_only_no_classical_tuning",
+                }
+            )
+        folds.append(
+            {
+                "outer_fold": outer_index,
+                "training_participants": list(training_ids),
+                "training_participants_with_supervision": sorted(
+                    np.unique(modelling.participant_ids[training]).tolist()
+                ),
+                "evaluation_participants": sorted(evaluation_ids),
+                "evaluation_participants_with_candidates": sorted(
+                    np.unique(modelling.participant_ids[evaluation]).tolist()
+                ),
+                "evaluation_participants_with_scoring": sorted(
+                    np.unique(
+                        modelling.participant_ids[evaluation & supervised_eligibility]
+                    ).tolist()
+                ),
+                "participant_partition_plan_sha256": plan_sha256,
+                "evaluation_candidate_window_count": int(evaluation.sum()),
+                "evaluation_scored_window_count": int(np.sum(evaluation & supervised_eligibility)),
+                "evaluation_activity_labels_passed_to_model_fit_or_prediction": False,
+                "fixed_classical_hyperparameter_trials": 0,
+                "inner_folds": inner_folds,
+            }
+        )
+    if any(not np.isfinite(values).all() for values in probabilities.values()):
+        raise ValueError("outer classical observable-pool probability coverage is incomplete")
+    return _ObservableClassicalSeedPredictions(
+        data=modelling,
+        scoring_indices=scoring_indices,
+        supervised_eligibility=supervised_eligibility,
+        probabilities=probabilities,
+        record={
+            "seed": seed,
+            "participant_partition_plan_sha256": plan_sha256,
+            "observable_candidate_window_count": int(modelling.labels.size),
+            "scored_window_count": int(scoring_indices.size),
+            "folds": folds,
+        },
+    )
+
+
 def _evaluate_seed(
     data: ExternalHARWindows,
     *,
@@ -423,6 +687,10 @@ def _evaluate_seed(
     repository_root: Path,
     include_classical: bool,
 ) -> tuple[dict[str, FloatArray], dict[str, Any]]:
+    if data.participant_partition_plan is None:
+        raise PermissionError("external evaluation requires a pre-window participant plan")
+    partition_plan = data.participant_partition_plan
+    partition_plan.validate()
     data, scoring_indices, supervised_eligibility = observable_modelling_pool(
         data, include_supervised_labels=True
     )
@@ -457,8 +725,11 @@ def _evaluate_seed(
             "fixed_method"
         ],
     )
-    assignment = participant_fold_assignment(
-        np.unique(participants).tolist(), fold_count=outer_fold_count, seed=seed
+    assignment = partition_plan.resolve(
+        partition_plan.participant_roster,
+        fold_count=outer_fold_count,
+        seed=seed,
+        role="outer",
     )
     active_methods = _METHODS if include_classical else _INVENTION_METHODS
     probability = {
@@ -470,7 +741,8 @@ def _evaluate_seed(
             participant for participant, fold in assignment.items() if fold == outer_index
         }
         evaluation = _participant_mask(participants, evaluation_ids)
-        training = (~evaluation) & supervised_eligibility
+        training_candidates, training = _outer_population_masks(evaluation, supervised_eligibility)
+        prewindow_training_ids = tuple(sorted(set(assignment) - evaluation_ids))
         if set(np.unique(labels[training]).tolist()) != {0, 1, 2}:
             raise ValueError("outer training partition lacks a core class")
         inner = _inner_oof_and_selection(
@@ -480,11 +752,15 @@ def _evaluate_seed(
             labels=labels,
             participants=participants,
             outer_training=training,
+            outer_training_candidates=training_candidates,
             candidates=candidates,
             outer_index=outer_index,
             seed=seed,
             inner_fold_count=inner_fold_count,
             n_jobs=n_jobs,
+            partition_plan=partition_plan,
+            prewindow_training_ids=prewindow_training_ids,
+            assignment_role=f"classical_inner_outer_{outer_index}",
         )
         base_model = _fit_base(
             rmrp,
@@ -564,15 +840,22 @@ def _evaluate_seed(
         context, cage_reliability, channel_scale = _outer_context(
             signals,
             gravity,
-            training,
+            training_candidates,
             sampling_rate_hz=data.sampling_rate_hz,
         )
-        all_base = np.concatenate((inner.base[training], outer_base), axis=0)
-        all_expert = np.concatenate((inner_selected_expert, outer_selected_expert), axis=0)
-        all_ctgr = np.concatenate((inner_ctgr, outer_ctgr), axis=0)
-        all_context = np.concatenate((context[training], context[evaluation]), axis=0)
+        training_candidate_expert = inner.expert_by_key[selected_expert_key][training_candidates]
+        training_candidate_ctgr = _candidate_probability(
+            inner.base[training_candidates],
+            {key: value[training_candidates] for key, value in inner.expert_by_key.items()},
+            inner.selected_candidate,
+        )
+        all_base = np.concatenate((inner.base[training_candidates], outer_base), axis=0)
+        all_expert = np.concatenate((training_candidate_expert, outer_selected_expert), axis=0)
+        all_ctgr = np.concatenate((training_candidate_ctgr, outer_ctgr), axis=0)
+        all_context = np.concatenate((context[training_candidates], context[evaluation]), axis=0)
         all_reliability = np.concatenate(
-            (cage_reliability[training], cage_reliability[evaluation]), axis=0
+            (cage_reliability[training_candidates], cage_reliability[evaluation]),
+            axis=0,
         )
         cage_methods, cage_diagnostics, cage_arrays = evaluate_cage_outer_arrays(
             training_base_probability=inner.base[training],
@@ -589,18 +872,25 @@ def _evaluate_seed(
             expert_name=str(inner.selected_expert_candidate["id"]),
             cage_config=cage_config,
         )
-        training_count = int(training.sum())
-        broad_training = cage_methods["global_trust_blend"][:training_count]
-        broad_evaluation = cage_methods["global_trust_blend"][training_count:]
-        cage_evaluation = cage_methods["cage_har"][training_count:]
+        training_candidate_count = int(training_candidates.sum())
+        broad_training_candidates = cage_methods["global_trust_blend"][:training_candidate_count]
+        broad_evaluation = cage_methods["global_trust_blend"][training_candidate_count:]
+        cage_evaluation = cage_methods["cage_har"][training_candidate_count:]
+        training_candidate_eligibility = supervised_eligibility[training_candidates]
+        broad_training = broad_training_candidates[training_candidate_eligibility]
 
-        physics_reference = fit_physics_reference(
-            _slice_context(kinematic, training),
+        physics_minimum_valid_pair_fraction = float(v1_fixed["physics_minimum_valid_pair_fraction"])
+        physics_reference = _fit_observable_physics_reference(
+            kinematic,
+            training_candidates,
             veto_quantile=float(v1_fixed["physics_veto_quantile"]),
-            minimum_valid_pair_fraction=float(v1_fixed["physics_minimum_valid_pair_fraction"]),
+            minimum_valid_pair_fraction=physics_minimum_valid_pair_fraction,
         )
         physics_training = apply_physics_reference(
             _slice_context(kinematic, training), physics_reference
+        )
+        physics_training_candidates = apply_physics_reference(
+            _slice_context(kinematic, training_candidates), physics_reference
         )
         physics_evaluation = apply_physics_reference(
             _slice_context(kinematic, evaluation), physics_reference
@@ -620,14 +910,17 @@ def _evaluate_seed(
             outer_base, strict_pre_veto, physics_evaluation.trusted
         )
         training_signatures = build_responder_signatures(
-            inner.base[training],
-            inner_selected_expert,
-            inner_ctgr,
-            broad_training,
-            participants[training],
-            gravity_reliability=reliability_training,
-            kinematic_context=_slice_context(kinematic, training),
-            physics_trusted=physics_training.trusted,
+            inner.base[training_candidates],
+            training_candidate_expert,
+            training_candidate_ctgr,
+            broad_training_candidates,
+            participants[training_candidates],
+            gravity_reliability=np.minimum(
+                cage_reliability[training_candidates],
+                physics_training_candidates.reliability,
+            ),
+            kinematic_context=_slice_context(kinematic, training_candidates),
+            physics_trusted=physics_training_candidates.trusted,
             low_confidence_threshold=float(v1_fixed["responder_low_confidence_threshold"]),
         )
         evaluation_signatures = build_responder_signatures(
@@ -641,17 +934,22 @@ def _evaluate_seed(
             physics_trusted=physics_evaluation.trusted,
             low_confidence_threshold=float(v1_fixed["responder_low_confidence_threshold"]),
         )
+        (
+            responder_training_features,
+            responder_training_ids,
+            responder_context_participants_without_supervision,
+        ) = _responder_supervision_rows(training_signatures, np.unique(participants[training]))
         base_utility, broad_utility = _utility_targets(
             labels[training],
             participants[training],
             inner.base[training],
             inner_ctgr,
             broad_training,
-            training_signatures.participant_ids,
+            responder_training_ids,
         )
         safe_route = _controller(
-            training_features=training_signatures.features,
-            training_ids=training_signatures.participant_ids,
+            training_features=responder_training_features,
+            training_ids=responder_training_ids,
             base_utility=base_utility,
             broad_utility=broad_utility,
             evaluation_features=evaluation_signatures.features,
@@ -665,8 +963,8 @@ def _evaluate_seed(
             lower_bound_z=float(v1_fixed["responder_safe_lower_bound_z"]),
         )
         meta_probability, meta_state, meta_veto = _meta_training_controller(
-            signatures=training_signatures.features,
-            signature_ids=training_signatures.participant_ids,
+            signatures=responder_training_features,
+            signature_ids=responder_training_ids,
             base_utility=base_utility,
             broad_utility=broad_utility,
             base=inner.base[training],
@@ -788,11 +1086,27 @@ def _evaluate_seed(
         fold_records.append(
             {
                 "outer_fold": outer_index,
-                "training_participants": sorted(np.unique(participants[training]).tolist()),
+                "training_participants": list(prewindow_training_ids),
+                "training_participants_with_supervision": sorted(
+                    np.unique(participants[training]).tolist()
+                ),
+                "training_participants_with_candidates": sorted(
+                    np.unique(participants[training_candidates]).tolist()
+                ),
                 "evaluation_participants": sorted(evaluation_ids),
+                "participant_partition_plan_sha256": partition_plan.audit()["plan_sha256"],
                 "evaluation_candidate_window_count": int(evaluation.sum()),
                 "evaluation_scored_window_count": int((evaluation & supervised_eligibility).sum()),
-                "context_event_population": "all supplied observable candidates of evaluation participants",
+                "training_candidate_window_count": int(training_candidates.sum()),
+                "training_scored_window_count": int(training.sum()),
+                "responder_training_participants": responder_training_ids.tolist(),
+                "responder_context_participants_without_supervision": (
+                    responder_context_participants_without_supervision
+                ),
+                "context_event_population": (
+                    "all observable candidates of both inner-held-out training and "
+                    "outer-held-out evaluation participants"
+                ),
                 "selected_ctgr_candidate": str(inner.selected_candidate["id"]),
                 "selected_cage_expert": str(inner.selected_expert_candidate["id"]),
                 "top_three_hera_candidates": [
@@ -803,11 +1117,21 @@ def _evaluate_seed(
                 "inner_folds": list(inner.folds),
                 "cage_diagnostics": cage_diagnostics,
                 "cage_evaluation_route_count": int(
-                    np.sum(cage_arrays["cage_har_route_mask"][training_count:])
+                    np.sum(cage_arrays["cage_har_route_mask"][training_candidate_count:])
                 ),
                 "channel_scale_fit_on_outer_training": channel_scale.tolist(),
+                "channel_scale_fit_population": ("all_observable_outer_training_candidates"),
+                "channel_scale_fit_candidate_window_count": int(training_candidates.sum()),
                 "physics_reference_threshold": (
                     physics_reference.normalized_residual_p90_threshold
+                ),
+                "physics_reference_fit_population": ("all_observable_outer_training_candidates"),
+                "physics_reference_fit_candidate_window_count": int(training_candidates.sum()),
+                "physics_reference_fit_signal_valid_window_count": int(
+                    np.sum(
+                        kinematic.valid_pair_fraction[training_candidates]
+                        >= physics_minimum_valid_pair_fraction
+                    )
                 ),
                 "physics_evaluation_trusted_fraction": float(physics_evaluation.trusted.mean()),
                 "hera_v1_strict_calibration": strict_selection,
@@ -966,6 +1290,7 @@ def evaluate_external_development(
         "schema_version": "1.0.0",
         "experiment_id": "cross-dataset-har-rnd-v1",
         "observable_context_protocol": OBSERVABLE_CONTEXT_PROTOCOL,
+        "observable_context_training_protocol": OBSERVABLE_CONTEXT_TRAINING_PROTOCOL,
         "dataset": data.summary(),
         "evidence_status": "EXTERNAL_DEVELOPMENT_NOT_CONFIRMATORY",
         "method_lane": "derived-gravity adaptations",
@@ -1001,17 +1326,32 @@ def run_and_write(
     seeds: tuple[int, ...],
     n_jobs: int,
     include_classical: bool,
+    inherited_launch_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Execute the run in a create-only directory and retain success or failure evidence."""
 
-    git_at_launch = _git_state(repository_root)
-    source_input_manifest = _source_input_manifest(repository_root)
+    if seeds != (11, 23, 47):
+        raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+    if not include_classical:
+        raise ValueError("publication evidence requires the complete classical control matrix")
+    git_at_launch, source_input_manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=repository_root,
+        output_directory=output_directory,
+        current_git_state=_git_state(repository_root),
+        current_source_manifest=_source_input_manifest(repository_root),
+        manifest_commit_validator=_source_manifest_commit_errors,
+        inherited_launch_context=inherited_launch_context,
+    )
+    launch_context_binding = _publication_launch_context_binding(launch_context)
     output_directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
+    dataset_summary = data.summary()
+    evidence_status = _external_evidence_status(dataset_summary)
     audit = {
         "schema_version": "1.0.0",
         "created_at": started,
-        "dataset": data.summary(),
+        "dataset": dataset_summary,
+        "artifact_evidence_status": evidence_status,
         "source_receipts": [item.to_dict() for item in data.receipts],
         "storage_disclosure": {
             "raw_local_mirror": False,
@@ -1019,8 +1359,12 @@ def run_and_write(
         },
         "source_input_manifest": source_input_manifest,
         "git_at_launch": git_at_launch,
+        "publication_launch_context": launch_context_binding,
     }
-    _write_json_create_only(output_directory / "data_audit.json", audit)
+    data_audit_artifact = _write_self_hashed_json_create_only(
+        output_directory / "data_audit.json", audit
+    )
+    artifact_contract = _publication_artifact_contract(source_input_manifest, data_audit_artifact)
     try:
         result, predictions = evaluate_external_development(
             data,
@@ -1043,16 +1387,24 @@ def run_and_write(
                 f"probability__{name}": value for name, value in predictions.items()
             },
         )
+        _resolve_publication_launch_context(
+            repository_root=repository_root,
+            output_directory=output_directory,
+            current_git_state=_git_state(repository_root),
+            current_source_manifest=_source_input_manifest(repository_root),
+            manifest_commit_validator=_source_manifest_commit_errors,
+            inherited_launch_context=launch_context,
+        )
         result["created_at"] = datetime.now(UTC).isoformat()
         result["started_at"] = started
         result["git"] = _git_state(repository_root)
         result["git_at_launch"] = git_at_launch
         result["source_input_manifest"] = source_input_manifest
-        result["environment"] = {
-            "python": platform.python_version(),
-            "platform": platform.platform(),
-            "numpy": np.__version__,
-        }
+        result["publication_launch_context"] = launch_context_binding
+        result["environment"] = _runtime_environment()
+        result["artifact_evidence_status"] = evidence_status
+        result["data_audit_artifact"] = data_audit_artifact
+        result["artifact_contract"] = artifact_contract
         result["inputs"] = {
             "portfolio_config": {
                 "path": "configs/datasets/external_har_portfolio_v1.yaml",
@@ -1073,7 +1425,6 @@ def run_and_write(
         }
         result["result_payload_sha256_before_serialization"] = canonical_json_sha256(result)
         _write_json_create_only(output_directory / "result.json", result)
-        return result
     except Exception as exc:
         failure = {
             "schema_version": "1.0.0",
@@ -1085,9 +1436,22 @@ def run_and_write(
             "traceback": traceback.format_exc(),
             "git": _git_state(repository_root),
             "git_at_launch": git_at_launch,
+            "source_input_manifest": source_input_manifest,
+            "publication_launch_context": launch_context_binding,
+            "environment": _runtime_environment(),
+            "artifact_evidence_status": evidence_status,
+            "data_audit_artifact": data_audit_artifact,
+            "artifact_contract": artifact_contract,
         }
-        _write_json_create_only(output_directory / "failure.json", failure)
+        _write_self_hashed_json_create_only(
+            output_directory / "failure.json",
+            failure,
+            hash_field="failure_payload_sha256_before_serialization",
+        )
+        validate_and_record_run_directory(output_directory, repository_root)
         raise
+    validate_and_record_run_directory(output_directory, repository_root)
+    return result
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -1111,41 +1475,71 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     root = args.repository_root.resolve()
-    experiment_config = _read_mapping(root / "configs/experiments/cross_dataset_har_rnd_v1.yaml")
-    preprocessing = cast(dict[str, Any], experiment_config["preprocessing"])
-    derived = cast(dict[str, Any], preprocessing["derived_gravity"])
-    declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
-    gravity_cutoff_hz = (
-        float(derived["cutoff_hz"])
-        if args.gravity_cutoff_hz is None
-        else float(args.gravity_cutoff_hz)
-    )
-    if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
-        raise ValueError(
-            f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
-            f"{declared_cutoffs}"
-        )
-    common = {
-        "participant_limit": args.participant_limit,
-        "target_rate_hz": float(preprocessing["target_sampling_rate_hz"]),
-        "window_samples": int(preprocessing["window_samples"]),
-        "gravity_cutoff_hz": gravity_cutoff_hz,
-    }
-    if args.dataset == "fog-star":
-        data = load_fog_star(**common)
-    else:
-        data = load_imu_har_il(
-            **common,
-            repetition_limit=args.repetition_limit,
-        )
-    result = run_and_write(
-        data=data,
-        output_directory=args.output_directory.resolve(),
+    output_directory = args.output_directory.resolve()
+    _launch, _manifest, launch_context = _resolve_publication_launch_context(
         repository_root=root,
-        seeds=tuple(args.seeds),
-        n_jobs=args.n_jobs,
-        include_classical=not args.skip_classical,
+        output_directory=output_directory,
+        current_git_state=_git_state(root),
+        current_source_manifest=_source_input_manifest(root),
+        manifest_commit_validator=_source_manifest_commit_errors,
     )
+    started = datetime.now(UTC).isoformat()
+    stage = "configuration"
+    try:
+        if tuple(args.seeds) != (11, 23, 47):
+            raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+        experiment_config = _read_mapping(
+            root / "configs/experiments/cross_dataset_har_rnd_v1.yaml"
+        )
+        preprocessing = cast(dict[str, Any], experiment_config["preprocessing"])
+        derived = cast(dict[str, Any], preprocessing["derived_gravity"])
+        declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
+        gravity_cutoff_hz = (
+            float(derived["cutoff_hz"])
+            if args.gravity_cutoff_hz is None
+            else float(args.gravity_cutoff_hz)
+        )
+        if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
+            raise ValueError(
+                f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
+                f"{declared_cutoffs}"
+            )
+        common = {
+            "participant_limit": args.participant_limit,
+            "target_rate_hz": float(preprocessing["target_sampling_rate_hz"]),
+            "window_samples": int(preprocessing["window_samples"]),
+            "gravity_cutoff_hz": gravity_cutoff_hz,
+        }
+        stage = "dataset_acquisition"
+        if args.dataset == "fog-star":
+            data = load_fog_star(**common)
+        else:
+            data = load_imu_har_il(
+                **common,
+                repetition_limit=args.repetition_limit,
+            )
+        stage = "experiment_writer"
+        result = run_and_write(
+            data=data,
+            output_directory=output_directory,
+            repository_root=root,
+            seeds=tuple(args.seeds),
+            n_jobs=args.n_jobs,
+            include_classical=not args.skip_classical,
+            inherited_launch_context=launch_context,
+        )
+    except Exception as error:
+        if not output_directory.exists():
+            _write_launch_failure_envelope(
+                repository_root=root,
+                output_directory=output_directory,
+                launch_context=launch_context,
+                started_at=started,
+                stage=stage,
+                exception=error,
+                traceback_text=traceback.format_exc(),
+            )
+        raise
     summary = {
         name: values["mean_participant_macro_f1"]
         for name, values in result["primary_seed_averaged"]["methods"].items()

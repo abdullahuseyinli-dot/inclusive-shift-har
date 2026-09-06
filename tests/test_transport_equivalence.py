@@ -10,6 +10,9 @@ from typing import Any
 import numpy as np
 import pytest
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    HAR_PMD_FULL_PARTICIPANT_ROSTER,
+)
 from inclusive_shift_har.data import provider_copy
 from inclusive_shift_har.evaluation.external_statistics import (
     ParticipantMetricInputs,
@@ -24,18 +27,23 @@ from inclusive_shift_har.manifests.canonical import canonical_json_sha256
 def fixture(
     monkeypatch: pytest.MonkeyPatch,
 ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
-    # Synthetic metadata boundary only. The retained real probe covers all 120 people.
-    monkeypatch.setattr(transport, "_PEOPLE", 3)
-    monkeypatch.setattr(transport, "_WINDOWS", 15)
+    # Synthetic values only. Preserve the real 120-person scientific cohort contract.
+    participant_count = len(HAR_PMD_FULL_PARTICIPANT_ROSTER)
+    window_count = participant_count * 5
+    monkeypatch.setattr(transport, "_PEOPLE", participant_count)
+    monkeypatch.setattr(transport, "_WINDOWS", window_count)
     monkeypatch.setattr(transport, "_manifest_commit_errors", lambda *_: [])
     blob = b"synthetic immutable old source; not an experimental implementation"
     monkeypatch.setattr(subprocess, "check_output", lambda *_args, **_kwargs: blob)
     identities = {
-        "labels": np.tile(np.arange(5), 3),
-        "participant_ids": np.repeat(["p1", "p2", "p3"], 5),
-        "session_ids": np.repeat(["s1", "s2", "s3"], 5),
-        "trial_ids": np.array([f"t{i}" for i in range(15)]),
-        "window_ids": np.array([f"w{i}" for i in range(15)]),
+        "labels": np.tile(np.arange(5), participant_count),
+        "participant_ids": np.repeat(HAR_PMD_FULL_PARTICIPANT_ROSTER, 5),
+        "session_ids": np.repeat(
+            [f"harpmd-session:{person:03d}" for person in range(1, participant_count + 1)],
+            5,
+        ),
+        "trial_ids": np.array([f"t{i}" for i in range(window_count)]),
+        "window_ids": np.array([f"w{i}" for i in range(window_count)]),
     }
     fields = ("signals", "gravity", *identities)
     classes = ("stationary", "walking", "walker", "crutches", "manual_wheelchair")
@@ -50,7 +58,7 @@ def fixture(
             },
             "class_window_counts": dict.fromkeys(classes, 1),
         }
-        for person in range(1, 4)
+        for person in range(1, participant_count + 1)
     ]
     storage = {
         "protocol_id": provider_copy.HAR_PMD_PROVIDER_COPY_PROTOCOL,
@@ -78,8 +86,8 @@ def fixture(
         "models_fit": 0,
         "annotation_or_value_mutations": 0,
         "performance_scores_computed": False,
-        "participant_count": 3,
-        "window_count": 15,
+        "participant_count": participant_count,
+        "window_count": window_count,
         "purpose": "transport_only_materialization_parity_no_model_fitting",
         "global_array_digest_convention": "C-order raw bytes concatenated in numeric participant order; dtype and global row count recorded separately; not the shape-prefixed _array_sha256 convention",
         "analysis_git": {"commit": "d" * 40, "worktree_dirty": False, "status_entries": []},
@@ -107,12 +115,26 @@ def fixture(
     result = {
         "dataset": {
             "dataset_id": "har_pmd_v1",
-            "participant_count": 3,
-            "window_count": 15,
-            "class_window_counts": dict.fromkeys(classes, 3),
+            "participant_count": participant_count,
+            "window_count": window_count,
+            "class_window_counts": dict.fromkeys(classes, participant_count),
             "sampling_rate_hz": 50,
             "raw_local_mirror": False,
+            "boundary_provenance": {
+                "protocol_id": "external-har-boundary-provenance-v1",
+                "repository_signal_grid_annotation_independent": True,
+                "provider_upstream_annotation_conditioned": False,
+            },
+            "participant_partition_plan": {
+                "participant_roster": list(HAR_PMD_FULL_PARTICIPANT_ROSTER)
+            },
+            "participant_partition_observation": {
+                "planned_participant_count": participant_count,
+                "observed_window_participant_count": participant_count,
+                "participants_without_retained_windows": [],
+            },
         },
+        "artifact_evidence_status": "validated_stress_test",
         "source_input_manifest": {
             "files": {transport._LOADER: witness["old_processing_source_sha256"]}
         },
@@ -282,7 +304,15 @@ def test_table_transport_integration_preserves_other_comparison_requirements(
     witness_path = tmp_path / "witness.json"
     _write(witness_path, witness)
     monkeypatch.setattr(
-        table, "validate_run_directory", lambda *_: {"publication_evidence_ready": True}
+        table,
+        "validate_run_directory",
+        lambda *_: {
+            "status": "VALIDATED",
+            "integrity_passed": True,
+            "publication_evidence_ready": True,
+            "publication_evidence_ready_for_unqualified_methods": False,
+            "diagnostic_contract_passed": False,
+        },
     )
     classes = tuple(original["dataset"]["class_window_counts"])
     for receipt in audit["source_receipts"]:
@@ -332,7 +362,7 @@ def test_table_transport_integration_preserves_other_comparison_requirements(
         record = table.reconstruct_matched_table(
             directories, tmp_path, transport_parity=witness_path
         )
-        assert record["statistics"]["participant_count"] == 3
+        assert record["statistics"]["participant_count"] == 120
         assert len(record["statistics"]["methods"]) == 2
         assert (
             record["transport_equivalence_reference"]["record_sha256"] == witness["record_sha256"]

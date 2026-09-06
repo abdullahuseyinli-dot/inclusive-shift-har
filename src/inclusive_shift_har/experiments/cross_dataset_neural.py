@@ -14,17 +14,29 @@ from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
-import torch
+import torch as torch
 from numpy.typing import NDArray
 from torch import Tensor, nn
 from torch.utils.data import DataLoader, Dataset
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
+    _publication_artifact_contract,
+    _publication_launch_context_binding,
+    _resolve_publication_launch_context,
+    _runtime_environment,
+    _source_manifest_commit_errors,
+    _write_launch_failure_envelope,
+    _write_self_hashed_json_create_only,
+)
 from inclusive_shift_har.data.external_har import (
     ExternalHARWindows,
+    _array_sha256,
     load_fog_star,
     load_imu_har_il,
-    participant_fold_assignment,
+    observable_modelling_pool,
 )
+from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.experiments.cross_dataset_har import (
     _git_state,
@@ -32,6 +44,9 @@ from inclusive_shift_har.experiments.cross_dataset_har import (
     _read_mapping,
     _source_input_manifest,
     _write_json_create_only,
+)
+from inclusive_shift_har.experiments.external_evidence_validate import (
+    validate_and_record_run_directory,
 )
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 from inclusive_shift_har.models import build_baseline, trainable_parameter_count
@@ -60,14 +75,21 @@ class ExternalNeuralConfig:
     def validate(self) -> None:
         if self.model_name not in {"deepconvlstm", "tinyhar"}:
             raise ValueError("external neural control is not predeclared")
-        if min(self.epochs, self.batch_size, self.patience, self.minimum_epochs) < 1:
-            raise ValueError("external neural training counts must be positive")
-        if self.minimum_epochs > self.epochs or self.seed < 0:
+        if self.seed < 0:
             raise ValueError("external neural epoch/seed contract is invalid")
-        if self.learning_rate <= 0.0 or self.weight_decay < 0.0:
-            raise ValueError("external neural optimizer settings are invalid")
-        if self.mixed_precision not in {"disabled", "float16", "bfloat16"}:
-            raise ValueError("external neural precision mode is invalid")
+        expected = {
+            "epochs": 40,
+            "batch_size": 128,
+            "learning_rate": 3e-4,
+            "weight_decay": 1e-4,
+            "patience": 8,
+            "minimum_epochs": 8,
+            "mixed_precision": "float16",
+            "disable_cudnn": self.model_name == "deepconvlstm",
+        }
+        actual = {name: getattr(self, name) for name in expected}
+        if actual != expected:
+            raise ValueError("external neural configuration differs from the frozen CUDA protocol")
 
 
 class _IndexedWindows(Dataset[tuple[Tensor, Tensor, Tensor]]):
@@ -413,13 +435,26 @@ def _train_fold_impl(
             stream,
         )
     return outer_probability, {
+        "training_config": asdict(config),
+        "training_config_sha256": canonical_json_sha256(asdict(config)),
         "disable_cudnn": config.disable_cudnn,
         "mixed_precision": config.mixed_precision,
         "device": str(device),
+        "device_type": device.type,
+        "cuda_runtime_version": str(torch.version.cuda),
+        "cuda_device_name": torch.cuda.get_device_name(device),
+        "amp_enabled": amp_enabled,
+        "autocast_device_type": device.type,
+        "autocast_dtype": str(amp_dtype).removeprefix("torch."),
+        "gradient_scaler_enabled": bool(scaler.is_enabled()),
         "selected_epoch": best_epoch,
         "selected_validation_mean_participant_macro_f1": best_metric,
         "epochs_completed": len(history),
-        "checkpoint": {"path": output_path.name, "sha256": sha256_file(output_path)},
+        "checkpoint": {
+            "path": output_path.name,
+            "sha256": sha256_file(output_path),
+            "size_bytes": output_path.stat().st_size,
+        },
         "parameter_count": trainable_parameter_count(model),
     }
 
@@ -436,7 +471,53 @@ def evaluate_neural_controls(
     experiment_id: str = "cross-dataset-har-neural-controls-v1",
 ) -> tuple[dict[str, Any], dict[str, FloatArray]]:
     data.validate()
-    selected_signals = data.signals if signals is None else np.asarray(signals, dtype=np.float32)
+    if epochs != 40:
+        raise ValueError("external publication neural evidence requires exactly 40 epochs")
+    if not torch.cuda.is_available():
+        raise RuntimeError("external neural CUDA/FP16 protocol requires an available CUDA device")
+    if data.participant_partition_plan is None:
+        raise PermissionError("external neural evaluation requires a pre-window participant plan")
+    partition_plan = data.participant_partition_plan
+    partition_plan.validate()
+    scored_data = data
+    data, scoring_indices, supervised_eligibility = observable_modelling_pool(
+        data, include_supervised_labels=True
+    )
+    scored_six = scored_data.signals
+    scored_nine = scored_data.nine_channel_signals
+    supplied = scored_six if signals is None else np.asarray(signals)
+    supplied_hash = _array_sha256(supplied)
+    if supplied_hash == _array_sha256(scored_six):
+        selected_signals = data.signals
+        representation_field = "signals"
+        expected_suffix = "6ch"
+    elif supplied_hash == _array_sha256(scored_nine):
+        selected_signals = data.nine_channel_signals
+        representation_field = "nine_channel_signals"
+        expected_suffix = "N9"
+    else:
+        raise ValueError("neural signals are not a bit-exact canonical dataset representation")
+    expected_experiment = (
+        "har-pmd-native-interface-neural-controls-v1"
+        if scored_data.dataset_id == "har_pmd_v1"
+        else "cross-dataset-har-neural-controls-v1"
+    )
+    if method_suffix != expected_suffix or experiment_id != expected_experiment:
+        raise ValueError(
+            "neural lane suffix or experiment identity differs from its representation"
+        )
+    if representation_field == "nine_channel_signals" and scored_data.dataset_id != "har_pmd_v1":
+        raise ValueError("nine-channel neural lane is predeclared only for HAR-PMD")
+    representation = {
+        "source_field": representation_field,
+        "method_suffix": expected_suffix,
+        "input_channels": int(selected_signals.shape[2]),
+        "array_sha256": _array_sha256(selected_signals),
+        "scored_source_array_sha256": supplied_hash,
+        "gravity_source": (
+            scored_data.gravity_source if representation_field == "nine_channel_signals" else None
+        ),
+    }
     selected_class_names = data.class_names if class_names is None else class_names
     if selected_class_names != data.class_names:
         raise ValueError("neural class names differ from the dataset ontology")
@@ -447,16 +528,25 @@ def evaluate_neural_controls(
     ):
         raise ValueError("neural signal representation is not aligned and finite")
     expected_classes = set(range(len(selected_class_names)))
-    if set(data.labels.tolist()) != expected_classes:
+    if set(scored_data.labels.tolist()) != expected_classes:
         raise ValueError("neural dataset lacks a declared class")
-    if np.unique(data.participant_ids).size < 12:
+    if len(partition_plan.participant_roster) < 12:
         raise ValueError("neural external controls require at least 12 participants")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda")
+    cuda_runtime_version = torch.version.cuda
+    if not isinstance(cuda_runtime_version, str) or not cuda_runtime_version:
+        raise RuntimeError("PyTorch does not report a CUDA runtime for the frozen neural protocol")
+    cuda_device_name = torch.cuda.get_device_name(device)
+    if not cuda_device_name:
+        raise RuntimeError("CUDA device identity is unavailable for the frozen neural protocol")
     per_seed: dict[int, dict[str, FloatArray]] = {}
     fold_records: list[dict[str, Any]] = []
     for seed in seeds:
-        assignment = participant_fold_assignment(
-            np.unique(data.participant_ids).tolist(), fold_count=5, seed=seed
+        assignment = partition_plan.resolve(
+            partition_plan.participant_roster,
+            fold_count=5,
+            seed=seed,
+            role="outer",
         )
         deep_name = f"DeepConvLSTM-{method_suffix}"
         tiny_name = f"TinyHAR-{method_suffix}"
@@ -473,18 +563,21 @@ def evaluate_neural_controls(
                 participant for participant, fold in assignment.items() if fold == outer_fold
             }
             outer_training_ids = sorted(set(assignment) - evaluation_ids)
-            validation_assignment = participant_fold_assignment(
-                outer_training_ids, fold_count=4, seed=seed + 20_000 + outer_fold
+            validation_assignment = partition_plan.resolve(
+                outer_training_ids,
+                fold_count=4,
+                seed=seed + 20_000 + outer_fold,
+                role=f"neural_validation_outer_{outer_fold}",
             )
             validation_ids = {
                 participant for participant, fold in validation_assignment.items() if fold == 0
             }
             training_ids = set(outer_training_ids) - validation_ids
             training_indices = np.flatnonzero(
-                np.isin(data.participant_ids, sorted(training_ids))
+                np.isin(data.participant_ids, sorted(training_ids)) & supervised_eligibility
             ).astype(np.int64)
             validation_indices = np.flatnonzero(
-                np.isin(data.participant_ids, sorted(validation_ids))
+                np.isin(data.participant_ids, sorted(validation_ids)) & supervised_eligibility
             ).astype(np.int64)
             evaluation_indices = np.flatnonzero(
                 np.isin(data.participant_ids, sorted(evaluation_ids))
@@ -520,6 +613,8 @@ def evaluate_neural_controls(
                     device=device,
                     class_names=selected_class_names,
                 )
+                checkpoint = cast(dict[str, Any], record.get("checkpoint"))
+                checkpoint["path"] = checkpoint_path.relative_to(output_directory).as_posix()
                 seed_probability[result_name][evaluation_indices] = values
                 fold_records.append(
                     {
@@ -527,40 +622,85 @@ def evaluate_neural_controls(
                         "outer_fold": outer_fold,
                         "model": result_name,
                         "training_participants": sorted(training_ids),
+                        "training_participants_with_supervision": sorted(
+                            np.unique(data.participant_ids[training_indices]).tolist()
+                        ),
                         "validation_participants": sorted(validation_ids),
+                        "validation_participants_with_supervision": sorted(
+                            np.unique(data.participant_ids[validation_indices]).tolist()
+                        ),
                         "evaluation_participants": sorted(evaluation_ids),
+                        "evaluation_participants_with_candidates": sorted(
+                            np.unique(data.participant_ids[evaluation_indices]).tolist()
+                        ),
+                        "evaluation_participants_with_scoring": sorted(
+                            set(scored_data.participant_ids.tolist()) & evaluation_ids
+                        ),
+                        "evaluation_candidate_window_count": int(evaluation_indices.size),
+                        "evaluation_scored_window_count": int(
+                            supervised_eligibility[evaluation_indices].sum()
+                        ),
+                        "participant_partition_plan_sha256": partition_plan.audit()["plan_sha256"],
                         "outer_labels_used_for_training_or_selection": False,
                         **record,
                     }
                 )
         if any(not np.isfinite(value).all() for value in seed_probability.values()):
             raise ValueError("neural OOF predictions are incomplete")
-        per_seed[seed] = seed_probability
+        per_seed[seed] = {
+            method: probability[scoring_indices] for method, probability in seed_probability.items()
+        }
     ensemble = {
         method: np.mean(np.stack([per_seed[seed][method] for seed in seeds], axis=0), axis=0)
         for method in per_seed[seeds[0]]
     }
     reports = {
         method: _report_any(
-            data.labels,
+            scored_data.labels,
             probability,
-            data.participant_ids,
+            scored_data.participant_ids,
             class_names=selected_class_names,
         )
         for method, probability in ensemble.items()
     }
     from inclusive_shift_har.evaluation.external_statistics import seed_evidence
 
-    primary_seed_averaged, seed_predictions = seed_evidence(data, per_seed)
+    primary_seed_averaged, seed_predictions = seed_evidence(scored_data, per_seed)
     return (
         {
             "schema_version": "1.0.0",
             "experiment_id": experiment_id,
+            "observable_context_protocol": (
+                OBSERVABLE_CONTEXT_PROTOCOL
+                if scored_data.observable_candidates is not None
+                else None
+            ),
             "evidence_status": "EXTERNAL_DEVELOPMENT_NOT_CONFIRMATORY",
-            "dataset": data.summary(),
+            "dataset": scored_data.summary(),
             "seeds": list(seeds),
             "device": str(device),
             "runtime_backend_protocol": "external-neural-cuda-nocudnn-v2",
+            "runtime_backend": {
+                "device_type": "cuda",
+                "amp_enabled": True,
+                "autocast_device_type": "cuda",
+                "autocast_dtype": "float16",
+                "gradient_scaler_enabled": True,
+                "cuda_runtime_version": cuda_runtime_version,
+                "cuda_device_name": cuda_device_name,
+            },
+            "training_contract": {
+                "epochs": 40,
+                "batch_size": 128,
+                "learning_rate": 3e-4,
+                "weight_decay": 1e-4,
+                "patience": 8,
+                "minimum_epochs": 8,
+                "mixed_precision": "float16",
+                "outer_folds": 5,
+                "models": ["deepconvlstm", "tinyhar"],
+            },
+            "input_representation": representation,
             "input_channels": int(selected_signals.shape[2]),
             "method_suffix": method_suffix,
             "reports": reports,
@@ -570,6 +710,7 @@ def evaluate_neural_controls(
                 "proposed_method": False,
                 "confirmatory_claim_allowed": False,
                 "state_of_the_art_claim_allowed": False,
+                "full_observable_candidate_inference_before_scoring": True,
             },
         },
         {**ensemble, **seed_predictions},
@@ -587,30 +728,43 @@ def run_and_write_neural(
     class_names: tuple[str, ...] | None = None,
     method_suffix: str = "6ch",
     experiment_id: str = "cross-dataset-har-neural-controls-v1",
+    inherited_launch_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    git_at_launch = _git_state(repository_root)
-    source_input_manifest = _source_input_manifest(repository_root)
+    if seeds != (11, 23, 47):
+        raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+    git_at_launch, source_input_manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=repository_root,
+        output_directory=output_directory,
+        current_git_state=_git_state(repository_root),
+        current_source_manifest=_source_input_manifest(repository_root),
+        manifest_commit_validator=_source_manifest_commit_errors,
+        inherited_launch_context=inherited_launch_context,
+    )
+    launch_context_binding = _publication_launch_context_binding(launch_context)
     output_directory.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
-    _write_json_create_only(
-        output_directory / "data_audit.json",
-        {
-            "schema_version": "1.0.0",
-            "created_at": started,
-            "dataset": data.summary(),
-            "source_receipts": [receipt.to_dict() for receipt in data.receipts],
-            "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
-            "source_input_manifest": source_input_manifest,
-            "git_at_launch": git_at_launch,
-            "model_input": {
-                "channel_count": int(
-                    data.signals.shape[2] if signals is None else signals.shape[2]
-                ),
-                "method_suffix": method_suffix,
-                "class_names": list(data.class_names if class_names is None else class_names),
-            },
+    dataset_summary = data.summary()
+    evidence_status = _external_evidence_status(dataset_summary)
+    audit = {
+        "schema_version": "1.0.0",
+        "created_at": started,
+        "dataset": dataset_summary,
+        "artifact_evidence_status": evidence_status,
+        "source_receipts": [receipt.to_dict() for receipt in data.receipts],
+        "raw_local_mirror": any(receipt.raw_local_mirror for receipt in data.receipts),
+        "source_input_manifest": source_input_manifest,
+        "git_at_launch": git_at_launch,
+        "publication_launch_context": launch_context_binding,
+        "model_input": {
+            "channel_count": int(data.signals.shape[2] if signals is None else signals.shape[2]),
+            "method_suffix": method_suffix,
+            "class_names": list(data.class_names if class_names is None else class_names),
         },
+    }
+    data_audit_artifact = _write_self_hashed_json_create_only(
+        output_directory / "data_audit.json", audit
     )
+    artifact_contract = _publication_artifact_contract(source_input_manifest, data_audit_artifact)
     try:
         result, predictions = evaluate_neural_controls(
             data,
@@ -634,11 +788,24 @@ def run_and_write_neural(
                 f"probability__{name}": value for name, value in predictions.items()
             },
         )
+        _resolve_publication_launch_context(
+            repository_root=repository_root,
+            output_directory=output_directory,
+            current_git_state=_git_state(repository_root),
+            current_source_manifest=_source_input_manifest(repository_root),
+            manifest_commit_validator=_source_manifest_commit_errors,
+            inherited_launch_context=launch_context,
+        )
         result["started_at"] = started
         result["created_at"] = datetime.now(UTC).isoformat()
         result["git"] = _git_state(repository_root)
         result["git_at_launch"] = git_at_launch
         result["source_input_manifest"] = source_input_manifest
+        result["publication_launch_context"] = launch_context_binding
+        result["environment"] = _runtime_environment()
+        result["artifact_evidence_status"] = evidence_status
+        result["data_audit_artifact"] = data_audit_artifact
+        result["artifact_contract"] = artifact_contract
         result["prediction_artifact"] = {"path": path.name, "sha256": sha256_file(path)}
         result["paired_model_comparison"] = _paired_bootstrap(
             result["reports"][f"TinyHAR-{method_suffix}"],
@@ -646,9 +813,8 @@ def run_and_write_neural(
         )
         result["result_payload_sha256_before_serialization"] = canonical_json_sha256(result)
         _write_json_create_only(output_directory / "result.json", result)
-        return result
     except Exception as exc:
-        _write_json_create_only(
+        _write_self_hashed_json_create_only(
             output_directory / "failure.json",
             {
                 "schema_version": "1.0.0",
@@ -660,9 +826,19 @@ def run_and_write_neural(
                 "traceback": traceback.format_exc(),
                 "git": _git_state(repository_root),
                 "git_at_launch": git_at_launch,
+                "source_input_manifest": source_input_manifest,
+                "publication_launch_context": launch_context_binding,
+                "environment": _runtime_environment(),
+                "artifact_evidence_status": evidence_status,
+                "data_audit_artifact": data_audit_artifact,
+                "artifact_contract": artifact_contract,
             },
+            hash_field="failure_payload_sha256_before_serialization",
         )
+        validate_and_record_run_directory(output_directory, repository_root)
         raise
+    validate_and_record_run_directory(output_directory, repository_root)
+    return result
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -685,38 +861,68 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     root = args.repository_root.resolve()
-    experiment = _read_mapping(root / "configs/experiments/cross_dataset_har_rnd_v1.yaml")
-    preprocessing = cast(dict[str, Any], experiment["preprocessing"])
-    derived = cast(dict[str, Any], preprocessing["derived_gravity"])
-    declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
-    gravity_cutoff_hz = (
-        float(derived["cutoff_hz"])
-        if args.gravity_cutoff_hz is None
-        else float(args.gravity_cutoff_hz)
-    )
-    if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
-        raise ValueError(
-            f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
-            f"{declared_cutoffs}"
-        )
-    common = {
-        "participant_limit": args.participant_limit,
-        "target_rate_hz": float(preprocessing["target_sampling_rate_hz"]),
-        "window_samples": int(preprocessing["window_samples"]),
-        "gravity_cutoff_hz": gravity_cutoff_hz,
-    }
-    data = (
-        load_fog_star(**common)
-        if args.dataset == "fog-star"
-        else load_imu_har_il(**common, repetition_limit=args.repetition_limit)
-    )
-    result = run_and_write_neural(
-        data=data,
-        output_directory=args.output_directory.resolve(),
+    output_directory = args.output_directory.resolve()
+    _launch, _manifest, launch_context = _resolve_publication_launch_context(
         repository_root=root,
-        seeds=tuple(args.seeds),
-        epochs=args.epochs,
+        output_directory=output_directory,
+        current_git_state=_git_state(root),
+        current_source_manifest=_source_input_manifest(root),
+        manifest_commit_validator=_source_manifest_commit_errors,
     )
+    started = datetime.now(UTC).isoformat()
+    stage = "configuration"
+    try:
+        if tuple(args.seeds) != (11, 23, 47):
+            raise ValueError("external publication evidence requires frozen seeds 11, 23, and 47")
+        if args.epochs != 40:
+            raise ValueError("external publication neural evidence requires exactly 40 epochs")
+        experiment = _read_mapping(root / "configs/experiments/cross_dataset_har_rnd_v1.yaml")
+        preprocessing = cast(dict[str, Any], experiment["preprocessing"])
+        derived = cast(dict[str, Any], preprocessing["derived_gravity"])
+        declared_cutoffs = tuple(float(value) for value in derived["cutoff_sensitivity_hz"])
+        gravity_cutoff_hz = (
+            float(derived["cutoff_hz"])
+            if args.gravity_cutoff_hz is None
+            else float(args.gravity_cutoff_hz)
+        )
+        if not any(np.isclose(gravity_cutoff_hz, value) for value in declared_cutoffs):
+            raise ValueError(
+                f"gravity cutoff {gravity_cutoff_hz} is outside the declared sensitivity set "
+                f"{declared_cutoffs}"
+            )
+        common = {
+            "participant_limit": args.participant_limit,
+            "target_rate_hz": float(preprocessing["target_sampling_rate_hz"]),
+            "window_samples": int(preprocessing["window_samples"]),
+            "gravity_cutoff_hz": gravity_cutoff_hz,
+        }
+        stage = "dataset_acquisition"
+        data = (
+            load_fog_star(**common)
+            if args.dataset == "fog-star"
+            else load_imu_har_il(**common, repetition_limit=args.repetition_limit)
+        )
+        stage = "experiment_writer"
+        result = run_and_write_neural(
+            data=data,
+            output_directory=output_directory,
+            repository_root=root,
+            seeds=tuple(args.seeds),
+            epochs=args.epochs,
+            inherited_launch_context=launch_context,
+        )
+    except Exception as error:
+        if not output_directory.exists():
+            _write_launch_failure_envelope(
+                repository_root=root,
+                output_directory=output_directory,
+                launch_context=launch_context,
+                started_at=started,
+                stage=stage,
+                exception=error,
+                traceback_text=traceback.format_exc(),
+            )
+        raise
     print(
         json.dumps(
             {

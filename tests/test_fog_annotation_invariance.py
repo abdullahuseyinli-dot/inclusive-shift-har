@@ -11,6 +11,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import pytest
 
 from inclusive_shift_har.data import external_har
+from inclusive_shift_har.preprocessing.features import extract_engineered_features
 
 
 def _fog_frame(labels: np.ndarray[Any, Any]) -> pd.DataFrame:
@@ -58,16 +59,36 @@ def test_fog_resampling_inputs_do_not_depend_on_annotation_boundaries(
 
     monkeypatch.setattr(external_har, "resample_uniform", capture)
     _install_fog_payload(monkeypatch, _fog_frame(np.repeat([1.0, 2.0, 3.0], 480)))
-    external_har.load_fog_star()
+    baseline = external_har.load_fog_star()
     first = calls.copy()
     calls.clear()
     changed = np.concatenate((np.full(511, 1.0), np.full(449, 2.0), np.full(480, 3.0)))
     changed[700] = np.nan
     _install_fog_payload(monkeypatch, _fog_frame(changed))
-    external_har.load_fog_star()
+    changed_result = external_har.load_fog_star()
     assert len(first) == len(calls)
     for left, right in zip(first, calls, strict=True):
         np.testing.assert_array_equal(left, right)
+    assert baseline.observable_candidates is not None
+    assert changed_result.observable_candidates is not None
+    baseline_pool = baseline.observable_candidates
+    changed_pool = changed_result.observable_candidates
+    six_names = tuple(f"signal_{index}" for index in range(6))
+    nine_names = (*six_names, "gravity_x", "gravity_y", "gravity_z")
+    np.testing.assert_array_equal(
+        extract_engineered_features(baseline_pool.signals, channel_names=six_names).values,
+        extract_engineered_features(changed_pool.signals, channel_names=six_names).values,
+    )
+    np.testing.assert_array_equal(
+        extract_engineered_features(
+            np.concatenate((baseline_pool.signals, baseline_pool.gravity), axis=2),
+            channel_names=nine_names,
+        ).values,
+        extract_engineered_features(
+            np.concatenate((changed_pool.signals, changed_pool.gravity), axis=2),
+            channel_names=nine_names,
+        ).values,
+    )
 
 
 @pytest.mark.parametrize("target_rate", [30.0, 50.0, 60.0, 90.0])
@@ -214,3 +235,75 @@ def test_task_annotations_cannot_reset_the_fog_signal_pipeline(
     np.testing.assert_array_equal(original.gravity, changed.gravity)
     np.testing.assert_array_equal(original.window_ids, changed.window_ids)
     np.testing.assert_array_equal(original.labels, changed.labels)
+
+
+@pytest.mark.parametrize("target_rate", [30.0, 50.0, 90.0])
+@pytest.mark.parametrize(
+    "peer_change", ["prepend", "interleave", "missing_annotations", "signals_and_gaps"]
+)
+def test_other_participants_cannot_change_a_fixed_participant_preprocessing(
+    monkeypatch: pytest.MonkeyPatch, target_rate: float, peer_change: str
+) -> None:
+    """Per-person materialization commutes with adding independent raw groups.
+
+    This checks signal construction, not fold invariance: adding an eligible
+    participant can legitimately change the subsequent seeded fold assignment.
+    Source receipts also change and are deliberately not claimed byte-identical.
+    """
+
+    fixed = _fog_frame(np.repeat([1.0, 2.0, 3.0], 600))
+    _install_fog_payload(monkeypatch, fixed)
+    standalone = external_har.load_fog_star(target_rate_hz=target_rate)
+    peer = fixed.copy(deep=True)
+    peer["subjectID"] = 2
+    peer["back_acc_x"] += 12.0
+    peer["back_gyro_z"] *= -7.0
+    if peer_change == "missing_annotations":
+        peer["activity"] = np.nan
+        peer["taskID"] = np.nan
+    elif peer_change == "signals_and_gaps":
+        peer.loc[200:204, "back_acc_x"] = np.nan
+        peer.loc[600:, "timestamp"] += 6.0
+        peer.loc[1300:, "timestamp"] -= 20.0
+    combined = pd.concat([peer, fixed])
+    if peer_change == "interleave":
+        # Preserve each participant's own row order, even when rows interleave.
+        combined = combined.sort_index(kind="stable")
+    _install_fog_payload(monkeypatch, combined)
+    together = external_har.load_fog_star(target_rate_hz=target_rate)
+    unchanged_person = together.participant_ids == "fogstar:001"
+    for name in (
+        "signals",
+        "gravity",
+        "labels",
+        "participant_ids",
+        "session_ids",
+        "trial_ids",
+        "window_ids",
+    ):
+        np.testing.assert_array_equal(
+            getattr(standalone, name), getattr(together, name)[unchanged_person]
+        )
+    assert standalone.observable_candidates is not None
+    assert together.observable_candidates is not None
+    pool = together.observable_candidates
+    unchanged_candidates = pool.participant_ids == "fogstar:001"
+    for name in (
+        "signals",
+        "gravity",
+        "participant_ids",
+        "session_ids",
+        "trial_ids",
+        "window_ids",
+    ):
+        np.testing.assert_array_equal(
+            getattr(standalone.observable_candidates, name),
+            getattr(pool, name)[unchanged_candidates],
+        )
+    # Includes per-segment signal/gravity/timestamp/global-grid hashes and starts.
+    fixed_audits = tuple(
+        item
+        for item in together.preprocessing_audit
+        if str(item["trial_id"]).startswith("fogstar:001:")
+    )
+    assert standalone.preprocessing_audit == fixed_audits

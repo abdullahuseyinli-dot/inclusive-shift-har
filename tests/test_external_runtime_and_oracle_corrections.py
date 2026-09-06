@@ -38,7 +38,10 @@ def test_neural_backend_setting_is_explicit_and_restored(
         "device": torch.device("cpu"),
         "class_names": ("mobility", "sitting", "standing"),
     }
-    if fail:
+    if not disabled:
+        with pytest.raises(ValueError, match="frozen CUDA protocol"):
+            neural._train_fold(None, np.zeros((3, 128, 6)), **kwargs)  # type: ignore[arg-type]
+    elif fail:
         with pytest.raises(RuntimeError, match="synthetic training failure"):
             neural._train_fold(None, np.zeros((3, 128, 6)), **kwargs)  # type: ignore[arg-type]
     else:

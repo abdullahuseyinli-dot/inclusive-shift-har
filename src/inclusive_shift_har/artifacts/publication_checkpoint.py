@@ -181,7 +181,7 @@ def supersession_snapshot(directory: Path, repository_root: Path) -> dict[str, A
         elif run.name.startswith("sole"):
             status, reason = (
                 "diagnostic",
-                "one participant/session and camera-bout oracle boundaries",
+                "camera-bout oracle-boundary diagnostic; use preserved run-specific coverage and never infer a deployable or confirmatory claim",
             )
         elif (run / "failure.json").exists() or not (run / "result.json").exists():
             status, reason = (

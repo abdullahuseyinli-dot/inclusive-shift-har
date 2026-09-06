@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib.metadata
 import json
 import pickle
 import time
@@ -14,12 +13,25 @@ from typing import Any
 
 import numpy as np
 
+from inclusive_shift_har.artifacts.research_provenance import (
+    _external_evidence_status,
+    _fog_star_full_cohort_observed,
+    _publication_artifact_contract,
+    _publication_launch_context_binding,
+    _resolve_publication_launch_context,
+    _runtime_environment,
+    _source_manifest_commit_errors,
+    _write_launch_failure_envelope,
+    _write_self_hashed_json_create_only,
+)
 from inclusive_shift_har.data.external_har import (
     ExternalHARWindows,
+    _array_sha256,
     load_fog_star,
-    participant_fold_assignment,
+    observable_modelling_pool,
 )
 from inclusive_shift_har.evaluation.external_statistics import seed_evidence
+from inclusive_shift_har.evaluation.inference_contracts import OBSERVABLE_CONTEXT_PROTOCOL
 from inclusive_shift_har.evaluation.metrics import classification_report
 from inclusive_shift_har.experiments.cross_dataset_har import (
     _git_state,
@@ -27,9 +39,10 @@ from inclusive_shift_har.experiments.cross_dataset_har import (
     _write_json_create_only,
 )
 from inclusive_shift_har.experiments.external_evidence_validate import (
-    _manifest_commit_errors,
+    validate_and_record_run_directory,
     validate_run_directory,
 )
+from inclusive_shift_har.experiments.publication_split_audit import write_split_audit
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256, sha256_file
 from inclusive_shift_har.models.hierarchical_posture import (
     VARIANTS,
@@ -41,6 +54,85 @@ from inclusive_shift_har.preprocessing.features import extract_engineered_featur
 PROTOCOL_ID = "participant-balanced-hierarchical-posture-forest-v3"
 PROTOCOL_PATH = "configs/protocols/participant_balanced_hierarchical_posture_forest_v3.json"
 SIX_NAMES = ("lin_acc_x", "lin_acc_y", "lin_acc_z", "gyro_x", "gyro_y", "gyro_z")
+BASELINE_PROBABILITY_ATOL = 1e-12
+
+
+def _reference_run_location(reference_run: Path, repository_root: Path) -> dict[str, str]:
+    resolved = reference_run.resolve()
+    try:
+        relative = resolved.relative_to(repository_root.resolve()).as_posix()
+    except ValueError:
+        return {"path_kind": "external_absolute", "path": str(resolved)}
+    return {"path_kind": "repository_relative", "path": relative or "."}
+
+
+def _stable_receipt_identity(receipt: dict[str, Any]) -> dict[str, Any]:
+    """Remove only the retrieval timestamp from an otherwise exact source receipt."""
+
+    return {name: value for name, value in receipt.items() if name != "accessed_at_utc"}
+
+
+def _matched_reference_input_errors(
+    data: ExternalHARWindows,
+    reference_result: dict[str, Any],
+    reference_audit: dict[str, Any],
+) -> list[str]:
+    """Require a baseline produced from the exact current scientific input tuple."""
+
+    errors: list[str] = []
+    summary = data.summary()
+    if reference_result.get("dataset") != summary:
+        errors.append("result dataset summary differs")
+    if reference_audit.get("dataset") != summary:
+        errors.append("data-audit dataset summary differs")
+    expected_receipts = [_stable_receipt_identity(receipt.to_dict()) for receipt in data.receipts]
+    actual_receipts = reference_audit.get("source_receipts")
+    if (
+        not isinstance(actual_receipts, list)
+        or [
+            _stable_receipt_identity(receipt) if isinstance(receipt, dict) else {}
+            for receipt in actual_receipts
+        ]
+        != expected_receipts
+    ):
+        errors.append("source receipt identity/version/hash differs")
+    return errors
+
+
+def _baseline_probability_check(reference: FloatArray, reconstructed: FloatArray) -> dict[str, Any]:
+    """Check a calibration-bearing comparator, not only its class decisions."""
+
+    shape_matches = bool(
+        reference.ndim == 2
+        and reconstructed.ndim == 2
+        and reference.shape == reconstructed.shape
+        and reference.shape[1] == 3
+    )
+    finite = bool(np.isfinite(reference).all() and np.isfinite(reconstructed).all())
+    maximum_difference = (
+        float(np.max(np.abs(reference - reconstructed)))
+        if shape_matches and reference.size and finite
+        else float("inf")
+    )
+    return {
+        "class_decisions_exact": bool(
+            shape_matches
+            and finite
+            and np.array_equal(reference.argmax(axis=1), reconstructed.argmax(axis=1))
+        ),
+        "probabilities_within_strict_tolerance": bool(
+            shape_matches
+            and finite
+            and np.allclose(
+                reference,
+                reconstructed,
+                rtol=0.0,
+                atol=BASELINE_PROBABILITY_ATOL,
+            )
+        ),
+        "probability_absolute_tolerance": BASELINE_PROBABILITY_ATOL,
+        "maximum_probability_absolute_difference": maximum_difference,
+    }
 
 
 def posture_advancement_gate(statistics: dict[str, Any]) -> dict[str, Any]:
@@ -132,25 +224,52 @@ def evaluate_posture_forests(
     data: ExternalHARWindows, *, output: Path, seeds: tuple[int, ...] = (11, 23, 47)
 ) -> tuple[dict[str, Any], dict[str, FloatArray]]:
     data.validate()
+    scored_data = data
+    has_observable_pool = data.observable_candidates is not None
+    if data.participant_partition_plan is None:
+        raise PermissionError("posture evaluation requires a pre-window participant plan")
+    partition_plan = data.participant_partition_plan
+    partition_plan.validate()
     if data.class_names != ("mobility", "sitting", "standing"):
         raise ValueError("posture hierarchy requires the fixed three-class ontology")
+    data, scoring_indices, supervised_eligibility = observable_modelling_pool(
+        data, include_supervised_labels=True
+    )
+    if (
+        scoring_indices.ndim != 1
+        or scoring_indices.size != scored_data.labels.size
+        or np.any(np.diff(scoring_indices) <= 0)
+        or not np.array_equal(data.window_ids[scoring_indices], scored_data.window_ids)
+    ):
+        raise ValueError("scored windows are not an ordered subset of the observable pool")
     six = extract_engineered_features(data.signals, channel_names=SIX_NAMES)
     nine = extract_engineered_features(
         data.nine_channel_signals, channel_names=(*SIX_NAMES, "gravity_x", "gravity_y", "gravity_z")
     )
     per_seed: dict[int, dict[str, FloatArray]] = {}
     records = []
+    fold_artifacts: list[dict[str, Any]] = []
     for seed in seeds:
-        assignment = participant_fold_assignment(
-            np.unique(data.participant_ids).tolist(), fold_count=5, seed=seed
+        assignment = partition_plan.resolve(
+            partition_plan.participant_roster,
+            fold_count=5,
+            seed=seed,
+            role="outer",
         )
-        probabilities = {name: np.full((len(data.labels), 3), np.nan) for name in VARIANTS}
+        candidate_probabilities = {
+            name: np.full((len(data.labels), 3), np.nan) for name in VARIANTS
+        }
         for fold in range(5):
             evaluation_people = sorted(
                 person for person, value in assignment.items() if value == fold
             )
+            assigned_training_people = sorted(set(assignment) - set(evaluation_people))
             evaluation = np.isin(data.participant_ids, evaluation_people)
-            training = ~evaluation
+            training_candidates = ~evaluation
+            training = training_candidates & supervised_eligibility
+            scored_evaluation = evaluation & supervised_eligibility
+            if not evaluation.any():
+                raise ValueError("an outer fold has no observable inference candidates")
             for name in VARIANTS:
                 features = nine if name == "PB-RF-D9" else six
                 started = time.perf_counter()
@@ -165,7 +284,7 @@ def evaluate_posture_forests(
                 started = time.perf_counter()
                 probability = fitted.predict(features.values[evaluation])
                 predict_seconds = time.perf_counter() - started
-                probabilities[name][evaluation] = probability
+                candidate_probabilities[name][evaluation] = probability
                 checkpoint = output / "checkpoints" / f"seed-{seed}__fold-{fold}__{name}.pickle"
                 checkpoint.parent.mkdir(parents=True, exist_ok=True)
                 with checkpoint.open("xb") as stream:
@@ -175,8 +294,25 @@ def evaluate_posture_forests(
                         "seed": seed,
                         "outer_fold": fold,
                         "method": name,
-                        "training_participants": list(fitted.training_participants),
+                        "training_participants": assigned_training_people,
+                        "training_participants_with_supervision": list(
+                            fitted.training_participants
+                        ),
+                        "training_participants_with_candidates": sorted(
+                            np.unique(data.participant_ids[training_candidates]).tolist()
+                        ),
                         "evaluation_participants": evaluation_people,
+                        "evaluation_participants_with_candidates": sorted(
+                            np.unique(data.participant_ids[evaluation]).tolist()
+                        ),
+                        "evaluation_participants_with_scoring": sorted(
+                            np.unique(data.participant_ids[scored_evaluation]).tolist()
+                        ),
+                        "participant_partition_plan_sha256": partition_plan.audit()["plan_sha256"],
+                        "training_candidate_window_count": int(training_candidates.sum()),
+                        "training_scored_window_count": int(training.sum()),
+                        "evaluation_candidate_window_count": int(evaluation.sum()),
+                        "evaluation_scored_window_count": int(scored_evaluation.sum()),
                         "outer_labels_used_for_training_or_selection": False,
                         "feature_names": list(features.names),
                         "fit_seconds": fit_seconds,
@@ -196,16 +332,24 @@ def evaluate_posture_forests(
             with fold_archive.open("xb") as stream:
                 np.savez_compressed(
                     stream,
-                    labels=data.labels[evaluation],
-                    participant_ids=data.participant_ids[evaluation],
-                    window_ids=data.window_ids[evaluation],
+                    labels=data.labels[scored_evaluation],
+                    participant_ids=data.participant_ids[scored_evaluation],
+                    window_ids=data.window_ids[scored_evaluation],
+                    candidate_participant_ids=data.participant_ids[evaluation],
+                    candidate_window_ids=data.window_ids[evaluation],
+                    candidate_scoring_eligibility=supervised_eligibility[evaluation],
                     **{  # type: ignore[arg-type]
-                        f"probability__{name}": values[evaluation]
-                        for name, values in probabilities.items()
+                        f"probability__{name}": values[scored_evaluation]
+                        for name, values in candidate_probabilities.items()
+                    },
+                    **{  # type: ignore[arg-type]
+                        f"candidate_probability__{name}": values[evaluation]
+                        for name, values in candidate_probabilities.items()
                     },
                 )
+            completion = output / f"seed-{seed}__fold-{fold}__complete.json"
             _write_json_create_only(
-                output / f"seed-{seed}__fold-{fold}__complete.json",
+                completion,
                 {
                     "completed_at_utc": datetime.now(UTC).isoformat(),
                     "seed": seed,
@@ -214,32 +358,55 @@ def evaluate_posture_forests(
                     "prediction_archive_sha256": sha256_file(fold_archive),
                 },
             )
+            fold_artifacts.append(
+                {
+                    "seed": seed,
+                    "outer_fold": fold,
+                    "prediction_archive": {
+                        "path": fold_archive.relative_to(output).as_posix(),
+                        "sha256": sha256_file(fold_archive),
+                        "size_bytes": fold_archive.stat().st_size,
+                    },
+                    "completion_marker": {
+                        "path": completion.relative_to(output).as_posix(),
+                        "sha256": sha256_file(completion),
+                        "size_bytes": completion.stat().st_size,
+                    },
+                }
+            )
             print(
                 json.dumps({"stage": "posture_forest_fold_complete", "seed": seed, "fold": fold}),
                 flush=True,
             )
-        if any(not np.isfinite(values).all() for values in probabilities.values()):
+        if any(not np.isfinite(values).all() for values in candidate_probabilities.values()):
             raise ValueError("posture forest predictions are incomplete")
-        per_seed[seed] = probabilities
-    statistics, archive = seed_evidence(data, per_seed)
+        per_seed[seed] = {
+            name: values[scoring_indices] for name, values in candidate_probabilities.items()
+        }
+    statistics, archive = seed_evidence(scored_data, per_seed)
     ensemble = {
         name: np.mean([per_seed[seed][name] for seed in seeds], axis=0) for name in VARIANTS
     }
     result = {
         "schema_version": "1.0.0",
         "experiment_id": PROTOCOL_ID,
-        "dataset": data.summary(),
+        "observable_context_protocol": OBSERVABLE_CONTEXT_PROTOCOL if has_observable_pool else None,
+        "dataset": scored_data.summary(),
         "seeds": list(seeds),
         "evidence_status": "PROSPECTIVE_DEVELOPMENT_RND_NOT_CONFIRMATORY",
         "reports": {
             name: classification_report(
-                data.labels, values, data.participant_ids.tolist(), class_names=data.class_names
+                scored_data.labels,
+                values,
+                scored_data.participant_ids.tolist(),
+                class_names=scored_data.class_names,
             )
             for name, values in ensemble.items()
         },
         "primary_seed_averaged": statistics,
         "advancement_gate": posture_advancement_gate(statistics),
         "fold_records": records,
+        "fold_artifacts": fold_artifacts,
         "method_input_lanes": {
             name: "derived-nine-channel diagnostic"
             if name == "PB-RF-D9"
@@ -256,13 +423,22 @@ def evaluate_posture_forests(
 
 
 def run_and_write(
-    *, data: ExternalHARWindows, output: Path, repository_root: Path, reference_run: Path
+    *,
+    data: ExternalHARWindows,
+    output: Path,
+    repository_root: Path,
+    reference_run: Path,
+    inherited_launch_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    launch, manifest = _git_state(repository_root), _source_input_manifest(repository_root)
-    if launch["worktree_dirty"] or _manifest_commit_errors(
-        repository_root, launch["commit"], manifest["files"]
-    ):
-        raise ValueError("R&D requires clean committed source before outcomes")
+    launch, manifest, launch_context = _resolve_publication_launch_context(
+        repository_root=repository_root,
+        output_directory=output,
+        current_git_state=_git_state(repository_root),
+        current_source_manifest=_source_input_manifest(repository_root),
+        manifest_commit_validator=_source_manifest_commit_errors,
+        inherited_launch_context=inherited_launch_context,
+    )
+    launch_context_binding = _publication_launch_context_binding(launch_context)
     protocol_path = repository_root / PROTOCOL_PATH
     protocol = json.loads(protocol_path.read_text(encoding="utf-8"))
     unhashed = {key: value for key, value in protocol.items() if key != "record_sha256"}
@@ -278,6 +454,15 @@ def run_and_write(
     ):
         raise ValueError("baseline reference must be a validated corrected result package")
     reference_result = json.loads((reference_run / "result.json").read_text(encoding="utf-8"))
+    reference_audit = json.loads((reference_run / "data_audit.json").read_text(encoding="utf-8"))
+    if data.observable_candidates is None:
+        raise ValueError("posture R&D requires the complete observable candidate pool")
+    reference_errors = _matched_reference_input_errors(data, reference_result, reference_audit)
+    if reference_errors:
+        raise ValueError(
+            "baseline reference has a different scientific input tuple: "
+            + "; ".join(reference_errors)
+        )
     reference_path = reference_run / reference_result["prediction_artifact"]["path"]
     with np.load(reference_path, allow_pickle=False) as archive:
         for name in ("labels", "participant_ids", "session_ids", "trial_ids", "window_ids"):
@@ -289,46 +474,82 @@ def run_and_write(
         }
     output.mkdir(parents=True, exist_ok=False)
     started = datetime.now(UTC).isoformat()
-    _write_json_create_only(
-        output / "data_audit.json",
-        {
-            "schema_version": "1.0.0",
-            "created_at": started,
-            "dataset": data.summary(),
-            "source_receipts": [receipt.to_dict() for receipt in data.receipts],
-            "source_input_manifest": manifest,
-            "git_at_launch": launch,
-            "protocol": protocol,
-        },
-    )
+    dataset_summary = data.summary()
+    evidence_status = _external_evidence_status(dataset_summary)
+    audit = {
+        "schema_version": "1.0.0",
+        "created_at": started,
+        "dataset": dataset_summary,
+        "artifact_evidence_status": evidence_status,
+        "source_receipts": [receipt.to_dict() for receipt in data.receipts],
+        "source_input_manifest": manifest,
+        "git_at_launch": launch,
+        "publication_launch_context": launch_context_binding,
+        "protocol": protocol,
+    }
+    data_audit_artifact = _write_self_hashed_json_create_only(output / "data_audit.json", audit)
+    artifact_contract = _publication_artifact_contract(manifest, data_audit_artifact)
     try:
+        reference_witness = output / "baseline_reference_predictions.npz"
+        with reference_witness.open("xb") as stream:
+            np.savez_compressed(
+                stream,
+                labels=data.labels,
+                participant_ids=data.participant_ids,
+                session_ids=data.session_ids,
+                trial_ids=data.trial_ids,
+                window_ids=data.window_ids,
+                **{
+                    f"probability__seed-{seed}__RandomForest-6ch": values
+                    for seed, values in reference_probabilities.items()
+                },
+            )
+        reference_witness_artifact = {
+            "path": reference_witness.relative_to(output).as_posix(),
+            "sha256": sha256_file(reference_witness),
+            "size_bytes": reference_witness.stat().st_size,
+        }
         result, probabilities = evaluate_posture_forests(data, output=output)
         baseline_checks = {
-            str(seed): {
-                "class_decisions_exact": bool(
-                    np.array_equal(
-                        values.argmax(axis=1),
-                        probabilities[f"seed-{seed}__RandomForest-6ch"].argmax(axis=1),
-                    )
-                ),
-                "maximum_probability_absolute_difference": float(
-                    np.max(np.abs(values - probabilities[f"seed-{seed}__RandomForest-6ch"]))
-                ),
-            }
+            str(seed): _baseline_probability_check(
+                values, probabilities[f"seed-{seed}__RandomForest-6ch"]
+            )
             for seed, values in reference_probabilities.items()
         }
         result["baseline_reconstruction"] = {
-            "reference_run": str(reference_run.resolve()),
+            "reference_run": _reference_run_location(reference_run, repository_root),
             "reference_result_sha256": sha256_file(reference_run / "result.json"),
             "reference_predictions_sha256": sha256_file(reference_path),
+            "retained_reference_witness": reference_witness_artifact,
             "per_seed": baseline_checks,
-            "gate_passed": all(item["class_decisions_exact"] for item in baseline_checks.values()),
+            "scientific_input_tuple_exact": True,
+            "gate_passed": all(
+                item["class_decisions_exact"] and item["probabilities_within_strict_tolerance"]
+                for item in baseline_checks.values()
+            ),
         }
         if not result["baseline_reconstruction"]["gate_passed"]:
             _write_json_create_only(
                 output / "baseline_reconstruction_failure.json", result["baseline_reconstruction"]
             )
             raise ValueError("matched baseline class decisions did not reproduce")
+        modelling, scoring_indices, scoring_eligibility = observable_modelling_pool(
+            data, include_supervised_labels=True
+        )
+        candidate_identifiers = {
+            "participant_ids": modelling.participant_ids,
+            "window_ids": modelling.window_ids,
+        }
+        result["candidate_prediction_contract"] = {
+            "candidate_window_count": int(modelling.window_ids.size),
+            "scored_window_count": int(data.window_ids.size),
+            "scoring_indices_sha256": canonical_json_sha256(scoring_indices.tolist()),
+            "scoring_indices_array_sha256": _array_sha256(scoring_indices),
+            "scoring_eligibility_array_sha256": _array_sha256(scoring_eligibility),
+            "candidate_identifier_hashes": {
+                name: _array_sha256(values) for name, values in candidate_identifiers.items()
+            },
+        }
         prediction = output / "predictions.npz"
         with prediction.open("xb") as stream:
             np.savez_compressed(
@@ -338,10 +559,22 @@ def run_and_write(
                 session_ids=data.session_ids,
                 trial_ids=data.trial_ids,
                 window_ids=data.window_ids,
+                candidate_participant_ids=modelling.participant_ids,
+                candidate_window_ids=modelling.window_ids,
+                candidate_scoring_indices=scoring_indices,
+                candidate_scoring_eligibility=scoring_eligibility,
                 **{  # type: ignore[arg-type]
                     f"probability__{name}": value for name, value in probabilities.items()
                 },
             )
+        _resolve_publication_launch_context(
+            repository_root=repository_root,
+            output_directory=output,
+            current_git_state=_git_state(repository_root),
+            current_source_manifest=_source_input_manifest(repository_root),
+            manifest_commit_validator=_source_manifest_commit_errors,
+            inherited_launch_context=launch_context,
+        )
         result.update(
             {
                 "started_at": started,
@@ -349,37 +582,52 @@ def run_and_write(
                 "git_at_launch": launch,
                 "git": _git_state(repository_root),
                 "source_input_manifest": manifest,
+                "publication_launch_context": launch_context_binding,
                 "protocol": {
                     "path": PROTOCOL_PATH,
                     "sha256": sha256_file(protocol_path),
                     "record_sha256": protocol["record_sha256"],
                 },
                 "prediction_artifact": {"path": prediction.name, "sha256": sha256_file(prediction)},
-                "environment": {
-                    dist.metadata["Name"]: dist.version
-                    for dist in importlib.metadata.distributions()
-                    if "Name" in dist.metadata
-                },
+                "environment": _runtime_environment(),
+                "artifact_evidence_status": evidence_status,
+                "data_audit_artifact": data_audit_artifact,
+                "artifact_contract": artifact_contract,
             }
         )
         result["result_payload_sha256_before_serialization"] = canonical_json_sha256(result)
         _write_json_create_only(output / "result.json", result)
     except Exception as error:
-        _write_json_create_only(
+        _write_self_hashed_json_create_only(
             output / "failure.json",
             {
                 "status": "FAILED_PRESERVED",
+                "started_at": started,
                 "failed_at_utc": datetime.now(UTC).isoformat(),
                 "exception_type": type(error).__name__,
                 "exception_message": str(error),
                 "traceback": traceback.format_exc(),
                 "git_at_launch": launch,
                 "source_input_manifest": manifest,
+                "publication_launch_context": launch_context_binding,
+                "environment": _runtime_environment(),
+                "artifact_evidence_status": evidence_status,
+                "data_audit_artifact": data_audit_artifact,
+                "artifact_contract": artifact_contract,
             },
+            hash_field="failure_payload_sha256_before_serialization",
         )
+        validate_and_record_run_directory(output, repository_root)
         raise
+    split_audit = write_split_audit(
+        output,
+        output / "split_audit.json",
+        repository_root=repository_root,
+    )
     validation = validate_run_directory(output, repository_root)
     _write_json_create_only(output / "validation.json", validation)
+    if not split_audit["valid"] or split_audit["status"] != "PASS_RECORDED_RESULT":
+        raise ValueError("R&D evidence failed the recorded participant-split gate")
     if not validation["publication_evidence_ready"]:
         raise ValueError("R&D evidence failed the independent reconstruction gate")
     return result
@@ -392,18 +640,43 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--reference-run", type=Path, required=True)
     args = parser.parse_args(argv)
     root = args.repository_root.resolve()
-    launch = _git_state(root)
-    manifest = _source_input_manifest(root)
-    if launch["worktree_dirty"] or _manifest_commit_errors(
-        root, launch["commit"], manifest["files"]
-    ):
-        raise ValueError("R&D requires clean source before dataset acquisition")
-    result = run_and_write(
-        data=load_fog_star(),
-        output=args.output.resolve(),
+    _launch, _manifest, launch_context = _resolve_publication_launch_context(
         repository_root=root,
-        reference_run=args.reference_run.resolve(),
+        output_directory=args.output.resolve(),
+        current_git_state=_git_state(root),
+        current_source_manifest=_source_input_manifest(root),
+        manifest_commit_validator=_source_manifest_commit_errors,
     )
+    output = args.output.resolve()
+    started = datetime.now(UTC).isoformat()
+    stage = "dataset_acquisition"
+    try:
+        data = load_fog_star()
+        if not _fog_star_full_cohort_observed(data.summary()):
+            raise ValueError(
+                "posture R&D requires the exact 22-person FoG-STAR provider roster "
+                "and all planned participants to contribute scored windows"
+            )
+        stage = "reference_validation_and_experiment_writer"
+        result = run_and_write(
+            data=data,
+            output=output,
+            repository_root=root,
+            reference_run=args.reference_run.resolve(),
+            inherited_launch_context=launch_context,
+        )
+    except Exception as error:
+        if not output.exists():
+            _write_launch_failure_envelope(
+                repository_root=root,
+                output_directory=output,
+                launch_context=launch_context,
+                started_at=started,
+                stage=stage,
+                exception=error,
+                traceback_text=traceback.format_exc(),
+            )
+        raise
     print(json.dumps(result["advancement_gate"], sort_keys=True))
     return 0
 
