@@ -1,0 +1,152 @@
+schema_version: "1.0.0"
+experiment_id: "fog-rf-feature-weight-factorial-v1"
+status: "frozen_before_outcomes"
+declared_at_utc: "2026-09-07T00:00:00Z"
+evidence_status: "corrected_fog_development_baseline_not_confirmation"
+purpose: >-
+  Resolve the superseded PB-RF-D9 feature-versus-weighting confound with one fixed
+  Random Forest crossed with six/derived-nine channels and ordinary/participant-first
+  weighting. This is baseline engineering, not a test or promotion of prompted C3.
+
+source:
+  dataset_id: "fog_star_v3"
+  provider_record: "https://zenodo.org/records/17838806"
+  content_url: "https://zenodo.org/api/records/17838806/files/sensor_data.csv/content"
+  declared_size_bytes: 119629580
+  declared_md5: "952a37ab147da35e6d4e7a1e9bac44cb"
+  expected_sha256: "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477"
+  participant_roster:
+    - "fogstar:001"
+    - "fogstar:002"
+    - "fogstar:003"
+    - "fogstar:004"
+    - "fogstar:005"
+    - "fogstar:006"
+    - "fogstar:007"
+    - "fogstar:008"
+    - "fogstar:009"
+    - "fogstar:010"
+    - "fogstar:011"
+    - "fogstar:012"
+    - "fogstar:013"
+    - "fogstar:014"
+    - "fogstar:015"
+    - "fogstar:016"
+    - "fogstar:017"
+    - "fogstar:018"
+    - "fogstar:019"
+    - "fogstar:020"
+    - "fogstar:021"
+    - "fogstar:022"
+  class_order: ["mobility", "sitting", "standing"]
+  target_rate_hz: 50.0
+  window_samples: 128
+  gravity_cutoff_hz: 0.30
+  maximum_gap_factor: 3.0
+  segmentation: "participant_session_timestamp_gap_nonfinite_run"
+  resampling_and_gravity_annotation_independent: true
+  annotation_role: "posthoc_window_label_and_scoring_eligibility_only"
+  participant_plan_created_before_windowing: true
+  raw_local_mirror: false
+
+folds:
+  seed: 11
+  count: 5
+  assignment_role: "outer"
+  assignment_source: "loader_frozen_external-har-prewindow-partitions-v1"
+  estimator_random_state: "11_plus_outer_fold_index_shared_by_all_four_cells"
+
+features:
+  extractor: "inclusive_shift_har.preprocessing.features.extract_engineered_features"
+  dtype: "float64"
+  cache_scope: "all_annotation_independent_observable_candidates"
+  six_channel:
+    signal: "linear_acceleration_plus_gyroscope"
+    channel_names: ["lin_acc_x", "lin_acc_y", "lin_acc_z", "gyro_x", "gyro_y", "gyro_z"]
+  derived_nine:
+    signal: "six_channel_plus_causal_gravity_derived_from_total_acceleration"
+    channel_names: ["lin_acc_x", "lin_acc_y", "lin_acc_z", "gyro_x", "gyro_y", "gyro_z", "gravity_x", "gravity_y", "gravity_z"]
+
+estimator:
+  library_class: "sklearn.ensemble.RandomForestClassifier"
+  n_estimators: 500
+  max_features: "sqrt"
+  min_samples_leaf: 2
+  bootstrap: true
+  n_jobs: 4
+  probability_class_order: [0, 1, 2]
+  no_hyperparameter_search: true
+
+weighting:
+  ordinary:
+    class_weight: "balanced_subsample"
+    sample_weight: null
+  participant_first:
+    class_weight: null
+    raw_sample_weight: "1 / (m_i * n_ic)"
+    normalization: "mean_one_over_outer_training_rows"
+    absent_person_class_rows: "no_rows_no_invented_weight"
+
+cells:
+  f0:
+    label: "RF-6ch-ordinary"
+    features: "six_channel"
+    weighting: "ordinary"
+  f1:
+    label: "RF-6ch-participant-first"
+    features: "six_channel"
+    weighting: "participant_first"
+  f2:
+    label: "RF-derived9-ordinary"
+    features: "derived_nine"
+    weighting: "ordinary"
+  f3:
+    label: "RF-derived9-participant-first"
+    features: "derived_nine"
+    weighting: "participant_first"
+
+primary:
+  candidate: "f3"
+  strongest_control_candidates: ["f0", "f1", "f2"]
+  strongest_control_tie_priority: ["f0", "f1", "f2"]
+  tie_tolerance: 1.0e-12
+  hierarchy: "fixed_three_class_macro_f1_within_person_then_equal_mean_across_22_roster_people"
+
+statistics:
+  paired_participant_bootstrap_resamples: 10000
+  paired_participant_bootstrap_seed: 1729
+  percentile_interval: [0.025, 0.975]
+  bottom_fraction: 0.30
+  missing_class_metric_rule: "fixed_class_zero_division_zero"
+  zero_scored_window_rule: "promotion_incomplete_never_drop_person"
+
+promotion_gate:
+  minimum_mean_gain: 0.015
+  minimum_bottom_30_difference: -0.010
+  minimum_worst_participant_difference: -0.030
+  minimum_mobility_recall_difference: -0.010
+  minimum_sitting_recall_difference: -0.020
+  minimum_standing_recall_difference: -0.020
+  minimum_participant_wins_if_full_roster: 14
+  require_all_leave_one_participant_out_means_positive: true
+  leave_one_out_positive_tolerance: 1.0e-12
+  require_all_22_roster_people_scored: true
+
+resource_limits:
+  controller_count: 1
+  maximum_model_fits: 20
+  compute_wall_seconds: 7200
+  cpu_estimator_workers: 4
+  prediction_workers: 1
+  blas_threads: 1
+  gpu_allowed: false
+  additional_seeds_allowed: false
+  automatic_follow_on_allowed: false
+
+claims:
+  invention_claim_allowed: false
+  independent_confirmation_claim_allowed: false
+  native_gravity_claim_allowed: false
+  zero_shot_transfer_claim_allowed: false
+  publication_queue_allowed: false
+  prompted_c3_continuation: false
