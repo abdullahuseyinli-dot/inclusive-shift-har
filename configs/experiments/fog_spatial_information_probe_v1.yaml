@@ -1,0 +1,152 @@
+schema_version: 1.0.0
+experiment_id: fog-spatial-information-probe-v1
+status: frozen_before_outcomes
+evidence_status: corrected_fog_exploratory_development_not_confirmation
+source:
+  dataset_id: fog_star_v3
+  expected_sha256: 888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477
+  expected_size_bytes: 119629580
+  observable_candidate_count: 1939
+  scored_window_count: 1213
+  scored_class_support: [954, 74, 185]
+  participant_roster:
+    - fogstar:001
+    - fogstar:002
+    - fogstar:003
+    - fogstar:004
+    - fogstar:005
+    - fogstar:006
+    - fogstar:007
+    - fogstar:008
+    - fogstar:009
+    - fogstar:010
+    - fogstar:011
+    - fogstar:012
+    - fogstar:013
+    - fogstar:014
+    - fogstar:015
+    - fogstar:016
+    - fogstar:017
+    - fogstar:018
+    - fogstar:019
+    - fogstar:020
+    - fogstar:021
+    - fogstar:022
+  outer_folds: [0, 1, 2, 3, 4]
+  inclusivehar_locked_target_access: false
+references:
+  coverage_audit_sha256: 16661d1e48b6b202a2295ccb2c258944d16d421024d0a7af506aa291a5ae6f14
+  availability_audit_sha256: ba80d1ff36567ed7d9dbac0ebb0a885fddabce22bac0e81968c1fa64d98a533d
+  back80_feature_array_sha256: b890eaa901357cb7ef4ab950665e090a92664e1796290f233cf30a93f1505ad4
+  back_signal_array_sha256: 12b95076c2d2518a79a9c156072e15d12f12123aa48ff9e3d52093f0ade615da
+  back_gravity_array_sha256: d61791708c83af6cb3d71b8e20f3854f5e8452d021892b8223831225db9f67f3
+  qualified_left_ankle_signal_array_sha256: 4a4e9b199e78acf728df405fdb7ac9a1c28973a476d4b575c0c6d2903d39f012
+  qualified_left_ankle_gravity_array_sha256: 15a6cdd15b9bc66b2c6f8c8f571e0ab3fe94aed8a9ed9caed17beb24f9290247
+  qualified_left_ankle80_feature_array_sha256: 4ee0db3c22f6e9f858835acb194d8f39fecd57830b12ac1ff1ff9a3de0079e50
+  left_ankle_segment_receipts_sha256: 4c9a9f97f9ece2b9a4851a2095523b4ca288e186572ca022e0f22d0fce8e1944
+  gsp_completion_sha256: 10d844a7ebd77930f2bb19d6ed08fd90433205ff0303c8ccfc659655db417698
+  factorial_completion_sha256: e91e6c9fbe61256fd49bc54574ea85728b8c960afe4c366458b5af30a96fcce2
+  decision_completion_sha256: 49927afb88c1f1843460a681867c2e64d84dd854a10af014feea485747cd6e01
+availability:
+  fixed_sensor: ankleL
+  mask_definition: raw_interval_contained AND independent_50hz_grid_matches_all128_times AND exactly_one_matching_run
+  mask_shape: [1939]
+  mask_dtype: '|b1'
+  mask_sha256: 27c4d82a970975d93784cce15aa67799b07300eeacf7bb82d1ee62ec7f6b9a3d
+  ordered_observable_ids_sha256: 4c73070017ae3b2b911df6daa5cd20a3db0f6c8712e23c2f7846c5410e956e44
+  observable_available_count: 1817
+  observable_fallback_count: 122
+  scored_available_count: 1154
+  scored_fallback_count: 59
+  timestamp_atol_seconds: 1.0e-10
+  timestamp_rtol: 0.0
+  fallback_cell: b0
+preprocessing:
+  source_rate_hz: 60.0
+  target_rate_hz: 50.0
+  gravity_cutoff_hz: 0.30
+  window_samples: 128
+  maximum_gap_factor: 3.0
+  acceleration_input_unit: g
+  acceleration_output_unit: m_per_s2
+  gyroscope_input_unit: degree_per_s
+  gyroscope_output_unit: rad_per_s
+  feature_extractor: inclusive_shift_har.preprocessing.features.extract_engineered_features
+  feature_dtype: float64
+  static_gravity_features_included: false
+cells:
+  order: [b0, bv, lv, blv, bbv]
+  b0: {training: all_scored, features: back80, fallback: none}
+  bv: {training: available_scored, features: back80, fallback: b0}
+  lv: {training: available_scored, features: left_ankle80, fallback: b0}
+  blv: {training: available_scored, features: back80_plus_left_ankle80, fallback: b0}
+  bbv: {training: available_scored, features: back80_plus_duplicate_back80, fallback: b0}
+estimator:
+  class: sklearn.ensemble.RandomForestClassifier
+  n_estimators: 500
+  criterion: gini
+  max_features: sqrt
+  min_samples_leaf: 2
+  min_samples_split: 2
+  max_depth: null
+  max_leaf_nodes: null
+  max_samples: null
+  bootstrap: true
+  class_weight: null
+  ccp_alpha: 0.0
+  min_impurity_decrease: 0.0
+  min_weight_fraction_leaf: 0.0
+  oob_score: false
+  warm_start: false
+  monotonic_cst: null
+  random_state: 11_plus_outer_fold_index
+  fit_workers: 4
+  prediction_workers: 1
+weighting:
+  policy: participant_first_mean_one
+  raw_sample_weight: 1 / (m_i * n_ic)
+  recompute_on_actual_training_rows: true
+comparisons:
+  report: [bv_minus_b0, lv_minus_bv, blv_minus_bv, blv_minus_lv, blv_minus_bbv, lv_minus_b0, lv_minus_f3, blv_minus_b0, blv_minus_f3, bbv_minus_bv]
+  lv_advancement: [lv_minus_bv, lv_minus_b0, lv_minus_f3]
+  blv_advancement: [blv_minus_bv, blv_minus_lv, blv_minus_bbv, blv_minus_b0, blv_minus_f3]
+gate:
+  minimum_mean_gain: 0.015
+  minimum_participant_wins: 14
+  minimum_bottom_30_difference: -0.01
+  minimum_worst_participant_difference: -0.03
+  minimum_mobility_recall_difference: -0.01
+  minimum_sitting_recall_difference: -0.02
+  minimum_standing_recall_difference: -0.02
+  leave_one_participant_positive_tolerance: 1.0e-12
+  require_every_leave_one_fold_mean_positive: true
+metrics:
+  class_order: [mobility, sitting, standing]
+  primary: fixed_three_class_macro_f1_within_person_then_equal_person_mean
+  missing_class_rule: fixed_class_zero_division_zero
+  bottom_fraction: 0.30
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+  probability_clip: 1.0e-12
+resources:
+  controller_count: 1
+  maximum_fit_attempts: 25
+  b0_fit_attempts: 5
+  restricted_fit_attempts: 20
+  compute_wall_seconds: 3600
+  implementation_and_checks_wall_seconds: 5400
+  analysis_wall_seconds: 1800
+  session_wall_seconds: 10800
+  blas_threads: 1
+  gpu_allowed: false
+  additional_seeds_allowed: false
+  other_datasets_allowed: false
+  automatic_follow_on_allowed: false
+  cooperative_cancel_file_supported: true
+claims:
+  novelty: false
+  confirmation: false
+  standalone_ankle_replacement: false
+  causal_information_identification: false
+  zero_lookahead_streaming: false
+  universal_sensor_failure: false
