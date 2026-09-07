@@ -321,6 +321,7 @@ def _verify_manifest(run_directory: Path, filename: str) -> int:
         allowed_unlisted = {
             "artifact_manifest.json",
             "validation.json",
+            "validation_worker_shutdown.json",
             "completion_manifest.json",
             "VALIDATION_INCOMPLETE.json",
         }
