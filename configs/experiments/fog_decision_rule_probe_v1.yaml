@@ -1,0 +1,138 @@
+schema_version: 1.0.0
+experiment_id: fog-decision-rule-probe-v1
+status: frozen_before_outcomes
+evidence_status: corrected_fog_exploratory_development_not_confirmation
+source:
+  dataset_id: fog_star_v3
+  expected_sha256: 888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477
+  observable_candidate_count: 1939
+  scored_window_count: 1213
+  participant_roster:
+    - fogstar:001
+    - fogstar:002
+    - fogstar:003
+    - fogstar:004
+    - fogstar:005
+    - fogstar:006
+    - fogstar:007
+    - fogstar:008
+    - fogstar:009
+    - fogstar:010
+    - fogstar:011
+    - fogstar:012
+    - fogstar:013
+    - fogstar:014
+    - fogstar:015
+    - fogstar:016
+    - fogstar:017
+    - fogstar:018
+    - fogstar:019
+    - fogstar:020
+    - fogstar:021
+    - fogstar:022
+  class_order: [mobility, sitting, standing]
+  scored_class_support: [954, 74, 185]
+  outer_fold_count: 5
+  outer_fold_participant_counts: [5, 5, 4, 4, 4]
+  candidate_features: six_channel_ordinary80
+  annotation_role: posthoc_window_label_and_scoring_eligibility_only
+references:
+  gsp_run:
+    run_id: fog-gsp-order-ablation-seed11-20260907-001
+    feature_cache_sha256: 6aabaae394bbf38e5ab84e738e9598c1d977e119d965f0f0eb17f7575aa7960a
+    predictions_sha256: 499219539c5105776c7dc396fbf87ee312a6ccf90a3f9b8a52bff8187876e489
+    result_sha256: b3fcd9f9399df66e01948ac48cee4b67f2b8d234af40f8586954ce5df2d24fc4
+    validation_sha256: f769d2c2c4d7f2ef2e30f8fd8a37de765b3918251265c9d1feca72ca2fbfdf13
+    completion_manifest_sha256: 10d844a7ebd77930f2bb19d6ed08fd90433205ff0303c8ccfc659655db417698
+    feature_key: a_values
+    feature_name_key: a_names
+    probability_cell_id: a
+    probability_cell_index: 0
+  factorial_run:
+    run_id: fog-rf-feature-weight-factorial-seed11-20260907-001
+    feature_cache_sha256: a9d6cfb4c3d0ea75623b3152255775f09292c510d5797d1c0b58192db20e4bea
+    predictions_sha256: c3c7ab375f20bf875a8ff871cf1f1dc7c6b7718d896f37f2d1f6440227ceac6b
+    participant_metrics_sha256: 417ee43e8b1ccf875805204b99a48322c5823939d086d053fc54704315e7b322
+    result_sha256: 30b27aec3cdd7848d9a08d53ad5118d6e7d7fd85e4db49ed2f0194e2debd12f1
+    validation_sha256: 1946240d9cb6a2f92777dc463c0516df30eeb10182eb8911dbe800d4df4355e5
+    completion_manifest_sha256: e91e6c9fbe61256fd49bc54574ea85728b8c960afe4c366458b5af30a96fcce2
+    f1_cell_index: 1
+    f3_cell_index: 3
+estimator:
+  class: sklearn.ensemble.RandomForestClassifier
+  n_estimators: 500
+  max_features: sqrt
+  min_samples_leaf: 2
+  bootstrap: true
+  class_weight: null
+  fit_workers: 4
+  prediction_workers: 1
+  outer_random_state: 11_plus_outer_fold_index
+  inner_random_state: 1100_plus_10_times_outer_fold_plus_inner_validation_fold
+weighting:
+  policy: participant_first_mean_one
+  raw_sample_weight: 1 / (m_i * n_ic)
+  training_eligible_rows_only: true
+decision_rule:
+  mobility_multiplier: 1.0
+  sitting_multipliers: [0.5, 1.0, 2.0]
+  standing_multipliers: [0.5, 1.0, 2.0]
+  tie_order: [mobility, sitting, standing]
+  output_kind: unnormalized_decision_scores_not_probabilities
+  preserve_raw_probabilities: true
+inner_selection:
+  score: equal_participant_fixed_three_class_macro_f1
+  comparison: candidate_minus_identity
+  minimum_bottom_30_difference: -0.01
+  minimum_worst_participant_difference: -0.03
+  minimum_mobility_recall_difference: -0.01
+  minimum_sitting_recall_difference: -0.02
+  minimum_standing_recall_difference: -0.02
+  tie_tolerance: 1.0e-12
+  tie_break: [minimum_absolute_log2_offset_l1, lexicographic_log2_sitting_then_standing]
+  identity_if_no_nonidentity_gain_above_tolerance: true
+final_gate:
+  comparisons: [d1_minus_d0, d1_minus_f3]
+  minimum_mean_gain: 0.015
+  minimum_participant_wins: 14
+  minimum_bottom_30_difference: -0.01
+  minimum_worst_participant_difference: -0.03
+  minimum_mobility_recall_difference: -0.01
+  minimum_sitting_recall_difference: -0.02
+  minimum_standing_recall_difference: -0.02
+  leave_one_participant_positive_tolerance: 1.0e-12
+  require_every_leave_one_fold_mean_positive: true
+metrics:
+  primary: fixed_three_class_macro_f1_within_person_then_equal_person_mean
+  missing_class_rule: fixed_class_zero_division_zero
+  bottom_fraction: 0.30
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+  probability_clip: 1.0e-12
+resources:
+  controller_count: 1
+  maximum_fit_attempts: 25
+  expected_outer_fits: 5
+  expected_inner_fits: 20
+  compute_wall_seconds: 3600
+  implementation_and_checks_wall_seconds: 5400
+  analysis_wall_seconds: 1800
+  session_wall_seconds: 10800
+  blas_threads: 1
+  gpu_allowed: false
+  additional_benchmark_fits_allowed: false
+  additional_seeds_allowed: false
+  other_datasets_allowed: false
+  automatic_follow_on_allowed: false
+runtime_contract:
+  python_version_prefix: '3.11.9 '
+  numpy_version: 2.3.5
+  scikit_learn_version: 1.8.0
+  python_executable_must_match_gsp_reference: true
+  effective_estimator_parameters_must_match_gsp_reference: true
+claims:
+  novelty: false
+  confirmation: false
+  calibration_improvement: false
+  physiological_mechanism: false
+  universal_temporal_failure: false
