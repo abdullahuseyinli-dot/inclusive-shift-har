@@ -1,0 +1,190 @@
+schema_version: "1.0.0"
+experiment_id: "fog-gsp-order-ablation-v1"
+status: "frozen_before_outcomes"
+declared_at_utc: "2026-09-07T00:00:00Z"
+evidence_status: "corrected_fog_exploratory_development_not_confirmation"
+purpose: >-
+  Test whether the existing six-channel Geometric Spectral Pyramid representation
+  improves the corrected FoG participant-weighted Random Forest and whether any
+  package benefit depends on the original within-window sample order.
+
+source:
+  dataset_id: "fog_star_v3"
+  provider_record: "https://zenodo.org/records/17838806"
+  content_url: "https://zenodo.org/api/records/17838806/files/sensor_data.csv/content"
+  declared_size_bytes: 119629580
+  declared_md5: "952a37ab147da35e6d4e7a1e9bac44cb"
+  expected_sha256: "888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477"
+  participant_roster:
+    - "fogstar:001"
+    - "fogstar:002"
+    - "fogstar:003"
+    - "fogstar:004"
+    - "fogstar:005"
+    - "fogstar:006"
+    - "fogstar:007"
+    - "fogstar:008"
+    - "fogstar:009"
+    - "fogstar:010"
+    - "fogstar:011"
+    - "fogstar:012"
+    - "fogstar:013"
+    - "fogstar:014"
+    - "fogstar:015"
+    - "fogstar:016"
+    - "fogstar:017"
+    - "fogstar:018"
+    - "fogstar:019"
+    - "fogstar:020"
+    - "fogstar:021"
+    - "fogstar:022"
+  class_order: ["mobility", "sitting", "standing"]
+  target_rate_hz: 50.0
+  window_samples: 128
+  gravity_cutoff_hz: 0.30
+  maximum_gap_factor: 3.0
+  segmentation: "participant_session_timestamp_gap_nonfinite_run"
+  signal_lane: "linear_acceleration_plus_gyroscope"
+  channel_names: ["lin_acc_x", "lin_acc_y", "lin_acc_z", "gyro_x", "gyro_y", "gyro_z"]
+  resampling_and_gravity_annotation_independent: true
+  annotation_role: "posthoc_window_label_and_scoring_eligibility_only"
+  participant_plan_created_before_windowing: true
+  raw_local_mirror: false
+
+reference_control:
+  experiment_id: "fog-rf-feature-weight-factorial-v1"
+  run_id: "fog-rf-feature-weight-factorial-seed11-20260907-001"
+  cell_id: "f1"
+  cell_index: 1
+  feature_cache_sha256: "a9d6cfb4c3d0ea75623b3152255775f09292c510d5797d1c0b58192db20e4bea"
+  predictions_sha256: "c3c7ab375f20bf875a8ff871cf1f1dc7c6b7718d896f37f2d1f6440227ceac6b"
+  result_sha256: "30b27aec3cdd7848d9a08d53ad5118d6e7d7fd85e4db49ed2f0194e2debd12f1"
+  validation_sha256: "1946240d9cb6a2f92777dc463c0516df30eeb10182eb8911dbe800d4df4355e5"
+  completion_manifest_sha256: "e91e6c9fbe61256fd49bc54574ea85728b8c960afe4c366458b5af30a96fcce2"
+  exact_feature_replay_required_before_fits: true
+  exact_observable_probability_replay_required_before_gsp_fits: true
+
+folds:
+  seed: 11
+  count: 5
+  assignment_role: "outer"
+  assignment_source: "loader_frozen_external-har-prewindow-partitions-v1"
+  estimator_random_state: "11_plus_outer_fold_index_shared_by_all_three_cells"
+  execution_order: ["a", "b", "c"]
+
+features:
+  dtype: "float64"
+  cache_scope: "all_annotation_independent_observable_candidates"
+  a:
+    extractor: "inclusive_shift_har.preprocessing.features.extract_engineered_features"
+    expected_dimension: 80
+  b:
+    extractor: "inclusive_shift_har.models.geometric_spectral_pyramid.extract_geometric_spectral_pyramid_features"
+    sampling_rate_hz: 50.0
+    expected_dimension: 1400
+  c:
+    extractor: "same_as_b_after_joint_within_window_permutation"
+    sampling_rate_hz: 50.0
+    expected_dimension: 1400
+  no_additional_denoising: true
+  no_gravity_channel_addition: true
+  no_learned_normalization: true
+
+permutation:
+  namespace: "fog-gsp-order-ablation-v1"
+  serialization: "utf8_namespace_pipe_observable_window_id_pipe_zero_padded_three_digit_index"
+  construction: "sort_indices_by_sha256_digest_then_numeric_index"
+  scope: "separately_within_each_observable_candidate"
+  joint_across_all_six_channels: true
+  stage: "after_continuous_preprocessing_before_all_gsp_construction"
+  train_and_evaluation_rule_identical: true
+  sample_tuple_multiset_exact: true
+  numeric_moment_tolerance: 1.0e-10
+  matrix_dtype: "int16"
+  matrix_shape: [1939, 128]
+  extra_permutation_replicates_allowed: false
+
+estimator:
+  library_class: "sklearn.ensemble.RandomForestClassifier"
+  n_estimators: 500
+  max_features: "sqrt"
+  min_samples_leaf: 2
+  bootstrap: true
+  class_weight: null
+  n_jobs: 4
+  probability_class_order: [0, 1, 2]
+  no_hyperparameter_search: true
+  prediction_workers: 1
+
+weighting:
+  raw_sample_weight: "1 / (m_i * n_ic)"
+  normalization: "mean_one_over_outer_training_rows"
+  absent_person_class_rows: "no_rows_no_invented_weight"
+  training_rows: "outer_training_intersection_scoring_eligibility"
+
+cells:
+  a:
+    label: "RF-ordinary80-six-participant-first-control"
+    features: "a"
+  b:
+    label: "RF-GSP1400-six-original-order"
+    features: "b"
+  c:
+    label: "RF-GSP1400-six-joint-shuffled-order"
+    features: "c"
+
+statistics:
+  paired_participant_bootstrap_resamples: 10000
+  paired_participant_bootstrap_seed: 1729
+  percentile_interval: [0.025, 0.975]
+  bottom_fraction: 0.30
+  missing_class_metric_rule: "fixed_class_zero_division_zero"
+  zero_scored_window_rule: "promotion_incomplete_never_drop_person"
+  comparisons:
+    practical_primary: "b_minus_a"
+    order_mechanism: "b_minus_c"
+    descriptive: "c_minus_a"
+
+practical_promotion_gate_b_minus_a:
+  minimum_mean_gain: 0.015
+  minimum_bottom_30_difference: -0.010
+  minimum_worst_participant_difference: -0.030
+  minimum_mobility_recall_difference: -0.010
+  minimum_sitting_recall_difference: -0.020
+  minimum_standing_recall_difference: -0.020
+  minimum_participant_wins: 14
+  require_all_leave_one_participant_out_means_positive: true
+  leave_one_out_positive_tolerance: 1.0e-12
+  require_all_22_roster_people_scored: true
+
+order_mechanism_gate_b_minus_c:
+  minimum_mean_gain: 0.010
+  require_positive_bootstrap_lower_endpoint: true
+  minimum_participant_wins: 14
+  require_all_leave_one_participant_out_means_positive: true
+  leave_one_out_positive_tolerance: 1.0e-12
+  require_all_22_roster_people_scored: true
+
+resource_limits:
+  controller_count: 1
+  maximum_fit_attempts: 15
+  expected_completed_fits: 15
+  compute_wall_seconds: 7200
+  cpu_estimator_workers: 4
+  prediction_workers: 1
+  blas_threads: 1
+  gpu_allowed: false
+  additional_benchmark_fits_allowed: false
+  first_registered_a_fold_is_timing_benchmark: true
+  additional_seeds_allowed: false
+  automatic_follow_on_allowed: false
+
+claims:
+  invention_claim_allowed: false
+  independent_confirmation_claim_allowed: false
+  information_impossibility_claim_allowed: false
+  physiology_claim_allowed: false
+  temporal_model_superiority_claim_allowed: false
+  robustness_claim_allowed: false
+  publication_queue_allowed: false
+  physical_pilot_continuation: false
