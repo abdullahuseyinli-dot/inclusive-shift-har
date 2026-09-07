@@ -1,0 +1,541 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://inclusive-shift-har.invalid/schema/physical_information_pilot.schema.json",
+  "title": "Physical information identifiability pilot plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_kind",
+    "study_id",
+    "evidence_status",
+    "readiness_status",
+    "created_at_utc",
+    "lineage",
+    "counts",
+    "wearers",
+    "visits",
+    "blocks",
+    "bouts",
+    "comparisons",
+    "pending_prerequisites",
+    "claims",
+    "record_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "record_kind": {"const": "physical_information_pilot_plan"},
+    "study_id": {"const": "physical-information-identifiability-v1"},
+    "evidence_status": {"const": "planned"},
+    "readiness_status": {"const": "plan_valid_collection_pending"},
+    "created_at_utc": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code_commit", "config", "protocol", "schema"],
+      "properties": {
+        "code_commit": {"$ref": "#/$defs/code_commit"},
+        "config": {"$ref": "#/$defs/file_reference"},
+        "protocol": {"$ref": "#/$defs/file_reference"},
+        "schema": {"$ref": "#/$defs/file_reference"}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wearers",
+        "visits",
+        "blocks",
+        "bouts",
+        "support_bouts",
+        "query_bouts",
+        "nominal_recording_seconds",
+        "fresh_query_blocks",
+        "attachment_stale_query_blocks",
+        "visit_stale_query_blocks"
+      ],
+      "properties": {
+        "wearers": {"const": 6},
+        "visits": {"const": 12},
+        "blocks": {"const": 24},
+        "bouts": {"const": 264},
+        "support_bouts": {"const": 96},
+        "query_bouts": {"const": 168},
+        "nominal_recording_seconds": {"const": 9000},
+        "fresh_query_blocks": {"const": 24},
+        "attachment_stale_query_blocks": {"const": 12},
+        "visit_stale_query_blocks": {"const": 12}
+      }
+    },
+    "wearers": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^pilot:[0-9]{3}$"}
+    },
+    "visits": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {"$ref": "#/$defs/visit_plan"}
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {"$ref": "#/$defs/block_plan"}
+    },
+    "bouts": {
+      "type": "array",
+      "minItems": 264,
+      "maxItems": 264,
+      "items": {"$ref": "#/$defs/bout_plan"}
+    },
+    "comparisons": {
+      "type": "array",
+      "minItems": 48,
+      "maxItems": 48,
+      "items": {"$ref": "#/$defs/comparison_plan"}
+    },
+    "pending_prerequisites": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "human_study_authorization",
+          "consent_process",
+          "participant_access",
+          "qualified_device",
+          "placement_instruction",
+          "bench_uncertainty",
+          "device_specific_processing_freeze"
+        ]
+      }
+    },
+    "claims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection_completed",
+        "device_qualified",
+        "physical_identifiability_demonstrated",
+        "population_superiority_demonstrated",
+        "architecture_eligible"
+      ],
+      "properties": {
+        "collection_completed": {"const": false},
+        "device_qualified": {"const": false},
+        "physical_identifiability_demonstrated": {"const": false},
+        "population_superiority_demonstrated": {"const": false},
+        "architecture_eligible": {"const": false}
+      }
+    },
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "code_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*[\\u0000-\\u001f\\u007f\\\\]).+[^/]$"
+    },
+    "file_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/safe_relative_path"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "collection_status": {
+      "enum": ["planned", "recorded", "partial", "failed", "withdrawn", "unresolved"]
+    },
+    "visit_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visit_id",
+        "wearer_id",
+        "visit_number",
+        "appointment_cap_minutes",
+        "block_ids",
+        "actual_visit_started_at_utc",
+        "status"
+      ],
+      "properties": {
+        "visit_id": {"type": "string", "pattern": "^pilot:[0-9]{3}/visit-[12]$"},
+        "wearer_id": {"type": "string", "pattern": "^pilot:[0-9]{3}$"},
+        "visit_number": {"enum": [1, 2]},
+        "appointment_cap_minutes": {"const": 30},
+        "block_ids": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "actual_visit_started_at_utc": {"type": "null"},
+        "status": {"const": "planned"}
+      }
+    },
+    "block_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "block_id",
+        "wearer_id",
+        "visit_id",
+        "visit_number",
+        "attachment_number",
+        "global_block_index",
+        "counterbalance_rotation_offset",
+        "bout_ids",
+        "equipment_receipt_id",
+        "recording_id",
+        "status"
+      ],
+      "properties": {
+        "block_id": {"type": "string"},
+        "wearer_id": {"type": "string", "pattern": "^pilot:[0-9]{3}$"},
+        "visit_id": {"type": "string"},
+        "visit_number": {"enum": [1, 2]},
+        "attachment_number": {"enum": [1, 2]},
+        "global_block_index": {"type": "integer", "minimum": 0, "maximum": 23},
+        "counterbalance_rotation_offset": {"type": "integer", "minimum": 0, "maximum": 28},
+        "bout_ids": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 11,
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "equipment_receipt_id": {"type": "null"},
+        "recording_id": {"type": "null"},
+        "status": {"const": "planned"}
+      }
+    },
+    "bout_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bout_id",
+        "block_id",
+        "wearer_id",
+        "visit_number",
+        "attachment_number",
+        "sequence_in_block",
+        "role",
+        "activity",
+        "motion",
+        "expected_duration_seconds",
+        "interior_trim_seconds_each_end",
+        "prompt_id",
+        "status"
+      ],
+      "properties": {
+        "bout_id": {"type": "string"},
+        "block_id": {"type": "string"},
+        "wearer_id": {"type": "string", "pattern": "^pilot:[0-9]{3}$"},
+        "visit_number": {"enum": [1, 2]},
+        "attachment_number": {"enum": [1, 2]},
+        "sequence_in_block": {"type": "integer", "minimum": 1, "maximum": 11},
+        "role": {"enum": ["support", "query"]},
+        "activity": {"enum": ["sitting", "standing", "mobility"]},
+        "motion": {"enum": ["quiet", "upper_body_motion", "usual", "slow", "turning"]},
+        "expected_duration_seconds": {"enum": [30, 45]},
+        "interior_trim_seconds_each_end": {"const": 5},
+        "prompt_id": {"type": "string"},
+        "status": {"const": "planned"}
+      }
+    },
+    "comparison_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "comparison_id",
+        "comparison_type",
+        "query_block_id",
+        "query_bout_ids",
+        "fresh_support_bout_ids",
+        "stale_support_bout_ids",
+        "identical_query_ids_required",
+        "validity_mask_policy"
+      ],
+      "properties": {
+        "comparison_id": {"type": "string"},
+        "comparison_type": {"enum": ["fresh", "attachment_stale", "visit_stale"]},
+        "query_block_id": {"type": "string"},
+        "query_bout_ids": {
+          "type": "array",
+          "minItems": 7,
+          "maxItems": 7,
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "fresh_support_bout_ids": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"type": "string"}
+        },
+        "stale_support_bout_ids": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true,
+              "items": {"type": "string"}
+            }
+          ]
+        },
+        "identical_query_ids_required": {"const": true},
+        "validity_mask_policy": {"const": "same_query_ids_and_intersection_validity_mask"}
+      }
+    },
+    "equipment_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_kind",
+        "receipt_id",
+        "device_id",
+        "manufacturer",
+        "model",
+        "firmware",
+        "logger",
+        "placement_instruction_path",
+        "placement_instruction_sha256",
+        "axis_convention",
+        "channel_map",
+        "units",
+        "clock_domain",
+        "nominal_rate_hz",
+        "observed_interval_summary",
+        "native_gravity_available",
+        "processing_contract",
+        "frame_conditioning_limit",
+        "bench_qualification_path",
+        "bench_qualification_sha256",
+        "qualified_at_utc",
+        "processing_frozen_at_utc",
+        "status"
+      ],
+      "properties": {
+        "record_kind": {"const": "physical_information_equipment_receipt"},
+        "receipt_id": {"type": "string", "minLength": 1},
+        "device_id": {"type": "string", "minLength": 1},
+        "manufacturer": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "firmware": {"type": "string", "minLength": 1},
+        "logger": {"type": "string", "minLength": 1},
+        "placement_instruction_path": {"$ref": "#/$defs/safe_relative_path"},
+        "placement_instruction_sha256": {"$ref": "#/$defs/sha256"},
+        "axis_convention": {"type": "string", "minLength": 1},
+        "channel_map": {
+          "type": "object",
+          "required": ["ax", "ay", "az", "gx", "gy", "gz"],
+          "additionalProperties": {"type": "string", "minLength": 1},
+          "properties": {
+            "ax": {"type": "string", "minLength": 1},
+            "ay": {"type": "string", "minLength": 1},
+            "az": {"type": "string", "minLength": 1},
+            "gx": {"type": "string", "minLength": 1},
+            "gy": {"type": "string", "minLength": 1},
+            "gz": {"type": "string", "minLength": 1}
+          }
+        },
+        "units": {
+          "type": "object",
+          "required": ["acceleration", "angular_velocity"],
+          "additionalProperties": {"type": "string", "minLength": 1},
+          "properties": {
+            "acceleration": {"type": "string", "minLength": 1},
+            "angular_velocity": {"type": "string", "minLength": 1}
+          }
+        },
+        "clock_domain": {"type": "string", "minLength": 1},
+        "nominal_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+        "observed_interval_summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sample_count",
+            "median_seconds",
+            "p05_seconds",
+            "p95_seconds",
+            "nonpositive_interval_count",
+            "gap_count"
+          ],
+          "properties": {
+            "sample_count": {"type": "integer", "minimum": 2},
+            "median_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "p05_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "p95_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "nonpositive_interval_count": {"type": "integer", "minimum": 0},
+            "gap_count": {"type": "integer", "minimum": 0}
+          }
+        },
+        "native_gravity_available": {"type": "boolean"},
+        "processing_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_rate_hz",
+            "target_rate_hz",
+            "gravity_source",
+            "gravity_cutoff_hz",
+            "maximum_gap_seconds",
+            "resampling_method",
+            "window_samples",
+            "window_stride_samples"
+          ],
+          "properties": {
+            "source_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+            "target_rate_hz": {"type": "number", "exclusiveMinimum": 0},
+            "gravity_source": {
+              "enum": ["provider_native_gravity", "derived_causal_lowpass"]
+            },
+            "gravity_cutoff_hz": {
+              "oneOf": [
+                {"type": "null"},
+                {"type": "number", "exclusiveMinimum": 0}
+              ]
+            },
+            "maximum_gap_seconds": {"type": "number", "exclusiveMinimum": 0},
+            "resampling_method": {"type": "string", "minLength": 1},
+            "window_samples": {"type": "integer", "minimum": 1},
+            "window_stride_samples": {"type": "integer", "minimum": 1}
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {"gravity_source": {"const": "provider_native_gravity"}},
+                "required": ["gravity_source"]
+              },
+              "then": {"properties": {"gravity_cutoff_hz": {"type": "null"}}}
+            },
+            {
+              "if": {
+                "properties": {"gravity_source": {"const": "derived_causal_lowpass"}},
+                "required": ["gravity_source"]
+              },
+              "then": {
+                "properties": {
+                  "gravity_cutoff_hz": {"type": "number", "exclusiveMinimum": 0}
+                }
+              }
+            }
+          ]
+        },
+        "frame_conditioning_limit": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "number", "exclusiveMinimum": 0}
+          ]
+        },
+        "bench_qualification_path": {"$ref": "#/$defs/safe_relative_path"},
+        "bench_qualification_sha256": {"$ref": "#/$defs/sha256"},
+        "qualified_at_utc": {"type": "string", "format": "date-time", "pattern": "Z$"},
+        "processing_frozen_at_utc": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "status": {"const": "qualified"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "processing_contract": {
+                "properties": {
+                  "gravity_source": {"const": "provider_native_gravity"}
+                },
+                "required": ["gravity_source"]
+              }
+            },
+            "required": ["processing_contract"]
+          },
+          "then": {
+            "properties": {
+              "native_gravity_available": {"const": true},
+              "channel_map": {
+                "required": ["gravity_x", "gravity_y", "gravity_z"]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "raw_recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recording_id",
+        "relative_path",
+        "sha256",
+        "size_bytes",
+        "sample_count",
+        "device_id",
+        "wearer_id",
+        "visit_number",
+        "attachment_number",
+        "clock_domain",
+        "visit_started_at_utc",
+        "started_at",
+        "ended_at",
+        "status"
+      ],
+      "properties": {
+        "recording_id": {"type": "string", "minLength": 1},
+        "relative_path": {"$ref": "#/$defs/safe_relative_path"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "size_bytes": {"type": "integer", "minimum": 1},
+        "sample_count": {"type": "integer", "minimum": 1},
+        "device_id": {"type": "string", "minLength": 1},
+        "wearer_id": {"type": "string", "pattern": "^pilot:[0-9]{3}$"},
+        "visit_number": {"enum": [1, 2]},
+        "attachment_number": {"enum": [1, 2]},
+        "clock_domain": {"type": "string", "minLength": 1},
+        "visit_started_at_utc": {"type": "string", "format": "date-time", "pattern": "Z$"},
+        "started_at": {"type": "number", "minimum": 0},
+        "ended_at": {"type": "number"},
+        "status": {"$ref": "#/$defs/collection_status"}
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bout_id",
+        "recording_id",
+        "start_sample",
+        "stop_sample_exclusive",
+        "observed_activity",
+        "observed_motion",
+        "adjudication_status",
+        "adjudicator_id",
+        "adjudicated_at_utc"
+      ],
+      "properties": {
+        "bout_id": {"type": "string"},
+        "recording_id": {"type": "string"},
+        "start_sample": {"type": "integer", "minimum": 0},
+        "stop_sample_exclusive": {"type": "integer", "minimum": 1},
+        "observed_activity": {"enum": ["sitting", "standing", "mobility", "other", "unresolved"]},
+        "observed_motion": {"enum": ["quiet", "upper_body_motion", "usual", "slow", "turning", "other", "unresolved"]},
+        "adjudication_status": {"enum": ["adjudicated", "failed", "withdrawn", "unresolved"]},
+        "adjudicator_id": {"type": "string", "minLength": 1},
+        "adjudicated_at_utc": {"type": "string", "format": "date-time"}
+      }
+    }
+  }
+}

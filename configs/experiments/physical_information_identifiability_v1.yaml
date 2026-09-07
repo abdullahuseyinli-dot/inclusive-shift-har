@@ -1,0 +1,153 @@
+schema_version: "1.0.0"
+study_id: "physical-information-identifiability-v1"
+status: "frozen_plan_device_contract_pending"
+evidence_role: "development_characterization"
+
+population:
+  planned_wearer_count: 6
+  wearer_ids: ["pilot:001", "pilot:002", "pilot:003", "pilot:004", "pilot:005", "pilot:006"]
+  visits_per_wearer: 2
+  attachments_per_visit: 2
+  replacement_recruitment_to_improve_outcomes: false
+  independent_unit: "wearer"
+
+schedule:
+  support_precedes_query: true
+  counterbalance: "cyclic_rotation_by_global_block_plus_wearer_index"
+  posture_duration_seconds: 30
+  mobility_duration_seconds: 45
+  interior_trim_seconds_each_end: 5
+  support_conditions:
+    - {activity: "sitting", motion: "quiet"}
+    - {activity: "sitting", motion: "upper_body_motion"}
+    - {activity: "standing", motion: "quiet"}
+    - {activity: "standing", motion: "upper_body_motion"}
+  query_conditions:
+    - {activity: "sitting", motion: "quiet"}
+    - {activity: "sitting", motion: "upper_body_motion"}
+    - {activity: "standing", motion: "quiet"}
+    - {activity: "standing", motion: "upper_body_motion"}
+    - {activity: "mobility", motion: "usual"}
+    - {activity: "mobility", motion: "slow"}
+    - {activity: "mobility", motion: "turning"}
+  expected_blocks: 24
+  expected_bouts_per_block: 11
+  expected_bouts: 264
+  expected_nominal_recording_seconds: 9000
+  appointment_cap_minutes_per_visit: 30
+
+comparison_contract:
+  fresh:
+    query_scope: "all_24_attachment_blocks"
+    support_scope: "same_attachment_block"
+    expected_query_blocks: 24
+  attachment_stale:
+    query_scope: "attachment_block_2_in_each_visit"
+    fresh_support_scope: "same_visit_attachment_2"
+    stale_support_scope: "same_visit_attachment_1"
+    expected_query_blocks: 12
+  visit_stale:
+    query_scope: "both_attachment_blocks_in_visit_2"
+    fresh_support_scope: "visit_2_same_attachment_number"
+    stale_support_scope: "visit_1_same_attachment_number"
+    expected_query_blocks: 12
+  identical_query_ids_and_validity_masks_required: true
+  future_support_forbidden: true
+
+recording_contract:
+  device_identity_required_before_collection: true
+  model_and_firmware_required: true
+  logging_application_required: true
+  placement_instruction_required: true
+  axis_convention_required: true
+  channel_map_and_units_required: true
+  nominal_and_observed_clock_required: true
+  bench_qualification_receipt_required: true
+  native_and_derived_gravity_separate: true
+  raw_recordings_preserved: true
+  planned_prompt_is_not_observed_label: true
+  actual_bout_adjudication_required: true
+  processing_freeze_point: "after_device_bench_qualification_before_first_human_outcome"
+  preprocessing_reset_boundaries: ["attachment_change", "recording_break", "timestamp_discontinuity", "nonfinite_sensor_run"]
+  preprocessing_non_boundaries: ["activity_annotation", "support_query_role", "bout_boundary", "scoring_admission"]
+
+analysis_contract:
+  aggregation_order: ["window_to_bout", "bout_to_condition_and_reference_scope", "condition_to_wearer", "equal_wearer_mean"]
+  signal_projection:
+    window_grid: "left_aligned_continuous_recording_no_bout_reset"
+    window_length_source: "equipment.processing_contract.window_samples"
+    window_stride_source: "equipment.processing_contract.window_stride_samples"
+    bout_admission: "full_window_inside_fixed_five_second_trimmed_adjudicated_interval"
+    gravity_direction: "normalize(arithmetic_mean(gravity_xyz_samples_in_window))"
+    numerical_norm_epsilon: 1.0e-12
+    invalid_window_if: ["nonfinite_inertial_or_gravity_sample", "timestamp_gap_above_frozen_maximum", "gravity_mean_norm_at_or_below_epsilon"]
+  bout_eligibility:
+    minimum_valid_window_count: 3
+    minimum_valid_window_fraction: 0.80
+    denominator: "all_grid_windows_fully_inside_fixed_trimmed_interval"
+    imputation_allowed: false
+    quiet_interval_search_allowed: false
+  prototypes:
+    posture_classes: ["sitting", "standing"]
+    motion_strata: ["quiet", "upper_body_motion"]
+    construction: "normalize(arithmetic_mean(valid_support_window_gravity_directions))"
+    support_scope: "one_adjudicated_support_bout_per_posture_and_motion_stratum_per_reference_block"
+    invalid_if: ["support_bout_ineligible", "prototype_resultant_norm_at_or_below_epsilon"]
+  estimands:
+    angular_distance: "acos(clip(dot(unit_vector_a,unit_vector_b),-1,1))_radians"
+    within_posture_angular_spread: ["median_window_to_prototype_angle", "p90_window_to_prototype_angle"]
+    between_posture_angular_separation: "angle(sitting_prototype,standing_prototype)_within_motion_stratum_and_reference_block"
+    signed_query_margin: "wrong_posture_angle_minus_correct_posture_angle_per_valid_query_window_then_bout_median"
+    fresh_stale_difference: "fresh_bout_median_signed_margin_minus_stale_bout_median_signed_margin_on_identical_query_windows"
+    anchor_angle: "between_posture_angular_separation"
+    inverse_absolute_sine_condition_number: "1/abs(sin(anchor_angle)); infinity_when_denominator_at_or_below_epsilon"
+    dynamic_acceleration_rms: "sqrt(mean(sum((acceleration_xyz-gravity_xyz)^2)))_per_window"
+    gyroscope_rms: "sqrt(mean(sum(gyroscope_xyz^2)))_per_window"
+    motion_overlap_description: "within_wearer_common_language_probability_mobility_bout_median_exceeds_upper_body_motion_posture_bout_median_reported_per_energy_feature"
+  completeness:
+    complete_wearer_requires: "all_16_fresh_posture_query_bouts_metadata_and_signal_eligible"
+    incomplete_wearer_imputation: "none"
+    failed_withdrawn_unresolved_retained: true
+    stale_validity_mask: "intersection_of_identical_query_window_ids_for_fresh_and_stale"
+  uncertainty:
+    independent_unit: "wearer"
+    report: ["all_wearer_values", "equal_wearer_mean", "sample_standard_deviation", "two_sided_95_percent_student_t_interval"]
+    interval_degrees_of_freedom: "complete_wearer_count_minus_one"
+    interval_suppressed_below_complete_wearers: 2
+    confirmatory_p_values: false
+  prototype_prerequisite_rule:
+    complete_wearers_required: 6
+    positive_mean_margin_required_for: ["quiet_posture_queries", "upper_body_motion_posture_queries"]
+    application: "every_complete_wearer_must_have_strictly_positive_fresh_mean_margin_in_each_motion_stratum"
+    decision_scope: "permits_new_protocol_draft_only"
+  frame_rule:
+    numerical_nondegeneracy_sufficient: false
+    bench_uncertainty_limit_status: "pending_device_qualification"
+  motion_rule:
+    overlap_rejects_simple_energy_interpretation_only: true
+    automatic_boundary_model_eligibility: false
+  c3_reopening_allowed: false
+  population_superiority_claim_allowed: false
+
+records:
+  allowed_collection_status: ["planned", "recorded", "partial", "failed", "withdrawn", "unresolved"]
+  raw_paths_must_be_relative_and_safe: true
+  raw_sha256_and_size_required: true
+  sample_identity_unique: true
+  support_query_sample_overlap_forbidden: true
+  failures_and_missingness_retained: true
+
+resources:
+  setup_engineering_wall_seconds: 7200
+  initial_analysis_compute_wall_seconds: 3600
+  total_participant_hours: 6
+  model_fit_budget: 0
+  automatic_architecture_experiment_allowed: false
+  automatic_external_dataset_allowed: false
+
+claims:
+  collection_completed: false
+  device_qualified: false
+  physical_identifiability_demonstrated: false
+  population_superiority_demonstrated: false
+  architecture_eligible: false

@@ -169,6 +169,7 @@ def test_schema_documents_are_valid_json_with_only_local_references(
         "final_freeze.schema.json",
         "final_release_gate_report.schema.json",
         "locked_target_result.schema.json",
+        "physical_information_pilot.schema.json",
         "release_evidence_inventory.schema.json",
         "source_calibrator.schema.json",
     }
