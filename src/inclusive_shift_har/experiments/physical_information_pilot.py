@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
-from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
+from jsonschema import Draft202012Validator
 
 from inclusive_shift_har.data.physical_information_pilot import (
     build_plan,
@@ -483,6 +483,7 @@ def validate_plan_run(run_directory: Path) -> dict[str, Any]:
         and float(preparation_runtime) >= 0.0,
         "readiness preparation runtime is invalid",
     )
+    preparation_runtime_seconds = float(cast(int | float, preparation_runtime))
     git_state = _mapping(readiness.get("git"), "readiness git state")
     _require(git_state.get("clean") is True, "readiness source was not clean")
     _require(git_state.get("porcelain") == [], "readiness source changes were hidden")
@@ -500,7 +501,7 @@ def validate_plan_run(run_directory: Path) -> dict[str, Any]:
     runtime = _sealed(
         {
             "record_kind": "physical_information_pilot_runtime",
-            "preparation_wall_seconds": float(preparation_runtime),
+            "preparation_wall_seconds": preparation_runtime_seconds,
             "validation_wall_seconds": validation_runtime,
             "physical_collection_wall_seconds": 0.0,
             "analysis_compute_wall_seconds": 0.0,
