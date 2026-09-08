@@ -65,7 +65,7 @@ BoolArray: TypeAlias = NDArray[np.bool_]
 StringArray: TypeAlias = NDArray[np.str_]
 
 EXPERIMENT_ID = "fog-left-ankle-derived-nine-probe-v1"
-RUN_DIRECTORY_NAME = "fog-left-ankle-derived-nine-seed11-20260908-002"
+RUN_DIRECTORY_NAME = "fog-left-ankle-derived-nine-seed11-20260908-003"
 EVIDENCE_FAMILY = ".audit/fog_left_ankle_derived_nine"
 SPATIAL_RELATIVE = Path(
     ".audit/fog_spatial_information_probe/fog-spatial-information-probe-seed11-20260907-001"
@@ -345,6 +345,22 @@ def _input_paths(spatial_run: Path) -> dict[str, Path]:
             _require(path.stat().st_size == expected_size, f"{name} size changed")
         paths[name] = path
     return paths
+
+
+def coverage_rows_from_audit(coverage: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Validate the exact legacy coverage contract without inventing a self-hash field."""
+    _require(
+        coverage.get("record_kind") == "fog_spatial_information_coverage_audit"
+        and coverage.get("status") == "complete_zero_fit_observable_coverage_audit"
+        and coverage.get("model_fits") == 0
+        and coverage.get("activity_fog_clinical_outcome_columns_accessed") is False
+        and coverage.get("raw_sha256") == RAW_SHA256
+        and coverage.get("raw_size_bytes") == RAW_SIZE,
+        "coverage audit contract changed",
+    )
+    rows = cast(list[dict[str, Any]], coverage.get("candidate_availability"))
+    _require(len(rows) == 1939, "coverage audit candidate count changed")
+    return rows
 
 
 def _quantiles(values: FloatArray) -> dict[str, float]:
@@ -1011,8 +1027,7 @@ def run_experiment(
         _deadline_check(deadline, "after source and reference verification")
 
         coverage = _read_json(inputs["coverage"])
-        _verify_sealed(coverage, "coverage audit")
-        coverage_rows = cast(list[dict[str, Any]], coverage["candidate_availability"])
+        coverage_rows = coverage_rows_from_audit(coverage)
         coverage_ids = np.asarray([str(row["window_id"]) for row in coverage_rows], dtype=np.str_)
         _require(
             _availability_array_sha256(coverage_ids) == ORDERED_ID_SHA256,
@@ -1591,8 +1606,7 @@ def _validate_run_impl(
         _require(Path(str(item["path"])).resolve() == inputs[name], f"{name} path changed")
         _require(sha256_file(inputs[name]) == item["sha256"], f"{name} hash changed")
     coverage = _read_json(inputs["coverage"])
-    _verify_sealed(coverage, "coverage audit")
-    coverage_rows = cast(list[dict[str, Any]], coverage["candidate_availability"])
+    coverage_rows = coverage_rows_from_audit(coverage)
     coverage_ids = np.asarray([str(row["window_id"]) for row in coverage_rows], dtype=np.str_)
     _require(
         _availability_array_sha256(coverage_ids) == ORDERED_ID_SHA256,

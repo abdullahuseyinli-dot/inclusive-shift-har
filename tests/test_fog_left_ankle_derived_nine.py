@@ -21,7 +21,7 @@ def test_config_is_frozen_and_mutations_fail() -> None:
     config = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
     l9v.validate_config(config)
     assert config["experiment_id"] == "fog-left-ankle-derived-nine-probe-v1"
-    assert l9v.RUN_DIRECTORY_NAME == "fog-left-ankle-derived-nine-seed11-20260908-002"
+    assert l9v.RUN_DIRECTORY_NAME == "fog-left-ankle-derived-nine-seed11-20260908-003"
     assert config["resources"]["maximum_fit_attempts"] == 5
     assert config["resources"]["compute_wall_seconds"] == 900
     assert config["weighting"]["expected_training_rows"] == [940, 825, 947, 829, 1075]
@@ -58,6 +58,24 @@ def test_shared_six_channel_features_are_selected_by_name_not_position() -> None
     assert np.array_equal(selected, np.asarray([[10.0, 20.0], [11.0, 21.0]]))
     with pytest.raises(ValueError, match="requested feature missing"):
         l9v.name_aligned_features(values, ("c", "a", "d", "b"), ("a", "missing"))
+
+
+def test_legacy_coverage_contract_does_not_require_an_invented_self_hash() -> None:
+    rows = [{"window_id": f"window-{index}"} for index in range(1939)]
+    coverage = {
+        "record_kind": "fog_spatial_information_coverage_audit",
+        "status": "complete_zero_fit_observable_coverage_audit",
+        "model_fits": 0,
+        "activity_fog_clinical_outcome_columns_accessed": False,
+        "raw_sha256": l9v.RAW_SHA256,
+        "raw_size_bytes": l9v.RAW_SIZE,
+        "candidate_availability": rows,
+    }
+    assert l9v.coverage_rows_from_audit(coverage) is rows
+    corrupted = copy.deepcopy(coverage)
+    corrupted["activity_fog_clinical_outcome_columns_accessed"] = True
+    with pytest.raises(ValueError, match="coverage audit contract changed"):
+        l9v.coverage_rows_from_audit(corrupted)
 
 
 def test_gate_requires_every_frozen_condition() -> None:
