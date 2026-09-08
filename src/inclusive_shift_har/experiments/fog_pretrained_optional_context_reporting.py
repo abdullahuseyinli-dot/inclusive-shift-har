@@ -159,7 +159,7 @@ def generate_reporting_supplement(
             "full_history": 1098,
             "short_history_current": 56,
             "missing_current_ankle": 59,
-            "q_zero_all_scored": 309,
+            "q_zero_all_scored": 301,
             "current_q_zero": 301,
             "current_q_nonzero_editable": 853,
             "full_history_q_zero": 298,
