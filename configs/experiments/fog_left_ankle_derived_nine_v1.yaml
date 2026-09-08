@@ -1,0 +1,159 @@
+schema_version: 1.0.0
+experiment_id: fog-left-ankle-derived-nine-probe-v1
+status: frozen_before_outcomes
+evidence_status: corrected_fog_adaptive_development_closure_not_confirmation
+source:
+  dataset_id: fog_star_v3
+  expected_sha256: 888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477
+  expected_size_bytes: 119629580
+  observable_candidate_count: 1939
+  scored_window_count: 1213
+  scored_class_support: [954, 74, 185]
+  participant_roster:
+    - fogstar:001
+    - fogstar:002
+    - fogstar:003
+    - fogstar:004
+    - fogstar:005
+    - fogstar:006
+    - fogstar:007
+    - fogstar:008
+    - fogstar:009
+    - fogstar:010
+    - fogstar:011
+    - fogstar:012
+    - fogstar:013
+    - fogstar:014
+    - fogstar:015
+    - fogstar:016
+    - fogstar:017
+    - fogstar:018
+    - fogstar:019
+    - fogstar:020
+    - fogstar:021
+    - fogstar:022
+  outer_folds: [0, 1, 2, 3, 4]
+  inclusivehar_locked_target_access: false
+reference:
+  governing_plan_sha256: 4bbcd2388518b514f98ba912af84d5378f7782aa902f781243dcbfe1587a22fb
+  spatial_run: .audit/fog_spatial_information_probe/fog-spatial-information-probe-seed11-20260907-001
+  predictions_sha256: f28ed71abb51d04f5968cfd3f3751e26dcac0f420e3451390b88b27654f0b1ef
+  feature_cache_sha256: d92f350128655dc70f7bf60a2773577a907d1688146d48e5c35723a426893088
+  analysis_sha256: 051cf2d9e40df748378fbd91a7ea2e524234d5f5579e47d993fe2801418cdb1a
+  validation_sha256: 2cc1211645a62b88a7a56e68d0df7811cc397ab9f10c6f9bb2779814c5b32f98
+  completion_manifest_sha256: 4b014e2a085b2133db5a37e61ef7d204b0ca26cc2ce9fe5613c1ea43663eefd1
+  availability_mask_sha256: 27c4d82a970975d93784cce15aa67799b07300eeacf7bb82d1ee62ec7f6b9a3d
+  availability_mask_generic_array_sha256: c003da099d835da78f6d989469ff0dd3731e3bf037f868c4c2577c098ff9e6dd
+  ordered_observable_ids_contract_sha256: 4c73070017ae3b2b911df6daa5cd20a3db0f6c8712e23c2f7846c5410e956e44
+  left_ankle_signal_sha256: 4a4e9b199e78acf728df405fdb7ac9a1c28973a476d4b575c0c6d2903d39f012
+  left_ankle_gravity_sha256: 15a6cdd15b9bc66b2c6f8c8f571e0ab3fe94aed8a9ed9caed17beb24f9290247
+  left_ankle80_feature_sha256: 4ee0db3c22f6e9f858835acb194d8f39fecd57830b12ac1ff1ff9a3de0079e50
+  left_ankle_derived_nine_feature_sha256: b1b38b52e66d10b31c6d70a689f90e917f81e269340534fb422d25d9514fdc70
+  left_ankle_derived_nine_names_array_sha256: cef905a4c45655db3a50016e9405ea47f8ae3019db7b967195ddc2d96c59f257
+  left_ankle_derived_nine_names_canonical_list_sha256: 1cea223cd9fa2df361c3061672e846a81d6ad5b667a1c148961497ffe44ce4ef
+availability:
+  fixed_sensor: ankleL
+  observable_available_count: 1817
+  observable_fallback_count: 122
+  scored_available_count: 1154
+  scored_fallback_count: 59
+  fallback_cell: b0
+preprocessing:
+  source_rate_hz: 60.0
+  target_rate_hz: 50.0
+  gravity_cutoff_hz: 0.30
+  window_samples: 128
+  acceleration_input_unit: g
+  acceleration_output_unit: m_per_s2
+  gyroscope_input_unit: degree_per_s
+  gyroscope_output_unit: rad_per_s
+  channel_order:
+    [lin_acc_x, lin_acc_y, lin_acc_z, gyro_x, gyro_y, gyro_z, gravity_x, gravity_y, gravity_z]
+  feature_extractor: inclusive_shift_har.preprocessing.features.extract_engineered_features
+  feature_count: 120
+  feature_dtype: float64
+  denoising: none
+  normalization: none
+cell:
+  id: l9v
+  training: available_scored
+  evaluation: available_with_exact_b0_fallback
+  representation: qualified_left_ankle_derived_nine
+estimator:
+  class: sklearn.ensemble.RandomForestClassifier
+  n_estimators: 500
+  criterion: gini
+  max_features: sqrt
+  min_samples_leaf: 2
+  min_samples_split: 2
+  bootstrap: true
+  class_weight: null
+  random_state: 11_plus_outer_fold_index
+  fit_workers: 4
+  prediction_workers: 1
+weighting:
+  policy: participant_first_mean_one
+  raw_sample_weight: 1 / (m_i * n_ic)
+  recompute_on_actual_training_rows: true
+  expected_training_rows: [940, 825, 947, 829, 1075]
+  expected_available_evaluation_rows: [408, 516, 314, 447, 132]
+  expected_weight_sha256:
+    - 2968090d2f4d7860e6a21b43ff031f4907b7841615ef3bb72f5c5e3d97842b32
+    - 22e9149cb58539cfc8add835271324609737098b9a357b0509764f47abbf128f
+    - 78b5a3416d3df97e35cdbdda5d18d0508919852bbb734c7a24d9a57ac01b9a1e
+    - a4d71b366138469dc6c040b6416944676e6bc1711bd8336e6264a1dd1cce399b
+    - b0ec80a767e3191057f1b7f935b35de59f3259b8514a135efd05c357ff99fc98
+  expected_training_global_indices_sha256:
+    - ce4f6cef8a553e13145a9ecbe8afcc6da8247207b7922cf0b04f1f64985d358f
+    - 15303cf535de5abea2672b00b8fb23cf9442e13172f99a8e59deec31e51492b7
+    - 6a4d5d09d70d13ed2a6493a02f2c7aefa673cbd6330f6d6f4d032134540f8dce
+    - 550a2f7b2e3dd27c255c6895024be8824686307f430197aeb964e87dbb222244
+    - bb97f7981f8a3ff67b47f76599fe45b7fa788535e94329a336914ae05fe7c52b
+  expected_evaluation_global_indices_sha256:
+    - ae6eb9dfb4a67dcfba49c4958f51cf5966a96293db1c1b52720cdd312370206b
+    - 750e6d5b48ef5e19c666099f3d0d7bda58aec5d0d14672e4480efcc8889cf606
+    - 3caee5f4000f9f4414f7c9cb6ff3eba9ff54e991adae10a10de2cf32970fc568
+    - ef6cc8005833ba9b4ead6cdd81aeccde3495ed7cbf764451b94df36a0b63e5e5
+    - 5b0d1c9170272a96c6227d5edd1883fa782d9f34d9554d83196469aa2fc9f266
+comparisons: [l9v_minus_lv, l9v_minus_bv, l9v_minus_b0, l9v_minus_f3]
+gate:
+  minimum_mean_gain: 0.015
+  minimum_participant_wins: 14
+  minimum_bottom_30_difference: -0.01
+  minimum_worst_participant_difference: -0.03
+  minimum_mobility_recall_difference: -0.01
+  minimum_sitting_recall_difference: -0.02
+  minimum_standing_recall_difference: -0.02
+  leave_one_participant_positive_tolerance: 1.0e-12
+  require_every_leave_one_fold_mean_positive: true
+metrics:
+  class_order: [mobility, sitting, standing]
+  primary: fixed_three_class_macro_f1_within_person_then_equal_person_mean
+  missing_class_rule: fixed_class_zero_division_zero
+  bottom_fraction: 0.30
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+  probability_clip: 1.0e-12
+label_blind_integrity_screen:
+  may_stop_invalid_measurement: true
+  may_select_feature_threshold_sensor_or_participant: false
+  report:
+    [finite_rates, gravity_norm_scale, within_window_direction_stability,
+     timestamp_run_boundaries, per_participant_availability]
+resources:
+  controller_count: 1
+  maximum_fit_attempts: 5
+  compute_wall_seconds: 900
+  implementation_and_checks_wall_seconds: 3600
+  analysis_wall_seconds: 1800
+  blas_threads: 1
+  gpu_allowed: false
+  additional_seeds_allowed: false
+  other_datasets_allowed: false
+  automatic_follow_on_allowed: false
+claims:
+  novelty: false
+  confirmation: false
+  pure_gravity_causal_effect: false
+  standalone_ankle_replacement: false
+  zero_lookahead_streaming: false
