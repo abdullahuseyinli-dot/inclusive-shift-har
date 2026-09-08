@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import math
 import platform
+import re
 import time
 from collections.abc import Mapping
 from pathlib import Path
@@ -89,8 +90,16 @@ class Inputs:
         return verify_record(load_json_strict(self.read(spec, filename)))
 
 
-def ctgr_provenance(inputs: Inputs, result: dict[str, Any]) -> dict[str, Any]:
+def ctgr_provenance(
+    inputs: Inputs, result: dict[str, Any], aggregate_reference: Mapping[str, Any]
+) -> dict[str, Any]:
     """Hash model bundles and small manifests without deserializing model/raw bytes."""
+    aggregate_commit = result.get("code_commit")
+    require(
+        isinstance(aggregate_commit, str)
+        and re.fullmatch(r"[0-9a-f]{40}", aggregate_commit) is not None,
+        "CTGR aggregate must declare a full source commit",
+    )
     folds = result["folds"]
     expected_ids = [f"source_cv_{index:02d}" for index in range(1, 6)]
     require(
@@ -99,6 +108,8 @@ def ctgr_provenance(inputs: Inputs, result: dict[str, Any]) -> dict[str, Any]:
     )
     model_paths: set[str] = set()
     models = []
+    fold_receipts = []
+    missing_fold_commits = []
     for reference in folds:
         fold = inputs.json(reference, "result.json")
         require(fold["record_sha256"] == reference["record_sha256"], "fold self-hash binding")
@@ -108,8 +119,23 @@ def ctgr_provenance(inputs: Inputs, result: dict[str, Any]) -> dict[str, Any]:
             and fold["seed"] == 11,
             "fold identity/seed binding",
         )
-        require(
-            fold["code_commit"] == result["code_commit"], "fold/aggregate source commit binding"
+        has_fold_commit = "code_commit" in fold
+        if has_fold_commit:
+            require(fold["code_commit"] == aggregate_commit, "fold/aggregate source commit binding")
+        else:
+            missing_fold_commits.append(fold["outer_fold_id"])
+        fold_receipts.append(
+            {
+                **reference,
+                "declared_code_commit": fold.get("code_commit"),
+                "own_code_commit_present": has_fold_commit,
+                "code_commit_binding": (
+                    "fold_declared_and_aggregate_reference"
+                    if has_fold_commit
+                    else "aggregate_reference_only"
+                ),
+                "per_fold_commit_inferred": False,
+            }
         )
         model = fold["models"]
         require(
@@ -146,6 +172,19 @@ def ctgr_provenance(inputs: Inputs, result: dict[str, Any]) -> dict[str, Any]:
         "source manifest window IDs",
     )
     return {
+        "aggregate_receipt": {
+            **aggregate_reference,
+            "record_sha256": result["record_sha256"],
+            "declared_code_commit": aggregate_commit,
+        },
+        "fold_receipts": fold_receipts,
+        "fold_receipts_without_code_commit": missing_fold_commits,
+        "source_commit_binding": (
+            "aggregate_reference_only"
+            if len(missing_fold_commits) == len(folds)
+            else "per_fold_declarations_where_present_and_aggregate_references"
+        ),
+        "per_fold_commit_inferred": False,
         "model_bundles_byte_hashed": models,
         "model_bundle_count": len(models),
         "models_deserialized": False,
@@ -349,7 +388,7 @@ def replay_ctgr(inputs: Inputs, config: dict[str, Any]) -> dict[str, Any]:
         "CTGR evidence scope",
     )
     require(result["target_performance_or_prediction_accessed"] is False, "CTGR target access")
-    provenance = ctgr_provenance(inputs, result)
+    provenance = ctgr_provenance(inputs, result, config["result"])
     path = inputs.read(config["predictions"], "all_outer_predictions.npz")
     require(
         result["predictions"]["sha256"] == config["predictions"]["sha256"],

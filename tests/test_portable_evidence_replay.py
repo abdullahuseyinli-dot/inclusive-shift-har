@@ -49,7 +49,9 @@ def test_metrics_equal_people_fixed_absent_class_and_probability_scores() -> Non
     }
 
 
-def fixtures(root: Path, *, fold_commit: str = "fixture") -> tuple[Path, dict[str, Any]]:
+def fixtures(
+    root: Path, *, fold_commit: str | None = None, aggregate_commit: str = "d" * 40
+) -> tuple[Path, dict[str, Any]]:
     root.mkdir()
     y = np.array([0, 1, 2, 0, 1, 2], dtype=np.int64)
     people = np.array(["a", "a", "a", "b", "b", "b"])
@@ -131,7 +133,7 @@ def fixtures(root: Path, *, fold_commit: str = "fixture") -> tuple[Path, dict[st
                 "record_kind": "confidence_triggered_gravity_residual_outer_fold",
                 "seed": 11,
                 "outer_fold_id": fold_id,
-                "code_commit": fold_commit,
+                **({"code_commit": fold_commit} if fold_commit is not None else {}),
                 "models": {"path": f"ctgr/{fold_id}/models.pkl", "sha256": sha256_file(model)},
             },
         )
@@ -152,7 +154,7 @@ def fixtures(root: Path, *, fold_commit: str = "fixture") -> tuple[Path, dict[st
             "predictions": prediction_spec,
             "aggregate_reports": {name: expected_ctgr for name in CTGR_METHODS},
             "evidence_status": "development",
-            "code_commit": "fixture",
+            "code_commit": aggregate_commit,
             "folds": folds,
             "source_manifest": source_spec,
             "dataset_manifest": dataset_spec,
@@ -410,6 +412,45 @@ def test_ctgr_fold_commit_must_match_aggregate(tmp_path: Path) -> None:
     result = run(tmp_path / "evidence", tmp_path / "out", config_path)
     assert result["status"] == "fail"
     assert "fold/aggregate source commit binding" in result["failures"][0]["message"]
+
+
+def test_historical_fold_receipts_without_commit_use_only_aggregate_reference(
+    tmp_path: Path,
+) -> None:
+    evidence = tmp_path / "evidence"
+    config_path, config = fixtures(evidence)
+    aggregate = verify_record(load_json_strict(evidence / "ctgr/result.json"))
+    assert all(
+        "code_commit" not in load_json_strict(evidence / reference["path"])
+        for reference in aggregate["folds"]
+    )
+    output = tmp_path / "out"
+    result = run(evidence, output, config_path)
+    assert result["status"] == "pass"
+    provenance = load_json_strict(output / "ctgr_replay.json")["byte_and_source_provenance"]
+    assert provenance["source_commit_binding"] == "aggregate_reference_only"
+    assert provenance["per_fold_commit_inferred"] is False
+    assert provenance["aggregate_receipt"]["declared_code_commit"] == "d" * 40
+    assert provenance["aggregate_receipt"]["sha256"] == config["lanes"]["ctgr"]["result"]["sha256"]
+    assert provenance["fold_receipts_without_code_commit"] == [
+        f"source_cv_{index:02d}" for index in range(1, 6)
+    ]
+    for receipt, original in zip(provenance["fold_receipts"], aggregate["folds"], strict=True):
+        assert receipt["declared_code_commit"] is None
+        assert receipt["own_code_commit_present"] is False
+        assert receipt["code_commit_binding"] == "aggregate_reference_only"
+        for key in ("path", "sha256", "record_sha256", "outer_fold_id"):
+            assert receipt[key] == original[key]
+    assert provenance["model_bundle_count"] == 5
+    assert provenance["models_deserialized"] is False
+
+
+@pytest.mark.parametrize("commit", ["fixture", "", "a" * 39, "g" * 40])
+def test_ctgr_aggregate_requires_full_commit(tmp_path: Path, commit: str) -> None:
+    config_path, _ = fixtures(tmp_path / "evidence", aggregate_commit=commit)
+    result = run(tmp_path / "evidence", tmp_path / "out", config_path)
+    assert result["status"] == "fail"
+    assert "aggregate must declare a full source commit" in result["failures"][0]["message"]
 
 
 def test_ctgr_scored_labels_must_match_source_ontology(

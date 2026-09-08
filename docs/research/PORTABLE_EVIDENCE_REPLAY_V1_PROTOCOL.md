@@ -21,7 +21,14 @@ fitted checkpoint files, its source-code manifest and input manifest, in additio
 to the three consumed prediction/report files. Duplicate and escaping paths fail.
 All model bundles are hashed as opaque bytes, never deserialized or executed.
 Each CTGR scored label must also match the source window's functional-core canonical
-label, and every CTGR fold receipt must declare the aggregate result's source commit.
+label. The CTGR aggregate must declare a full 40-character Git commit. The five retained
+historical fold receipts do **not** declare their own commit. Their source-commit binding
+is therefore `aggregate_reference_only`: the pinned, self-hashed aggregate identifies each
+fold by path, file hash and record self-hash; each fold then binds its seed, fold identity,
+and model bundle. Replay records the absent per-fold commits explicitly as null, lists
+all affected folds, and never infers a per-fold commit. If a receipt actually declares a
+commit, it must agree with the aggregate. This transitive reference chain does not prove
+an independently recorded per-fold implementation commit.
 
 The original files remain unchanged. JSON self-hashes, class order, unique window
 IDs, participant rosters, probability schemas/simplexes, scored/observable
