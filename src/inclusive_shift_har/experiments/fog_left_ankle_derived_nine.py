@@ -125,6 +125,12 @@ MAXIMUM_FIT_ATTEMPTS = 5
 COMPUTE_CAP_SECONDS = 900
 
 
+def fallback_source_method_ids(count: int) -> StringArray:
+    """Return full, non-truncated B0 provenance identifiers."""
+    _require(count >= 0, "fallback source count must be nonnegative")
+    return np.full(count, "b0", dtype=np.dtype("<U2"))
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -1384,7 +1390,7 @@ def run_experiment(
                 [scored_probabilities[name].argmax(axis=1) for name in METHOD_ORDER]
             ).astype(np.int64),
             fallback_source_method_index=np.full(122, B0_METHOD_INDEX, dtype=np.int64),
-            fallback_source_method_id=np.full(122, "b0", dtype=np.str_),
+            fallback_source_method_id=fallback_source_method_ids(122),
         )
         result = _sealed(
             {
@@ -1894,7 +1900,7 @@ def _validate_run_impl(
             stored["fallback_source_method_index"],
             np.full(122, B0_METHOD_INDEX, dtype=np.int64),
         )
-        and np.array_equal(stored["fallback_source_method_id"], np.full(122, "b0", dtype=np.str_)),
+        and np.array_equal(stored["fallback_source_method_id"], fallback_source_method_ids(122)),
         "fallback source differs",
     )
     _require(

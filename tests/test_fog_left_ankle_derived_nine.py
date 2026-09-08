@@ -40,6 +40,9 @@ def test_frozen_hash_conventions_and_exact_lv_partitions_are_distinct() -> None:
         l9v.EXPECTED_GENERIC_MASK_SHA256
     )
     assert l9v.METHOD_ORDER[l9v.B0_METHOD_INDEX] == "b0"
+    fallback_ids = l9v.fallback_source_method_ids(122)
+    assert fallback_ids.dtype == np.dtype("<U2")
+    assert fallback_ids.tolist() == ["b0"] * 122
     assert l9v.EXPECTED_L9V_FEATURE_SHA256 == (
         "b1b38b52e66d10b31c6d70a689f90e917f81e269340534fb422d25d9514fdc70"
     )
