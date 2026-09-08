@@ -2061,6 +2061,8 @@ def recover_postprocessing(
         git["clean"] is True and git["commit"] == recovery_code_commit,
         "recovery source must be clean and exactly identified",
     )
+    _configure_runtime(11)
+    recovery_environment = _require_environment(config)
     ancestor = subprocess.run(
         (
             "git",
@@ -2180,6 +2182,7 @@ def recover_postprocessing(
             "additional_fit_budget": 0,
             "automatic_retry": False,
             "outcome_selection_or_method_change": False,
+            "environment_sha256": canonical_json_sha256(recovery_environment),
         }
     )
     _write_json_create_only(output_directory / "postprocessing_recovery_intent.json", intent)
