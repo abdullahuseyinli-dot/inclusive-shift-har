@@ -65,6 +65,7 @@ from inclusive_shift_har.experiments.fog_rf_feature_weight_factorial import (
     _mapping,
     _require,
     _sealed,
+    _verify_sealed,
     _write_bytes_create_only,
     _write_json_create_only,
     method_report,
@@ -927,6 +928,17 @@ def _outcome_summary(analysis: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _participant_metric_rows(reports: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    _require(set(reports) == set(METHOD_ORDER), "participant report method set changed")
+    rows = {}
+    for method in METHOD_ORDER:
+        report = _mapping(reports[method], f"{method} report")
+        participants = cast(list[Any], report["participants"])
+        _require(len(participants) == 22, f"{method} participant row count changed")
+        rows[method] = participants
+    return rows
+
+
 def _artifact_rows(directory: Path, exclusions: set[str]) -> list[dict[str, Any]]:
     return [
         {
@@ -1578,10 +1590,7 @@ def run_experiment(
             "editable_q_nonzero_scored": int((scored_current & q_nonzero).sum()),
         }
         _write_json_create_only(output_directory / "analysis_prevalidation.json", _sealed(analysis))
-        participant_rows = {
-            method: _mapping(reports[method]["primary"], "primary")["participants"]
-            for method in METHOD_ORDER
-        }
+        participant_rows = _participant_metric_rows(reports)
         _write_json_create_only(
             output_directory / "participant_metrics.json",
             _sealed(
@@ -1667,7 +1676,8 @@ def validate_run(
     protocol_path = repository_root / PROTOCOL_RELATIVE
     config = _read_yaml(config_path)
     validate_config(config, config_path, protocol_path)
-    _require(_git_state(repository_root)["clean"] is True, "source dirty during validation")
+    validator_git = _git_state(repository_root)
+    _require(validator_git["clean"] is True, "source dirty during validation")
     _verify_harnet_root(harnet_root, config)
     _require(
         sha256_file(run_directory / "config_snapshot.yaml") == CONFIG_SHA256,
@@ -1873,6 +1883,8 @@ def validate_run(
             "fallback_probabilities_replayed_exact": True,
             "metric_and_gate_replay": True,
             "source_commit": code_commit,
+            "run_source_commit": code_commit,
+            "validator_source_commit": validator_git["commit"],
             "validation_seconds": time.perf_counter() - started,
             "InclusiveHAR_P11_P20_loaded": False,
         }
@@ -2001,10 +2013,383 @@ def execute(
         return final
     except BaseException:
         if output_directory.exists() and not (output_directory / "worker_shutdown.json").exists():
+            incomplete_path = output_directory / "INCOMPLETE.json"
+            if incomplete_path.is_file():
+                incomplete = _read_json(incomplete_path)
+                attempts = int(incomplete.get("fit_attempts", attempts))
+                completed = int(incomplete.get("completed_fits", completed))
             shutdown = _stop_task_owned_workers(
                 baseline, attempts, completed, terminal="incomplete"
             )
             _write_json_create_only(output_directory / "worker_shutdown.json", shutdown)
+        raise
+
+
+def recover_postprocessing(
+    *,
+    repository_root: Path,
+    evidence_root: Path,
+    harnet_root: Path,
+    config_path: Path,
+    protocol_path: Path,
+    output_directory: Path,
+    run_code_commit: str,
+    recovery_code_commit: str,
+) -> dict[str, Any]:
+    """Finish an exact, zero-fit replay after the preserved participant-export failure."""
+
+    baseline = _worker_baseline()
+    started = time.perf_counter()
+    repository_root = repository_root.resolve()
+    evidence_root = evidence_root.resolve()
+    harnet_root = harnet_root.resolve()
+    output_directory = output_directory.resolve()
+    _require(config_path.resolve() == repository_root / CONFIG_RELATIVE, "config path changed")
+    _require(
+        protocol_path.resolve() == repository_root / PROTOCOL_RELATIVE, "protocol path changed"
+    )
+    _require(
+        output_directory.parent == evidence_root / EVIDENCE_FAMILY
+        and output_directory.name == RUN_DIRECTORY_NAME
+        and output_directory.is_dir(),
+        "recovery run path changed",
+    )
+    config = _read_yaml(config_path)
+    validate_config(config, config_path, protocol_path)
+    git = _git_state(repository_root)
+    _require(
+        git["clean"] is True and git["commit"] == recovery_code_commit,
+        "recovery source must be clean and exactly identified",
+    )
+    ancestor = subprocess.run(
+        (
+            "git",
+            "-C",
+            str(repository_root),
+            "merge-base",
+            "--is-ancestor",
+            run_code_commit,
+            recovery_code_commit,
+        ),
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    _require(ancestor.returncode == 0, "recovery commit does not descend from run commit")
+    changed = tuple(
+        name
+        for name in _git_output(
+            repository_root, "diff", "--name-only", f"{run_code_commit}..{recovery_code_commit}"
+        ).splitlines()
+        if name
+    )
+    allowed_changes = {
+        "src/inclusive_shift_har/experiments/fog_pretrained_optional_context_run.py",
+        "tests/test_fog_pretrained_optional_context_run.py",
+    }
+    _require(
+        set(changed) <= allowed_changes
+        and "src/inclusive_shift_har/experiments/fog_pretrained_optional_context_run.py" in changed,
+        "recovery source change scope is not postprocessing-only",
+    )
+    required_existing = (
+        "INCOMPLETE.json",
+        "worker_shutdown.json",
+        "analysis_prevalidation.json",
+        "predictions.npz",
+        "fit_reports.json",
+        "encoder_qualification.json",
+        "source_manifest.json",
+    )
+    _require(
+        all((output_directory / name).is_file() for name in required_existing),
+        "incomplete run is missing required retained evidence",
+    )
+    required_absent = (
+        "analysis.json",
+        "validation.json",
+        "participant_metrics.json",
+        "runtime_prevalidation.json",
+        "result_prevalidation.json",
+        "runtime.json",
+        "result.json",
+        "OUTCOME_SUMMARY.md",
+        "postprocessing_recovery_intent.json",
+        "postprocessing_recovery.json",
+        "recovery_worker_shutdown.json",
+        "artifact_manifest.json",
+        "completion_manifest.json",
+        "controller_final_receipt.json",
+    )
+    _require(
+        all(not (output_directory / name).exists() for name in required_absent),
+        "recovery destination already contains postprocessing artifacts",
+    )
+    incomplete = _read_json(output_directory / "INCOMPLETE.json")
+    original_shutdown = _read_json(output_directory / "worker_shutdown.json")
+    prevalidation = _read_json(output_directory / "analysis_prevalidation.json")
+    fit_report = _read_json(output_directory / "fit_reports.json")
+    encoder = _read_json(output_directory / "encoder_qualification.json")
+    source_manifest = _read_json(output_directory / "source_manifest.json")
+    for name, payload in (
+        ("incomplete", incomplete),
+        ("original worker shutdown", original_shutdown),
+        ("prevalidation analysis", prevalidation),
+        ("fit report", fit_report),
+        ("encoder qualification", encoder),
+        ("source manifest", source_manifest),
+    ):
+        _verify_sealed(payload, name)
+    fit_rows = cast(list[dict[str, Any]], fit_report["rows"])
+    _require(
+        incomplete["status"] == "incomplete"
+        and incomplete["error_type"] == "KeyError"
+        and incomplete["error"] == "'participants'"
+        and incomplete["fit_attempts"] == incomplete["completed_fits"] == 20
+        and prevalidation["status"] == "analysis_awaiting_replay"
+        and len(fit_rows) == 20
+        and [int(row["attempt_number"]) for row in fit_rows] == list(range(1, 21))
+        and all(row["status"] == "complete" for row in fit_rows)
+        and len(list((output_directory / "checkpoints").glob("*.pkl"))) == 20
+        and len(list((output_directory / "fit_attempts").glob("*--complete.json"))) == 20
+        and not list((output_directory / "fit_attempts").glob("*--failed.json")),
+        "retained fit completion contract changed",
+    )
+    _require(
+        all(
+            sha256_file(output_directory / str(row["checkpoint_path"])) == row["checkpoint_sha256"]
+            for row in fit_rows
+        ),
+        "retained checkpoint hash changed",
+    )
+    _require(
+        all(row["code_commit"] == run_code_commit for row in fit_rows),
+        "retained fit source commit changed",
+    )
+    intent = _sealed(
+        {
+            "record_kind": "fog_pretrained_postprocessing_recovery_intent",
+            "status": "zero_fit_replay_only",
+            "original_incomplete_record_sha256": incomplete["record_sha256"],
+            "run_source_commit": run_code_commit,
+            "recovery_source_commit": recovery_code_commit,
+            "changed_tracked_files": list(changed),
+            "retained_fit_attempts": 20,
+            "retained_completed_fits": 20,
+            "additional_fit_budget": 0,
+            "automatic_retry": False,
+            "outcome_selection_or_method_change": False,
+        }
+    )
+    _write_json_create_only(output_directory / "postprocessing_recovery_intent.json", intent)
+    try:
+        validated = validate_run(
+            repository_root=repository_root,
+            evidence_root=evidence_root,
+            harnet_root=harnet_root,
+            run_directory=output_directory,
+            code_commit=run_code_commit,
+        )
+        analysis = _mapping(validated["analysis"], "analysis")
+        reports = {
+            method: _mapping(_mapping(analysis["reports"], "reports")[method], method)
+            for method in METHOD_ORDER
+        }
+        _write_json_create_only(
+            output_directory / "participant_metrics.json",
+            _sealed(
+                {
+                    "record_kind": "fog_pretrained_participant_metrics",
+                    "rows": _participant_metric_rows(reports),
+                    "recovered_without_model_fitting": True,
+                }
+            ),
+        )
+        command = _read_json(output_directory / "command_receipt.json")
+        launched = datetime.fromisoformat(str(command["launched_at_utc"]))
+        stopped = datetime.fromisoformat(str(original_shutdown["observed_at_utc"]))
+        original_wall_seconds = float((stopped - launched).total_seconds())
+        pretrained_extract = _mapping(encoder["pretrained"], "pretrained extraction")
+        random_section = _mapping(encoder["random"], "random extraction")
+        random_extracts = cast(list[dict[str, Any]], random_section["extractions"])
+        runtime_pre = _sealed(
+            {
+                "record_kind": "fog_pretrained_runtime",
+                "status": "reconstructed_after_preserved_postprocessing_failure",
+                "original_controller_wall_seconds_to_shutdown": original_wall_seconds,
+                "fit_seconds": float(sum(float(row["fit_seconds"]) for row in fit_rows)),
+                "encoder_extraction_seconds": encoder["total_extraction_seconds"],
+                "fit_attempts": 20,
+                "completed_fits": 20,
+                "peak_process_working_set_bytes": None,
+                "peak_process_working_set_limitation": (
+                    "not emitted before the preserved postprocessing failure"
+                ),
+                "peak_cuda_allocated_bytes": max(
+                    [int(pretrained_extract["peak_cuda_allocated_bytes"])]
+                    + [int(row["peak_cuda_allocated_bytes"]) for row in random_extracts]
+                ),
+                "peak_cuda_reserved_bytes": max(
+                    [int(pretrained_extract["peak_cuda_reserved_bytes"])]
+                    + [int(row["peak_cuda_reserved_bytes"]) for row in random_extracts]
+                ),
+            }
+        )
+        _write_json_create_only(output_directory / "runtime_prevalidation.json", runtime_pre)
+        _write_json_create_only(
+            output_directory / "result_prevalidation.json",
+            _sealed(
+                {
+                    "record_kind": "fog_pretrained_result_prevalidation",
+                    "status": "retained_complete_outcomes_after_postprocessing_failure",
+                    "decision": prevalidation["decision"],
+                    "fit_attempts": 20,
+                    "completed_fits": 20,
+                    "new_encoder_parameter_fits": 0,
+                    "automatic_follow_on_launched": False,
+                }
+            ),
+        )
+        shutdown = _stop_task_owned_workers(
+            baseline, 20, 20, terminal="zero_fit_postprocessing_recovery_complete"
+        )
+        _write_json_create_only(output_directory / "recovery_worker_shutdown.json", shutdown)
+        _require(
+            shutdown["task_owned_fit_workers_and_monitors_stopped"] is True,
+            "task-owned workers remain after recovery",
+        )
+        runtime = _sealed(
+            {
+                "record_kind": "fog_pretrained_complete_runtime",
+                "status": "complete_after_zero_fit_postprocessing_recovery",
+                "original_controller_wall_seconds_to_shutdown": original_wall_seconds,
+                "recovery_controller_seconds": time.perf_counter() - started,
+                "fit_seconds": runtime_pre["fit_seconds"],
+                "initial_encoder_extraction_seconds": runtime_pre["encoder_extraction_seconds"],
+                "validation_seconds": validated["validation"]["validation_seconds"],
+                "fit_attempts": 20,
+                "completed_fits": 20,
+                "model_fits_during_recovery": 0,
+            }
+        )
+        _write_json_create_only(output_directory / "runtime.json", runtime)
+        _write_json_create_only(
+            output_directory / "result.json",
+            _sealed(
+                {
+                    "record_kind": "fog_pretrained_optional_context_result",
+                    "status": "complete_and_independently_replayed_after_zero_fit_recovery",
+                    "decision": analysis["decision"],
+                    "advancement": analysis["advancement"],
+                    "fit_attempts": 20,
+                    "completed_fits": 20,
+                    "encoder_parameter_fits": 0,
+                    "model_fits_during_recovery": 0,
+                    "original_incomplete_record_preserved": True,
+                    "confirmation_claimed": False,
+                    "novelty_claimed": False,
+                    "automatic_follow_on_launched": False,
+                    "all_task_owned_workers_and_monitors_stopped": True,
+                }
+            ),
+        )
+        with (output_directory / "OUTCOME_SUMMARY.md").open("x", encoding="utf-8") as stream:
+            stream.write(_outcome_summary(analysis))
+        recovery = _sealed(
+            {
+                "record_kind": "fog_pretrained_postprocessing_recovery",
+                "status": "complete_zero_fit_replay",
+                "original_incomplete_record_sha256": incomplete["record_sha256"],
+                "original_worker_shutdown_record_sha256": original_shutdown["record_sha256"],
+                "original_worker_shutdown_count_limitation": (
+                    "the outer exception scope reported zero attempts even though the preserved "
+                    "fit and incomplete records prove 20 of 20 completed"
+                ),
+                "run_source_commit": run_code_commit,
+                "recovery_source_commit": recovery_code_commit,
+                "changed_tracked_files": list(changed),
+                "participant_export_schema_fix": "report.participants",
+                "model_fits_during_recovery": 0,
+                "checkpoint_replays": validated["validation"]["checkpoint_predictions_replayed"],
+                "maximum_absolute_probability_difference": validated["validation"][
+                    "maximum_absolute_probability_difference"
+                ],
+                "analysis_file_sha256": sha256_file(output_directory / "analysis.json"),
+                "validation_file_sha256": sha256_file(output_directory / "validation.json"),
+                "preserved_failure_visible": True,
+                "outcome_selection_or_method_change": False,
+            }
+        )
+        _write_json_create_only(output_directory / "postprocessing_recovery.json", recovery)
+        exclusions = {
+            "artifact_manifest.json",
+            "completion_manifest.json",
+            "controller_final_receipt.json",
+        }
+        artifact_manifest = _sealed(
+            {
+                "record_kind": "fog_pretrained_artifact_manifest",
+                "artifacts": _artifact_rows(output_directory, exclusions),
+            }
+        )
+        _write_json_create_only(output_directory / "artifact_manifest.json", artifact_manifest)
+        completion = _sealed(
+            {
+                "record_kind": "fog_pretrained_completion_manifest",
+                "status": "complete_after_zero_fit_postprocessing_recovery",
+                "artifacts": _artifact_rows(
+                    output_directory, {"completion_manifest.json", "controller_final_receipt.json"}
+                ),
+                "fit_attempts": 20,
+                "completed_fits": 20,
+                "model_fits_during_recovery": 0,
+                "validation_status": validated["validation"]["status"],
+                "original_incomplete_record_preserved": True,
+                "all_task_owned_workers_and_monitors_stopped": True,
+            }
+        )
+        _write_json_create_only(output_directory / "completion_manifest.json", completion)
+        final = _sealed(
+            {
+                "record_kind": "fog_pretrained_controller_final_receipt",
+                "status": "complete_after_zero_fit_postprocessing_recovery",
+                "completion_manifest_file_sha256": sha256_file(
+                    output_directory / "completion_manifest.json"
+                ),
+                "model_fit_attempts": 20,
+                "completed_model_fits": 20,
+                "model_fits_during_validation": 0,
+                "model_fits_during_recovery": 0,
+                "automatic_follow_on_launched": False,
+                "original_incomplete_record_preserved": True,
+                "all_task_owned_workers_and_monitors_stopped": True,
+                "recovery_controller_seconds": runtime["recovery_controller_seconds"],
+            }
+        )
+        _write_json_create_only(output_directory / "controller_final_receipt.json", final)
+        return final
+    except BaseException as error:
+        if not (output_directory / "recovery_worker_shutdown.json").exists():
+            shutdown = _stop_task_owned_workers(
+                baseline, 20, 20, terminal="zero_fit_postprocessing_recovery_incomplete"
+            )
+            _write_json_create_only(output_directory / "recovery_worker_shutdown.json", shutdown)
+        if not (output_directory / "RECOVERY_INCOMPLETE.json").exists():
+            _write_json_create_only(
+                output_directory / "RECOVERY_INCOMPLETE.json",
+                _sealed(
+                    {
+                        "record_kind": "fog_pretrained_postprocessing_recovery_incomplete",
+                        "status": "incomplete",
+                        "error_type": type(error).__name__,
+                        "error": str(error),
+                        "traceback": traceback.format_exc(),
+                        "model_fits_during_recovery": 0,
+                        "automatic_retry": False,
+                    }
+                ),
+            )
         raise
 
 
@@ -2017,20 +2402,36 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--protocol", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--code-commit", required=True)
+    parser.add_argument("--recover-postprocessing", action="store_true")
+    parser.add_argument("--recovery-commit")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     arguments = _parser().parse_args(argv)
-    result = execute(
-        repository_root=arguments.repository_root,
-        evidence_root=arguments.evidence_root,
-        harnet_root=arguments.harnet_root,
-        config_path=arguments.config,
-        protocol_path=arguments.protocol,
-        output_directory=arguments.output,
-        code_commit=arguments.code_commit,
-    )
+    if arguments.recover_postprocessing:
+        _require(arguments.recovery_commit is not None, "recovery commit is required")
+        result = recover_postprocessing(
+            repository_root=arguments.repository_root,
+            evidence_root=arguments.evidence_root,
+            harnet_root=arguments.harnet_root,
+            config_path=arguments.config,
+            protocol_path=arguments.protocol,
+            output_directory=arguments.output,
+            run_code_commit=arguments.code_commit,
+            recovery_code_commit=arguments.recovery_commit,
+        )
+    else:
+        _require(arguments.recovery_commit is None, "recovery commit requires recovery mode")
+        result = execute(
+            repository_root=arguments.repository_root,
+            evidence_root=arguments.evidence_root,
+            harnet_root=arguments.harnet_root,
+            config_path=arguments.config,
+            protocol_path=arguments.protocol,
+            output_directory=arguments.output,
+            code_commit=arguments.code_commit,
+        )
     print(json.dumps(result, indent=2))
     return 0
 

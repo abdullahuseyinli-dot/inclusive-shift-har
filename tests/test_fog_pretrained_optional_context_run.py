@@ -16,6 +16,7 @@ from inclusive_shift_har.experiments.fog_pretrained_optional_context_run import 
     PROTOCOL_RELATIVE,
     _gate,
     _participant_fold_vector,
+    _participant_metric_rows,
     run_experiment,
     validate_config,
 )
@@ -45,6 +46,17 @@ def test_leave_one_fold_contract_uses_one_fold_per_participant() -> None:
     row_folds[1] = 4
     with pytest.raises(ValueError, match="participant fold assignment changed"):
         _participant_fold_vector(people, row_folds, roster)
+
+
+def test_participant_export_uses_top_level_report_rows() -> None:
+    participants = [{"participant_id": f"fogstar:{index:03d}"} for index in range(1, 23)]
+    reports = {
+        method: {"primary": {"mean_participant_macro_f1": 0.5}, "participants": participants}
+        for method in METHOD_ORDER
+    }
+    exported = _participant_metric_rows(reports)
+    assert list(exported) == list(METHOD_ORDER)
+    assert all(rows == participants for rows in exported.values())
 
 
 def test_mechanism_gate_does_not_inherit_practical_fourteen_win_requirement() -> None:
