@@ -1,0 +1,177 @@
+schema_version: 1.0.0
+experiment_id: fog-pretrained-optional-context-v1
+status: frozen_before_fitting
+evidence_status: corrected_fog_adaptive_development_not_confirmation
+protocol_path: docs/research/FOG_PRETRAINED_OPTIONAL_CONTEXT_V1_PROTOCOL.md
+protocol_sha256: 27a31156bc89008d56c3d72881993a54189adaf319cded0a39fbed7245b49c2d
+authority:
+  specification_path: .audit/research_breakthrough_review_20260908-002/EXACT_NEXT_EXPERIMENT.md
+  specification_sha256: 716c939d5c6742705b924e7288572294c6654f6bdd88e3f78ff7cefac0e913ca
+  modifies_historical_protocol: false
+source:
+  dataset_id: fog_star_v3
+  raw_path: .audit/fog_decision_team_review_20260907-001/inputs/sensor_data.csv
+  raw_sha256: 888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477
+  raw_size_bytes: 119629580
+  observable_count: 1939
+  scored_count: 1213
+  scored_class_counts: [954, 74, 185]
+  current_ankle_observable: 1817
+  current_ankle_scored: 1154
+  full_history_observable: 1724
+  full_history_scored: 1098
+  inclusivehar_p11_p20_access: false
+reference:
+  run_path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003
+  methods: [l9v, lv, bv, b0, f3]
+  predictions_sha256: 18db784799b42212952fc2d6644cd874a83f5e2caf132ab3c1192e15a08b73eb
+  feature_cache_sha256: fb4c21ebcdcac75823f0cb746fa5c443565d89e2c72fabe244bafd7735e0e488
+  analysis_sha256: 2043d38b89356fbf2c02dc3feb4c48270e858bde65bb6ee1289abedf22491184
+  exact_missing_ankle_fallback: b0
+  conditional_posture_source: l9v
+  historical_motion_run_path: .audit/fog_motion_factorization/fog-motion-factorization-seed11-20260908-001
+  historical_motion_methods: [E2, T128, T500, T500-P]
+  historical_motion_source_commit: 4d4e591b9d714c384abdcaac2afc67acf08f87c7
+  historical_motion_predictions_sha256: 0b5b399fea0159644ca8d63f08215a99d98e60c42d1d927191fdd9ce78e34a73
+  historical_motion_analysis_sha256: 17911b6475d1cd9cce7f3ced92fdd389072b5293dcb3a23a16052f17f6fb496d
+  historical_motion_validation_sha256: 7e1838b61d8e794850459073b5664c698cdd1a8dd5598e13727b3c22f753512b
+  historical_motion_completion_sha256: 39d83696f0251609c1684c7809e0bc1fa60721a099a322daf3d7e9562ef02311
+harnet:
+  source_repository: https://github.com/OxWearables/ssl-wearables.git
+  source_commit: 150550ea5d41800229c95e36f88f5bf0d2e7cf04
+  source_file: sslearning/models/accNet.py
+  source_file_sha256: 3721adb0064135c5ec0703af59fccf2afceca2a8b16176c6339875d148e3cda0
+  hubconf_sha256: a77e66954e7c13917d93d5e115aed9508f2645a651e473ec62cf340635a4027e
+  preprocessing_readme_sha256: c5e826edab5b1ee4e22eaf77c1bbba3bf3365cc8bb06e34cfc8a18348e11480c
+  license: Oxford_Academic_Use_Licence
+  license_sha256: 331fd5fc22235c1af71044c100bd46b9a429f74d4f8397a5fe050984871703ea
+  checkpoint_file: model_check_point/mtl_best.mdl
+  checkpoint_source_url: https://wearables-files.ndph.ox.ac.uk/files/ssl/mtl_best.mdl
+  checkpoint_size_bytes: 42014098
+  checkpoint_git_blob_sha1: 252acc5eb036bcf8d37d915ce0377ab2dd5f9104
+  checkpoint_sha256: c64f9135d99e2dcdfc9ae7cc0672f2bcc438df9ceb8215665882f92cddd162a6
+  input_shape: [3, 300]
+  input_unit: g
+  sample_rate_hz: 30.0
+  window_seconds: 10.0
+  clip_g: [-3.0, 3.0]
+  interpolation: linear_native_60hz_without_extrapolation
+  embedding_dimension: 1024
+  feature_parameter_count: 10457408
+  feature_state_key_count: 131
+  mode: frozen_eval_inference_only
+  batch_size: 32
+  repeat_max_absolute_tolerance: 0.0
+  batch_single_max_absolute_tolerance: 1.0e-5
+folds:
+  seed_base: 11
+  seed_rule: 11_plus_zero_based_outer_fold_index
+  order: [0, 1, 2, 3, 4]
+  held_out_participants:
+    0: ["fogstar:007", "fogstar:012", "fogstar:016", "fogstar:017", "fogstar:018"]
+    1: ["fogstar:001", "fogstar:003", "fogstar:014", "fogstar:015", "fogstar:020"]
+    2: ["fogstar:006", "fogstar:010", "fogstar:019", "fogstar:021"]
+    3: ["fogstar:002", "fogstar:004", "fogstar:009", "fogstar:011"]
+    4: ["fogstar:005", "fogstar:008", "fogstar:013", "fogstar:022"]
+  expected_training_rows: [940, 825, 947, 829, 1075]
+  expected_evaluation_scored_rows: [214, 329, 207, 325, 79]
+weighting:
+  policy: original_three_class_participant_first_mean_one
+  raw_weight: 1/(k_i*n_ic)
+  recompute_on_current_query_training_rows: true
+  binary_rebalancing: false
+  class_weight: null
+query:
+  samples: 128
+  sample_rate_hz: 50.0
+  features: [accelerometer_norm__rms, gyroscope_norm__rms]
+  transform: log_max_rms_floor
+  rms_floor: 1.0e-8
+  normalization: outer_training_unweighted_mean_population_std
+  zero_variance_scale: 1.0
+cells:
+  order: [Q, M, R, P]
+  primary: P
+  Q: two_query_log_rms
+  M: two_query_log_rms_plus_physical_history_mask
+  R: query_mask_plus_fold_seeded_frozen_random_harnet_embedding
+  P: query_mask_plus_frozen_pretrained_harnet_embedding
+  dimensions: {Q: 2, M: 3, R: 1027, P: 1027}
+estimator:
+  class: sklearn.linear_model.LogisticRegression
+  penalty: l2
+  C: 1.0
+  solver: lbfgs
+  fit_intercept: true
+  max_iter: 1000
+  tol: 1.0e-6
+  class_weight: null
+  warm_start: false
+  random_state: 11_plus_outer_fold_index
+  positive_target: original_label_equals_mobility
+composition:
+  class_order: [mobility, sitting, standing]
+  probability: "[m,(1-m)*q,(1-m)*(1-q)]"
+  current_query_intervention: true
+  q_zero: exact_l9v
+  missing_current_ankle: exact_b0
+  add_epsilon: false
+metrics:
+  primary: mean_over_22_people_of_fixed_three_class_macro_f1
+  missing_class: zero_division_zero
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+  bootstrap_unit: participant
+  bottom_count: 7
+  strict_win_epsilon: 1.0e-12
+gates:
+  primary_candidate: P
+  practical:
+    comparator: l9v
+    minimum_mean_gain: 0.015
+    minimum_strict_participant_wins: 14
+  transferred_weights:
+    comparator: R
+    minimum_mean_gain: 0.010
+  beyond_query_and_availability:
+    comparator: M
+    minimum_mean_gain: 0.010
+  common:
+    bootstrap_lower_bound_strictly_greater_than: 0.0
+    minimum_bottom_seven_difference: -0.010
+    minimum_worst_person_difference: -0.030
+    minimum_paired_person_difference: -0.050
+    minimum_recall_differences: {mobility: -0.010, sitting: -0.020, standing: -0.020}
+    require_all_leave_one_person_and_fold_positive: true
+    require_complete_validation: true
+  prospective_label_oracle_preflight:
+    expected_editable_rows: 853
+    expected_maximum_possible_strict_wins: 17
+    expected_motion_only_mean_ceiling: 0.7518754751866962
+    never_use_for_fitting_or_prediction: true
+runtime:
+  controller_count: 1
+  maximum_fit_attempts: 20
+  automatic_retry: false
+  additional_seed: false
+  external_dataset: false
+  automatic_follow_on: false
+  device: cuda_0
+  blas_threads: 1
+  expected_python: 3.11.9
+  expected_versions:
+    numpy: 2.3.5
+    scipy: 1.17.1
+    scikit-learn: 1.8.0
+    torch: 2.12.0+cu132
+    PyYAML: 6.0.3
+    joblib: 1.5.3
+artifacts:
+  family: .audit/fog_pretrained_optional_context
+  run_directory: fog-pretrained-optional-context-seed11-20260908-001
+  create_only: true
+claims:
+  confirmation: false
+  novelty_demonstrated: false
+  pretrained_transfer_established_before_outcome: false
+  publication_or_release: false
