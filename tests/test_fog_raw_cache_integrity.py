@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 import pandas as pd  # type: ignore[import-untyped]
 import pytest
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 import inclusive_shift_har.experiments.fog_raw_cache_integrity as integrity
 from inclusive_shift_har.experiments.fog_raw_cache_integrity import (

@@ -1,0 +1,39 @@
+experiment_id: portable-evidence-replay-v1
+model_fits: 0
+cross_lane_comparison: false
+provenance:
+  model_byte_hashes: true
+  manifest_byte_hashes: true
+  model_deserialization: false
+  raw_bytes_rehashed: false
+lanes:
+  ctgr:
+    scored_rows: 725
+    participant_ids: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    predictions:
+      path: .audit/v3/max-rnd/ctgr-evaluation-seed-11-001/all_outer_predictions.npz
+      sha256: 5033a819beb8d03943535578ac7701b73fd9cc517dd9f01bad16da09041c74c8
+    result:
+      path: .audit/v3/max-rnd/ctgr-evaluation-seed-11-001/result.json
+      sha256: a7b9331c8a645f381c2982882cfced6e82afad38b113bc1388395aefac170d50
+  l9v:
+    observable_rows: 1939
+    scored_rows: 1213
+    observable_fallback_rows: 122
+    scored_fallback_rows: 59
+    participant_ids: ['fogstar:001', 'fogstar:002', 'fogstar:003', 'fogstar:004', 'fogstar:005', 'fogstar:006', 'fogstar:007', 'fogstar:008', 'fogstar:009', 'fogstar:010', 'fogstar:011', 'fogstar:012', 'fogstar:013', 'fogstar:014', 'fogstar:015', 'fogstar:016', 'fogstar:017', 'fogstar:018', 'fogstar:019', 'fogstar:020', 'fogstar:021', 'fogstar:022']
+    predictions:
+      path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003/predictions.npz
+      sha256: 18db784799b42212952fc2d6644cd874a83f5e2caf132ab3c1192e15a08b73eb
+    result:
+      path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003/result.json
+      sha256: 92d427d2af3592e3174ae44dc740c1ab5e999f5a6c1e05c2261de45d1457e7c5
+    analysis:
+      path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003/analysis.json
+      sha256: 2043d38b89356fbf2c02dc3feb4c48270e858bde65bb6ee1289abedf22491184
+    completion:
+      path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003/completion_manifest.json
+      sha256: 819542340714cfd9088f40e96100b5f9c8616f8d107bb668ae8c724601e280f7
+    erratum:
+      path: .audit/fog_left_ankle_derived_nine/erratum-seed11-20260908-003/ERRATUM.json
+      sha256: 83e27c9c1e049ea9a4546379b7a1494d5dfff7a9fb6b0af1e432039a8972bda1

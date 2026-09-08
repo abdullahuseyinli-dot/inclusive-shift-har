@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd  # type: ignore[import-untyped]
 import requests
 import scipy  # type: ignore[import-untyped]
-import yaml  # type: ignore[import-untyped]
+import yaml
 from numpy.typing import NDArray
 from scipy.signal import resample_poly  # type: ignore[import-untyped]
 

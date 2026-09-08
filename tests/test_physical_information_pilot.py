@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-import yaml  # type: ignore[import-untyped]
-from jsonschema import Draft202012Validator  # type: ignore[import-untyped]
+import yaml
+from jsonschema import Draft202012Validator
 
 import inclusive_shift_har.experiments.physical_information_pilot as runner
 from inclusive_shift_har.data.physical_information_pilot import (

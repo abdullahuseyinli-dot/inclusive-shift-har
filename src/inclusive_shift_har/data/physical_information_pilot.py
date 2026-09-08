@@ -15,7 +15,7 @@ from itertools import pairwise
 from pathlib import Path, PurePosixPath
 from typing import Any, cast
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from inclusive_shift_har.manifests.canonical import (
     canonical_json_sha256,

@@ -1,0 +1,28 @@
+schema_version: "1.0.0"
+experiment_id: ctgr-source-finalization-v1
+evidence_status: new_source_only_final_predictor_recipe_not_confirmation
+seed: 11
+n_jobs: 4
+inference_n_jobs: 1
+sampling_rate_hz: 50.0
+window_samples: 128
+source_window_count: 725
+participants: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+selection_pairs: [["1", "4"], ["6", "7"], ["2", "3"], ["5", "9"], ["8", "10"]]
+selection_fit_cap: 45
+final_fit_cap: 3
+total_fit_cap: 48
+candidate_count: 121
+mean_tie_tolerance: 0.005
+expert_estimators: [extra_trees_leaf3, extra_trees_leaf1]
+base_wins_policy: T9_equals_B6_U9_and_trigger_contrast_not_applicable
+B9:
+  feature_view: physics_plus_rmrp
+  n_estimators: 500
+  min_samples_leaf: 1
+  max_features: sqrt
+  class_weight: null
+  weighting: participant_first_present_classes_mean_one
+target_access_allowed: false
+confirmation_evaluation_allowed: false
+extra_seeds_allowed: false
