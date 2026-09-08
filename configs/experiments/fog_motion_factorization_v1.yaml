@@ -1,0 +1,373 @@
+schema_version: 1.0.0
+experiment_id: fog-motion-factorization-v1
+status: frozen_before_fitting
+evidence_status: corrected_fog_adaptive_development_not_confirmation
+protocol_path: docs/research/FOG_MOTION_FACTORIZATION_V1_PROTOCOL.md
+protocol_sha256: a8561555ffb8098b7931f77a921d95f771b4ac4c855fda79517354be0dbc32d3
+config_identity:
+  algorithm: sha256_canonical_json_excluding_top_level_protocol_sha256
+  serialization: "UTF-8; sort_keys=True; separators=(',', ':'); ensure_ascii=False; allow_nan=False"
+authority:
+  specification_path: .audit/research_invention_review_20260908-001/EXACT_NEXT_EXPERIMENT.md
+  specification_sha256: 0310bed0c618031119df8b6df6161c84f777f15b32663ae5fb7f5ce31b7a9224
+  modifies_historical_protocol: false
+source:
+  root_argument: evidence_root
+  dataset_id: fog_star_v3
+  raw_path: .audit/fog_decision_team_review_20260907-001/inputs/sensor_data.csv
+  raw_sha256: 888875133fef386affddd0a5864f122d527d8d7bc588a69905cc0871bef53477
+  raw_size_bytes: 119629580
+  copy_raw_data: false
+  download_allowed: false
+  inclusivehar_p11_p20_access: false
+  observable_count: 1939
+  scored_count: 1213
+  scored_class_counts: [954, 74, 185]
+reference:
+  run_path: .audit/fog_left_ankle_derived_nine/fog-left-ankle-derived-nine-seed11-20260908-003
+  files:
+    predictions.npz: 18db784799b42212952fc2d6644cd874a83f5e2caf132ab3c1192e15a08b73eb
+    feature_cache.npz: fb4c21ebcdcac75823f0cb746fa5c443565d89e2c72fabe244bafd7735e0e488
+    analysis.json: 2043d38b89356fbf2c02dc3feb4c48270e858bde65bb6ee1289abedf22491184
+    config_snapshot.yaml: 52320e2bd947ddb0701a3c1c45484f35183919eeb1f04b023f5293407e807cf0
+    artifact_manifest.json: f64f34d835ff707a2dff0babe6d7719e2effb9024e5bc304b8d69eea51ab06eb
+    completion_manifest.json: 819542340714cfd9088f40e96100b5f9c8616f8d107bb668ae8c724601e280f7
+    validation.json: 2d5b61fabf7bd2892acd0bdc5048e0b76d5eba0283037f5c5cfeabe0fb15bbd9
+  erratum_path: .audit/fog_left_ankle_derived_nine/erratum-seed11-20260908-003/ERRATUM.json
+  erratum_sha256: 83e27c9c1e049ea9a4546379b7a1494d5dfff7a9fb6b0af1e432039a8972bda1
+  methods: [l9v, lv, bv, b0, f3]
+  refit: false
+  numeric_b0_method_index: 3
+  current_signal_sha256: 4a4e9b199e78acf728df405fdb7ac9a1c28973a476d4b575c0c6d2903d39f012
+  current_gravity_sha256: 15a6cdd15b9bc66b2c6f8c8f571e0ab3fe94aed8a9ed9caed17beb24f9290247
+  current_ankle80_features_sha256: 4ee0db3c22f6e9f858835acb194d8f39fecd57830b12ac1ff1ff9a3de0079e50
+  current_l9v_features_sha256: b1b38b52e66d10b31c6d70a689f90e917f81e269340534fb422d25d9514fdc70
+  availability_mask_contract_sha256: 27c4d82a970975d93784cce15aa67799b07300eeacf7bb82d1ee62ec7f6b9a3d
+  observable_ids_contract_sha256: 4c73070017ae3b2b911df6daa5cd20a3db0f6c8712e23c2f7846c5410e956e44
+folds:
+  seed_base: 11
+  seed_rule: 11_plus_zero_based_outer_fold_index
+  order: [0, 1, 2, 3, 4]
+  held_out_participants:
+    0: ["fogstar:007", "fogstar:012", "fogstar:016", "fogstar:017", "fogstar:018"]
+    1: ["fogstar:001", "fogstar:003", "fogstar:014", "fogstar:015", "fogstar:020"]
+    2: ["fogstar:006", "fogstar:010", "fogstar:019", "fogstar:021"]
+    3: ["fogstar:002", "fogstar:004", "fogstar:009", "fogstar:011"]
+    4: ["fogstar:005", "fogstar:008", "fogstar:013", "fogstar:022"]
+  inner_selection: false
+  training_rows: scored_and_full_history_and_not_outer_fold
+context:
+  sensor: ankleL
+  source_rate_hz: 60.0
+  target_rate_hz: 50.0
+  gravity_cutoff_hz: 0.30
+  gravity_filter: inherited_causal_native_rate
+  resampling: inherited_single_joint_offline_polyphase_60_to_50
+  query_samples: 128
+  long_samples: 500
+  history_samples: 372
+  interval: "[query_end_exclusive - 500, query_end_exclusive)"
+  temporal_channels: [lin_acc_x, lin_acc_y, lin_acc_z, gyro_x, gyro_y, gyro_z]
+  boundary_keys: [participant, observable_session, sensor_finite_monotonic_run]
+  activity_labels_may_define_history_boundaries: false
+  bridge_gaps_or_nonfinite_resets: false
+  concatenate_cached_windows: false
+  expected_observable_ankle_available: 1817
+  expected_scored_ankle_available: 1154
+  expected_observable_full_history: 1724
+  expected_scored_full_history: 1098
+  expected_scored_short_history_fallback: 56
+  expected_scored_missing_ankle_fallback: 59
+  expected_training_rows_by_fold: [904, 780, 902, 780, 1026]
+  expected_training_original_class_counts_by_fold:
+    - [762, 19, 123]
+    - [641, 28, 111]
+    - [753, 21, 128]
+    - [619, 28, 133]
+    - [849, 32, 145]
+  mismatch_action: stop_before_first_fit_preserve_preflight_failure
+  current_window_parity: exact_inherited_hash_algorithms
+  common_training_and_intervention_support: true
+weighting:
+  original_class_order: [mobility, sitting, standing]
+  policy: original_three_class_participant_first_mean_one
+  raw_weight: "1 / (k_i * n_ic)"
+  recompute_after_common_support_restriction: true
+  k_i: represented_original_classes_in_actual_training_rows_for_person_i
+  n_ic: actual_training_rows_for_person_i_and_original_class_c
+  normalization: divide_by_unweighted_mean_raw_weight
+  class_weight: null
+  binary_rebalancing: false
+  save_original_class_and_binary_weight_totals: true
+cells:
+  order: [E2, T128, T500, T500-P]
+  E2: frozen_two_feature_logistic_motion_head
+  T128: frozen_E2_logit_plus_temporal_residual_mask_first_372
+  T500: frozen_E2_logit_plus_temporal_residual_true_500
+  T500-P: frozen_E2_logit_plus_temporal_residual_permuted_past_3_blocks
+  primary: T500
+  logistic_fits: 5
+  neural_fits: 15
+  total_successful_fits_required: 20
+e2:
+  feature_names: [accelerometer_norm__rms, gyroscope_norm__rms]
+  feature_source: inherited_current_query_l9v_cache
+  transform: log_max_rms_floor
+  rms_floor: 1.0e-8
+  normalization: unweighted_training_query_mean_population_std_ddof0
+  zero_variance_scale: 1.0
+  dtype: float64
+  estimator: sklearn.linear_model.LogisticRegression
+  penalty: l2
+  C: 1.0
+  solver: lbfgs
+  fit_intercept: true
+  max_iter: 1000
+  tol: 1.0e-6
+  class_weight: null
+  warm_start: false
+  positive_target: original_label_equals_mobility
+  required_class_order: [0, 1]
+  probability: predict_proba_positive_class_1
+  nonconvergence: fail_without_retry_or_iteration_extension
+temporal:
+  shape: [500, 7]
+  channel_order: [lin_acc_x, lin_acc_y, lin_acc_z, gyro_x, gyro_y, gyro_z, observation_mask]
+  normalization: unweighted_valid_samples_from_common_training_current_queries
+  normalizer_dtype: float64
+  normalization_ddof: 0
+  zero_variance_scale: 1.0
+  model_dtype: float32
+  masks_applied_after_normalization: true
+  projection: {in_channels: 7, out_channels: 32, kernel_size: 1, bias: true}
+  residual_blocks: 6
+  dilations: [1, 2, 4, 8, 16, 32]
+  convolutions_per_block: 2
+  convolution: {in_channels: 32, out_channels: 32, kernel_size: 5, bias: true, padding: causal_left_only}
+  sublayer_order: [convolution, channel_only_layer_norm, gelu, dropout, observation_mask]
+  layer_norm: {normalized_shape: 32, eps: 1.0e-5, elementwise_affine: true}
+  gelu_approximate: none
+  dropout: 0.1
+  residual_order: [two_sublayers, add_block_input, observation_mask]
+  mask_after_stem: true
+  pooling: arithmetic_mean_of_last_128_outputs
+  head: {in_features: 32, out_features: 1, bias: true, weight_initialization: zero, bias_initialization: zero}
+  initialization_other_parameters: pytorch_default_from_identical_fold_seed_and_constructor_order
+  expected_trainable_parameters: 62881
+  effective_receptive_field_samples: 505
+  residual_composition: sigmoid_float32_of_float32_frozen_E2_logit_plus_float32_residual
+  freeze_E2_parameters: true
+  gravity_features_to_neural_head: false
+  posthoc_calibration: false
+training:
+  epochs: 80
+  checkpoint: last_epoch_only
+  optimizer: torch.optim.AdamW
+  learning_rate: 0.001
+  minimum_learning_rate: 0.00001
+  epoch_learning_rate: "1e-5 + 0.5*(1e-3-1e-5)*(1+cos(pi*zero_based_epoch/79))"
+  optimizer_betas: [0.9, 0.999]
+  optimizer_eps: 1.0e-8
+  weight_decay: 0.0001
+  optimizer_amsgrad: false
+  optimizer_foreach: false
+  optimizer_fused: false
+  batch_size: 32
+  drop_last: false
+  data_loader_workers: 0
+  loss: binary_cross_entropy_with_logits
+  target: original_label_equals_mobility
+  minibatch_loss: sum_weight_times_BCE_divided_by_sum_weight_in_minibatch
+  whole_training_loss: sum_weight_times_BCE_divided_by_sum_weight_over_all_training_rows
+  gradient_clip_norm: 1.0
+  gradient_clip_norm_type: 2.0
+  nonfinite_gradient: error
+  minibatch_order: precomputed_numpy_default_rng_fold_seed_permutations_once_per_epoch
+  identical_batch_orders_across_temporal_cells: true
+  identical_initial_state_across_temporal_cells: true
+  dropout_rng: reset_torch_cpu_and_cuda_to_fold_seed_after_loading_shared_initial_state
+  mixed_precision: false
+  use_evaluation_labels_for_training_or_selection: false
+  use_evaluation_probabilities_for_training_or_selection: false
+  inference_batch_size: 32
+permutation:
+  cell: T500-P
+  past_block_length: 124
+  past_block_count: 3
+  block_indices: [0, 1, 2]
+  hash: sha256
+  payload: "motion-history-v1|{observable_window_id}|{block_index}"
+  encoding: UTF-8
+  order: ascending_raw_digest_then_integer_block_index
+  joint_channels_and_mask: true
+  current_query_unchanged: true
+  applies_during_training_and_evaluation: true
+  identity_permutation: retain_and_report_without_retry
+  filtering_and_resampling: completed_before_permutation
+composition:
+  class_order: [mobility, sitting, standing]
+  conditional_posture: "q = L9v_sitting / (L9v_sitting + L9v_standing)"
+  composed_probability: "[m, (1-m)*q, (1-m)*(1-q)]"
+  output_dtype: float64
+  decoder: numpy_argmax_first_maximum
+  denominator_zero: exact_entire_L9v_vector
+  short_history_ankle_available: exact_entire_L9v_vector
+  missing_ankle: exact_entire_B0_vector
+  fallback_priority: [missing_ankle_B0, insufficient_history_L9v, zero_posture_denominator_L9v, compose]
+  add_epsilon_to_posture_denominator: false
+  per_wearer_adaptation: false
+  preserve_all_observable_rows_before_scoring: true
+metrics:
+  primary: mean_over_22_people_of_fixed_three_class_macro_f1
+  class_order: [mobility, sitting, standing]
+  zero_division: 0
+  person_order: lexicographic_participant_id
+  strict_win_epsilon: 1.0e-12
+  bottom_count: 7
+  quantiles: [0.25, 0.50, 0.75]
+  class_recall_aggregation: equal_22_people_absent_class_zero
+  nll_clip_true_class_only: [1.0e-12, 1.0]
+  nll_aggregation: mean_within_person_then_equal_person
+  brier: sum_three_class_squared_error_mean_within_person_then_equal_person
+  ece_bins: 10
+  ece_edges: equal_width_0_to_1_left_closed_right_open_last_includes_1
+  ece_confidence: maximum_class_probability
+  ece_correctness: argmax_matches_original_label
+  ece_empty_bin_contribution: 0.0
+  ece_aggregations: [pooled_windows, equal_person]
+  binary_probability: effective_composed_mobility_probability
+  binary_threshold: 0.5
+  binary_threshold_equality: mobility
+  binary_balanced_accuracy_population: people_with_both_binary_classes
+  binary_balanced_accuracy_aggregation: equal_eligible_people_mean_sensitivity_specificity
+  probability_auc: mobility_positive_pooled_and_equal_eligible_person
+  binary_calibration: binary_NLL_Brier_and_10_bin_confidence_ECE
+  conditional_posture: sitting_positive_q_AUC_on_true_stationary_q_nonzero_with_both_postures
+  additional_reports:
+    - per_person_confusion_class_support_precision_recall_f1_and_delta
+    - mean_median_quartiles_bottom_seven_worst
+    - pooled_accuracy_and_present_class_f1_descriptive
+    - pooled_binary_sensitivity_specificity_and_eligible_person_count
+    - exact_row_level_boundary_rescues_harms_and_ties
+    - original_class_and_binary_weight_totals
+    - full_history_short_history_missing_ankle_q_zero_intervention_strata
+    - P017_structural_non_intervention_without_participant_exclusion
+    - conditional_posture_coverage_and_q_zero_count
+  bootstrap:
+    unit: paired_participant_vector
+    participants_per_resample: 22
+    resamples: 10000
+    seed: 1729
+    generator: numpy_default_rng
+    confidence_level: 0.95
+    quantile_method: linear
+    same_draws_across_all_contrasts: true
+    scope: descriptive_conditional_on_adaptively_consumed_cohort_and_overlapping_fits
+gates:
+  primary_candidate: T500
+  sequential_claims:
+    - {id: practical, candidate: T500, comparator: l9v, minimum_mean_gain: 0.015}
+    - {id: learned_signal, candidate: T500, comparator: E2, minimum_mean_gain: 0.010}
+    - {id: additional_context, candidate: T500, comparator: T128, minimum_mean_gain: 0.010}
+    - {id: coarse_history_order, candidate: T500, comparator: T500-P, minimum_mean_gain: 0.010}
+  every_stage:
+    bootstrap_lower_bound_strictly_greater_than: 0.0
+    minimum_strict_participant_wins: 14
+    minimum_bottom_seven_difference: -0.010
+    minimum_worst_person_difference: -0.030
+    minimum_paired_individual_difference: -0.050
+    minimum_mobility_recall_difference: -0.010
+    minimum_sitting_recall_difference: -0.020
+    minimum_standing_recall_difference: -0.020
+    every_leave_one_person_and_fold_mean_greater_than: 0.0
+    require_complete_validation: true
+  stop_claim_progression_at_first_failure: true
+  report_all_unordered_pairwise_comparisons: true
+  report_E2_minus_l9v_all_practical_guards: true
+  no_automatic_alternate_primary_selection: true
+  do_not_retroactively_change_historical_gates: true
+runtime:
+  controller_count: 1
+  gpu_count: 1
+  expected_python: 3.11.9
+  expected_versions:
+    numpy: 2.3.5
+    scipy: 1.17.1
+    scikit-learn: 1.8.0
+    torch: 2.12.0+cu132
+    PyYAML: 6.0.3
+    joblib: 1.5.3
+  bind_interpreter_dependency_inventory_gpu_driver_and_cuda_receipt: true
+  device: cuda_0
+  torch_threads: 1
+  torch_interop_threads: 1
+  blas_openmp_threads: 1
+  deterministic_algorithms: true
+  cudnn_deterministic: true
+  cudnn_benchmark: false
+  tf32: false
+  cublas_workspace_config: ":4096:8"
+  clean_committed_source_required: true
+  fit_order: outer_fold_then_E2_T128_T500_T500_P
+  maximum_fit_attempts: 20
+  count_failed_fit_attempts: true
+  automatic_retry: false
+  fit_failure_policy: stop_training_preserve_completed_and_mark_remaining_unattempted
+  additional_seed: false
+  other_dataset: false
+  automatic_follow_on: false
+  time_limit_extension_from_promising_results: false
+validation:
+  independent_zero_fit_raw_context_replay: true
+  independent_checkpoint_replay: true
+  maximum_absolute_neural_probability_replay_error: 1.0e-7
+  decisions_and_ids_replay: exact
+  fallback_replay: byte_exact
+  preserved_reference_probabilities: byte_exact
+  required_tests:
+    - source_hash_and_reference_schema_alignment
+    - participant_exclusion_and_no_history_boundary_bridging
+    - annotation_blind_history_and_inference_population
+    - exact_current_query_raw_replay
+    - expected_common_support_and_class_counts
+    - training_only_normalizers_weights_and_identical_arm_support
+    - mask_prefix_perturbation_and_hidden_zero_invariance
+    - causal_model_dependency_and_505_sample_receptive_field
+    - shared_initialization_minibatches_and_E2_checkpoint
+    - permutation_multiset_query_identity_and_mask_alignment
+    - fixed_q_composition_zero_denominator_and_exact_fallback
+    - inherited_L9v_report_metric_parity
+    - every_checkpoint_output_and_replay_hash_binding
+    - create_only_lifecycle_fit_cap_failure_and_worker_shutdown
+artifacts:
+  default_run_parent: .audit/fog_motion_factorization
+  output_argument: output
+  create_only: true
+  copy_raw_data: false
+  mandatory:
+    - source_config_protocol_environment_and_command_receipts
+    - input_manifest_with_raw_byte_hash_and_reference_hashes
+    - mandatory_L9v_fallback_ERRATUM_snapshot
+    - independent_context_segmentation_parity_and_qualification_receipts
+    - ordered_observable_scoring_ids_fold_masks_and_support_arrays
+    - common_training_weights_and_normalizers_per_fold
+    - temporal_initial_state_and_batch_order_hashes_per_fold
+    - permutation_arrays_identity_counts_and_hashes
+    - every_fit_attempt_loss_convergence_runtime_and_failure_receipt
+    - five_E2_and_fifteen_temporal_checkpoints_or_explicit_missing_states
+    - all_observable_reference_and_new_cell_probabilities_before_scoring
+    - all_scored_participant_metrics_predictions_error_events_and_comparisons
+    - raw_learner_motion_probabilities_and_effective_composed_probabilities
+    - sequential_gate_and_all_pairwise_descriptive_reports
+    - peak_cpu_gpu_memory_runtime_model_bytes_and_parameter_counts
+    - independent_no_fit_validation_and_checkpoint_replay
+    - self_hashed_completion_and_artifact_manifests
+    - failure_or_interruption_records_and_final_worker_shutdown_receipt
+claims:
+  confirmation: false
+  novelty_demonstrated: false
+  zero_lookahead_sensor_streaming: false
+  standalone_ankle_product: false
+  historical_CTGR_score_replacement: false
+  physical_pilot_required_for_this_offline_experiment: false
+  publication_release_push_tag_deposit: false
