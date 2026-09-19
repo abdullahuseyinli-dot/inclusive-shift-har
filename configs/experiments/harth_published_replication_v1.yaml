@@ -1,0 +1,27 @@
+experiment_id: harth_published_replication_v1
+status: diagnostic_protocol_parity
+source:
+  dataset: HARTH
+  url: https://archive.ics.uci.edu/static/public/779/harth.zip
+  paper: https://doi.org/10.3390/s21237853
+contract:
+  participants: 22
+  split: leave_one_subject_out
+  sampling_rate_hz: 50
+  window_samples: 250
+  overlap_samples: 0
+  lowpass_hz: 20
+  gravity_filter_hz: 1
+  feature_count: 161
+  labels: [walking, running, shuffling, stairs_ascending, stairs_descending, standing, sitting, lying, cycling_sit, cycling_stand, cycling_sit_inactive, cycling_stand_inactive]
+models:
+  published_svm: {kernel: rbf, C: 10, gamma: scale, scaling: train_only_minmax}
+  published_rf: {n_estimators: 80, min_samples_split: 10, min_samples_leaf: 1, max_features: sqrt, class_weight: balanced}
+  published_xgb: {n_estimators: 1024, max_depth: 3, learning_rate: 0.1, reg_lambda: 1, tree_method: hist}
+  ours_back_rich_rf: {n_estimators: 300, max_features: sqrt, min_samples_leaf: 2, class_weight: balanced_subsample}
+  ours_thigh_rich_rf: {n_estimators: 300, max_features: sqrt, min_samples_leaf: 2, class_weight: balanced_subsample}
+  ours_fused_rich_rf: {n_estimators: 300, max_features: sqrt, min_samples_leaf: 2, class_weight: balanced_subsample}
+metrics:
+  primary: pooled_sample_level_macro_f1
+  secondary: [pooled_sample_level_accuracy, pooled_sample_level_macro_precision, pooled_sample_level_macro_recall, merged_nine_activity_metrics, participant_macro_f1]
+claim_boundary: diagnostic_only

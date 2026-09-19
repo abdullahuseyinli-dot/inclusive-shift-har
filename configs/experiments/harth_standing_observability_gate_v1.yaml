@@ -1,0 +1,49 @@
+experiment_id: harth-standing-observability-gate-v1
+status: fixed_predeclared_existing_data
+dataset: HARTH
+source_url: https://archive.ics.uci.edu/static/public/779/harth.zip
+sampling_rate_hz: 50
+window_samples: 250
+window_overlap_samples: 0
+folds:
+  count: 5
+  seed: 11
+classes: [sitting, standing]
+label_map:
+  7: sitting
+  6: standing
+estimator:
+  name: random_forest
+  n_estimators: 300
+  max_features: sqrt
+  min_samples_leaf: 2
+  class_weight: balanced_subsample
+  n_jobs: 4
+  seed_base: 11
+arms:
+  - id: B_back_rich
+    input: lower_back_rich_161
+  - id: T_thigh_rich
+    input: right_thigh_rich_161
+  - id: F_fused_rich
+    input: lower_back_plus_right_thigh_rich_322
+  - id: G_confidence_gated
+    input: back_rich_with_train_only_thigh_override
+gate:
+  inner_folds: 4
+  threshold_source: outer_training_participant_oof
+  sitting_recall_loss_limit: 0.02
+  override: sitting_back_decision_only
+promotion_gate:
+  mean_macro_f1_gain_min: 0.05
+  standing_recall_gain_min: 0.10
+  standing_f1_gain_min: 0.10
+  sitting_recall_loss_max: 0.02
+  participant_wins_min: 16
+  participant_harm_floor: -0.05
+constraints:
+  additional_seeds: false
+  external_datasets: false
+  synthetic_gyro: false
+  phone_collection: false
+  target_access: false

@@ -1,0 +1,18 @@
+experiment_id: harth_sage_x_v2
+parent_experiment: harth_sage_x_v1
+lane: exploratory_external_development
+dataset: HARTH
+window_samples: 250
+folds:
+  count: 5
+  seed: 11
+arms: [paired_distill, paired_distill_contrastive]
+teacher:
+  supervised_cross_entropy_weight: 0.50
+  distillation_weight: 0.25
+  temperature: 2.0
+paired_reconstruction:
+  reconstruction_weight: 0.25
+  embedding_alignment_weight: 0.10
+contrastive:
+  weight: 0.15

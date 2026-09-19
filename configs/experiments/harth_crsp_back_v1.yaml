@@ -1,0 +1,53 @@
+experiment_id: harth_crsp_back_v1
+lane: exploratory_external_development
+dataset: HARTH
+source_url: https://archive.ics.uci.edu/static/public/779/harth.zip
+source_record: https://archive.ics.uci.edu/dataset/779/harth
+sampling_rate_hz: 50
+windows:
+  control_samples: 128
+  proposed_samples: 250
+  overlap_samples: 0
+folds:
+  count: 5
+  seed: 11
+classes: [sitting, standing]
+label_map:
+  7: sitting
+  6: standing
+estimator:
+  name: random_forest
+  n_estimators: 300
+  max_features: sqrt
+  min_samples_leaf: 2
+  class_weight: balanced_subsample
+  n_jobs: 4
+  seed_base: 11
+arms:
+  - id: A_control_128_base_rf
+    representation: base
+  - id: B_context_250_base_rf
+    representation: base
+  - id: C_rich_250_rf
+    representation: rich
+  - id: D_temporal_250_rf
+    representation: temporal
+  - id: E_temporal_physics_250_rf
+    representation: temporal_physics
+  - id: F_paired_reconstruction_250_rf
+    representation: paired_reconstruction
+paired_reconstruction:
+  mapping: back_to_thigh_ridge
+  alpha: 10.0
+  thigh_usage: training_target_only
+metrics:
+  primary: participant_macro_f1
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+promotion_gate:
+  mean_macro_f1_gain_min: 0.05
+  bootstrap_ci_lower_positive: true
+  standing_recall_gain_min: 0.10
+  sitting_recall_loss_max: 0.02
+  participant_wins_min: 16
+  participant_harm_floor: -0.05

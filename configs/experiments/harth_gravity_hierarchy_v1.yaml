@@ -1,0 +1,65 @@
+experiment_id: harth-gravity-hierarchy-v1
+status: fixed_predeclared_source_development
+dataset: HARTH
+source_url: https://archive.ics.uci.edu/static/public/779/harth.zip
+sampling_rate_hz: 50
+window_samples: 250
+window_overlap_samples: 0
+folds:
+  count: 5
+  seed: 11
+classes: [sitting, standing]
+label_map:
+  7: sitting
+  6: standing
+estimator:
+  name: random_forest
+  n_estimators: 300
+  max_features: sqrt
+  min_samples_leaf: 2
+  class_weight: balanced_subsample
+  n_jobs: 4
+  seed_base: 11
+cells:
+  - id: C_rich_control
+    representation: rich_161
+    postprocess: none
+  - id: G_gravity_geometry
+    representation: rich_161_plus_gravity_geometry_30
+    postprocess: none
+  - id: G_calibrated
+    representation: rich_161_plus_gravity_geometry_30
+    postprocess: outer_training_prior_logit
+  - id: G_state_decoder
+    representation: rich_161_plus_gravity_geometry_30
+    postprocess: outer_training_viterbi_min_dwell_2
+gravity_geometry:
+  smoothing_samples: 25
+  channels: lower_back_accelerometer_only
+  native_gravity: false
+  gyroscope: false
+  synthetic_channels: false
+calibration:
+  source: outer_training_class_prior
+  held_out_labels: false
+state_decoder:
+  minimum_dwell_windows: 2
+  transition_counts: outer_training_contiguous_windows_only
+metrics:
+  primary: participant_macro_f1
+  diagnostics: [accuracy, window_macro_f1, sitting_recall, standing_recall, sitting_f1, standing_f1, confusion_matrix]
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+promotion_gate:
+  mean_macro_f1_gain_min: 0.05
+  standing_recall_gain_min: 0.10
+  standing_f1_gain_min: 0.10
+  sitting_recall_loss_max: 0.02
+  participant_wins_min: 16
+  participant_harm_floor: -0.05
+constraints:
+  additional_seeds: false
+  external_datasets: false
+  target_access: false
+  thigh_inference: false
+  synthetic_gyro: false

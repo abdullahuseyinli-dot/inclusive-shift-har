@@ -1,0 +1,41 @@
+experiment_id: harth_sage_x_v1
+lane: exploratory_external_development
+dataset: HARTH
+source_record: https://archive.ics.uci.edu/dataset/779/harth
+sampling_rate_hz: 50
+window_samples: 250
+overlap_samples: 0
+folds:
+  count: 5
+  seed: 11
+classes: [sitting, standing]
+label_map:
+  7: sitting
+  6: standing
+arms:
+  - supervised_temporal
+  - same_sensor_ssl
+  - paired_csmr
+  - paired_contrastive
+model:
+  hidden_width: 32
+  embedding_width: 64
+  kernel_size: 5
+  dilations: [1, 2, 4, 8]
+  epochs: 18
+  batch_size: 256
+  mask_probability: 0.15
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  gradient_clip_norm: 1.0
+metrics:
+  primary: participant_macro_f1
+  bootstrap_resamples: 10000
+  bootstrap_seed: 1729
+promotion_gate:
+  mean_macro_f1_gain_min: 0.05
+  standing_recall_gain_min: 0.10
+  standing_f1_gain_min: 0.10
+  sitting_recall_loss_max: 0.02
+  participant_wins_min: 16
+  participant_harm_floor: -0.05

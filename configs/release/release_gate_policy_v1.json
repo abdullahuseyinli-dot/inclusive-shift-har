@@ -248,7 +248,7 @@
       "platform_machine": "x86_64",
       "scope": "transitive_linux_xgboost_gpu_runtime_installed_from_pypi_not_redistributed",
       "lock_path": "uv.lock",
-      "lock_sha256": "17d48a0547159c7c5146a2d572bee8e2f0a49200bc092a0c065ad112f56c5d6e",
+      "lock_sha256": "51a6d988bb5f1b0590760a347c7d130ead4d93e22bd183a5118c94754ede0ee9",
       "review_path": "docs/release/NVIDIA_NCCL_CU12_2_31_2_REVIEW.json",
       "review_sha256": "ac91805bae85ad7cde3c9eef3a95cf83411e8367854f9ce3422f92f2168dad5c",
       "review_record_sha256": "989bf532680f4696485f807508ed49061092ab2a9308dceb635207523b8213d3",
