@@ -1,0 +1,14 @@
+schema_version: "1.0.0"
+experiment_id: hera-compact-evidence-integration-v1
+status: fixed_predeclared_source_development
+evidence_status: reused_source_development_not_independent
+reference: frozen HERA-v1 strict
+compact_branch: gravity-invariant-followup-v1
+hera_probability_weight: 0.75
+compact_probability_weight: 0.25
+weight_selection: fixed_before_integration_outcomes
+new_hera_fits: 0
+upstream_compact_fits: 5
+target_access: false
+additional_seeds: false
+external_datasets: false

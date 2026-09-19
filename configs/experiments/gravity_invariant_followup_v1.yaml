@@ -1,0 +1,33 @@
+schema_version: "1.0.0"
+experiment_id: gravity-invariant-followup-v1
+status: fixed_predeclared_source_development
+evidence_status: reused_source_development_not_independent
+hypothesis: "The native-gravity loss is driven by orientation-sensitive/high-dimensional component features; compact scalar gravity-relative dynamics may retain complementary information."
+reference: "Round-A A2 cached denoised six-channel GSP"
+candidate: "A2 plus ten scalar gravity-relative feature groups"
+estimator:
+  class: sklearn.ensemble.ExtraTreesClassifier
+  n_estimators: 500
+  max_features: sqrt
+  min_samples_leaf: 1
+  random_state: 11
+  class_weight: null
+  n_jobs: 4
+weighting: "1/(present_person_class_count * training_person_class_window_count), normalized mean one"
+outer_folds: [["1", "4"], ["6", "7"], ["2", "3"], ["5", "9"], ["8", "10"]]
+feature_groups:
+  - user_acceleration_parallel_gravity
+  - user_acceleration_perpendicular_norm
+  - gyroscope_parallel_gravity
+  - gyroscope_perpendicular_norm
+  - total_acceleration_parallel_gravity
+  - total_acceleration_perpendicular_norm
+  - gravity_direction_angular_speed
+  - user_acceleration_norm
+  - gyroscope_norm
+  - normalized_acceleration_gyroscope_dot
+constraints:
+  target_access: false
+  hyperparameter_search: false
+  additional_seeds: false
+  external_datasets: false

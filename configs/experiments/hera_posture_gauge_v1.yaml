@@ -1,0 +1,51 @@
+schema_version: "1.0.0"
+experiment_id: "inclusivehar-hera-posture-gauge-v1"
+declared_on: "2026-09-16"
+status: "locked_source_development_before_hera_gauge_run"
+description: >-
+  Fixed, label-assisted semantic-gauge calibration attached to frozen HERA-v1 strict
+  source predictions. Mobility remains unchanged; only sitting/standing semantics are
+  calibrated. The run is exploratory source development and is not zero-shot or
+  confirmatory evidence.
+input:
+  prediction_artifact: ".audit/hera_compact_evidence_integration/hera-compact-evidence-integration-20260916-001/predictions.npz"
+  probability_key: "hera_v1_strict_probabilities"
+  labels_key: "labels"
+  participant_ids_key: "participant_ids"
+  window_ids_key: "window_ids"
+  participant_roster: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+method:
+  fixed_class: "mobility"
+  reconcilable_classes: ["sitting", "standing"]
+  minimum_predicted_stationary_probability: 0.5
+  minimum_absolute_log_bayes_factor: 1.0986122886681098
+  maximum_queries_per_participant: [1, 2, 3]
+  active_query_utility: "predicted stationary probability times absolute posture log odds"
+  random_query_control: "sha256(seed|window_id) order under the same candidate filter"
+  active_random_seed: 271828
+  fixed_sar_seed: 314159
+  query_windows_excluded_from_evaluation: true
+  label_access_timing: "query labels are read only after label-free selection"
+  unresolved_budget_exhaustion_rule: "retain identity"
+  soft_gauge:
+    prior_swap_probability: 0.5
+    maximum_swap_weight: 1.0
+    evidence_temperature: 1.0
+    rule: "posterior probability of swap after the selected labels"
+comparators:
+  - "full frozen HERA-v1 strict"
+  - "same-remaining-window HERA without adaptation"
+  - "active hard identity-versus-swap gauge"
+  - "active soft posterior gauge"
+  - "random hash hard and soft gauges"
+  - "fixed one-per-posture-class SAR hard gauge (1+1 labels)"
+claim_policy:
+  zero_shot_claim_allowed: false
+  labelled_personalization_only: true
+  target_data_allowed: false
+  confirmatory_claim_allowed: false
+  all_query_budgets_reported_without_best_budget_selection: true
+temporal_stage:
+  status: "blocked"
+  reason: "authoritative contiguous source session/trial order is unavailable in the released prediction artifact"
+  no_temporal_fit_launched: true
