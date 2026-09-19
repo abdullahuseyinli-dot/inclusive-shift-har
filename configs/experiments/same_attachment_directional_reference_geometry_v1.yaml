@@ -1,0 +1,60 @@
+schema_version: "1.0.0"
+experiment_id: "same-attachment-directional-reference-geometry-v1"
+status: "zero_fit_software_qualification"
+evidence_role: "synthetic_fixture_not_physical_evidence"
+
+class_order: ["mobility", "sitting", "standing"]
+posture_order: ["sitting", "standing"]
+support_bouts_per_posture: 2
+support_bouts_total: 4
+equal_bout_mixture_weights: true
+
+numerics:
+  norm_epsilon: 1.0e-12
+  maximum_concentration: 500.0
+  comparison_atol: 1.0e-12
+  probability_sum_atol: 1.0e-15
+
+fixed_fixture_head:
+  motion_intercept: -0.3
+  motion_dynamics_coefficients: [0.7, -0.2]
+  motion_compatibility_coefficient: 0.4
+  motion_dispersion_coefficient: -0.1
+  motion_interaction_coefficients: [0.25, -0.15]
+  posture_ratio_coefficient: 0.8
+  posture_dispersion_interaction_coefficient: -0.2
+  posture_intercept_allowed: false
+
+required_fixtures:
+  - "common_proper_rotation_invariance"
+  - "sitting_standing_swap_equivariance"
+  - "uniform_broad_distribution_limit"
+  - "equal_odds_distinct_compatibility"
+  - "identical_anchor_nondiscrimination"
+  - "antipodal_anchor_likelihood_validity"
+  - "support_bout_rotation_equivariance"
+  - "zero_resultant_rejection"
+  - "nonfinite_direction_norm_rejection"
+  - "explicit_query_validity_fallback"
+  - "non_float64_baseline_rejection"
+  - "exact_missing_support_fallback"
+  - "exact_stale_support_fallback"
+  - "exact_invalid_support_fallback"
+  - "exact_attachment_mismatch_fallback"
+  - "probability_normalization_and_finiteness"
+  - "nonzero_joint_interaction_execution"
+
+resources:
+  model_fit_budget: 0
+  encoder_fit_budget: 0
+  target_cohort_access_allowed: false
+  external_dataset_access_allowed: false
+  workers_allowed: 0
+  monitors_allowed: 0
+
+claims:
+  physical_measurement_used: false
+  physical_identifiability_demonstrated: false
+  reattachment_robustness_demonstrated: false
+  model_performance_demonstrated: false
+  architecture_promotion_allowed: false

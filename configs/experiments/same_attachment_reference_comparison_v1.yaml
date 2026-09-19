@@ -1,0 +1,59 @@
+schema_version: "1.0.0"
+experiment_id: "same-attachment-reference-comparison-v1"
+status: "implementation_qualification_physical_inputs_pending"
+evidence_role: "prospective_development"
+governing_specification: ".audit/research_direction_20260913-001/NEXT_EXPERIMENT_SPEC.md"
+frozen_physical_pilot_unchanged: true
+automatic_human_performance_execution_allowed: false
+admission:
+  evidence_status: "real_physical_development_observations"
+  required_wearers: 6
+  required_attachment_blocks: 24
+  required_support_bouts: 96
+  required_query_bouts: 168
+  original_pilot_gate_required: true
+  pooled_companion_gate_required: true
+  verified_equipment_canonicalization_and_human_prerequisites_required: true
+outer_validation:
+  method: "six_leave_one_wearer_out"
+  held_out_scope: "all_visits_attachments_support_and_queries_for_one_wearer"
+  held_out_label_features_forbidden: true
+arms: ["Z", "A", "B", "C", "D", "D-additive", "D-constant", "K", "MAP"]
+class_order: ["mobility", "sitting", "standing"]
+optimizer:
+  algorithm: "L-BFGS-B"
+  float_dtype: "float64"
+  initialization: "all_zero"
+  slope_l2: 0.01
+  max_iterations: 1000
+  gradient_tolerance: 1.0e-8
+  function_tolerance: 1.0e-12
+concentration:
+  maximum: 500.0
+  bench_delta: null
+  scalar_max_iterations: 500
+  scalar_x_tolerance: 1.0e-8
+fitting:
+  binary_objects: 54
+  multinomial_objects: 6
+  scalar_concentration_objects: 12
+  total_optimization_objects: 72
+  arm_fold_outputs: 54
+  encoder_fits: 0
+  additional_seeds: 0
+gates:
+  practical_comparators: ["Z", "A", "MAP"]
+  minimum_mean_gain: 0.03
+  paired_interval_lower_strictly_positive: true
+  minimum_strict_wearer_wins: 5
+  maximum_wearer_harm: 0.03
+  bottom_two_must_not_worsen: true
+  maximum_mobility_recall_loss: 0.01
+  maximum_sitting_or_standing_recall_loss: 0.02
+  mechanism_order: ["D-B", "D-C", "D-K", "D-D-additive", "D-D-constant"]
+  minimum_mechanism_gain: 0.01
+execution:
+  one_controller: true
+  automatic_retry: false
+  automatic_extra_arms_seeds_or_data: false
+  participant_outcome_run_status: "blocked_pending_real_physical_inputs"
