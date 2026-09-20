@@ -12,7 +12,10 @@ participant macro-F1. Subsequent development on ten source participants produced
 Confidence-Triggered Gravity Residual (CTGR), which adds native gravity and
 selectively corrects uncertain posture predictions. Across five matched seeds,
 CTGR improved the six-channel RMRP baseline from 83.953% to 86.540%. Strict
-HERA-CTGR reached 86.849%, but its incremental advancement gates failed.
+HERA-CTGR reached 86.849% macro-F1 and 87.228% accuracy, but its incremental
+advancement gates failed. On a separate binary HARTH posture diagnostic,
+right-thigh rich-feature Random Forest reached 97.261% participant macro-F1
+and 99.723% accuracy across five participant-exclusive folds.
 External studies exposed substantial placement and sensor-interface effects.
 The contribution is an implemented method, matched ablations, and an auditable
 evaluation framework; independent superiority remains unestablished.
@@ -67,7 +70,9 @@ trial-safe segmentation. Identity and sensitive metadata are not model inputs.
 The principal endpoint is mean participant macro-F1: compute macro-F1 separately
 for each eligible participant, then average participants equally. Pooled
 macro-F1 instead builds one confusion matrix from all scored observations.
-Accuracy is the fraction of correctly classified observations. These metrics
+Accuracy is the fraction of correctly classified observations. Five-seed source
+accuracy is the arithmetic mean of the five per-seed pooled window accuracies;
+predictions are not ensembled across seeds. These metrics
 weight participants and classes differently and are not interchangeable.
 
 Source results also report the bottom 30% of participants, the worst participant,
@@ -80,8 +85,12 @@ training seeds do not increase the independent sample size beyond ten.
 
 HARTH supplies lower-back and right-thigh accelerometry from 22 participants.
 Its original study describes twelve activities and participant-held-out
-evaluation. The binary posture diagnostic and the project's merged nine-class
-replay are separate endpoints. See the
+evaluation. The binary posture diagnostic uses five participant-exclusive folds
+and 13,715 non-overlapping 250-sample windows confined to physical and annotated
+label runs. The multiclass replay uses 22 leave-one-participant-out folds,
+25,831 complete majority-label windows and sample-level scoring over 6,461,328
+samples, including recording tails. It reports twelve classes and a merged
+nine-class endpoint. These are separate segmentation and evaluation contracts. See the
 [HARTH dataset paper](https://pmc.ncbi.nlm.nih.gov/articles/PMC8659926/) and the
 [executed replication protocol](research/HARTH_PUBLISHED_REPLICATION_V1_PROTOCOL.md).
 
@@ -115,6 +124,9 @@ the sitting/standing probability mass.
 The mobility probability remains exactly that of the base. Confident base
 outputs pass through unchanged. This restricts the intervention to uncertain
 posture decisions and avoids replacing a strong mobility model globally.
+Both the base and the selected posture expert use standard Extra Trees
+classifiers. CTGR's contribution is the feature and conditional combination
+procedure, rather than a new tree-learning algorithm.
 
 ```mermaid
 flowchart LR
@@ -139,6 +151,25 @@ oracles, and labelled semantic gauges are separate ablations with distinct
 information budgets. The [model card](MODEL_CARD_CTGR_HERA.md) and versioned
 protocols specify the implementations.
 
+### 3.4 HARTH feature pipelines and reference methods
+
+The HARTH project pipeline is trained within HARTH participant folds. It combines
+axis and norm statistics, covariance geometry, spectra, subwindow summaries and
+lag features with a standard Random Forest: 300 trees, minimum leaf size 2,
+square-root feature sampling and balanced-subsample class weights. A single
+placement has 161 features; concatenating back and thigh gives 322. This is a
+separate accelerometer pipeline, not a frozen CTGR/HERA model or a simple learner
+substitution within CTGR.
+
+The multiclass replay also executes reference-style SVM, Random Forest and
+XGBoost with the declared 161-feature reference view. The RF comparator uses
+80 trees, minimum split size 10 and balanced class weights; XGBoost uses 1,024
+depth-3 trees; SVM uses an RBF kernel with C=10 and training-only MinMax scaling.
+The project/reference comparisons therefore change feature recipes and estimator
+settings. Only the placement comparison holds the RF recipe fixed while changing
+the measured placement. Exact configurations and filtering are in the
+[replay protocol](research/HARTH_PUBLISHED_REPLICATION_V1_PROTOCOL.md).
+
 ## 4. Results
 
 ### 4.1 Original locked target
@@ -160,11 +191,11 @@ The target cohort is closed to subsequent model selection.
 
 All rows below use the same 725 source windows and five seeds.
 
-| Method | Channels | Participant macro-F1 (%) | Bottom 30% (%) | Worst participant (%) | NLL | Brier |
-|---|---:|---:|---:|---:|---:|---:|
-| RMRP | 6 | 83.953 | 69.941 | 54.767 | 0.36889 | 0.22512 |
-| CTGR | 9 | 86.540 | **73.990** | 57.512 | 0.35426 | 0.21165 |
-| Strict HERA-v1 | 9 | **86.849** | 73.933 | **58.028** | **0.34038** | **0.20303** |
+| Method | Channels | Accuracy (%) | Participant macro-F1 (%) | Bottom 30% (%) | Worst participant (%) | NLL | Brier |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| RMRP | 6 | 84.579 | 83.953 | 69.941 | 54.767 | 0.36889 | 0.22512 |
+| CTGR | 9 | 86.979 | 86.540 | **73.990** | 57.512 | 0.35426 | 0.21165 |
+| Strict HERA-v1 | 9 | **87.228** | **86.849** | 73.933 | **58.028** | **0.34038** | **0.20303** |
 
 CTGR gained 2.586 percentage points over RMRP and passed all nine predeclared
 development advancement checks. Eight participants improved and two declined.
@@ -176,10 +207,43 @@ Strict HERA gained 0.309 points over CTGR, with a descriptive paired interval of
 [-0.095, +0.713] points. Its gain and bottom-tail gates failed. The highest point
 estimate therefore does not establish a reliable successor.
 
-Sources: [CTGR aggregate](../results/development/max_rnd_secondary_v1_summary.json)
-and [HERA-v1 aggregate](../results/development/hera_ctgr_retrospective_v1_summary.json).
+Sources: [CTGR aggregate](../results/development/max_rnd_secondary_v1_summary.json),
+[HERA-v1 aggregate](../results/development/hera_ctgr_retrospective_v1_summary.json)
+and [prediction-based metric audit](../results/research/reported_metrics_audit_v1.json).
 
-### 4.3 Mechanism and ablation evidence
+### 4.3 Fixed source ablation
+
+Round A evaluated all six predeclared flat configurations on the same 725 windows,
+ten people, five outer folds and seed 11. CTGR and strict HERA are cached controls,
+with window identifiers, labels, participant identifiers and probabilities
+checked against the canonical source archive.
+
+| Cell / method | Input and feature path | Window accuracy (%) | Participant macro-F1 (%) |
+|---|---|---:|---:|
+| A1 Extra Trees | Raw six-channel GSP | 83.034 | 82.659 |
+| A2 Extra Trees | Denoised six-channel GSP | 84.000 | 83.393 |
+| A3 Extra Trees | Raw GSP + native gravity, nine channels | 81.103 | 76.848 |
+| A4 Extra Trees | Denoised GSP + native gravity, nine channels | 82.207 | 78.653 |
+| A5 Random Forest | Same features as A4 | 80.000 | 74.576 |
+| A6 XGBoost | Same features as A4 | 80.966 | 75.579 |
+| CTGR control | Six-channel base + selective gravity expert | 86.897 | 86.474 |
+| Strict HERA control | CTGR candidate ensemble, calibration and veto | **87.034** | **86.755** |
+
+Denoising improved both tested flat Extra Trees feature sets. Appending gravity
+to the flat representation reduced performance, whereas CTGR used gravity
+selectively and exceeded A4 by 7.821 macro-F1 points. Extra Trees was stronger
+than the tested RF and XGBoost configurations on the identical A4 features.
+Thus, merely replacing the learner or appending more measurements did not
+reproduce the structured pipeline's result.
+
+These are single-seed development comparisons. CTGR uses nested selection while
+the six flat cells use fixed settings, so this is not a tuning-budget-matched
+ranking of estimator families. A2 is also a different fixed recipe from the
+canonical RMRP base in Section 4.2; their scores must not be substituted.
+All eight rows were independently recomputed in the
+[metric audit](research/REPORTED_METRICS_AUDIT_20260920.md).
+
+### 4.4 Mechanism and ablation evidence
 
 | Question | Executed evidence | Supported conclusion |
 |---|---|---|
@@ -197,46 +261,78 @@ The [canonical method status](research/CANONICAL_HERA_CTGR_METHOD_STATUS.md),
 [gauge report](research/HERA_POSTURE_GAUGE_V1_RESULTS.md), and
 [routing validation](research/CTGR_ROUTING_VALIDATION_20260919.md)
 identify the corresponding controls and denominators.
+The random-hard gauge reached 87.328% on its own 715 remaining windows; a
+different query set changes which windows are excluded. Neither gauge result
+replaces the full-cohort, zero-query five-seed source comparison.
 
-### 4.4 External transfer and placement
+### 4.5 External transfer and placement
 
 **AICOS, 38 complete participants, three classes, frozen source models:**
 
 | Method | Window accuracy (%) | Mean participant macro-F1 (%) | Sitting recall (%) | Standing recall (%) |
 |---|---:|---:|---:|---:|
-| Triggered CTGR (T9) | **76.27** | **68.972** | **57.92** | 69.96 |
+| Six-channel denoised GSP base (B6) | **76.28** | 67.424 | **64.60** | 62.06 |
+| Flat nine-channel Extra Trees (B9) | 68.10 | 64.638 | 34.87 | 69.60 |
+| Triggered CTGR (T9) | 76.27 | **68.972** | 57.92 | 69.96 |
 | Unconditional posture routing (U9) | 73.31 | 68.926 | 45.13 | **75.60** |
+
+CTGR exceeded B6 by 1.549 macro-F1 points with essentially unchanged accuracy,
+and exceeded B9 by 4.334 points. These are descriptive conditional transfer
+results; B6 also has a smaller signal budget. All models were fitted on source
+data, with no model fit on the external cohort.
 
 U9 minus T9 was -0.046 points, with a descriptive paired interval of
 [-1.712, +1.584] points. Standing improved while sitting deteriorated; the bottom
 30% declined by 2.367 points. The earlier eight-person favorable result did not
 repeat. Source: [fixed routing report](research/CTGR_ROUTING_VALIDATION_20260919.md).
 
-**HARTH, 22 participants, matched binary sitting/standing diagnostic:**
+**HARTH, 22 participants, five folds, matched binary sitting/standing diagnostic:**
 
-| Input to rich Random Forest | Mean participant macro-F1 (%) |
-|---|---:|
-| Lower back | 59.037 |
-| Right thigh | **97.261** |
-| Both placements | 97.198 |
+| Input to rich Random Forest | Window accuracy (%) | Mean participant macro-F1 (%) | Sitting recall (%) | Standing recall (%) |
+|---|---:|---:|---:|---:|
+| Lower back | 81.291 | 59.037 | 89.515 | 37.413 |
+| Right thigh | **99.723** | **97.261** | **99.913** | 98.707 |
+| Both placements | 99.672 | 97.198 | **99.913** | 98.383 |
+| Back with inner-fold-selected thigh override | 90.222 | 86.263 | 88.571 | **99.030** |
+
+The thigh made 38 errors in 13,715 windows. Its pooled window macro-F1 was
+99.477%, while the participant-balanced endpoint was 97.261%. This difference
+reflects unequal participant support and class balance, rather than a metric
+inconsistency. The thigh-minus-back participant gain was 38.224 points, with a
+95% paired bootstrap interval of [30.320, 46.353]; 21 people improved, none
+declined and one tied. The override maximized standing recall at the expense of
+sitting precision and overall macro-F1; the direct thigh model was stronger.
 
 This is strong placement evidence within the executed protocol, not proof that
-lower-back recognition is impossible. Geometry, prior correction, neural
+lower-back recognition is impossible. Annotation-constrained pure-bout windows
+also limit inference to continuous, unsegmented operation. Geometry, prior correction, neural
 representations, and temporal decoding did not yield an acceptable joint
 improvement in posture classes and participant outcomes.
 
-**HARTH, merged nine-class published-style replay:**
+**HARTH, twelve-class and merged nine-class published-style replay:**
 
-| Executed method | Sample accuracy (%) | Pooled macro-F1 (%) |
-|---|---:|---:|
-| Project fused Random Forest | 93.56 | 85.37 |
-| Published-style XGBoost | **94.22** | **87.82** |
+| Executed method | 12-class sample accuracy (%) | 12-class pooled macro-F1 (%) | 9-class sample accuracy (%) | 9-class pooled macro-F1 (%) |
+|---|---:|---:|---:|---:|
+| Project lower-back rich RF | 80.58 | 62.46 | 82.42 | 77.32 |
+| Project right-thigh rich RF | 88.62 | 66.82 | 90.72 | 80.58 |
+| Project fused rich RF | 91.54 | 71.19 | 93.56 | 85.37 |
+| Reference-style SVM | 91.57 | **73.39** | 93.79 | 86.02 |
+| Reference-style RF | 91.82 | 70.65 | 94.06 | 86.40 |
+| Reference-style XGBoost | **91.96** | 72.90 | **94.22** | **87.82** |
+
+Fusion improves the project pipeline substantially over either single placement
+in the multiclass task, unlike the binary pure-bout task. The project fused RF
+exceeds the reference RF's twelve-class macro-F1 by about 0.54 points, but trails
+SVM and XGBoost there, and all three references on nine classes. The strongest
+executed comparator therefore depends on the endpoint. This comparison does
+not demonstrate overall superiority of the project pipeline.
 
 These are executed comparator results, not copied paper scores or a claim of
 exact historical replication. Frozen CTGR/HERA was not tested in this HARTH
-contract. Source: [HARTH disposition](research/RESEARCH_LANE_CLOSURE_20260919.md)
-and the hash-bound entries in the
-[machine-readable evidence index](../results/research/current_publication_evidence_v1.json).
+contract. Pooled sample scores cannot be compared directly with the paper's
+means across held-out participants. Source: [HARTH disposition](research/RESEARCH_LANE_CLOSURE_20260919.md)
+and the confusion matrices and artifact hashes in the
+[metric audit](../results/research/reported_metrics_audit_v1.json).
 
 ## 5. Discussion and limitations
 

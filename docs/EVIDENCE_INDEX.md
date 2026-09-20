@@ -44,12 +44,15 @@ five participant outer folds, four inner folds, and seeds 11, 23, 47, 89, and
 131. The participants were reused during method invention, so this is development
 evidence.
 
-| Method | Channels | Mean participant macro-F1 | Change versus CTGR | Evidence decision |
-|---|---:|---:|---:|---|
-| RMRP | 6 | 83.953% | -2.586 points | Matched six-channel base |
-| CTGR | 9 | 86.540% | reference | Retained advancement; eight of ten participants improve versus RMRP |
-| Strict HERA-CTGR v1 | 9 | **86.849%** | +0.309 points | Highest point estimate; incremental gates failed |
-| HERA-CTGR v2 full | 9 | 86.749% | +0.209 points | Calibration ablation; not promoted over v1 |
+| Method | Channels | Window accuracy | Mean participant macro-F1 | Change versus CTGR | Evidence decision |
+|---|---:|---:|---:|---:|---|
+| RMRP | 6 | 84.579% | 83.953% | -2.586 points | Matched six-channel base |
+| CTGR | 9 | 86.979% | 86.540% | reference | Retained advancement; eight of ten participants improve versus RMRP |
+| Strict HERA-CTGR v1 | 9 | **87.228%** | **86.849%** | +0.309 points | Highest matched mean; incremental gates failed |
+
+Accuracy and participant macro-F1 are each averaged over the five seeds, without
+ensembling their predictions. HERA-v2 full reached 86.749% participant macro-F1;
+it remains a calibration ablation and was not promoted over v1.
 
 CTGR adds native gravity channels, so its RMRP comparison is a sensor-sufficiency
 and method comparison rather than a fixed-input architecture-only effect. Its
@@ -64,6 +67,13 @@ Canonical evidence:
 - [`results/development/hera_ctgr_v2_retrospective_v1_summary.json`](../results/development/hera_ctgr_v2_retrospective_v1_summary.json)
 - [Canonical method status](research/CANONICAL_HERA_CTGR_METHOD_STATUS.md)
 - [CTGR/HERA model card](MODEL_CARD_CTGR_HERA.md)
+- [Recomputed accuracy and matched prediction audit](research/REPORTED_METRICS_AUDIT_20260920.md)
+
+The [fixed seed-11 source ablation](RESEARCH_REPORT.md#43-fixed-source-ablation)
+compares all six flat GSP/gravity/estimator configurations with aligned CTGR and
+HERA controls. Flat nine-channel RF reached 74.576% participant macro-F1, versus
+86.474% for CTGR. RF's high HARTH thigh score comes from another pipeline and
+endpoint; it is not evidence that RF exceeded CTGR on InclusiveHAR.
 
 ## C. Labelled personalization
 
@@ -77,29 +87,70 @@ Canonical report: [HERA posture gauge](research/HERA_POSTURE_GAUGE_V1_RESULTS.md
 
 ## D. External transfer and placement diagnostics
 
-| Dataset and protocol | Method | Accuracy | Macro-F1 endpoint | Result status |
-|---|---|---:|---:|---|
-| AICOS development, 38 complete participants | Frozen CTGR/T9 | 76.27% | 68.97% mean participant | Conditional cross-device/position diagnostic |
-| AICOS development, same windows | U9 unconditional routing | 73.31% | 68.93% mean participant | Failed nomination; sitting recall fell 12.79 points |
-| HARTH binary sitting/standing, right thigh | Project rich RF | not a publication headline | 97.261% mean participant | Placement/observability diagnostic |
-| HARTH binary sitting/standing, lower back | Project rich RF | not a publication headline | 59.037% mean participant | Weak back-only posture observability in this protocol |
-| HARTH merged 9-class | Project fused RF | 93.56% | 85.37% pooled | Competitive diagnostic, below executed published-style XGBoost |
-| HARTH merged 9-class | Published-style XGBoost | 94.22% | **87.82% pooled** | Strongest executed comparator in that lane |
+### D.1 AICOS: source-frozen transfer
+
+Three classes, 38 complete development participants and 40,588 shared windows;
+no fitting on AICOS.
+
+| Method | Window accuracy | Mean participant macro-F1 | Result status |
+|---|---:|---:|---|
+| Six-channel base B6 | **76.28%** | 67.424% | Smaller signal budget |
+| Flat nine-channel Extra Trees B9 | 68.10% | 64.638% | Flat gravity control |
+| Frozen CTGR/T9 | 76.27% | **68.972%** | Conditional cross-device/position diagnostic |
+| U9 unconditional routing | 73.31% | 68.926% | Failed nomination; sitting recall fell 12.79 points versus CTGR |
 
 AICOS acceleration and derived gravity were corrected from SI units to the g
 interface expected by the frozen source models. The acquisition logger's full
 axis/polarity convention remains unresolved, so the result cannot confirm
 ability-cohort generalization or a native-nine interface.
 
+### D.2 HARTH: binary placement diagnostic
+
+Sitting/standing, 22 participants, **five participant-exclusive folds** and
+13,715 non-overlapping five-second windows within physical and annotated label
+runs. Each arm uses the same rich-feature Random Forest recipe.
+
+| Placement | Window accuracy | Mean participant macro-F1 |
+|---|---:|---:|
+| Lower back | 81.291% | 59.037% |
+| Right thigh | **99.723%** | **97.261%** |
+| Back + thigh | 99.672% | 97.198% |
+
+The thigh-minus-back gain is 38.224 points, with a 95% paired bootstrap interval
+of [30.320, 46.353] points; 21 participants improve, none decline and one ties.
+This measures posture discrimination with annotation-constrained segmentation,
+not a continuous deployment result. The separate confidence-gated arm reaches
+86.263% participant macro-F1 and is reported in the research report.
+
+### D.3 HARTH: multiclass comparator replay
+
+Twenty-two leave-one-participant-out folds; merged nine-class, pooled sample
+metrics over 6,461,328 samples. All scores below were executed in this repository.
+
+| Method | Sample accuracy | Pooled macro-F1 |
+|---|---:|---:|
+| Project fused rich-feature RF | 93.56% | 85.37% |
+| Reference-style SVM | 93.79% | 86.02% |
+| Reference-style RF | 94.06% | 86.40% |
+| Reference-style XGBoost | **94.22%** | **87.82%** |
+
+All six executed arms and both the twelve- and nine-class endpoints appear in
+the [research report](RESEARCH_REPORT.md#45-external-transfer-and-placement).
+Filtering and aggregation differ from the historical paper, so these are
+reference-style local comparisons rather than exact reproduced paper scores.
+
 The HARTH binary and multiclass endpoints are not comparable to each other or to
 InclusiveHAR. The right-thigh result supports a placement-information lesson;
 it does not establish universal superiority of the project architecture.
+The HARTH models were trained within HARTH. They are distinct from source-frozen
+CTGR/HERA transfer and use standard RF learning with project feature pipelines.
 
 Canonical reports:
 
 - [AICOS unit and posture review](research/AICOS_POSTURE_REVIEW_20260919.md)
 - [Fixed routing validation](research/CTGR_ROUTING_VALIDATION_20260919.md)
 - [Research-lane closure](research/RESEARCH_LANE_CLOSURE_20260919.md)
+- [Audited metrics and source bindings](research/REPORTED_METRICS_AUDIT_20260920.md)
 
 ## E. Latest candidate decision
 

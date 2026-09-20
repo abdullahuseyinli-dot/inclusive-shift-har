@@ -10,6 +10,12 @@
 - **Software version:** 0.1.7a0 publication candidate.
 - **Evidence date:** 2026-09-20.
 
+These are composite classification methods: feature extraction, standard Extra
+Trees learners, expert routing and calibration. The project contribution is the
+combination and selective posture correction, not the underlying tree-learning
+algorithm. The separate HARTH rich-feature Random Forest models are not frozen
+CTGR/HERA evaluations.
+
 ## Intended task
 
 The models classify non-overlapping 128-sample inertial windows into the ordered
@@ -86,11 +92,16 @@ reopened for HERA/CTGR development.
 
 ## Performance
 
-| Model | Mean participant macro-F1 | Bottom 30% | Worst participant | NLL | Brier |
-|---|---:|---:|---:|---:|---:|
-| RMRP | 83.953% | 69.941% | 54.767% | 0.36889 | 0.22512 |
-| CTGR | 86.540% | **73.990%** | 57.512% | 0.35426 | 0.21165 |
-| Strict HERA-v1 | **86.849%** | 73.933% | **58.028%** | **0.34038** | **0.20303** |
+| Model | Window accuracy | Mean participant macro-F1 | Bottom 30% | Worst participant | NLL | Brier |
+|---|---:|---:|---:|---:|---:|---:|
+| RMRP | 84.579% | 83.953% | 69.941% | 54.767% | 0.36889 | 0.22512 |
+| CTGR | 86.979% | 86.540% | **73.990%** | 57.512% | 0.35426 | 0.21165 |
+| Strict HERA-v1 | **87.228%** | **86.849%** | 73.933% | **58.028%** | **0.34038** | **0.20303** |
+
+Every column is averaged over the same five seeds. Accuracy pools windows within
+each seed; the primary macro-F1 gives each participant equal weight. The
+[metric audit](research/REPORTED_METRICS_AUDIT_20260920.md) recomputed both from
+the preserved source predictions and reproduced the canonical macro-F1 values.
 
 CTGR improved mean participant macro-F1 by 2.586 points over RMRP and passed all
 nine predeclared source-development advancement checks. It also added three

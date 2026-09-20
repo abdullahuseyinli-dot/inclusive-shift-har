@@ -66,10 +66,18 @@ tables without fitting a model:
 | HERA-v1 matched source result | `results/development/hera_ctgr_retrospective_v1_summary.json` |
 | HERA-v2 matched source result | `results/development/hera_ctgr_v2_retrospective_v1_summary.json` |
 | CAGE-HAR negative result | `results/development/cage_har_retrospective_v1_summary.json` |
+| Source accuracy, fixed ablation, HARTH and AICOS display metrics | `results/research/reported_metrics_audit_v1.json` |
 
 The [evidence index](EVIDENCE_INDEX.md) quotes those values without changing their
 evidence class. Self-hashed records are validated by the artifact and document
 tests. Large prediction arrays are deliberately excluded from Git.
+
+The [display-metric audit](research/REPORTED_METRICS_AUDIT_20260920.md) contains
+confusion matrices, denominators, per-seed results and sorted participant F1
+values. It supports checking the displayed arithmetic from a Git clone.
+Independent prediction-level verification still requires the bound local
+archives; HARTH multiclass sample metrics were recomputed from saved sample
+confusion matrices, with window matrices checked against the prediction archive.
 
 ## 4. Separately restored evidence
 

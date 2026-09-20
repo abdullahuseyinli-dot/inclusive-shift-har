@@ -20,6 +20,11 @@ their original records and Git history.
 
 ### Changed
 
+- Recomputed source, fixed-ablation, HARTH posture and AICOS metrics from saved
+  predictions; added accuracy, denominators, aggregate confusion matrices and
+  source hashes. Corrected the HARTH binary fold label from leave-one-out to
+  five participant-exclusive folds and presented separate matched comparison
+  groups with all executed multiclass reference methods.
 - Integrated the reviewed research history into `main`, presented the strongest
   results by evaluation protocol, and pinned the existing benchmark tag so main
   can advance without changing historical evidence.
