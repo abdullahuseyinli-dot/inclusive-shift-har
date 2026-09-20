@@ -435,6 +435,48 @@ def test_repository_scan_rejects_unreviewed_annotated_tag_payload(tmp_path: Path
     assert "unreviewed_annotated_tag" in {item["code"] for item in report["violations"]}
 
 
+def test_main_can_advance_beyond_pinned_tag_without_allowing_tag_rewrites(tmp_path: Path) -> None:
+    repository, historical_commit = _repository(tmp_path / "repository")
+    policy_path = _policy(tmp_path / "policy.json")
+    _git(repository, "tag", "-a", "historical-v1", "-m", "Historical evidence")
+    policy = json.loads(policy_path.read_text(encoding="utf-8"))
+    refs = policy["git_refs"]
+    refs["required_for_release_tags"] = ["historical-v1"]
+    refs["pinned_annotated_tags"] = {
+        "historical-v1": {
+            "object_id": _git(repository, "rev-parse", "refs/tags/historical-v1"),
+            "target_commit": historical_commit,
+            "message": "Historical evidence",
+            "tagger_name": "Release Gate Test",
+            "tagger_email": "release@example.invalid",
+        }
+    }
+    _write_json(policy_path, policy)
+    (repository / "README.md").write_text("# Current research\n", encoding="utf-8")
+    _git(repository, "add", "README.md")
+    _git(repository, "commit", "-m", "advance main")
+    candidate = _git(repository, "rev-parse", "HEAD")
+    assert candidate != historical_commit
+
+    accepted = scan_repository(
+        repository_root=repository,
+        candidate_commit=candidate,
+        policy_path=policy_path,
+        created_at_utc="2026-09-20T14:00:00Z",
+    )
+    assert accepted["status"] == "pass"
+
+    _git(repository, "tag", "-f", "-a", "historical-v1", "-m", "Historical evidence")
+    rejected = scan_repository(
+        repository_root=repository,
+        candidate_commit=candidate,
+        policy_path=policy_path,
+        created_at_utc="2026-09-20T14:00:00Z",
+    )
+    assert rejected["status"] == "fail"
+    assert "pinned_tag_mismatch" in {item["code"] for item in rejected["violations"]}
+
+
 def test_git_object_scan_rejects_forbidden_payload_even_after_deletion(tmp_path: Path) -> None:
     repository, _commit_value = _repository(tmp_path / "repository")
     policy = _policy(tmp_path / "policy.json")

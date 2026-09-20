@@ -72,6 +72,13 @@
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com"
       },
+      "benchmark-v0.1.7": {
+        "object_id": "dd306074da5625a0a398f8c0934f9b052c8df284",
+        "target_commit": "2c3d2262d9698b60f06a1291173389392feab50b",
+        "message": "InclusiveShift-HAR benchmark v0.1.7",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com"
+      },
       "legacy-audit-v0.1.0": {
         "object_id": "75a16d169fabd4ec2b444a0eebf25ed1551ad110",
         "target_commit": "4567cadbdc198a6e6661ee74214776577ee1229a",
@@ -94,13 +101,7 @@
         "tagger_email": "abdullahuseyinli@gmail.com"
       }
     },
-    "permitted_candidate_tags": {
-      "benchmark-v0.1.7": {
-        "message": "InclusiveShift-HAR benchmark v0.1.7",
-        "tagger_name": "Abdulla Huseyinli",
-        "tagger_email": "abdullahuseyinli@gmail.com"
-      }
-    },
+    "permitted_candidate_tags": {},
     "historical_notes": {
       "benchmark-v0.1.0": "Preserved failed release candidate. GitHub Actions run 32799146947 stopped before tests because UV_FROZEN and --locked were supplied together; the tag is immutable and superseded by benchmark-v0.1.1.",
       "benchmark-v0.1.1": "Preserved failed patch candidate. GitHub Actions run 32801378375 stopped before tests because an empty UV_FROZEN override is not a valid boolish value on hosted runners; the tag is immutable and superseded by benchmark-v0.1.2.",
@@ -109,6 +110,7 @@
       "benchmark-v0.1.4": "Preserved failed patch candidate. GitHub Actions run 32829208254 failed the Ubuntu matrix with 49 synthetic release-fixture tests after 511 passed and 3 skipped: the hardened Linux x86-64 licence gate correctly required the reviewed XGBoost and NCCL packages, while generic fixtures still inventoried only safe@1. The Windows matrix passed tests, lint, formatting, and mypy; the dependent release-security job was skipped. The production licence gate was not weakened; the tag is immutable and superseded by benchmark-v0.1.5.",
       "benchmark-v0.1.5": "Preserved failed release-bundle candidate. GitHub Actions run 32836567358 passed Ubuntu, Windows, and complete-history release-security. The external bundle reconstructed exactly, but its pinned Gitleaks directory scan reported one credential-bearing temp_clone_token field from the authenticated repository API response and two deterministic SHA-256 evidence values keyed secret_scan or secret_scan.json. No GitHub release was created and no assets were uploaded. Raw failure evidence remains quarantined outside Git; the tag is immutable and superseded by benchmark-v0.1.6.",
       "benchmark-v0.1.6": "Preserved failed draft-validation candidate. GitHub Actions run 32846091138 and all local, repository, licence, bundle, and authoritative Gitleaks gates passed. A private draft with two byte-validated assets was created but not published because the tracked Windows PowerShell 5 example decoded the UTF-8 REST response with the platform default encoding and falsely rejected the correct release body at its first em dash. Proper strict UTF-8 decoding proves the local and REST bodies are identical. The draft, tag, and external evidence remain preserved; the tag is immutable and superseded by benchmark-v0.1.7.",
+      "benchmark-v0.1.7": "Existing remote tag preserved at its original object and commit. Current main advances independently; a branch update neither moves this tag nor creates a new versioned release.",
       "protocol-v1.0.0": "The preserved historical tag name predates its message, which states protocol v1.2; the exact tag object is pinned and is not relabelled."
     }
   },

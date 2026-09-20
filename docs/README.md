@@ -46,6 +46,7 @@ names and hashes are part of the evidence chain.
 | [Experiment runbook](EXPERIMENT_RUNBOOK.md) | Gated research commands and immutable target boundary |
 | [Results policy](../results/README.md) | Evidence classes and canonical tracked artifacts |
 | [Release evidence gate](RELEASE_EVIDENCE_GATE.md) | Historical full release-security workflow for the exact tagged candidate |
+| [Main verification](MAIN_VERIFICATION.md) | Current branch integration, immutable remote tags, and complete-history security checks |
 | [Contributing](../CONTRIBUTING.md) | Development, evidence, and review rules |
 | [Security](../SECURITY.md) | Vulnerability and sensitive-data reporting |
 

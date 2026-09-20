@@ -1,6 +1,6 @@
 # GitHub and Zenodo publication checklist
 
-This checklist distinguishes a validated research-branch update from a formal
+This checklist distinguishes a validated branch update from a formal
 versioned release. A branch push publishes the reviewed source revision to the
 existing repository; it does not create a tag, GitHub release, Zenodo deposit,
 DOI, or change repository visibility.
@@ -77,12 +77,16 @@ actual candidate rather than copying an earlier pass.
 
 ## 6. GitHub branch update and release
 
-For a research-branch update:
+For a research-branch or `main` update:
 
 - push the reviewed branch without rewriting remote history;
 - require green CI on the exact head SHA;
 - run complete-history and candidate-tree secret scans;
 - retain the commit identifier and remote validation evidence.
+
+On `main`, also require the complete-history security job, including its
+candidate-bound licence and CI bundle checks. Follow
+[MAIN_VERIFICATION.md](MAIN_VERIFICATION.md) for the current immutable tag policy.
 
 For a separately commissioned versioned release:
 

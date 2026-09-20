@@ -20,6 +20,9 @@ their original records and Git history.
 
 ### Changed
 
+- Integrated the reviewed research history into `main`, presented the strongest
+  results by evaluation protocol, and pinned the existing benchmark tag so main
+  can advance without changing historical evidence.
 - Corrected the canonical table's single-seed/five-seed grouping and clarified
   the selected denoised GSP feature path and limits of HARTH placement evidence.
 - Removed a private sibling-checkout dependency from the FoG configuration

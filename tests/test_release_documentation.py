@@ -304,13 +304,14 @@ def test_nccl_dependency_review_is_exact_date_only_and_policy_bound(repository_r
         "tagger_name": "Abdulla Huseyinli",
         "tagger_email": "abdullahuseyinli@gmail.com",
     }
-    assert refs["permitted_candidate_tags"] == {
-        "benchmark-v0.1.7": {
-            "message": "InclusiveShift-HAR benchmark v0.1.7",
-            "tagger_name": "Abdulla Huseyinli",
-            "tagger_email": "abdullahuseyinli@gmail.com",
-        }
+    assert refs["pinned_annotated_tags"]["benchmark-v0.1.7"] == {
+        "object_id": "dd306074da5625a0a398f8c0934f9b052c8df284",
+        "target_commit": "2c3d2262d9698b60f06a1291173389392feab50b",
+        "message": "InclusiveShift-HAR benchmark v0.1.7",
+        "tagger_name": "Abdulla Huseyinli",
+        "tagger_email": "abdullahuseyinli@gmail.com",
     }
+    assert refs["permitted_candidate_tags"] == {}
     assert "32836567358" in refs["historical_notes"]["benchmark-v0.1.5"]
     assert "32846091138" in refs["historical_notes"]["benchmark-v0.1.6"]
     exception = policy["license_exception_records"]["nvidia-nccl-cu12@2.31.2"]

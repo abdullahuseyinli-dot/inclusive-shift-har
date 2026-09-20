@@ -127,7 +127,7 @@ jobs:
         run: git fsck --full
 
   release-security:
-    name: Complete-history release security
+    name: Complete-history main security
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: synthetic-validation
     runs-on: ubuntu-latest

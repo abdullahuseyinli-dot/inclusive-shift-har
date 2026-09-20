@@ -3,32 +3,33 @@
 Auditable research software for participant-exclusive inertial human activity
 recognition under population and sensor-interface shift.
 
-[![CI](https://github.com/abdullahuseyinli-dot/inclusive-shift-har/actions/workflows/ci.yml/badge.svg?branch=research%2Fhar-substantiation-pilot-pipeline-20260908)](https://github.com/abdullahuseyinli-dot/inclusive-shift-har/actions/workflows/ci.yml)
+[![CI](https://github.com/abdullahuseyinli-dot/inclusive-shift-har/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/abdullahuseyinli-dot/inclusive-shift-har/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)](pyproject.toml)
 
 ## Research overview
 
-The project examines three questions: population transfer under a locked
-participant split, selective gravity-based correction of posture errors, and
-generalization across sensor interfaces. The current method combines a denoised
-geometric/spectral base with a confidence-triggered sitting/standing expert.
+The project develops selective gravity-based correction of posture errors and
+tests population transfer and generalization across sensor interfaces. The
+current method combines a denoised geometric/spectral base with a
+confidence-triggered sitting/standing expert.
+
+**CTGR improved source participant macro-F1 from 83.953% to 86.540%** across five
+fixed seeds, passing the prespecified development advancement checks. Strict
+HERA-v1 reached the highest matched point estimate, **86.849%**. A separate HARTH
+placement study reached **97.261%** participant macro-F1 for binary posture
+recognition from the right thigh. The tables below distinguish these protocols
+and the limits of each finding.
 
 Read the **[research report](docs/RESEARCH_REPORT.md)** for the study design,
 architecture, matched results, ablations, and limitations. The
 **[experiment map](docs/research/README.md)** organizes the full research sequence
 by question and points to the original records.
 
-The research phase is frozen for repository finalization. The retained
-source-development package is Confidence-Triggered Gravity Residual (CTGR), with
-strict HERA-CTGR v1 reported as the highest source point estimate. The latest
-unconditional posture-routing candidate failed its source non-regression,
-external-gain, and interface-qualification gates. No further architecture search
-on the repeatedly used source participants is pending.
-
-This repository is being prepared as an exploratory research-software and
-evidence package. It has no published Zenodo DOI at this revision. The current
-claim and publication boundaries are defined in the
+The `main` branch contains the current research-software and evidence package.
+The retained method is Confidence-Triggered Gravity Residual (CTGR), with strict
+HERA-CTGR v1 reported as its highest source point-estimate extension. Research
+disposition and publication boundaries are defined in the
 [evidence index](docs/EVIDENCE_INDEX.md),
 [project status](docs/PROJECT_STATUS.md), and
 [publication checklist](docs/PUBLICATION_CHECKLIST.md).
@@ -50,6 +51,21 @@ CTGR adds native gravity, so its comparison with RMRP changes the sensor budget.
 These ten people were reused for development; training seeds are not additional
 independent participants. See the [matched evidence](docs/EVIDENCE_INDEX.md).
 
+### External diagnostics
+
+| Study and method | Accuracy | Macro-F1 | Evaluation scope |
+|---|---:|---:|---|
+| HARTH right-thigh rich Random Forest | Not reported here | **97.261%** participant mean | Binary sitting/standing; 22 participants; leave-one-participant-out |
+| HARTH fused project Random Forest | **93.56%** | 85.37% pooled | Merged nine-class published-style replay |
+| AICOS frozen CTGR | 76.27% | 68.972% participant mean | Three classes; 38 complete development participants; logger axes unresolved |
+
+The HARTH posture result is a placement-specific Random Forest study, separate
+from frozen CTGR/HERA transfer. The matched lower-back result was 59.037%.
+On the nine-class replay, the executed published-style XGBoost comparator was
+stronger (94.22% accuracy; 87.82% pooled macro-F1). The
+[research report](docs/RESEARCH_REPORT.md) provides the matched controls,
+denominators, and limitations for each study.
+
 ### Original locked target
 
 On the distinct ten-person target cohort and original six-channel protocol,
@@ -57,15 +73,6 @@ Compact DANN reached **68.084%** mean participant macro-F1, effectively tied wit
 Compact CORAL. The MoRe-HAR hypothesis was unsupported. This one-time result is
 preserved in the [target report](results/confirmatory/zero_shot_v1/publication_report_v1.json).
 It is not a target evaluation of CTGR or HERA.
-
-### External diagnostics
-
-Frozen CTGR reached **68.972%** mean participant macro-F1 on 38 complete AICOS
-development participants; logger axes remain unresolved. On HARTH's separate
-merged nine-class replay, project fused RF reached **85.37% pooled macro-F1**,
-below the executed published-style XGBoost at **87.82%**. The
-[research report](docs/RESEARCH_REPORT.md) gives each protocol, its matched
-controls, accuracy, and limitations.
 
 ## What the repository contributes
 
@@ -93,7 +100,7 @@ Requirements: Python 3.11 and
 distributed through Git.
 
 ```powershell
-git clone --config core.longpaths=true --branch research/har-substantiation-pilot-pipeline-20260908 https://github.com/abdullahuseyinli-dot/inclusive-shift-har.git
+git clone --config core.longpaths=true --branch main https://github.com/abdullahuseyinli-dot/inclusive-shift-har.git
 Set-Location inclusive-shift-har
 uv sync --locked --extra training-cpu --group research
 uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock

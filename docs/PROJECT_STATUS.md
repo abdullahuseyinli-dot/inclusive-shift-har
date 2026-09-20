@@ -2,7 +2,7 @@
 
 **Status date:** 2026-09-20
 
-**Phase:** research freeze and repository validation
+**Phase:** research freeze; current software and evidence integrated into `main`
 
 **Current decision:** retain CTGR/HERA, close the latest routing recipe, and
 finalize the repository before starting another scientific campaign.
@@ -69,15 +69,17 @@ third-party files. Those materials remain locally preserved where required.
 | Temporary third-party HARTH inputs | Excluded from Git; local hashes preserved |
 | Full tests, lint, format, types, manifests, splits, artifacts | Passed on the review candidate |
 | Distribution build, archive inspection, and secret scan | Passed on the review candidate |
-| Research branch | `research/har-substantiation-pilot-pipeline-20260908`; exact commit and CI available in Git history and Actions |
+| Current branch | `main`; integrated research history retained; exact commit and CI available in Git history and Actions |
+| Main security policy | Existing remote tags pinned to their immutable objects; complete-history, secret, licence, and quality gates required |
 | GitHub release and Zenodo deposit | Not published; no DOI claimed |
 
 The [research report](RESEARCH_REPORT.md) is the scientific entry point. The
 [earlier readiness snapshot](PUBLICATION_READINESS_REPORT_20260920.md) records the
 pre-commit validation state; its checks do not replace checks on a later commit.
 The [publication checklist](PUBLICATION_CHECKLIST.md) separates a validated branch
-update from a formal versioned release. No GitHub release, tag, or Zenodo deposit
-is implied by this repository update.
+update from a formal versioned release. The [main verification guide](MAIN_VERIFICATION.md)
+explains the tag pins and current security checks. No GitHub release, tag, or
+Zenodo deposit is implied by this repository update.
 
 ## Immutable and ethical boundaries
 
