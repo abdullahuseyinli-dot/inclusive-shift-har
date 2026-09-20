@@ -1,6 +1,6 @@
 {
-  "title": "InclusiveShift-HAR: Annotation-Isolated Wearable Activity Evaluation and Participant-Level Reproducibility Evidence",
-  "description": "Research software for participant-exclusive wearable activity evaluation, annotation-isolated signal preprocessing and explicit inference-population contracts. Opened datasets retain development, stress-test, diagnostic or historical consumed roles. Negative model outcomes, failures and superseded evidence remain visible. InclusiveHAR trial boundaries are unrecoverable. No SOTA, clinical-validity, independent-confirmation or publication-acceptance claim is asserted. Candidate metadata only, not a published deposit.",
+  "title": "InclusiveShift-HAR: Auditable Wearable Activity Recognition under Population and Sensor-Interface Shift",
+  "description": "Evidence-gated research software for participant-exclusive inertial human activity recognition. The package contains the locked InclusiveHAR benchmark, participant-level evaluation, RMRP/CTGR/HERA source-development methods, external sensor-interface diagnostics, and append-only records of corrections, negative outcomes and participant harms. InclusiveHAR trial boundaries remain unrecoverable. Later CTGR/HERA results are development evidence and do not establish clinical validity, state-of-the-art performance or independent superiority.",
   "upload_type": "software",
   "creators": [
     {
@@ -14,6 +14,7 @@
     "wearable sensing",
     "inertial sensors",
     "domain generalization",
+    "gravity-aware activity recognition",
     "participant-exclusive evaluation",
     "annotation leakage",
     "reproducible research"

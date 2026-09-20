@@ -1,0 +1,99 @@
+schema_version: "1.0.0"
+protocol_id: ctgr-native9-confirmation-v1
+class_names:
+  - mobility
+  - sitting
+  - standing
+interface:
+  sampling_rate_hz: 50.0
+  window_samples: 128
+  stride_samples: 128
+  channel_order:
+    - lin_acc_x
+    - lin_acc_y
+    - lin_acc_z
+    - gyro_x
+    - gyro_y
+    - gyro_z
+    - gravity_x
+    - gravity_y
+    - gravity_z
+  units:
+    linear_acceleration: m/s^2
+    angular_velocity: rad/s
+    gravity: m/s^2
+  maximum_native_gravity_missing_fraction: 0.05
+  require_secondary_controls: true
+predictor:
+  package: .audit/ctgr_source_finalization/ctgr-source-finalization-seed11-20260908-001
+  predictor_sha256: 623b7636222f0b52861709672395a7174b027ec09a3b63b50ab2e4969127ac3c
+  result_record_sha256: 803ed045cdd2284be2267e10576d87d0e634a2206775ccd7e266b71488cb6067
+  component_sha256:
+    B6: 8ab5b7cd9f7dbd957eb38c88c9a5999c0b7e1f5713cdd16157b842f7d89519e3
+    B9: 8044e944562b57df1f10953783a58ddc12e44bb7040eb46df55a5feb5c155d8f
+    expert: a34a82ee0310a32564089872c41ddf6f359188a666cdaa3001edada9e912cd28
+  source_raw_csv_for_secondary_controls: ../publication_audit_20260903/inclusive-shift-har/data/raw/inclusivehar/v4/InclusiveHAR_dataset_v2 (1).csv
+  source_raw_csv_sha256: 0209542286e9031dc64a65abb47e1d84676088b1a77e52f738635887cb9bce34
+power:
+  method: two_sided_paired_participant_t_power
+  two_sided_alpha: 0.05
+  target_power: 0.80
+  smallest_worthwhile_effect: 0.02
+  minimum_complete_participants: 38
+  maximum_search_participants: 300
+  sensitivity_effects:
+    - 0.01
+    - 0.015
+    - 0.02
+    - 0.025
+    - 0.025864458530445923
+  planning_source_path: ../publication_audit_20260903/inclusive-shift-har/.audit/v3/max-rnd/postrun-analysis-001/result.json
+  planning_source_sha256: e51f1847e4047b58d9d17b0306f26ee481c37aa2e8292b524469edb231bedae8
+  planning_deltas_canonical_sha256: 517151c194ae5c2502fb7ca25802f3ac9e7c60043aaf805bc07e7050dfe8ce9e
+  planning_participant_deltas:
+    - 0.032069439415294054
+    - 0.027454213439765507
+    - 0.0770985211876507
+    - 0.05250008409160756
+    - -0.04833836980113837
+    - 0.019404301918437228
+    - 0.0348362032827787
+    - 0.0647991825645644
+    - -0.04665778310363644
+    - 0.045478792309135874
+comparisons:
+  primary:
+    candidate: T9
+    control: B9
+  mechanism:
+    candidate: T9
+    control: U9
+  sensor_plus_method:
+    candidate: T9
+    control: B6
+  secondary_methods:
+    - HERA-v1
+    - RandomForest
+    - XGBoost
+    - PriorSoftRouter
+gates:
+  minimum_mean_macro_f1_difference: 0.02
+  minimum_bottom_30_difference: -0.01
+  minimum_worst_score_difference: -0.03
+  minimum_paired_participant_difference: -0.05
+  minimum_class_recall_difference:
+    mobility: -0.01
+    sitting: -0.02
+    standing: -0.02
+  maximum_native_gravity_missing_fraction: 0.05
+  bootstrap:
+    replicates: 100000
+    seed: 20260919
+consumed_cohorts:
+  - InclusiveHAR-P1-P10
+  - InclusiveHAR-P11-P20
+  - MotionSense
+  - AICOS-HAR-test
+  - HARTH
+  - IMU-HAR-IL
+  - FoG-STAR

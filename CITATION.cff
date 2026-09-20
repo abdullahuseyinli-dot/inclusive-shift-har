@@ -3,8 +3,8 @@ message: >-
   If you use repository-authored InclusiveShift-HAR software, cite this
   metadata and cite every third-party dataset separately under its own terms.
 title: >-
-  InclusiveShift-HAR: Annotation-Isolated Wearable Activity Evaluation and
-  Participant-Level Reproducibility Evidence
+  InclusiveShift-HAR: Auditable Wearable Activity Recognition under
+  Population and Sensor-Interface Shift
 type: software
 version: 0.1.7a0
 repository-code: https://github.com/abdullahuseyinli-dot/inclusive-shift-har
@@ -12,27 +12,21 @@ authors:
   - family-names: Huseyinli
     given-names: Abdulla
 abstract: >-
-  Research software for participant-exclusive wearable activity evaluation,
-  annotation-isolated signal preprocessing and explicit inference-population
-  contracts. Opened datasets retain development, stress-test, diagnostic or
-  historical consumed roles. Negative model outcomes, failures and superseded
-  evidence remain visible. InclusiveHAR trial boundaries are unrecoverable;
-  this software does not establish clinical validity, state-of-the-art
-  performance or independent confirmation of later inventions.
+  Evidence-gated research software for participant-exclusive inertial human
+  activity recognition. The package contains the locked InclusiveHAR benchmark,
+  participant-level evaluation, RMRP/CTGR/HERA source-development methods,
+  external sensor-interface diagnostics, and append-only records of corrections,
+  negative outcomes and participant harms. InclusiveHAR trial boundaries remain
+  unrecoverable. Later CTGR/HERA results are development evidence and do not
+  establish clinical validity, state-of-the-art performance or independent
+  superiority.
 keywords:
   - human activity recognition
   - wearable sensing
   - inertial sensors
   - domain generalization
+  - gravity-aware activity recognition
   - participant-exclusive evaluation
   - annotation leakage
   - reproducible research
 license: Apache-2.0
-notes: >-
-  Apache-2.0 applies only to repository-authored material that the copyright
-  holder has authority to license. Third-party datasets, legacy coursework
-  artifacts, predictions, checkpoints, papers, and figures retain their original
-  terms, including IMU-HAR-IL's CC BY-NC 4.0 restriction. The package version
-  remains the current development version, not a new release or tag. Final
-  release metadata requires owner approval and an actual immutable commit;
-  no DOI, acceptance status or Zenodo publication is asserted.

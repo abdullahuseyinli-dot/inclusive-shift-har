@@ -125,10 +125,16 @@ def _inner_oof_probabilities(
 
 def _recall(labels: np.ndarray, prediction: np.ndarray, class_index: int) -> float:
     support = int(np.sum(labels == class_index))
-    return 0.0 if support == 0 else float(np.sum((labels == class_index) & (prediction == class_index)) / support)
+    return (
+        0.0
+        if support == 0
+        else float(np.sum((labels == class_index) & (prediction == class_index)) / support)
+    )
 
 
-def _gate_prediction(back_prediction: np.ndarray, thigh_probability: np.ndarray, threshold: float) -> np.ndarray:
+def _gate_prediction(
+    back_prediction: np.ndarray, thigh_probability: np.ndarray, threshold: float
+) -> np.ndarray:
     """Override only sitting back decisions with high-confidence thigh standing."""
 
     prediction = np.asarray(back_prediction, dtype=np.int64).copy()
@@ -162,8 +168,16 @@ def _choose_gate_threshold(
         selected = max(
             (
                 (
-                    _recall(labels, _gate_prediction(back_prediction, thigh_probability, float(threshold)), 1),
-                    _recall(labels, _gate_prediction(back_prediction, thigh_probability, float(threshold)), 0),
+                    _recall(
+                        labels,
+                        _gate_prediction(back_prediction, thigh_probability, float(threshold)),
+                        1,
+                    ),
+                    _recall(
+                        labels,
+                        _gate_prediction(back_prediction, thigh_probability, float(threshold)),
+                        0,
+                    ),
                     float(threshold),
                     _gate_prediction(back_prediction, thigh_probability, float(threshold)),
                 )
@@ -271,7 +285,9 @@ def _fit_outer(
                     "F_fused_rich": "lower_back_plus_right_thigh_rich_322",
                     "G_confidence_gated": "back_rich_with_outer_training_thigh_override",
                 }[name],
-                "postprocess": "train_only_inner_participant_gate" if name.startswith("G_") else "none",
+                "postprocess": "train_only_inner_participant_gate"
+                if name.startswith("G_")
+                else "none",
                 "report": report,
                 "folds": folds[name],
                 "fit_count": FOLD_COUNT,
@@ -313,7 +329,9 @@ def run(archive: Path, output: Path) -> dict[str, Any]:
         assignment=assignment,
         output_path=output,
     )
-    control_people = _participant_scores(next(item["report"] for item in results if item["arm"] == "B_back_rich"))
+    control_people = _participant_scores(
+        next(item["report"] for item in results if item["arm"] == "B_back_rich")
+    )
     contrasts = {
         item["arm"]: _paired_bootstrap(
             control_people,
@@ -389,9 +407,13 @@ def run(archive: Path, output: Path) -> dict[str, Any]:
         "runtime_seconds": (ended - started).total_seconds(),
     }
     payload = json.dumps(result, sort_keys=True, indent=2)
-    result["result_payload_sha256_before_serialization"] = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    result["result_payload_sha256_before_serialization"] = hashlib.sha256(
+        payload.encode("utf-8")
+    ).hexdigest()
     (output / "RESULT.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    (output / "SOURCE_RECEIPT.json").write_text(json.dumps(result["source"], indent=2) + "\n", encoding="utf-8")
+    (output / "SOURCE_RECEIPT.json").write_text(
+        json.dumps(result["source"], indent=2) + "\n", encoding="utf-8"
+    )
     return result
 
 
@@ -401,7 +423,10 @@ if __name__ == "__main__":
     payload = run(Path(sys.argv[1]), Path(sys.argv[2]))
     print(
         json.dumps(
-            {item["arm"]: item["report"]["primary"]["mean_participant_macro_f1"] for item in payload["results"]},
+            {
+                item["arm"]: item["report"]["primary"]["mean_participant_macro_f1"]
+                for item in payload["results"]
+            },
             indent=2,
             sort_keys=True,
         )

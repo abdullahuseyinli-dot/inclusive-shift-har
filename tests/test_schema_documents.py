@@ -134,7 +134,9 @@ def test_ci_and_gitattributes_preserve_hash_bound_files_on_windows(
         "name": "Preserve Git blob line endings on Windows",
         "if": "runner.os == 'Windows'",
         "shell": "pwsh",
-        "run": "git config --global core.autocrlf false",
+        "run": (
+            "git config --global core.autocrlf false\ngit config --global core.longpaths true\n"
+        ),
     }
     assert steps[1]["name"] == "Check out repository"
     attributes = (repository_root / ".gitattributes").read_text(encoding="utf-8").splitlines()

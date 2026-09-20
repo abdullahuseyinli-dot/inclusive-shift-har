@@ -161,11 +161,13 @@ def _fit_apply_seed(
     repository_root: Path,
     n_jobs: int,
     include_classical: bool,
+    expected_dataset_pair: tuple[str, str] = ("imu_har_il_v1", "fog_star_v3"),
+    allow_cross_gravity_interface: bool = False,
 ) -> tuple[dict[str, FloatArray], dict[str, Any]]:
     source.validate()
     target.validate()
-    if source.dataset_id != "imu_har_il_v1" or target.dataset_id != "fog_star_v3":
-        raise ValueError("zero-shot runner is bound to IMU-HAR-IL source and FoG-STAR target")
+    if (source.dataset_id, target.dataset_id) != expected_dataset_pair:
+        raise ValueError(f"zero-shot runner expected dataset pair {expected_dataset_pair!r}")
     if source.participant_partition_plan is None:
         raise PermissionError("zero-shot source requires a pre-window participant plan")
     source_partition_plan = source.participant_partition_plan
@@ -182,11 +184,40 @@ def _fit_apply_seed(
     target, scoring_indices, _target_supervised_eligibility = observable_modelling_pool(
         target, include_supervised_labels=False
     )
-    combined = concatenate_external_windows(
-        (source, target),
-        dataset_id=f"{source.dataset_id}_to_{target.dataset_id}",
-        require_all_classes_per_dataset=False,
-    )
+    if allow_cross_gravity_interface:
+        if source.class_names != target.class_names:
+            raise ValueError("cross-interface transfer requires the same class ontology")
+        combined = replace(
+            source,
+            dataset_id=f"{source.dataset_id}_to_{target.dataset_id}",
+            channel_lane=target.channel_lane,
+            signals=np.concatenate((source.signals, target.signals), axis=0),
+            gravity=np.concatenate((source.gravity, target.gravity), axis=0),
+            labels=np.concatenate((source.labels, target.labels), axis=0),
+            participant_ids=np.concatenate(
+                (source.participant_ids, target.participant_ids), axis=0
+            ),
+            session_ids=np.concatenate((source.session_ids, target.session_ids), axis=0),
+            trial_ids=np.concatenate((source.trial_ids, target.trial_ids), axis=0),
+            window_ids=np.concatenate((source.window_ids, target.window_ids), axis=0),
+            receipts=source.receipts + target.receipts,
+            exclusions=source.exclusions + target.exclusions,
+            source_issues=source.source_issues + target.source_issues,
+            gravity_source="provider-native source to causal-derived target",
+            gravity_cutoff_hz=target.gravity_cutoff_hz,
+            preprocessing_audit=(),
+            cohort_audit=None,
+            observable_candidates=None,
+            source_storage_audit=None,
+            boundary_provenance=None,
+            participant_partition_plan=None,
+        )
+    else:
+        combined = concatenate_external_windows(
+            (source, target),
+            dataset_id=f"{source.dataset_id}_to_{target.dataset_id}",
+            require_all_classes_per_dataset=False,
+        )
     source_count = source.labels.size
     # This replacement makes target-label leakage through any imported fitting helper
     # impossible. The real target labels remain only in `scored_target`, which is not
@@ -570,6 +601,9 @@ def _fit_apply_seed(
         "hera_v1_strict_target_veto_count": int(strict_vetoed.sum()),
         "real_target_labels_present_in_modelling_container": False,
         "target_labels_used_for_fit_selection_or_calibration": False,
+        "source_channel_lane": source.channel_lane,
+        "target_channel_lane": target.channel_lane,
+        "cross_gravity_interface_enabled": allow_cross_gravity_interface,
     }
     return {method: values[scoring_indices] for method, values in probabilities.items()}, record
 

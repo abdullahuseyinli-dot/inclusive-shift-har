@@ -1,3 +1,16 @@
 # Evidence includes intentional LF and CRLF blobs whose byte hashes are pinned.
+# Treat CRLF as a valid terminator during whitespace review.
+* whitespace=cr-at-eol
+
+# This sealed protocol intentionally ends with one blank line. Its exact bytes
+# are authenticated by its completed run and frozen experiment configuration.
+docs/research/FOG_COMPACT_JOINT_READOUT_V1_PROTOCOL.md whitespace=-blank-at-eof
+
+# These completed AICOS records use Markdown hard breaks and their exact bytes
+# are already named in local execution evidence.
+docs/research/AICOS_ZERO_SHOT_BENCHMARK_20260919.md whitespace=cr-at-eol,-blank-at-eol
+docs/research/EXTERNAL_GENERALIZATION_DATASET_QUALIFICATION_20260919.md whitespace=cr-at-eol,-blank-at-eol
+
 # Disable Git end-of-line conversion for every tracked path on every platform.
+# Keep this final so the cross-platform integrity contract can verify it.
 * -text

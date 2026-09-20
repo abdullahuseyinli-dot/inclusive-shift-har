@@ -7,7 +7,7 @@ does not reopen, replace, or reinterpret a locked target result.
 
 ## Canonical comparisons
 
-All zero-query rows use the matched source-development contract: 725 windows,
+The following four rows use the matched source-development contract: 725 windows,
 ten source participants, five participant outer folds, four inner folds, and
 five fixed seeds. Participant macro-F1 is the primary metric.
 
@@ -17,7 +17,6 @@ five fixed seeds. Participant macro-F1 is the primary metric.
 | CTGR | 0.86540 | 0.00000 | robust retained control |
 | HERA-CTGR v1 strict | **0.86849** | **+0.00309** | highest zero-query source-development point estimate |
 | HERA-CTGR v2 full | 0.86749 | +0.00209 | calibration improvement; not promoted over v1 |
-| HERA compact evidence integration | 0.86461 | -0.00294 versus aligned HERA reference | closed: no complementary gain |
 
 The exact HERA-v1 comparison reports a descriptive participant-bootstrap interval
 of [-0.00095, +0.00713] for strict HERA minus CTGR. Its predeclared gain,
@@ -29,6 +28,17 @@ CTGR has the stronger incremental source-development support: it improved the
 matched RMRP package by +0.025864 F1 (2.5864 pp), with eight of ten participants
 improving. Its participant bootstrap interval still crosses zero, so this also
 remains development evidence rather than independent confirmation.
+
+## Single-seed follow-up
+
+The compact-evidence trial used seed 11 and the same 725 source windows. It must
+be compared with its seed-matched HERA control, rather than the five-seed mean
+above.
+
+| Method | Mean participant macro-F1 | Change versus matched HERA | Status |
+|---|---:|---:|---|
+| HERA-v1 reference, seed 11 | 0.86755 | 0.00000 | aligned control |
+| HERA compact evidence integration, seed 11 | 0.86461 | -0.00294 | closed: no complementary gain |
 
 ## Separate supervised modes
 
@@ -48,7 +58,7 @@ be reopened for selection or tuning.
 
 Retain the following as the current source-development package:
 
-- CTGR as the primary robust control and deployment-candidate feature path.
+- CTGR as the primary robust control and candidate for independent validation.
 - HERA-v1 strict as the highest point-estimate zero-query ablation.
 - HERA-v2 temperature calibration and rank-locked decision separation only as
   probability-quality and safety ablations.

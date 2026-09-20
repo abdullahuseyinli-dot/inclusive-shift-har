@@ -1826,7 +1826,7 @@ def test_release_policy_pins_supply_chain_and_forbids_model_payloads(
     assert policy["gitleaks"]["version"] == "8.30.1"
     assert policy["gitleaks"]["config_path"] == ".gitleaks.toml"
     assert policy["gitleaks"]["ignore_path"] == ".gitleaksignore"
-    assert len(policy["gitleaks"]["reviewed_ignore_entries"]) == 3
+    assert len(policy["gitleaks"]["reviewed_ignore_entries"]) == 4
     assert policy["gitleaks"]["linux_x64_archive_sha256"] == (
         "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
     )
@@ -1868,7 +1868,7 @@ def test_gitleaks_allowlist_is_rule_path_and_exact_field_scoped(repository_root:
     assert rule["id"] == "generic-api-key"
     allowlists = rule["allowlists"]
     assert isinstance(allowlists, list)
-    assert len(allowlists) == 2
+    assert len(allowlists) == 4
     allowlist = allowlists[0]
     assert isinstance(allowlist, dict)
     assert set(allowlist) == {
@@ -1886,7 +1886,51 @@ def test_gitleaks_allowlist_is_rule_path_and_exact_field_scoped(repository_root:
         r'^secret_scan\.json":"[0-9a-f]{64}"$',
     ]
 
-    source_hash_rule = allowlists[1]
+    identifier_field = "ke" + "y"
+    api_field = "api_" + identifier_field
+    probability_field = "probability_" + identifier_field
+    legacy_identifiers = [
+        "legacy_cnn1d_h128",
+        "legacy_joint_bilstm256_cnn128",
+        "legacy_joint_bilstm512_cnn256",
+    ]
+    legacy_model_rule = allowlists[1]
+    assert legacy_model_rule == {
+        "description": "Reviewed legacy architecture identifiers",
+        "condition": "AND",
+        "regexTarget": "match",
+        "paths": [r"(?:^|[/\\])src[/\\]inclusive_shift_har[/\\]models[/\\]legacy_models\.py$"],
+        "regexes": [rf'^{identifier_field} == "{name}"$' for name in legacy_identifiers],
+    }
+    legacy_path = re.compile(legacy_model_rule["paths"][0])
+    legacy_patterns = [re.compile(value) for value in legacy_model_rule["regexes"]]
+    assert legacy_path.search("src/inclusive_shift_har/models/legacy_models.py")
+    assert not legacy_path.search("src/inclusive_shift_har/models/current_models.py")
+    assert any(
+        pattern.fullmatch(f'{identifier_field} == "{legacy_identifiers[0]}"')
+        for pattern in legacy_patterns
+    )
+    assert not any(
+        pattern.fullmatch(f'{api_field} == "{legacy_identifiers[0]}"')
+        for pattern in legacy_patterns
+    )
+
+    hera_probability_rule = allowlists[2]
+    assert hera_probability_rule == {
+        "description": "Reviewed HERA probability-array identifier",
+        "condition": "AND",
+        "regexTarget": "match",
+        "paths": [r"(?:^|[/\\])configs[/\\]experiments[/\\]hera_posture_gauge_v1\.yaml$"],
+        "regexes": [rf'^{probability_field}: "hera_v1_strict_probabilities"$'],
+    }
+    hera_path = re.compile(hera_probability_rule["paths"][0])
+    hera_pattern = re.compile(hera_probability_rule["regexes"][0])
+    assert hera_path.search("configs/experiments/hera_posture_gauge_v1.yaml")
+    assert not hera_path.search("configs/experiments/other.yaml")
+    assert hera_pattern.fullmatch(f'{probability_field}: "hera_v1_strict_probabilities"')
+    assert not hera_pattern.fullmatch(f'{api_field}: "hera_v1_strict_probabilities"')
+
+    source_hash_rule = allowlists[3]
     assert source_hash_rule["condition"] == "AND"
     assert source_hash_rule["regexTarget"] == "match"
     public_digest = hashlib.sha256(

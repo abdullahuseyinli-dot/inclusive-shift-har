@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 import numpy as np
 import pytest
 import yaml
 
+from inclusive_shift_har.experiments import fog_compact_joint_readout as joint_readout
 from inclusive_shift_har.experiments.fog_compact_joint_readout import (
     CONFIG_RELATIVE,
     CURRENT_GRAVITY_SHA256,
@@ -15,7 +17,6 @@ from inclusive_shift_har.experiments.fog_compact_joint_readout import (
     PROTOCOL_RELATIVE,
     PROTOCOL_SHA256,
     REPRESENTATIONS,
-    SPEC_RELATIVE,
     _compact_raw,
     _compose,
     _gate,
@@ -25,15 +26,26 @@ from inclusive_shift_har.experiments.fog_compact_joint_readout import (
 )
 
 
-def test_frozen_configuration_and_attempt_schedule() -> None:
+def test_frozen_configuration_and_attempt_schedule(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     root = Path(__file__).resolve().parents[1]
-    evidence = root.parents[0] / "publication_audit_20260903" / "inclusive-shift-har"
     config = yaml.safe_load((root / CONFIG_RELATIVE).read_text(encoding="utf-8"))
+    assert config["authority"]["specification_sha256"] == joint_readout.SPEC_SHA256
+
+    # Exercise the binding contract without requiring the private execution archive.
+    # The production specification hash and tracked protocol remain unchanged.
+    specification = tmp_path / "specification.md"
+    specification_bytes = b"Synthetic governing specification for contract verification.\n"
+    specification.write_bytes(specification_bytes)
+    fixture_hash = hashlib.sha256(specification_bytes).hexdigest()
+    monkeypatch.setattr(joint_readout, "SPEC_SHA256", fixture_hash)
+    config["authority"]["specification_sha256"] = fixture_hash
     validate_config(
         config,
         root / CONFIG_RELATIVE,
         root / PROTOCOL_RELATIVE,
-        evidence / SPEC_RELATIVE,
+        specification,
     )
     assert REPRESENTATIONS == ("S", "R16", "P16")
     assert OUTPUTS[-1] == "P16-full"
@@ -43,6 +55,14 @@ def test_frozen_configuration_and_attempt_schedule() -> None:
     assert FIT_SCHEDULE[-1] == (4, "P16")
     assert config["protocol_sha256"] == PROTOCOL_SHA256
     assert len(CURRENT_GRAVITY_SHA256) == 64
+
+    specification.write_bytes(specification_bytes + b"Tampered.\n")
+    with pytest.raises(ValueError, match="governing specification changed"):
+        validate_config(config, root / CONFIG_RELATIVE, root / PROTOCOL_RELATIVE, specification)
+    with pytest.raises(ValueError, match="governing specification missing"):
+        validate_config(
+            config, root / CONFIG_RELATIVE, root / PROTOCOL_RELATIVE, tmp_path / "missing.md"
+        )
 
 
 def test_compact_feature_definition_and_train_only_standardization() -> None:

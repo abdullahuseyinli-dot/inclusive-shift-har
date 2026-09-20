@@ -1,0 +1,101 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "current_publication_evidence_index",
+  "status": "complete_interpretive_index_not_new_experiment",
+  "status_date": "2026-09-20",
+  "metric_contract": {
+    "primary_source_metric": "mean_participant_macro_f1",
+    "participant_is_inference_unit": true,
+    "seeds_are_independent_participants": false,
+    "cross_group_numeric_ranking_allowed": false
+  },
+  "locked_target_opening": {
+    "evidence_class": "locked_confirmatory_target_opening_1",
+    "participants": 10,
+    "channels": 6,
+    "compact_dann_mean_participant_macro_f1": 0.6808438411858967,
+    "compact_coral_mean_participant_macro_f1": 0.6807882279787615,
+    "more_har_full_mean_participant_macro_f1": 0.6353322774558664,
+    "decision": "more_har_preregistered_hypothesis_not_supported",
+    "canonical_record": "results/confirmatory/zero_shot_v1/publication_report_v1.json"
+  },
+  "matched_source_development": {
+    "evidence_class": "source_development_not_confirmatory",
+    "participants": 10,
+    "windows": 725,
+    "seeds": [11, 23, 47, 89, 131],
+    "rmrp_6ch_mean_participant_macro_f1": 0.8395337505837951,
+    "ctgr_9ch_mean_participant_macro_f1": 0.8653982091142408,
+    "ctgr_minus_rmrp": 0.0258644585304457,
+    "strict_hera_v1_9ch_mean_participant_macro_f1": 0.8684917479119463,
+    "strict_hera_v1_minus_ctgr": 0.0030935387977055,
+    "strict_hera_v1_minus_ctgr_interval": [-0.000953598400195058, 0.0071279378536783415],
+    "hera_v2_full_9ch_mean_participant_macro_f1": 0.867493040748332,
+    "decision": "retain_ctgr_as_robust_control_report_strict_hera_v1_as_highest_point_estimate",
+    "canonical_records": [
+      "results/development/max_rnd_secondary_v1_summary.json",
+      "results/development/hera_ctgr_retrospective_v1_summary.json",
+      "results/development/hera_ctgr_v2_retrospective_v1_summary.json"
+    ]
+  },
+  "aicos_development_routing_validation": {
+    "evidence_class": "development_target_descriptive_conditional_interface",
+    "complete_participants": 38,
+    "qualified_windows_all_participants": 59753,
+    "primary_windows": 40588,
+    "ctgr_accuracy": 0.762737755,
+    "ctgr_mean_participant_macro_f1": 0.689721308,
+    "u9_accuracy": 0.733147728,
+    "u9_mean_participant_macro_f1": 0.689258169,
+    "u9_minus_ctgr_mean_participant_macro_f1": -0.0004631389987251804,
+    "unit_status": "acceleration_and_gravity_converted_from_SI_to_g",
+    "axis_polarity_status": "unresolved_acquisition_logger_provenance",
+    "decision": "reject_U9_retain_original_CTGR_HERA",
+    "canonical_report": "docs/research/CTGR_ROUTING_VALIDATION_20260919.md"
+  },
+  "harth_diagnostics": {
+    "evidence_class": "external_sensor_placement_and_comparator_diagnostic",
+    "participants": 22,
+    "binary_back_mean_participant_macro_f1": 0.59037,
+    "binary_thigh_mean_participant_macro_f1": 0.97261,
+    "binary_fused_mean_participant_macro_f1": 0.97198,
+    "merged_9class_project_fused_pooled_macro_f1": 0.8537,
+    "merged_9class_published_style_xgboost_pooled_macro_f1": 0.8782,
+    "decision": "retain_placement_lesson_close_current_harth_tuning",
+    "canonical_report": "docs/research/RESEARCH_LANE_CLOSURE_20260919.md"
+  },
+  "local_artifact_bindings": [
+    {
+      "path": ".audit/ctgr_routing_validation/ctgr-routing-validation-seed11-20260919-001/result.json",
+      "bytes": 1058799,
+      "sha256": "967dc9a890e276d0fc3f73ea3dbea700c315641dec0fb243e290ca3f91a9dbe9"
+    },
+    {
+      "path": ".audit/ctgr_routing_validation/ctgr-routing-validation-seed11-20260919-001/completion_manifest.json",
+      "bytes": 7492,
+      "sha256": "4222dc5d2ccc84cdcd4d90189e8fa8983793e926a90f8610f4d0ccef6f81b60c"
+    },
+    {
+      "path": ".audit/aicos_units_review_20260919-001/result.json",
+      "bytes": 924891,
+      "sha256": "892c71bf499a2f072d5e4abdb87adbc56f69b67a015803ee6375d50ec6963549"
+    },
+    {
+      "path": ".audit/harth_published_replication_20260918/run-007/RESULT.json",
+      "bytes": 97158,
+      "sha256": "eca1ad18ec99b9d4b17812a9dbce9aa8522e11e8fa0940d253dee814296637eb"
+    }
+  ],
+  "claim_boundary": {
+    "independent_ctgr_hera_superiority": false,
+    "state_of_the_art": false,
+    "clinical_validity": false,
+    "aicos_ability_cohort_confirmation": false,
+    "universal_sensor_placement_generalization": false,
+    "inclusivehar_target_reopening_permitted": false,
+    "new_performance_result_created_by_this_index": false
+  },
+  "human_readable_index": "docs/EVIDENCE_INDEX.md",
+  "supersession_map": "docs/EVIDENCE_SUPERSESSION.md",
+  "record_sha256": "fa9e302ae6de3ea8cb1744e3d783fa06e7c9f8e7353d794ea1893deb4b6e1f98"
+}

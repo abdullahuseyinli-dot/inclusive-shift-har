@@ -56,3 +56,4 @@ Before fitting, bind implementation/config/protocol/specification and all frozen
 After fitting, replay all transforms and checkpoints with zero additional fits. Reproduce predictions, metrics, gates and manifests; verify exact within-pair p_m, exact fallbacks, all attempt counts, complete participant export, and task-worker shutdown.
 
 This is repeatedly consumed adaptive-development evidence. A pass may freeze a candidate for independent confirmation. It is not confirmation, a population claim, a novelty demonstration, or permission to launch more experiments automatically.
+

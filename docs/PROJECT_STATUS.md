@@ -1,149 +1,118 @@
-# Project status and evidence gates
+# Project status
 
-This is a superseding status snapshot updated 2026-09-04. Earlier manifests, gates, failures, tags, and status records remain preserved and must not be relabelled.
+**Status date:** 2026-09-20
 
-## 2026-09-04 Max R&D secondary addendum
+**Phase:** research freeze and repository validation
 
-The prospectively locked nine-channel Confidence-Triggered Gravity Residual completed five fixed source-development seeds at 0.8654 mean participant macro-F1 versus 0.8395 matched RMRP. It improved all five seeds, averaged 3.4 positive outer folds, improved the bottom-30% endpoint from 0.6994 to 0.7399, and passed all nine advancement checks. The result reuses source participants 1--10 after disclosed post-hoc inspiration and adds three gravity channels, so it is not independent confirmation and cannot replace the locked six-channel target result. ASGS produced a +0.0300 matched-window GSP gain using about one queried label per participant; explicit-mask reconstruction produced a smaller +0.0033 mean across corruption cases. Participants 11--20 and target predictions remained unopened. See `docs/research/MAX_RND_SECONDARY_RESULTS.md` and `results/development/max_rnd_secondary_v1_summary.json`.
+**Current decision:** retain CTGR/HERA, close the latest routing recipe, and
+finalize the repository before starting another scientific campaign.
 
-## 2026-09-03 FuSE/ReFrame v2 addendum
+## Research disposition
 
-The smartphone/wearable IMU repository now includes a completed post-analysis source-development suite. The invented Robust Multiscale Residual Pyramid reached mean/lower-decile/worst participant macro-F1 0.8379/0.7284/0.5494 in strict nested source cross-validation, versus 0.8292/0.7373/0.4985 for its Geometric Spectral Pyramid predecessor. The mean gain (+0.0087) did not meet the recorded +0.015 engineering threshold and was not statistically decisive. The primary supported advance is improved weakest-participant and additive-noise performance, with explicit temporal-gap and drift limitations.
-
-Sparse labelled Semantic Anchor Reconciliation reached 0.8654 mean and 0.7677 worst with one anchor per posture class on the remaining source windows. It is labelled personalization, not zero-shot. Frozen external evaluation produced a 0.6196 equal-domain mean over MotionSense, KuHar, and WISDM after a disclosed earlier schema probe; domain means 0.7985, 0.3679, and 0.6923 show that transfer remains heterogeneous. InclusiveHAR target participants 11--20 were not reopened. See `docs/research/FUSE_REFRAME_V2_RESEARCH_REPORT.md` and `results/development/fuse_reframe_v2/research_summary_v1.json`.
-
-| Stage | Status | Evidence |
+| Lane | Outcome | Current role |
 |---|---|---|
-| 0 - legacy preservation and audit | Passed for archive integrity and metric reconstruction | `legacy/verification_results.json`; UCI test remains development-consumed |
-| 1 - literature and novelty | Passed with narrowed contribution | `docs/LITERATURE_MATRIX.md`; no verified novelty conflict; no "first" claim |
-| 2 - repository and provenance | Passed | package, lockfile, manifests, CLI, tests, CI, licence metadata |
-| 3 - InclusiveHAR audit and ontology | Integrity passed; trial-boundary limitation retained | `results/data_audit/inclusivehar_v4.audit.json`; timestamps/trials absent |
-| 4 - released-block protocol | Conditionally passed and locked | split `ccb6c3d...`; participant-exclusive/raw-row-disjoint, not trial-safe |
-| 4A - corrected UCI reproduction | Complete source-development evidence | 75/75 first-attempt CUDA cells; official UCI test and InclusiveHAR remained unopened |
-| 4B - disabled within-group | Complete post-confirmatory descriptive evidence | 75/75 CUDA cells; successful aggregate `within_group_v1_1`; prior failed aggregate preserved |
-| 4C - zero-shot primary | Complete locked confirmatory evidence | 20 configurations x 5 seeds; participant inference; opening 1 consumed |
-| 4D - few-person inclusion | Complete post-confirmatory secondary evidence | 1,200/1,200 CUDA cells; 64 model-k summaries; 80 paired comparisons; failed aggregate attempts 1-3 preserved |
-| 4E - cross-source and SSL/foundation | Not evaluated | exact-label classification blocked beyond sitting; adapted transfer not implemented; licence/interface/checkpoint gates unresolved |
-| 4F - sensor reliability | Complete post-confirmatory secondary evidence | 120 stressed cells; compact ERM/CORAL; severity calibration limitation retained |
-| 4G - FuSE/ReFrame v2 | Source-development and external held-out evaluation complete; not confirmatory | RMRP nested source result, corruption audit, sparse labelled anchors, and one consumed DAGHAR held-out opening; no v2 target access |
-| 4H - Max R&D secondary | CTGR gate passed; ASGS and explicit-mask diagnostics complete; not confirmatory | Five-seed CTGR source matrix, labelled-personalization controls, new-seed corruption suite, immutable pre-run tag `max-rnd-secondary-v1`; no target access |
-| 5-8 - models, training, and statistics | Primary and feasible secondary suites complete | locked suite, CCIL/BPD adaptations, signal sensitivities, and 320-profile CUDA efficiency aggregate |
-| 9 - final evidence gate | Passed before opening | 190 tests, lint, format, mypy, manifests, splits, artifacts, clean tree, protocol tag |
-| 9 - target opening | Consumed exactly once and complete | opening receipt, 100 result sidecars/arrays, immutable index, locked statistics |
-| 10 - release | v0.1.7 metadata predates the v2 research scope; Git remote exists | final release version/scope, metadata, committed-candidate attestation, remote CI, tag, and Zenodo deposition remain outstanding; no DOI |
+| Historical locked InclusiveHAR target | Compact DANN 68.084% mean participant macro-F1; Compact CORAL effectively tied; MoRe-HAR hypothesis not supported | Immutable primary benchmark outcome |
+| CTGR source development | 86.540%, +2.586 points over six-channel RMRP; advancement gate passed | Retained robust nine-channel control |
+| Strict HERA-v1 source development | 86.849%, +0.309 points over CTGR; interval crosses zero and promotion gates failed | Highest point-estimate ablation, not a confirmed successor |
+| HERA labelled semantic gauge | +0.611 points on matched remaining windows; only P10 improves | Optional labelled personalization diagnostic |
+| AICOS transfer | Unit mismatch corrected; CTGR 68.97%; U9 68.93% on 38 complete development participants | Conditional external diagnostic; axes/polarity unresolved |
+| HARTH | Right-thigh posture endpoint strong, lower-back weak; project fused RF below executed published-style XGBoost on merged 9-class endpoint | Sensor-placement and comparator evidence |
+| Native-nine confirmation | Runner and unit bridge implemented; no qualified fresh cohort supplied | Prepared future study, no performance result |
+| Same-attachment reference pilot | Algebra and synthetic software contracts qualified; no human recordings supplied | Distinct future physical-information study |
 
-## Confirmatory outcome
+All percentages above are tied to their named endpoint. They are not one
+leaderboard. The complete comparison and claim boundaries are in
+[EVIDENCE_INDEX.md](EVIDENCE_INDEX.md).
 
-- Target cohort: participants 11-20; 10 participants, 807 functional-core windows.
-- Frozen lineup: 20 model/ablation configurations, seeds 11, 23, 47, 89, and 131.
-- Numerically highest locked-primary mean participant macro-F1: compact DANN, 0.6808438, 95% participant-bootstrap CI [0.5391426, 0.8093204]. Compact CORAL obtained 0.6807882, only 0.0000556 lower; they are effectively tied at the supported precision.
-- MoRe-HAR full: mean 0.6353323, worst 0.2583943, lower decile 0.2659867.
-- Strongest mean reference: compact DANN; strongest worst-participant reference: legacy joint CNN/BiLSTM (0.2942991); strongest lower decile: compact CORAL (0.3669902).
-- Preregistered MoRe-HAR decision: not supported. Mean improvement and joint lower-tail improvement were both false; the source non-inferiority gate had passed.
-- Candidate minus compact-DANN participant mean: -0.0455116. Holm-adjusted exact sign-flip p = 0.7207031; Holm-adjusted Wilcoxon p = 0.7558594.
+## Why the architecture search is closed
 
-Target confidence intervals are wide and participant tails are low across every model. A post-confirmatory DANN source-minus-target estimate was 0.1196 with interval [-0.0371, 0.2831], but its one-seed source-CV and five-seed final-target regimes differ. The evidence documents difficult and heterogeneous target generalization; it does not provide a controlled causal decomposition, a direct measure of physical ability, or a fairness/clinical claim.
+The same ten source participants have supported repeated hypothesis generation.
+CTGR remains the strongest clearly justified advancement, while later HERA
+increments are small and uncertain. HERA-v2 routing abstained in every outer
+fold, compact evidence integration regressed, and unconditional U9 routing lost
+3.442 points on source while remaining essentially tied on the larger AICOS
+development cohort. Continuing to select variants from these people would add
+less scientific confidence than documenting and independently validating the
+retained method.
 
-## Completed post-confirmatory evidence
+The label-informed HERA oracle reaches 88.618%, which shows potential expert
+complementarity. It uses held participant labels and does not supply a deployable
+selection rule. It is retained as headroom evidence, not as an attainable model
+result.
 
-- Few-person v1.1: 1,200 validated scenario results. Descriptive numerical mean leaders were DANN at k=0 (0.6808), compact ERM at k=1 (0.6744), MoRe-HAR backbone at k=2 (0.7060), and MoRe-HAR content at k=4 (0.7593); no between-model significance tests were run. All models' k=4 means exceeded k=0, but only DeepConvLSTM and the static matched baseline were monotone across mean, worst-participant, and lower-decile endpoints. None of 80 within-model paired comparisons survived Holm correction (minimum adjusted p = 0.15625).
-- Disabled within-group: compact ERM 0.6067 mean, MoRe-HAR backbone 0.5626, DeepConvLSTM 0.4001; 75/75 CUDA cells.
-- Sensor stress: 120 result cells. Drift and missing accelerometer-Z had the largest target mean reductions for both compact ERM and CORAL. Source n=2 versus target n=10 and uncalibrated severities preclude strong interaction claims.
-- Qualified CCIL/BPD adaptations: CCIL 0.6896 mean but slightly lower ERM-relative tails and adjusted p=0.2109; BPD 0.5710. Both are descriptive, post-confirmatory, and non-faithful adaptations.
-- CUDA efficiency: 80 checkpoints, 320 profiles, and 641 contention samples. Timing status is `valid_with_declared_allowlisted_ambient_system_processes`; measurements are device-resident forward passes, not end-to-end application latency. FP16 autocast was slower than FP32 for every model at both batch sizes, while usually reducing allocated VRAM; 60 recurrent profiles used the cuDNN-disabled CUDA fallback.
-- Raw/total acceleration v1.1 and SI-unit sensitivity completed. The latter demonstrated exact normalized-tensor equivalence rather than an accuracy result.
+## Publication package
 
-Cross-source pretraining and SSL/foundation comparisons were not evaluated. Exact-label all-cohort UCI→InclusiveHAR classification is blocked because sitting is the only defensible exact shared class; standing remains provisional and ordinary UCI walking is not wheelchair propulsion. Adapted-label transfer was not implemented. BenchHAR/SimMTM, FOCAL, and foundation-model tracks did not clear the combined licensing, interface, checkpoint, adapter, and equal-budget source-only selection gates. These omissions are not zero-valued or negative empirical results.
+The intended package contains:
 
-## Active immutable anchors
+- first-party benchmark, model, experiment, and validation code;
+- locked protocols and tracked aggregate evidence;
+- CTGR/HERA source-development summaries and negative gates;
+- corrected AICOS and HARTH diagnostic documentation;
+- benchmark, data, and model cards;
+- reproducibility, supersession, contribution, security, and release guidance;
+- preserved failures and explicit evidence classes.
 
-- Coursework ZIP SHA-256: `13DE970A22336DB695029ACF5789DEC36D237CC0FC00D9BE7D779DFC6568CA94`
-- Literature matrix file SHA-256: `B119EE0C05191777E6222F16E8A53D0D39F9583BC34107F714AE3FDF8AB0E92C`
-- Literature registry file SHA-256: `0B896954537106CF9A1066956CC2B9825B937BE78723B0D827B2FB78DFCE08F6`
-- Dataset manifest file SHA-256: `52de5370682f13fbd9a4e9affe805b4f5ee0f28901d137743884b77471b24d29`
-- Split manifest embedded SHA-256: `ccb6c3d1254c1464c48e412afb6f83e7942113299e853f89c77df1d6cfad131b`
-- Source-window manifest embedded SHA-256: `1ad1ee3accaae5f2f93bb91ac0afa5ce583134ce1d882c3f08323b09026fa522`
-- Target seal ID: `aecba05fa4a0fc4e4bbc135ac30944b686be19c0b6a2820c838e6c8b802bb29d`
-- Frozen artifact-set SHA-256: `e759b60f32b965e7ae3e5a994d919a08553c4958f9bdcf10d7497697f685dd51`
-- Confirmatory analysis plan SHA-256: `7b99dd5894109370397867a1ca141758c0a30b4efb2fb3d76aba23ab1ad62177`
-- Opening receipt record SHA-256: `5704f65efd416e9cd16d6ed24c2735c1d52b7fcaafddb113e481498797cd182a`
-- Locked target index record SHA-256: `79434d8fbc136cb55e18fa980490e5aaa94a91fb3c823837cccf6137b026b5b9`
-- Participant statistics record SHA-256: `c7f20362598922223a8d72d927fba69445fca31cb3607ef9eff0b130211f2cbd`
-- Publication report record SHA-256: `3afe0ceee9f97025d1adc5f59ab3528b512a3212385ef5344028850e9cb39c66`
-- Disabled within-group aggregate record SHA-256: `fbe81492df167e136c3ad14bccfdd94a4c82c12497b48c2042a50e25dc521180`
-- Sensor-stress aggregate record SHA-256: `abe1aee172e9b680e2aca16848c84bf6788491d005964b3d18e597098a06df90`
-- Corrected UCI grouped-reproduction record SHA-256: `c2e0191259bd2f51cb58a91e51ebc27acfa84f47e1bf654dc04cf9ecaaafa1f6`
-- Few-person v1.1 statistics record SHA-256: `d14c4a071ee2460a2182fcab56ab6454be6d4cc3c6cc391445e56a368b776058`
-- CUDA efficiency aggregate record SHA-256: `7c0fa71edcd0a368090df0513d6a418a35a6989b35f828734febd135f11530bb`
-- Qualified CCIL/BPD aggregate record SHA-256: `c7b27e2a6d5ddf94efcd2c2064cb84aecfc70dfe3d4f38539660c3479128c180`
-- Raw/total acceleration aggregate record SHA-256: `817405fd04b78a7a30ac985d84ad5009800edb78e48a69c8d246c0e4003a815a`
-- SI-unit equivalence record SHA-256: `ca42d11b9b846307afc1cd2dfeda9e113c81fbdcc8bd60f1499eb22f1fb7bcaa`
-- CTGR five-seed source-development record SHA-256: `1cabbd7ec48ed334bb620e0376f8b26b520fcf7443e1d26bb4e83d197c345128`
-- Max R&D compact summary record SHA-256: `507a598eb432ebd72effd407515469ffbde8767cf210cf85a0c618e6dfb7ddb0`
-- Frozen training code commit: `b4dc38fb9d5a0c17003221b61156ebc065395170`
-- One-time target evidence commit: `f0d11b2`
-- Active protocol tag: `protocol-v1.2.0`
+It excludes raw datasets, `.audit` run directories, large predictions,
+checkpoints, unrestricted participant material, secrets, and temporary HARTH
+third-party files. Those materials remain locally preserved where required.
 
-## Preserved limitations and deviations
+## Preparation state
 
-The immutable `benchmark-v0.1.0` tag points to commit
-`f0a589a0bb18f60862c80f7e56eac2a33027c358`. Its first GitHub Actions run,
-`32799146947`, failed before test execution on both operating systems because
-the workflow combined `UV_FROZEN=1` with the mutually exclusive `uv sync
---locked` option. The immutable `benchmark-v0.1.1` tag points to commit
-`4ac9b7b5471c945389348a73b5c59387c2aae069`; run `32801378375` also stopped
-before tests because hosted `uv` rejects an empty `UV_FROZEN` value rather than
-treating it as false. Neither tag was moved or deleted. Patch candidate
-`benchmark-v0.1.2` used the explicit boolish value `false`; its Ubuntu
-synthetic-validation job passed tests, lint, format, and types, but Windows
-checkout converted LF evidence/config files to CRLF. Six exact-hash tests
-failed and the release-security job did not run in run `32802922698`. Patch candidate
-`benchmark-v0.1.3` additionally disabled Git end-of-line conversion for every
-tracked path through `.gitattributes`, disabled Windows `core.autocrlf` before
-checkout, and retained the explicit boolish sync override. Run `32811935288`
-passed both operating-system matrices, then failed the release-security bundle
-because Linux XGBoost 3.2.0 installed `nvidia-nccl-cu12==2.31.2`, whose PyPI
-metadata reports `LicenseRef-NVIDIA-Proprietary`. Candidate
-`benchmark-v0.1.4` records the exact Linux x86-64 wheel, dependency marker,
-metadata sidecar, embedded BSD 3-Clause text, and archived NVIDIA pages whose
-`nccl_2312` path renders a 2.29.2 label. Its run `32829208254` then failed 49
-Ubuntu synthetic release-fixture tests after 511 passed and 3 skipped: generic
-fixtures inventoried only `safe@1` while the hardened Linux gate correctly
-required the reviewed XGBoost/NCCL pair. Windows passed tests, lint, formatting,
-and mypy, and the dependent release-security job was skipped. Candidate
-`benchmark-v0.1.5` retained the production gate and dependency evidence and made
-those fixtures explicitly platform-deterministic. Its run `32836567358` passed
-both synthetic-validation matrices and complete-history release security. The
-subsequent external release-bundle Gitleaks scan failed on three sanitized
-findings: one actual-risk `temp_clone_token` field and two deterministic
-`secret_scan` hash false positives. The bundle, raw scanner report, and
-supporting evidence are quarantined outside Git and were not committed. No
-release was created and no assets were uploaded; v0.1.5 is not released. The
-sanitized record is
-[`benchmark-v0.1.5-bundle-gitleaks.json`](../results/release/failures/benchmark-v0.1.5-bundle-gitleaks.json).
-The five earlier failed tags/runs and this post-CI bundle-scan failure remain
-visible; no research result changed and the target was not reopened.
+| Area | State |
+|---|---|
+| Current research decision | Complete |
+| Research report and experiment map | Methods, comparable tables, ablations, and limitations organized by question |
+| Evidence and supersession indexes | Current interpretation linked to preserved source records |
+| README and documentation navigation | Scientific reading order and reproduction path |
+| CTGR/HERA model card | Selected feature path and input/claim boundaries documented |
+| AICOS/native-nine first-party code and focused tests | Implemented; candidate-wide validation passed |
+| Temporary third-party HARTH inputs | Excluded from Git; local hashes preserved |
+| Full tests, lint, format, types, manifests, splits, artifacts | Passed on the review candidate |
+| Distribution build, archive inspection, and secret scan | Passed on the review candidate |
+| Research branch | `research/har-substantiation-pilot-pipeline-20260908`; exact commit and CI available in Git history and Actions |
+| GitHub release and Zenodo deposit | Not published; no DOI claimed |
 
-The v0.1.6 successor filters authenticated repository metadata inside `gh`
-before stdout is redirected, rejects any retained `temp_clone_token` field in
-both capture and offline inventory validation, and restricts the Gitleaks
-allowance to the two canonical SHA-256 evidence fields in `ci.json`. The
-create-only release gate still requires complete local validation, an immutable
-successor tag, exact green CI, an empty authoritative bundle scan, and
-byte-identical uploaded assets.
+The [research report](RESEARCH_REPORT.md) is the scientific entry point. The
+[earlier readiness snapshot](PUBLICATION_READINESS_REPORT_20260920.md) records the
+pre-commit validation state; its checks do not replace checks on a later commit.
+The [publication checklist](PUBLICATION_CHECKLIST.md) separates a validated branch
+update from a formal versioned release. No GitHub release, tag, or Zenodo deposit
+is implied by this repository update.
 
-Those gates passed for v0.1.6, including Actions run `32846091138`, a ready
-29-artifact inventory, exact bundle reconstruction, and an empty authoritative
-bundle scan. A two-asset private draft was created but not published because
-the tracked Windows PowerShell 5 example decoded the UTF-8 REST response with
-the platform default encoding and falsely rejected the correct release body at
-an em dash. Strict UTF-8 decoding proves the local and REST bodies are
-identical. The v0.1.7 successor reads all saved GitHub JSON with a strict UTF-8
-decoder; the v0.1.6 tag, draft, assets, and external failure evidence remain
-unchanged.
+## Immutable and ethical boundaries
 
-The split audit validates participant exclusivity, label-block containment, and raw-row disjointness. Because InclusiveHAR releases no trial/session/timestamp identifiers, its unconditional hidden-join contamination bound is 100%; a conditional three-repetition assumption gives 240/3,042 (7.8895%), but that assumption is unverified. This benchmark must not be called trial-safe or unqualified leakage-safe.
+- InclusiveHAR P11-P20 may not be reopened for tuning or successor selection.
+- The released-block protocol is participant-exclusive and raw-row-disjoint, but
+  the provider does not expose trial/timestamp boundaries; it is not trial-safe.
+- Participant identity, group/disability labels, assistive-device metadata,
+  location, timestamps, and order proxies are prohibited model inputs.
+- Seeds do not increase independent participant count.
+- External unit, sign, axis, label, or threshold choices may not be selected by
+  target performance.
+- Development, diagnostic, personalization, and locked target results must retain
+  their evidence labels.
+- Apache-2.0 covers first-party repository material only.
 
-Recurrent cuDNN execution failed on this Windows/CUDA stack with process exit `0xc0000409`. Failure artifacts are preserved. Successful recurrent experiments used CUDA tensors with cuDNN disabled, not CPU neural fallback. Classical scikit-learn estimators retained their native CPU policy; XGBoost training used CUDA.
+## Valid future studies
 
-The target opening cannot be repeated. All few-person inclusion, corruption, efficiency, signal-sensitivity, predecessor-adaptation, or other follow-up is post-confirmatory and cannot alter the locked zero-shot claim. The historical 190-test pre-opening gate remains a historical fact; a separate final-release gate must validate the eventual release commit rather than rewriting that record.
+Further research should resume only with new information:
+
+1. A fresh, qualified native-nine cohort for a frozen CTGR/B9 comparison. The
+   planning model estimates 38 complete participants for a two-point paired
+   effect, subject to uncertain variance transport from the ten-person source.
+2. The prespecified six-wearer, 264-bout same-attachment pilot testing whether
+   genuine reference bouts improve both posture classes without mobility or
+   participant harms.
+
+Neither dataset is currently supplied. They are future studies, not incomplete
+training from the present publication package.
+
+## Current authorities
+
+- [Evidence index](EVIDENCE_INDEX.md)
+- [Evidence supersession map](EVIDENCE_SUPERSESSION.md)
+- [CTGR/HERA model card](MODEL_CARD_CTGR_HERA.md)
+- [Canonical HERA/CTGR method status](research/CANONICAL_HERA_CTGR_METHOD_STATUS.md)
+- [Fixed routing validation](research/CTGR_ROUTING_VALIDATION_20260919.md)
+- [Expert finalization assessment](research/EXPERT_FINALIZATION_ASSESSMENT_20260920.md)
+- [Results evidence policy](../results/README.md)

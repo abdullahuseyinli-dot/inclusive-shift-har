@@ -19,6 +19,27 @@ regexes = [
   '''^secret_scan\.json":"[0-9a-f]{64}"$''',
 ]
 
+# Gitleaks' generic assignment heuristic treats these fixed, public model and
+# probability identifiers as credentials. The path and complete match must both
+# agree, so unrelated assignments remain findings.
+[[rules.allowlists]]
+description = "Reviewed legacy architecture identifiers"
+condition = "AND"
+regexTarget = "match"
+paths = ['''(?:^|[/\\])src[/\\]inclusive_shift_har[/\\]models[/\\]legacy_models\.py$''']
+regexes = [
+  '''^key == "legacy_cnn1d_h128"$''',
+  '''^key == "legacy_joint_bilstm256_cnn128"$''',
+  '''^key == "legacy_joint_bilstm512_cnn256"$''',
+]
+
+[[rules.allowlists]]
+description = "Reviewed HERA probability-array identifier"
+condition = "AND"
+regexTarget = "match"
+paths = ['''(?:^|[/\\])configs[/\\]experiments[/\\]hera_posture_gauge_v1\.yaml$''']
+regexes = ['''^probability_key: "hera_v1_strict_probabilities"$''']
+
 # Verified SHA-256 of the public access checklist, not an access credential.
 # Exact digest + field + generated v3 evidence path only; see the dated review.
 [[rules.allowlists]]

@@ -84,6 +84,13 @@ SOURCE_RECEIPT_METADATA: dict[str, dict[str, str]] = {
         "permissible_redistribution": "raw data excluded from Git; attribution required",
         "evidence_role": "oracle_diagnostic",
     },
+    "aicos_har_v1": {
+        "record_url": "https://zenodo.org/records/19452049",
+        "dataset_version": "Zenodo record 19452049 v1",
+        "dataset_license": "CC-BY-4.0",
+        "permissible_redistribution": "raw data excluded from Git; attribution required",
+        "evidence_role": "external_zero_shot_evaluation",
+    },
 }
 
 

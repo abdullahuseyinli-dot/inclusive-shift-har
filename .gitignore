@@ -110,3 +110,7 @@ secrets.yml
 *.temp
 *.bak
 ~$*
+
+# Preserved third-party HARTH review inputs. Their hashes are retained in the
+# local audit receipt; redistribution rights have not been established.
+/.tmp_harth_*

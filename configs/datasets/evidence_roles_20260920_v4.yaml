@@ -1,0 +1,71 @@
+schema_version: "1.0.0"
+ledger_id: evidence-roles-20260920-v4
+status: current_publication_candidate_interpretation
+supersedes_for_current_interpretation:
+  - configs/datasets/evidence_roles_20260905_v3.yaml
+  - configs/datasets/external_har_portfolio_v1.yaml
+preservation_policy: >-
+  Earlier ledgers and acquisition-time portfolio entries remain immutable
+  historical records. This file updates evidence roles only; it does not alter
+  any protocol, split, result, or source artifact.
+
+datasets:
+  inclusivehar_v4:
+    source_participants: "P1-P10"
+    source_role: source_development_reused_not_confirmatory
+    target_participants: "P11-P20"
+    target_role: locked_confirmatory_target_opening_1_consumed
+    target_opening_count: 1
+    target_reopening_permitted: false
+    current_source_candidate: CTGR
+    highest_source_point_estimate: HERA-CTGR-v1-strict
+    native_nine_confirmation_status: no_fresh_qualified_cohort_scored
+    governing_records:
+      - docs/BENCHMARK_CARD.md
+      - docs/research/CANONICAL_HERA_CTGR_METHOD_STATUS.md
+      - docs/research/CTGR_ROUTING_VALIDATION_20260919.md
+
+  aicos_har_v1:
+    provider_test_role: consumed_posthoc_external_diagnostic
+    provider_development_folds_1_to_5_role: consumed_fixed_external_development_diagnostic
+    ability_cohort_confirmation: false
+    input_unit_status: corrected_acceleration_and_gravity_to_g
+    axis_polarity_status: unresolved_acquisition_logger_provenance
+    current_model_decision: retain_CTGR_reject_U9
+    governing_records:
+      - docs/research/AICOS_POSTURE_REVIEW_20260919.md
+      - docs/research/CTGR_ROUTING_VALIDATION_20260919.md
+
+  harth_v1_2:
+    role: external_sensor_placement_and_published_protocol_diagnostic
+    participant_count: 22
+    tuning_status: closed_without_new_sensor_interface_question
+    redistribution_status: >-
+      Provider dataset terms apply; temporary upstream code and paper copies are
+      excluded pending separate provenance and licence review.
+    governing_record: docs/research/RESEARCH_LANE_CLOSURE_20260919.md
+
+  fog_star_v3:
+    role: ability_relevant_external_development_consumed
+    current_status: historical_correction_chain_with_v4_supersession
+    governing_records:
+      - docs/research/EXTERNAL_HAR_SESSION_GRID_V3_AMENDMENT.md
+      - docs/research/EXTERNAL_HAR_CONTEXT_TRAINING_POPULATION_CORRECTION_20260905.md
+      - docs/research/EXTERNAL_HAR_PROVIDER_BOUNDARY_AND_SPLIT_CORRECTION_20260905.md
+      - results/research/cross_dataset_har_v4/context_training_population_supersession_20260905.json
+
+  daghar:
+    role: external_heldout_development_consumed
+    selection_use_permitted: false
+
+  uci_har_v1:
+    official_train_role: corrected_grouped_source_development
+    official_test_role: unopened_under_corrected_reproduction
+
+claim_policy:
+  independent_CTGR_HERA_superiority_supported: false
+  state_of_the_art_claim_supported: false
+  clinical_validity_supported: false
+  universal_placement_generalization_supported: false
+  participant_level_harms_required: true
+  supersession_map: docs/EVIDENCE_SUPERSESSION.md

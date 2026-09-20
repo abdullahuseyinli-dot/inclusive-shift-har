@@ -56,7 +56,9 @@ def _moving_average(window: np.ndarray, width: int = 25) -> np.ndarray:
         raise ValueError("invalid gravity window or smoothing width")
     kernel = np.ones(width, dtype=np.float64) / float(width)
     padded = np.pad(window, ((width // 2, width - 1 - width // 2), (0, 0)), mode="edge")
-    return np.column_stack([np.convolve(padded[:, axis], kernel, mode="valid") for axis in range(3)])
+    return np.column_stack(
+        [np.convolve(padded[:, axis], kernel, mode="valid") for axis in range(3)]
+    )
 
 
 def _gravity_geometry_features(window: np.ndarray) -> np.ndarray:
@@ -75,7 +77,10 @@ def _gravity_geometry_features(window: np.ndarray) -> np.ndarray:
     residual = window - smoothed
     residual_norm = np.linalg.norm(residual, axis=1)
     subunits = np.array_split(smoothed, 4, axis=0)
-    subunit_units = [part.mean(axis=0) / max(float(np.linalg.norm(part.mean(axis=0))), 1.0e-12) for part in subunits]
+    subunit_units = [
+        part.mean(axis=0) / max(float(np.linalg.norm(part.mean(axis=0))), 1.0e-12)
+        for part in subunits
+    ]
     subunit_delta = np.concatenate(
         [subunit_units[index + 1] - subunit_units[index] for index in range(3)]
     )
@@ -105,10 +110,10 @@ def _gravity_geometry_features(window: np.ndarray) -> np.ndarray:
                     float(np.quantile(unit_delta, 0.90)),
                     float(unit_delta.max()),
                     float(residual_norm.mean()),
-                        float(residual_norm.std()),
-                        float(np.quantile(residual_norm, 0.90)),
-                        float(np.sqrt(np.mean(residual_norm**2))),
-                    ],
+                    float(residual_norm.std()),
+                    float(np.quantile(residual_norm, 0.90)),
+                    float(np.sqrt(np.mean(residual_norm**2))),
+                ],
                 dtype=np.float64,
             ),
             subunit_delta,
@@ -122,7 +127,9 @@ def _gravity_geometry_features(window: np.ndarray) -> np.ndarray:
 def _geometry_matrix(raw_windows: np.ndarray) -> np.ndarray:
     if raw_windows.ndim != 3 or raw_windows.shape[1:] != (WINDOW_SAMPLES, 3):
         raise ValueError("raw lower-back windows have the wrong shape")
-    return np.asarray([_gravity_geometry_features(window) for window in raw_windows], dtype=np.float64)
+    return np.asarray(
+        [_gravity_geometry_features(window) for window in raw_windows], dtype=np.float64
+    )
 
 
 def _align_probability(raw: np.ndarray, classes: np.ndarray) -> np.ndarray:
@@ -192,14 +199,21 @@ def _decode_sequence(probability: np.ndarray, transition_log: np.ndarray) -> np.
                 for previous_dwell in range(dwell):
                     if previous_state != state and previous_dwell < dwell - 1:
                         continue
-                    next_dwell = min(dwell - 1, previous_dwell + 1) if previous_state == state else 0
-                    candidate = score[time_index - 1, previous_state, previous_dwell] + transition_log[previous_state, state]
+                    next_dwell = (
+                        min(dwell - 1, previous_dwell + 1) if previous_state == state else 0
+                    )
+                    candidate = (
+                        score[time_index - 1, previous_state, previous_dwell]
+                        + transition_log[previous_state, state]
+                    )
                     if candidate > score[time_index, state, next_dwell]:
                         score[time_index, state, next_dwell] = candidate
                         back_state[time_index, state, next_dwell] = previous_state
                         back_dwell[time_index, state, next_dwell] = previous_dwell
             score[time_index, state, :] += log_emission[time_index, state]
-    state, dwell_index = (int(value) for value in np.unravel_index(np.argmax(score[-1]), score[-1].shape))
+    state, dwell_index = (
+        int(value) for value in np.unravel_index(np.argmax(score[-1]), score[-1].shape)
+    )
     decoded = np.empty(probability.shape[0], dtype=np.int64)
     decoded[-1] = state
     for time_index in range(probability.shape[0] - 1, 0, -1):
@@ -218,12 +232,19 @@ def _decode_sequences(
     transition_log: np.ndarray,
 ) -> np.ndarray:
     decoded = np.argmax(probability, axis=1).astype(np.int64)
-    records = sorted((_parse_window_id(str(window_ids[index])), int(index)) for index in indices.tolist())
+    records = sorted(
+        (_parse_window_id(str(window_ids[index])), int(index)) for index in indices.tolist()
+    )
     groups: list[list[int]] = []
     current: list[int] = []
     previous: tuple[str, str, int, int] | None = None
     for key, index in records:
-        if previous is None or key[0] != previous[0] or key[1] != previous[1] or key[2] != previous[3]:
+        if (
+            previous is None
+            or key[0] != previous[0]
+            or key[1] != previous[1]
+            or key[2] != previous[3]
+        ):
             if current:
                 groups.append(current)
             current = []
@@ -263,7 +284,9 @@ def _fit_arm(
     decoded = np.zeros(labels.size, dtype=np.int64)
     folds: list[dict[str, Any]] = []
     for fold in range(FOLD_COUNT):
-        test_mask = np.asarray([fold_assignment[str(item)] == fold for item in participants], dtype=np.bool_)
+        test_mask = np.asarray(
+            [fold_assignment[str(item)] == fold for item in participants], dtype=np.bool_
+        )
         train_mask = ~test_mask
         train_x = features[train_mask]
         test_x = features[test_mask]
@@ -298,8 +321,12 @@ def _fit_arm(
         folds.append(
             {
                 "fold": fold,
-                "training_participants": sorted(p for p, assigned in fold_assignment.items() if assigned != fold),
-                "evaluation_participants": sorted(p for p, assigned in fold_assignment.items() if assigned == fold),
+                "training_participants": sorted(
+                    p for p, assigned in fold_assignment.items() if assigned != fold
+                ),
+                "evaluation_participants": sorted(
+                    p for p, assigned in fold_assignment.items() if assigned == fold
+                ),
                 "training_window_count": int(train_mask.sum()),
                 "evaluation_window_count": int(test_mask.sum()),
                 "feature_count": int(train_x.shape[1]),
@@ -310,9 +337,15 @@ def _fit_arm(
     report_probability = calibrated_probability if calibrate else probabilities
     if state_decoder:
         report_probability = _one_hot(decoded)
-    report = classification_report(labels, report_probability, participants.tolist(), class_names=CLASS_NAMES)
-    raw_report = classification_report(labels, probabilities, participants.tolist(), class_names=CLASS_NAMES)
-    calibrated_report = classification_report(labels, calibrated_probability, participants.tolist(), class_names=CLASS_NAMES)
+    report = classification_report(
+        labels, report_probability, participants.tolist(), class_names=CLASS_NAMES
+    )
+    raw_report = classification_report(
+        labels, probabilities, participants.tolist(), class_names=CLASS_NAMES
+    )
+    calibrated_report = classification_report(
+        labels, calibrated_probability, participants.tolist(), class_names=CLASS_NAMES
+    )
     np.savez_compressed(
         output_path / f"{arm}_predictions.npz",
         labels=labels,
@@ -328,7 +361,9 @@ def _fit_arm(
         "state_decoder": state_decoder,
         "calibration": calibrate,
         "window_samples": WINDOW_SAMPLES,
-        "feature_count": int(features.shape[1] + (geometry.shape[1] if geometry is not None else 0)),
+        "feature_count": int(
+            features.shape[1] + (geometry.shape[1] if geometry is not None else 0)
+        ),
         "fold_count": FOLD_COUNT,
         "fit_count": FOLD_COUNT,
         "folds": folds,
@@ -379,7 +414,9 @@ def run(archive: Path, output: Path) -> dict[str, Any]:
     control_people = _participant_scores(by_arm["C_rich_control"]["report"])
     contrasts = {}
     for item in results[1:]:
-        contrasts[item["arm"]] = _paired_bootstrap(control_people, _participant_scores(item["report"]))
+        contrasts[item["arm"]] = _paired_bootstrap(
+            control_people, _participant_scores(item["report"])
+        )
     ended = datetime.now(UTC)
     result: dict[str, Any] = {
         "schema_version": "1.0.0",
@@ -407,7 +444,10 @@ def run(archive: Path, output: Path) -> dict[str, Any]:
             "inference_sensor": "lower_back_only",
             "gravity_source": "low_passed_accelerometer_only",
             "calibration": "outer_training empirical class-prior logit correction",
-            "state_decoder": {"minimum_dwell_windows": MIN_DWELL_WINDOWS, "transition_counts": "outer_training only"},
+            "state_decoder": {
+                "minimum_dwell_windows": MIN_DWELL_WINDOWS,
+                "transition_counts": "outer_training only",
+            },
         },
         "data_audit": data_audit,
         "geometry_feature_count": int(geometry.shape[1]),
@@ -432,9 +472,13 @@ def run(archive: Path, output: Path) -> dict[str, Any]:
         "runtime_seconds": (ended - started).total_seconds(),
     }
     payload = json.dumps(result, sort_keys=True, indent=2)
-    result["result_payload_sha256_before_serialization"] = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    result["result_payload_sha256_before_serialization"] = hashlib.sha256(
+        payload.encode("utf-8")
+    ).hexdigest()
     (output / "RESULT.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    (output / "SOURCE_RECEIPT.json").write_text(json.dumps(result["source"], indent=2) + "\n", encoding="utf-8")
+    (output / "SOURCE_RECEIPT.json").write_text(
+        json.dumps(result["source"], indent=2) + "\n", encoding="utf-8"
+    )
     return result
 
 
@@ -444,7 +488,10 @@ if __name__ == "__main__":
     payload = run(Path(sys.argv[1]), Path(sys.argv[2]))
     print(
         json.dumps(
-            {item["arm"]: item["report"]["primary"]["mean_participant_macro_f1"] for item in payload["results"]},
+            {
+                item["arm"]: item["report"]["primary"]["mean_participant_macro_f1"]
+                for item in payload["results"]
+            },
             indent=2,
             sort_keys=True,
         )

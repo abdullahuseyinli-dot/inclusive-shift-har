@@ -1,0 +1,131 @@
+# Reproducibility guide
+
+This guide separates what a clean Git checkout can verify from analyses that
+require separately restored datasets, predictions, or checkpoints. Commands are
+read-only or create new ignored audit outputs unless stated otherwise.
+
+## 1. Environment
+
+Use Python 3.11 and the lockfile-pinned environment.
+
+On Windows, use a short checkout path and clone with
+`--config core.longpaths=true`, as shown in the README. Some preserved evidence
+filenames exceed the legacy Windows path limit when nested under a long parent
+directory. For an existing checkout, `git config core.longpaths true` enables
+Git's long-path support without changing the archived filenames.
+
+```powershell
+uv sync --locked --extra training-cpu --group research
+uv pip install --python .venv --require-hashes -r requirements/external-har-research.lock
+uv run --no-sync inclusive-shift-har --version
+```
+
+The overlay supplies hash-pinned external-reader packages after the main locked
+environment. CPU and CUDA Torch extras are mutually exclusive. The default public
+verification path uses `training-cpu`; historical CUDA evidence remains valid only
+for its recorded environment and hardware.
+
+## 2. Clean-checkout verification
+
+These checks need no private sensor arrays:
+
+```powershell
+uv lock --check --offline
+uv run --no-sync inclusive-shift-har validate-manifests --json
+uv run --no-sync inclusive-shift-har audit-splits `
+  --split-manifest results/protocol/splits/inclusivehar_v4_released_block_v1_2.json `
+  --json
+uv run --no-sync inclusive-shift-har validate-artifacts `
+  --artifact-root results --require-artifacts --json
+uv run --no-sync ruff check src tests
+uv run --no-sync ruff format --check src tests
+uv run --no-sync mypy src tests
+```
+
+Run the complete synthetic suite through the same sharded controller used by CI:
+
+```powershell
+uv run --no-sync python -m inclusive_shift_har.artifacts.parallel_test_gate `
+  --output .audit/local-test-shards-001 `
+  --workers 2
+```
+
+Use a new output directory for each attempt. `.audit/` is intentionally ignored
+by Git but is preservation evidence, not a cleanup target.
+
+## 3. Reconstructing tracked conclusions
+
+The following records contain the aggregate values needed to verify the public
+tables without fitting a model:
+
+| Evidence | Tracked record |
+|---|---|
+| Locked target opening | `results/confirmatory/zero_shot_v1/publication_report_v1.json` |
+| Locked participant statistics | `results/confirmatory/zero_shot_v1/participant_statistics.json` |
+| CTGR five-seed source result | `results/development/max_rnd_secondary_v1_summary.json` |
+| HERA-v1 matched source result | `results/development/hera_ctgr_retrospective_v1_summary.json` |
+| HERA-v2 matched source result | `results/development/hera_ctgr_v2_retrospective_v1_summary.json` |
+| CAGE-HAR negative result | `results/development/cage_har_retrospective_v1_summary.json` |
+
+The [evidence index](EVIDENCE_INDEX.md) quotes those values without changing their
+evidence class. Self-hashed records are validated by the artifact and document
+tests. Large prediction arrays are deliberately excluded from Git.
+
+## 4. Separately restored evidence
+
+Some claims require local artifacts whose hashes are named in the tracked
+summaries:
+
+- source cross-fitted probabilities and fitted fold models under `.audit/`;
+- the AICOS provider archive and routing-validation probabilities;
+- HARTH source data and LOSO predictions;
+- historical CUDA checkpoints and efficiency traces;
+- external FoG prediction payloads.
+
+A valid restoration must match every recorded byte hash before metrics are
+recomputed. A Git-only clone is sufficient to audit the reported aggregate
+records and software contracts; it is not sufficient to refit or independently
+recompute every metric from predictions.
+
+The fixed U9 routing report records the exact local run layout at
+`docs/research/CTGR_ROUTING_VALIDATION_20260919.md`. Its local completion manifest
+verified 42 experiment files, and a separate review recomputed all nine primary
+reports and both paired bootstrap intervals. The local `.audit` directory is not
+part of the public software archive unless a separately reviewed evidence asset
+is created.
+
+## 5. Raw datasets
+
+Raw data are never committed. Restore them using the provider records and hashes
+in `manifests/datasets/` and `docs/data/`. The primary InclusiveHAR runbook is
+[DATA_ACQUISITION_RUNBOOK.md](DATA_ACQUISITION_RUNBOOK.md).
+
+Dataset licences do not inherit Apache-2.0 from this repository. Keep provider
+attribution with derived evidence and review redistribution rights before sharing
+predictions that could expose participant-level information.
+
+## 6. Target and development boundaries
+
+- InclusiveHAR P11-P20 were consumed once and must not be reopened for tuning,
+  reruns, debugging, or successor selection.
+- P1-P10 are repeatedly used source-development evidence.
+- AICOS provider test and development folds are consumed diagnostics.
+- A fresh native-nine cohort must remain label-blind through prediction sealing.
+- A reported seed is not an independent participant or cohort.
+
+The CLI refuses unsupported target operations, but scientific evidence status
+also depends on following the relevant protocol and artifact-restoration record.
+
+## 7. Package build
+
+After all checks pass and the worktree contains only reviewed files:
+
+```powershell
+uv build
+.\.venv\Scripts\python.exe -m zipfile -l dist\inclusive_shift_har-0.1.7a0-py3-none-any.whl
+```
+
+Build artifacts remain ignored until an exact release candidate is approved.
+Before GitHub or Zenodo publication, follow the
+[publication checklist](PUBLICATION_CHECKLIST.md) and bind the final archive to
+one immutable commit and version.

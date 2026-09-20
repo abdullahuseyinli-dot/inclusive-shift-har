@@ -10,6 +10,39 @@ storage_policy:
   raw_evidence_deletion_allowed: false
 
 datasets:
+  aicos_har_v1:
+    role: "unconsumed cross-device and cross-position zero-shot benchmark"
+    record_doi: "10.5281/zenodo.19452049"
+    record_url: "https://zenodo.org/records/19452049"
+    content_url: "https://zenodo.org/api/records/19452049/files/AICOS-HAR.zip/content"
+    artifact_name: "AICOS-HAR.zip"
+    artifact_size_bytes: 2539861502
+    artifact_md5: "faa895e7b203d664525b0a1e74542793"
+    licence: "CC-BY-4.0"
+    participants_reported: 106
+    provider_test_participants_reported: 22
+    selected_sensor: "phone accelerometer and gyroscope"
+    source_acceleration_unit: "heterogeneous release; audited per acquisition"
+    source_gyroscope_unit: "rad/s"
+    core_label_map:
+      Walking: mobility
+      Running: mobility
+      Upstairs: mobility
+      Downstairs: mobility
+      RampUp: mobility
+      RampDown: mobility
+      Sitting: sitting
+      Standing: standing
+    excluded_labels: [LiftUp, LiftDown, ElevatorUp, ElevatorDown, LyingDown]
+    unit_policy:
+      g_median_norm_inclusive: [0.75, 1.25]
+      m_s2_median_norm_inclusive: [6.0, 16.0]
+      ambiguous: quarantine
+    primary_split: "provider test"
+    adapter_qualification_splits: ["1", "2", "3", "4", "5"]
+    channel_lane: "derived-gravity-9ch"
+    evidence_status: "zero_shot_external_healthy_cross_device_position"
+
   fog_star_v3:
     role: "ability-relevant clinical development"
     record_doi: "10.5281/zenodo.17838806"

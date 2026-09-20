@@ -59,7 +59,9 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _load_raw_windows(archive: Path, window_samples: int = 250) -> tuple[dict[str, Any], dict[str, Any]]:
+def _load_raw_windows(
+    archive: Path, window_samples: int = 250
+) -> tuple[dict[str, Any], dict[str, Any]]:
     """Materialise paired non-overlapping windows without using labels as features."""
 
     back_windows: list[np.ndarray] = []
@@ -100,22 +102,31 @@ def _load_raw_windows(archive: Path, window_samples: int = 250) -> tuple[dict[st
             parsed = pd.to_datetime(frame["timestamp"], errors="coerce")
             timestamp = parsed.astype("int64").to_numpy(dtype=np.float64) / 1.0e9
             timestamp[parsed.isna().to_numpy()] = np.nan
-            back = frame[["back_x", "back_y", "back_z"]].to_numpy(dtype=np.float32) * STANDARD_GRAVITY
-            thigh = frame[["thigh_x", "thigh_y", "thigh_z"]].to_numpy(dtype=np.float32) * STANDARD_GRAVITY
+            back = (
+                frame[["back_x", "back_y", "back_z"]].to_numpy(dtype=np.float32) * STANDARD_GRAVITY
+            )
+            thigh = (
+                frame[["thigh_x", "thigh_y", "thigh_z"]].to_numpy(dtype=np.float32)
+                * STANDARD_GRAVITY
+            )
             values = np.column_stack((back, thigh))
             physical_runs, gap_count = _physical_runs(timestamp, values)
             stats["physical_run_count"] += len(physical_runs)
             stats["timestamp_boundary_count"] += int(gap_count)
             raw_labels = pd.to_numeric(frame["label"], errors="coerce").to_numpy(dtype=np.float64)
             for physical_start, physical_stop in physical_runs:
-                selected = np.isin(raw_labels[physical_start:physical_stop], np.asarray(tuple(LABEL_MAP)))
+                selected = np.isin(
+                    raw_labels[physical_start:physical_stop], np.asarray(tuple(LABEL_MAP))
+                )
                 for local_start, local_stop in _true_runs(selected):
                     absolute_start = physical_start + local_start
                     absolute_stop = physical_start + local_stop
                     segment_labels = raw_labels[absolute_start:absolute_stop]
                     changes = np.r_[True, segment_labels[1:] != segment_labels[:-1]]
                     change_starts = np.flatnonzero(changes)
-                    change_stops = np.concatenate((change_starts[1:], np.array([segment_labels.size])))
+                    change_stops = np.concatenate(
+                        (change_starts[1:], np.array([segment_labels.size]))
+                    )
                     for label_start, label_stop in zip(change_starts, change_stops, strict=True):
                         stats["label_run_count"] += 1
                         code = int(segment_labels[int(label_start)])
@@ -129,9 +140,15 @@ def _load_raw_windows(archive: Path, window_samples: int = 250) -> tuple[dict[st
                             right = left + window_samples
                             back_window = back[left:right]
                             thigh_window = thigh[left:right]
-                            if back_window.shape != (window_samples, 3) or not np.isfinite(back_window).all():
+                            if (
+                                back_window.shape != (window_samples, 3)
+                                or not np.isfinite(back_window).all()
+                            ):
                                 continue
-                            if thigh_window.shape != (window_samples, 3) or not np.isfinite(thigh_window).all():
+                            if (
+                                thigh_window.shape != (window_samples, 3)
+                                or not np.isfinite(thigh_window).all()
+                            ):
                                 continue
                             back_windows.append(back_window)
                             thigh_windows.append(thigh_window)
@@ -154,7 +171,10 @@ def _load_raw_windows(archive: Path, window_samples: int = 250) -> tuple[dict[st
     stats["window_count"] = len(labels)
     stats["window_samples"] = window_samples
     stats["sampling_rate_hz"] = SOURCE_RATE_HZ
-    if not np.isfinite(cast(np.ndarray, arrays["back"])).all() or not np.isfinite(cast(np.ndarray, arrays["thigh"])).all():
+    if (
+        not np.isfinite(cast(np.ndarray, arrays["back"])).all()
+        or not np.isfinite(cast(np.ndarray, arrays["thigh"])).all()
+    ):
         raise RuntimeError("raw materialisation produced non-finite values")
     return arrays, stats
 
@@ -194,7 +214,9 @@ class TemporalEncoder(nn.Module):
             nn.GELU(),
         )
         self.pool = nn.AdaptiveAvgPool1d(1)
-        self.projection = nn.Sequential(nn.Linear(hidden * 2, embedding), nn.LayerNorm(embedding), nn.GELU())
+        self.projection = nn.Sequential(
+            nn.Linear(hidden * 2, embedding), nn.LayerNorm(embedding), nn.GELU()
+        )
 
     def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
         sequence = self.net(x)
@@ -209,12 +231,17 @@ class SageModel(nn.Module):
         self.back_encoder = TemporalEncoder()
         self.classifier = nn.Linear(64, 2)
         self.reconstruction = nn.Sequential(nn.Linear(64, 64), nn.GELU(), nn.Linear(64, 75))
-        self.thigh_encoder = TemporalEncoder() if arm in {
-            "paired_csmr",
-            "paired_contrastive",
-            "paired_distill",
-            "paired_distill_contrastive",
-        } else None
+        self.thigh_encoder = (
+            TemporalEncoder()
+            if arm
+            in {
+                "paired_csmr",
+                "paired_contrastive",
+                "paired_distill",
+                "paired_distill_contrastive",
+            }
+            else None
+        )
         self.thigh_classifier = nn.Linear(64, 2) if self.thigh_encoder is not None else None
 
     def forward(self, back: Tensor, thigh: Tensor | None = None) -> dict[str, Tensor]:
@@ -224,7 +251,9 @@ class SageModel(nn.Module):
             "embedding": back_embedding,
         }
         if self.arm == "same_sensor_ssl":
-            pooled = F.adaptive_avg_pool1d(back_sequence, 25).transpose(1, 2).reshape(back.shape[0], -1)
+            pooled = (
+                F.adaptive_avg_pool1d(back_sequence, 25).transpose(1, 2).reshape(back.shape[0], -1)
+            )
             output["reconstruction"] = self.reconstruction(back_embedding)
             output["target"] = pooled
         elif self.arm in {
@@ -247,7 +276,9 @@ class SageModel(nn.Module):
         return output
 
 
-def _participant_weights(labels: np.ndarray, participants: np.ndarray, train_indices: np.ndarray) -> np.ndarray:
+def _participant_weights(
+    labels: np.ndarray, participants: np.ndarray, train_indices: np.ndarray
+) -> np.ndarray:
     values = np.zeros(train_indices.size, dtype=np.float32)
     selected_labels = labels[train_indices]
     selected_participants = participants[train_indices]
@@ -261,7 +292,9 @@ def _participant_weights(labels: np.ndarray, participants: np.ndarray, train_ind
     return values
 
 
-def _standardize(train: np.ndarray, other: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def _standardize(
+    train: np.ndarray, other: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     mean = train.mean(axis=(0, 1), keepdims=True)
     scale = train.std(axis=(0, 1), keepdims=True)
     scale = np.where(scale < 1.0e-4, 1.0, scale)
@@ -288,7 +321,9 @@ def _contrastive_loss(embedding: Tensor, labels: Tensor) -> Tensor:
         negatives = similarity[index][labels == 0]
         if positives.numel() <= 1 or negatives.numel() == 0:
             continue
-        positive = positives[positives < 0.999].mean() if (positives < 0.999).any() else positives.mean()
+        positive = (
+            positives[positives < 0.999].mean() if (positives < 0.999).any() else positives.mean()
+        )
         negative = negatives.max()
         losses.append(F.relu(0.20 - positive + negative))
     return torch.stack(losses).mean() if losses else embedding.new_zeros(())
@@ -302,7 +337,9 @@ def _fit_fold(
     seed: int,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     _seed_everything(seed)
-    back_train, back_test, mean, scale = _standardize(arrays["back"][train_indices], arrays["back"][test_indices])
+    back_train, back_test, mean, scale = _standardize(
+        arrays["back"][train_indices], arrays["back"][test_indices]
+    )
     thigh_train = (arrays["thigh"][train_indices] - mean) / scale
     labels_train = arrays["labels"][train_indices]
     weights = _participant_weights(arrays["labels"], arrays["participants"], train_indices)
@@ -328,27 +365,49 @@ def _fit_fold(
             raw_back = back_train_tensor[batch]
             masked_back, _mask = _mask_batch(raw_back, generator)
             model_input = raw_back if model.arm == "supervised_temporal" else masked_back
-            output = model(model_input, thigh_train_tensor[batch] if model.thigh_encoder is not None else None)
+            output = model(
+                model_input, thigh_train_tensor[batch] if model.thigh_encoder is not None else None
+            )
             ce = F.cross_entropy(output["logits"], labels_tensor[batch], reduction="none")
             loss = (ce * weights_tensor[batch]).mean()
             if model.thigh_encoder is not None:
-                reconstruction = F.mse_loss(output["reconstruction"], output["target"], reduction="none").mean(dim=1)
+                reconstruction = F.mse_loss(
+                    output["reconstruction"], output["target"], reduction="none"
+                ).mean(dim=1)
                 loss = loss + 0.25 * reconstruction.mean()
                 if "thigh_embedding" in output:
-                    loss = loss + 0.10 * (1.0 - F.cosine_similarity(output["embedding"], output["thigh_embedding"], dim=1)).mean()
+                    loss = (
+                        loss
+                        + 0.10
+                        * (
+                            1.0
+                            - F.cosine_similarity(
+                                output["embedding"], output["thigh_embedding"], dim=1
+                            )
+                        ).mean()
+                    )
                 if model.arm in {"paired_distill", "paired_distill_contrastive"}:
                     teacher_logits = output["thigh_logits"]
                     teacher_loss = F.cross_entropy(teacher_logits, labels_tensor[batch])
                     temperature = 2.0
-                    distillation = F.kl_div(
-                        F.log_softmax(output["logits"] / temperature, dim=1),
-                        F.softmax(teacher_logits.detach() / temperature, dim=1),
-                        reduction="batchmean",
-                    ) * temperature**2
+                    distillation = (
+                        F.kl_div(
+                            F.log_softmax(output["logits"] / temperature, dim=1),
+                            F.softmax(teacher_logits.detach() / temperature, dim=1),
+                            reduction="batchmean",
+                        )
+                        * temperature**2
+                    )
                     loss = loss + 0.50 * teacher_loss + 0.25 * distillation
             if model.arm == "same_sensor_ssl":
-                target = F.adaptive_avg_pool1d(raw_back, 25).transpose(1, 2).reshape(raw_back.shape[0], -1)
-                reconstruction = F.mse_loss(output["reconstruction"], target, reduction="none").mean(dim=1)
+                target = (
+                    F.adaptive_avg_pool1d(raw_back, 25)
+                    .transpose(1, 2)
+                    .reshape(raw_back.shape[0], -1)
+                )
+                reconstruction = F.mse_loss(
+                    output["reconstruction"], target, reduction="none"
+                ).mean(dim=1)
                 loss = loss + 0.25 * reconstruction.mean()
             if model.arm in {"paired_contrastive", "paired_distill_contrastive"}:
                 loss = loss + 0.15 * _contrastive_loss(output["embedding"], labels_tensor[batch])
@@ -363,9 +422,13 @@ def _fit_fold(
     with torch.inference_mode():
         probabilities: list[np.ndarray] = []
         for start in range(0, len(test_indices), BATCH_SIZE):
-            batch_back = torch.from_numpy(back_test[start : start + BATCH_SIZE]).to(DEVICE).transpose(1, 2)
+            batch_back = (
+                torch.from_numpy(back_test[start : start + BATCH_SIZE]).to(DEVICE).transpose(1, 2)
+            )
             output = model(batch_back, None)
-            probabilities.append(torch.softmax(output["logits"], dim=1).cpu().numpy().astype(np.float64))
+            probabilities.append(
+                torch.softmax(output["logits"], dim=1).cpu().numpy().astype(np.float64)
+            )
     report = classification_report(
         arrays["labels"][test_indices],
         np.vstack(probabilities),
@@ -388,7 +451,12 @@ def _fit_fold(
     }
 
 
-def _aggregate_reports(reports: list[dict[str, Any]], arrays: dict[str, np.ndarray], test_indices: np.ndarray, probability: np.ndarray) -> dict[str, Any]:
+def _aggregate_reports(
+    reports: list[dict[str, Any]],
+    arrays: dict[str, np.ndarray],
+    test_indices: np.ndarray,
+    probability: np.ndarray,
+) -> dict[str, Any]:
     report = classification_report(
         arrays["labels"][test_indices],
         probability,
@@ -401,8 +469,13 @@ def _aggregate_reports(reports: list[dict[str, Any]], arrays: dict[str, np.ndarr
 def _participant_contrast(
     control_report: dict[str, Any], candidate_report: dict[str, Any]
 ) -> dict[str, Any]:
-    control = {str(row["participant_id"]): float(row["macro_f1"]) for row in control_report["participants"]}
-    candidate = {str(row["participant_id"]): float(row["macro_f1"]) for row in candidate_report["participants"]}
+    control = {
+        str(row["participant_id"]): float(row["macro_f1"]) for row in control_report["participants"]
+    }
+    candidate = {
+        str(row["participant_id"]): float(row["macro_f1"])
+        for row in candidate_report["participants"]
+    }
     common = sorted(set(control) & set(candidate))
     differences = np.asarray([candidate[item] - control[item] for item in common], dtype=np.float64)
     rng = np.random.default_rng(1729)
@@ -415,7 +488,9 @@ def _participant_contrast(
         "harms": int(np.sum(differences < 0.0)),
         "ties": int(np.sum(differences == 0.0)),
         "worst_difference": float(differences.min()),
-        "participants": {item: float(value) for item, value in zip(common, differences, strict=True)},
+        "participants": {
+            item: float(value) for item, value in zip(common, differences, strict=True)
+        },
     }
 
 
@@ -470,9 +545,13 @@ def run(
             prediction, record = _fit_fold(arrays, train_indices, test_indices, arm, SEED + fold)
             probabilities[test_indices] = prediction
             record["fold"] = fold
-            record["evaluation_participants"] = [item for item in participants if assignment[item] == fold]
+            record["evaluation_participants"] = [
+                item for item in participants if assignment[item] == fold
+            ]
             fold_records.append(record)
-        aggregate = _aggregate_reports(fold_records, arrays, np.arange(arrays["labels"].size), probabilities)
+        aggregate = _aggregate_reports(
+            fold_records, arrays, np.arange(arrays["labels"].size), probabilities
+        )
         np.savez_compressed(
             output / f"{arm}_predictions.npz",
             window_ids=arrays["window_ids"],
@@ -482,14 +561,23 @@ def run(
         )
         all_results[arm] = aggregate
     controls = {
-        "compact_rf": {"participant_macro_f1": 0.5576350826727572, "standing_recall": 0.38676740861752096},
-        "rich_rf": {"participant_macro_f1": 0.5903696635673075, "standing_recall": 0.3741339491916859},
+        "compact_rf": {
+            "participant_macro_f1": 0.5576350826727572,
+            "standing_recall": 0.38676740861752096,
+        },
+        "rich_rf": {
+            "participant_macro_f1": 0.5903696635673075,
+            "standing_recall": 0.3741339491916859,
+        },
     }
     retained_control = _retained_rich_control()
     for arm in arms:
         candidate_report = all_results[arm]["report"]
         all_results[arm]["contrast_vs_rich_rf"] = {
-            "mean": float(candidate_report["primary"]["mean_participant_macro_f1"] - controls["rich_rf"]["participant_macro_f1"]),
+            "mean": float(
+                candidate_report["primary"]["mean_participant_macro_f1"]
+                - controls["rich_rf"]["participant_macro_f1"]
+            ),
             "standing_recall_gain": float(
                 candidate_report["window_level_diagnostics"]["per_class_recall"]["standing"]
                 - controls["rich_rf"]["standing_recall"]

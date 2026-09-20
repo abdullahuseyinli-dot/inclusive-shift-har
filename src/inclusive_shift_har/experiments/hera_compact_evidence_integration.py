@@ -59,13 +59,20 @@ def _bootstrap(candidate: dict[str, float], reference: dict[str, float]) -> dict
     }
 
 
-def run_integration(*, hera_predictions: Path, compact_predictions: Path, output: Path) -> dict[str, Any]:
+def run_integration(
+    *, hera_predictions: Path, compact_predictions: Path, output: Path
+) -> dict[str, Any]:
     if output.exists():
         raise FileExistsError(f"create-only output already exists: {output}")
     hera = _load(hera_predictions)
     compact = _load(compact_predictions)
     required_hera = {"labels", "participant_ids", "window_ids", "hera_v1_strict_probabilities"}
-    required_compact = {"labels", "participant_ids", "window_ids", "gravity_invariant_probabilities"}
+    required_compact = {
+        "labels",
+        "participant_ids",
+        "window_ids",
+        "gravity_invariant_probabilities",
+    }
     if not required_hera.issubset(hera) or not required_compact.issubset(compact):
         raise ValueError("integration inputs are missing required arrays")
     for key in ("labels", "participant_ids", "window_ids"):
@@ -83,12 +90,25 @@ def run_integration(*, hera_predictions: Path, compact_predictions: Path, output
     )
     integrated = np.asarray((1.0 - ALPHA) * hera_probability + ALPHA * compact_probability)
     started = time.perf_counter()
-    hera_report = classification_report(labels, hera_probability, participants.tolist(), class_names=CLASS_NAMES)
-    compact_report = classification_report(labels, compact_probability, participants.tolist(), class_names=CLASS_NAMES)
-    integrated_report = classification_report(labels, integrated, participants.tolist(), class_names=CLASS_NAMES)
-    hera_people = {str(row["participant_id"]): float(row["macro_f1"]) for row in hera_report["participants"]}
-    integrated_people = {str(row["participant_id"]): float(row["macro_f1"]) for row in integrated_report["participants"]}
-    differences = {person: integrated_people[person] - hera_people[person] for person in hera_people}
+    hera_report = classification_report(
+        labels, hera_probability, participants.tolist(), class_names=CLASS_NAMES
+    )
+    compact_report = classification_report(
+        labels, compact_probability, participants.tolist(), class_names=CLASS_NAMES
+    )
+    integrated_report = classification_report(
+        labels, integrated, participants.tolist(), class_names=CLASS_NAMES
+    )
+    hera_people = {
+        str(row["participant_id"]): float(row["macro_f1"]) for row in hera_report["participants"]
+    }
+    integrated_people = {
+        str(row["participant_id"]): float(row["macro_f1"])
+        for row in integrated_report["participants"]
+    }
+    differences = {
+        person: integrated_people[person] - hera_people[person] for person in hera_people
+    }
     output.mkdir(parents=True)
     np.savez_compressed(
         output / "predictions.npz",
@@ -139,8 +159,16 @@ def run_integration(*, hera_predictions: Path, compact_predictions: Path, output
         "schema_version": "1.0.0",
         "record_kind": "hera_compact_evidence_integration_manifest",
         "artifacts": [
-            {"path": "result.json", "sha256": sha256_file(output / "result.json"), "size_bytes": (output / "result.json").stat().st_size},
-            {"path": "predictions.npz", "sha256": sha256_file(output / "predictions.npz"), "size_bytes": (output / "predictions.npz").stat().st_size},
+            {
+                "path": "result.json",
+                "sha256": sha256_file(output / "result.json"),
+                "size_bytes": (output / "result.json").stat().st_size,
+            },
+            {
+                "path": "predictions.npz",
+                "sha256": sha256_file(output / "predictions.npz"),
+                "size_bytes": (output / "predictions.npz").stat().st_size,
+            },
         ],
     }
     manifest["record_sha256"] = canonical_json_sha256(manifest)
@@ -161,7 +189,15 @@ def main() -> int:
         compact_predictions=args.compact_predictions.resolve(),
         output=args.output.resolve(),
     )
-    print(json.dumps({"status": result["status"], "mean_difference": result["paired_bootstrap_vs_hera"]["mean_difference"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "status": result["status"],
+                "mean_difference": result["paired_bootstrap_vs_hera"]["mean_difference"],
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

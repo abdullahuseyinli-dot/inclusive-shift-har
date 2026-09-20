@@ -146,9 +146,11 @@ def run_followup(
     ):
         if not np.array_equal(left, right):
             raise ValueError(f"{name} are not aligned between caches")
-    if not np.array_equal(cached["labels"], labels) or not np.array_equal(
-        cached["participant_ids"], participants
-    ) or not np.array_equal(cached["window_ids"], windows):
+    if (
+        not np.array_equal(cached["labels"], labels)
+        or not np.array_equal(cached["participant_ids"], participants)
+        or not np.array_equal(cached["window_ids"], windows)
+    ):
         raise ValueError("cached A2 predictions are not aligned by authoritative ids")
     if not np.array_equal(np.unique(labels), np.arange(3, dtype=np.int64)):
         raise ValueError("labels do not use fixed three-class ontology")
@@ -219,7 +221,9 @@ def run_followup(
         str(row["participant_id"]): float(row["macro_f1"])
         for row in reference_report["participants"]
     }
-    differences = {person: candidate_people[person] - reference_people[person] for person in candidate_people}
+    differences = {
+        person: candidate_people[person] - reference_people[person] for person in candidate_people
+    }
     output.mkdir(parents=True)
     np.savez_compressed(
         output / "predictions.npz",
@@ -281,8 +285,16 @@ def run_followup(
         "schema_version": "1.0.0",
         "record_kind": "gravity_invariant_followup_manifest",
         "artifacts": [
-            {"path": "result.json", "sha256": sha256_file(output / "result.json"), "size_bytes": (output / "result.json").stat().st_size},
-            {"path": "predictions.npz", "sha256": sha256_file(output / "predictions.npz"), "size_bytes": (output / "predictions.npz").stat().st_size},
+            {
+                "path": "result.json",
+                "sha256": sha256_file(output / "result.json"),
+                "size_bytes": (output / "result.json").stat().st_size,
+            },
+            {
+                "path": "predictions.npz",
+                "sha256": sha256_file(output / "predictions.npz"),
+                "size_bytes": (output / "predictions.npz").stat().st_size,
+            },
         ],
     }
     manifest["record_sha256"] = canonical_json_sha256(manifest)
@@ -307,7 +319,16 @@ def main() -> int:
         output=args.output.resolve(),
         source_commit=args.source_commit,
     )
-    print(json.dumps({"status": result["status"], "mean_difference": result["paired_bootstrap"]["mean_difference"], "runtime_seconds": result["runtime_seconds"]}, indent=2))
+    print(
+        json.dumps(
+            {
+                "status": result["status"],
+                "mean_difference": result["paired_bootstrap"]["mean_difference"],
+                "runtime_seconds": result["runtime_seconds"],
+            },
+            indent=2,
+        )
+    )
     return 0
 
 

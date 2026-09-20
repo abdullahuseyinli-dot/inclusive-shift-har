@@ -2,3 +2,5 @@
 e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:183
 e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:190
 e0066c065e47cafa2706a4a813fc5f511a700d18:src/inclusive_shift_har/models/legacy_models.py:generic-api-key:208
+# Historical probability-array name, not a credential; exact commit/path/line only.
+da0ffe18f9d1d0854cf5b6c97a8389b6f96c2a0c:configs/experiments/prompted_posture_calibration_v1.yaml:generic-api-key:48

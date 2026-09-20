@@ -1,4 +1,4 @@
-﻿"""Apply a fixed labelled semantic gauge to frozen HERA source predictions.
+"""Apply a fixed labelled semantic gauge to frozen HERA source predictions.
 
 The runner is intentionally prediction-only: it cannot load raw or target data and it
 does not fit a new classifier. Query selection is label-free; labels are consumed only
@@ -52,7 +52,10 @@ def _load_config(path: Path) -> dict[str, Any]:
     if config.get("experiment_id") != "inclusivehar-hera-posture-gauge-v1":
         raise ValueError("unexpected HERA posture-gauge experiment ID")
     method = _mapping(config.get("method"), name="method")
-    if tuple(int(item) for item in method.get("maximum_queries_per_participant", [])) != QUERY_BUDGETS:
+    if (
+        tuple(int(item) for item in method.get("maximum_queries_per_participant", []))
+        != QUERY_BUDGETS
+    ):
         raise ValueError("query budget drift")
     if not math.isclose(float(method.get("minimum_absolute_log_bayes_factor", -1.0)), THRESHOLD):
         raise ValueError("Bayes threshold drift")
@@ -82,18 +85,26 @@ def _load_config(path: Path) -> dict[str, Any]:
     return config
 
 
-def _load_prediction_artifact(path: Path, *, probability_key: str) -> tuple[FloatArray, IntArray, StringArray, StringArray]:
+def _load_prediction_artifact(
+    path: Path, *, probability_key: str
+) -> tuple[FloatArray, IntArray, StringArray, StringArray]:
     with np.load(path, allow_pickle=False) as archive:
         required = {probability_key, "labels", "participant_ids", "window_ids"}
         if not required.issubset(archive.files):
-            raise ValueError(f"prediction artifact is missing {sorted(required - set(archive.files))}")
+            raise ValueError(
+                f"prediction artifact is missing {sorted(required - set(archive.files))}"
+            )
         probabilities = np.asarray(archive[probability_key], dtype=np.float64)
         labels = np.asarray(archive["labels"], dtype=np.int64)
         participants = np.asarray(archive["participant_ids"], dtype=np.str_)
         windows = np.asarray(archive["window_ids"], dtype=np.str_)
     if probabilities.ndim != 2 or probabilities.shape[1] != 3:
         raise ValueError("HERA probabilities must have shape [n,3]")
-    if labels.shape != (probabilities.shape[0],) or participants.shape != labels.shape or windows.shape != labels.shape:
+    if (
+        labels.shape != (probabilities.shape[0],)
+        or participants.shape != labels.shape
+        or windows.shape != labels.shape
+    ):
         raise ValueError("HERA prediction arrays are not aligned")
     if not np.isfinite(probabilities).all() or np.any(probabilities < 0.0):
         raise ValueError("HERA probabilities must be finite and non-negative")
@@ -117,16 +128,25 @@ def _query_order(
 ) -> list[int]:
     stationary = probabilities[:, 1] + probabilities[:, 2]
     sitting = probabilities[:, 1] / np.maximum(stationary, 1e-12)
-    utility = stationary * np.abs(np.log(np.maximum(sitting, 1e-12)) - np.log(np.maximum(1.0 - sitting, 1e-12)))
+    utility = stationary * np.abs(
+        np.log(np.maximum(sitting, 1e-12)) - np.log(np.maximum(1.0 - sitting, 1e-12))
+    )
     eligible = np.flatnonzero(stationary >= MIN_STATIONARY).tolist()
     fallback = np.flatnonzero(stationary < MIN_STATIONARY).tolist()
     if strategy == "active_information":
+
         def active_key(index: int) -> tuple[float, str]:
             return (-float(utility[index]), str(windows[index]))
+
         return sorted(eligible, key=active_key) + sorted(fallback, key=active_key)
     elif strategy == "random_hash":
+
         def random_key(index: int) -> tuple[str, str]:
-            return (hashlib.sha256(f"{seed}|{windows[index]}".encode()).hexdigest(), str(windows[index]))
+            return (
+                hashlib.sha256(f"{seed}|{windows[index]}".encode()).hexdigest(),
+                str(windows[index]),
+            )
+
         return sorted(eligible, key=random_key) + sorted(fallback, key=random_key)
     else:
         raise ValueError(f"unknown query strategy {strategy!r}")
@@ -163,7 +183,10 @@ def _participant_gauge(
         increment = 0.0
         if observed in (1, 2):
             other = 2 if observed == 1 else 1
-            increment = float(np.log(max(probabilities[index, other], 1e-12)) - np.log(max(probabilities[index, observed], 1e-12)))
+            increment = float(
+                np.log(max(probabilities[index, other], 1e-12))
+                - np.log(max(probabilities[index, observed], 1e-12))
+            )
             log_bayes += increment
         records.append(
             {
@@ -181,16 +204,21 @@ def _participant_gauge(
         hard[:, [1, 2]] = hard[:, [2, 1]]
     soft_posterior = float(1.0 / (1.0 + np.exp(-np.clip(log_bayes, -40.0, 40.0))))
     soft = _soft_adjust(probabilities, soft_posterior)
-    return hard, soft, queried, {
-        "strategy": strategy,
-        "maximum_queries": maximum_queries,
-        "query_count": int(queried.sum()),
-        "decision": "swap_sitting_standing" if hard_swap else "retain_identity",
-        "threshold_reached": abs(log_bayes) >= THRESHOLD,
-        "log_bayes_swap_over_identity": log_bayes,
-        "soft_posterior_swap_probability": soft_posterior,
-        "queries": records,
-    }
+    return (
+        hard,
+        soft,
+        queried,
+        {
+            "strategy": strategy,
+            "maximum_queries": maximum_queries,
+            "query_count": int(queried.sum()),
+            "decision": "swap_sitting_standing" if hard_swap else "retain_identity",
+            "threshold_reached": abs(log_bayes) >= THRESHOLD,
+            "log_bayes_swap_over_identity": log_bayes,
+            "soft_posterior_swap_probability": soft_posterior,
+            "queries": records,
+        },
+    )
 
 
 def _apply_strategy(
@@ -210,7 +238,12 @@ def _apply_strategy(
     for participant in PARTICIPANTS:
         mask = participants == participant
         hard_p, soft_p, participant_queried, decision = _participant_gauge(
-            probabilities[mask], labels[mask], windows[mask], maximum_queries=maximum_queries, strategy=strategy, seed=seed + int(participant) * 1009
+            probabilities[mask],
+            labels[mask],
+            windows[mask],
+            maximum_queries=maximum_queries,
+            strategy=strategy,
+            seed=seed + int(participant) * 1009,
         )
         hard[mask] = hard_p
         soft[mask] = soft_p
@@ -221,19 +254,30 @@ def _apply_strategy(
     return hard, soft, queried, decisions
 
 
-def _select_sar_anchors(labels: IntArray, participants: StringArray, windows: StringArray) -> BoolArray:
+def _select_sar_anchors(
+    labels: IntArray, participants: StringArray, windows: StringArray
+) -> BoolArray:
     selected = np.zeros(labels.size, dtype=np.bool_)
     for participant in PARTICIPANTS:
         for class_index in (1, 2):
-            candidates = np.flatnonzero((participants == participant) & (labels == class_index)).tolist()
+            candidates = np.flatnonzero(
+                (participants == participant) & (labels == class_index)
+            ).tolist()
             if len(candidates) <= 1:
                 raise ValueError("SAR anchor budget leaves no posture evaluation rows")
-            ranked = sorted(candidates, key=lambda index: hashlib.sha256(f"{SAR_SEED}|{participant}|{windows[index]}".encode()).hexdigest())
+            ranked = sorted(
+                candidates,
+                key=lambda index: hashlib.sha256(
+                    f"{SAR_SEED}|{participant}|{windows[index]}".encode()
+                ).hexdigest(),
+            )
             selected[ranked[0]] = True
     return selected
 
 
-def _apply_sar(probabilities: FloatArray, labels: IntArray, participants: StringArray, windows: StringArray) -> tuple[FloatArray, BoolArray, list[dict[str, Any]]]:
+def _apply_sar(
+    probabilities: FloatArray, labels: IntArray, participants: StringArray, windows: StringArray
+) -> tuple[FloatArray, BoolArray, list[dict[str, Any]]]:
     adjusted = probabilities.copy()
     selected = _select_sar_anchors(labels, participants, windows)
     decisions: list[dict[str, Any]] = []
@@ -253,12 +297,25 @@ def _apply_sar(probabilities: FloatArray, labels: IntArray, participants: String
             adjusted[np.ix_(participant_rows, posture_columns)] = adjusted[
                 np.ix_(participant_rows, swapped_columns)
             ]
-        decisions.append({"participant_id": participant, "anchor_count": int(rows.size), "anchor_window_ids": windows[rows].tolist(), "decision": "swap_sitting_standing" if log_bayes >= THRESHOLD else "retain_identity", "swap_log_bayes_factor": log_bayes})
+        decisions.append(
+            {
+                "participant_id": participant,
+                "anchor_count": int(rows.size),
+                "anchor_window_ids": windows[rows].tolist(),
+                "decision": "swap_sitting_standing"
+                if log_bayes >= THRESHOLD
+                else "retain_identity",
+                "swap_log_bayes_factor": log_bayes,
+            }
+        )
     return adjusted, selected, decisions
 
 
 def _participant_values(report: dict[str, Any]) -> dict[str, float]:
-    return {str(row["participant_id"]): float(row["macro_f1"]) for row in cast(list[dict[str, Any]], report["participants"])}
+    return {
+        str(row["participant_id"]): float(row["macro_f1"])
+        for row in cast(list[dict[str, Any]], report["participants"])
+    }
 
 
 def _bootstrap(delta: dict[str, float]) -> dict[str, Any]:
@@ -267,18 +324,34 @@ def _bootstrap(delta: dict[str, float]) -> dict[str, Any]:
     rng = np.random.default_rng(BOOTSTRAP_SEED)
     draws = rng.integers(0, values.size, size=(BOOTSTRAP_RESAMPLES, values.size))
     means = values[draws].mean(axis=1)
-    return {"mean_difference": float(values.mean()), "lower": float(np.quantile(means, 0.025)), "upper": float(np.quantile(means, 0.975)), "resamples": BOOTSTRAP_RESAMPLES, "seed": BOOTSTRAP_SEED}
+    return {
+        "mean_difference": float(values.mean()),
+        "lower": float(np.quantile(means, 0.025)),
+        "upper": float(np.quantile(means, 0.975)),
+        "resamples": BOOTSTRAP_RESAMPLES,
+        "seed": BOOTSTRAP_SEED,
+    }
 
 
-def _report(labels: IntArray, probabilities: FloatArray, participants: StringArray, mask: BoolArray) -> dict[str, Any]:
-    return classification_report(labels[mask], probabilities[mask], participants[mask].tolist(), class_names=CLASS_NAMES)
+def _report(
+    labels: IntArray, probabilities: FloatArray, participants: StringArray, mask: BoolArray
+) -> dict[str, Any]:
+    return classification_report(
+        labels[mask], probabilities[mask], participants[mask].tolist(), class_names=CLASS_NAMES
+    )
 
 
 def _comparison(candidate: dict[str, Any], baseline: dict[str, Any]) -> dict[str, Any]:
     left = _participant_values(candidate)
     right = _participant_values(baseline)
     delta = {name: left[name] - right[name] for name in left}
-    return {"paired_participant_macro_f1_difference": delta, "participant_wins": int(sum(value > 0.0 for value in delta.values())), "participant_harms": int(sum(value < 0.0 for value in delta.values())), "participant_ties": int(sum(value == 0.0 for value in delta.values())), "paired_bootstrap": _bootstrap(delta)}
+    return {
+        "paired_participant_macro_f1_difference": delta,
+        "participant_wins": int(sum(value > 0.0 for value in delta.values())),
+        "participant_harms": int(sum(value < 0.0 for value in delta.values())),
+        "participant_ties": int(sum(value == 0.0 for value in delta.values())),
+        "paired_bootstrap": _bootstrap(delta),
+    }
 
 
 def run_hera_posture_gauge(*, config_path: Path, output_directory: Path) -> dict[str, Any]:
@@ -287,28 +360,86 @@ def run_hera_posture_gauge(*, config_path: Path, output_directory: Path) -> dict
     config = _load_config(config_path)
     input_cfg = _mapping(config.get("input"), name="input")
     prediction_path = Path(str(input_cfg["prediction_artifact"])).resolve()
-    probabilities, labels, participants, windows = _load_prediction_artifact(prediction_path, probability_key=str(input_cfg["probability_key"]))
+    probabilities, labels, participants, windows = _load_prediction_artifact(
+        prediction_path, probability_key=str(input_cfg["probability_key"])
+    )
     output_directory.mkdir(parents=True)
     started = time.perf_counter()
     full_report = _report(labels, probabilities, participants, np.ones(labels.size, dtype=np.bool_))
-    prediction_payload: dict[str, NDArray[Any]] = {"labels": labels, "participant_ids": participants, "window_ids": windows, "hera_v1_strict_probabilities": probabilities}
+    prediction_payload: dict[str, NDArray[Any]] = {
+        "labels": labels,
+        "participant_ids": participants,
+        "window_ids": windows,
+        "hera_v1_strict_probabilities": probabilities,
+    }
     budget_records: list[dict[str, Any]] = []
     for budget in QUERY_BUDGETS:
-        active_hard, active_soft, active_mask, active_decisions = _apply_strategy(probabilities, labels, participants, windows, maximum_queries=budget, strategy="active_information", seed=ACTIVE_SEED)
-        random_hard, random_soft, random_mask, random_decisions = _apply_strategy(probabilities, labels, participants, windows, maximum_queries=budget, strategy="random_hash", seed=ACTIVE_SEED)
+        active_hard, active_soft, active_mask, active_decisions = _apply_strategy(
+            probabilities,
+            labels,
+            participants,
+            windows,
+            maximum_queries=budget,
+            strategy="active_information",
+            seed=ACTIVE_SEED,
+        )
+        random_hard, random_soft, random_mask, random_decisions = _apply_strategy(
+            probabilities,
+            labels,
+            participants,
+            windows,
+            maximum_queries=budget,
+            strategy="random_hash",
+            seed=ACTIVE_SEED,
+        )
         active_base = _report(labels, probabilities, participants, ~active_mask)
         random_base = _report(labels, probabilities, participants, ~random_mask)
         active_hard_report = _report(labels, active_hard, participants, ~active_mask)
         active_soft_report = _report(labels, active_soft, participants, ~active_mask)
         random_hard_report = _report(labels, random_hard, participants, ~random_mask)
         random_soft_report = _report(labels, random_soft, participants, ~random_mask)
-        budget_records.append({
-            "maximum_queries_per_participant": budget,
-            "active": {"total_query_count": int(active_mask.sum()), "decision_counts": {name: sum(item["decision"] == name for item in active_decisions) for name in ("retain_identity", "swap_sitting_standing")}, "decisions": active_decisions, "same_remaining_window_report": active_base, "hard_report": active_hard_report, "soft_report": active_soft_report, "hard_comparison": _comparison(active_hard_report, active_base), "soft_comparison": _comparison(active_soft_report, active_base)},
-            "random": {"total_query_count": int(random_mask.sum()), "decision_counts": {name: sum(item["decision"] == name for item in random_decisions) for name in ("retain_identity", "swap_sitting_standing")}, "decisions": random_decisions, "same_remaining_window_report": random_base, "hard_report": random_hard_report, "soft_report": random_soft_report, "hard_comparison": _comparison(random_hard_report, random_base), "soft_comparison": _comparison(random_soft_report, random_base)},
-        })
+        budget_records.append(
+            {
+                "maximum_queries_per_participant": budget,
+                "active": {
+                    "total_query_count": int(active_mask.sum()),
+                    "decision_counts": {
+                        name: sum(item["decision"] == name for item in active_decisions)
+                        for name in ("retain_identity", "swap_sitting_standing")
+                    },
+                    "decisions": active_decisions,
+                    "same_remaining_window_report": active_base,
+                    "hard_report": active_hard_report,
+                    "soft_report": active_soft_report,
+                    "hard_comparison": _comparison(active_hard_report, active_base),
+                    "soft_comparison": _comparison(active_soft_report, active_base),
+                },
+                "random": {
+                    "total_query_count": int(random_mask.sum()),
+                    "decision_counts": {
+                        name: sum(item["decision"] == name for item in random_decisions)
+                        for name in ("retain_identity", "swap_sitting_standing")
+                    },
+                    "decisions": random_decisions,
+                    "same_remaining_window_report": random_base,
+                    "hard_report": random_hard_report,
+                    "soft_report": random_soft_report,
+                    "hard_comparison": _comparison(random_hard_report, random_base),
+                    "soft_comparison": _comparison(random_soft_report, random_base),
+                },
+            }
+        )
         prefix = f"budget_{budget}"
-        prediction_payload.update({f"active_hard_{prefix}": active_hard, f"active_soft_{prefix}": active_soft, f"active_query_mask_{prefix}": active_mask, f"random_hard_{prefix}": random_hard, f"random_soft_{prefix}": random_soft, f"random_query_mask_{prefix}": random_mask})
+        prediction_payload.update(
+            {
+                f"active_hard_{prefix}": active_hard,
+                f"active_soft_{prefix}": active_soft,
+                f"active_query_mask_{prefix}": active_mask,
+                f"random_hard_{prefix}": random_hard,
+                f"random_soft_{prefix}": random_soft,
+                f"random_query_mask_{prefix}": random_mask,
+            }
+        )
     sar, sar_mask, sar_decisions = _apply_sar(probabilities, labels, participants, windows)
     sar_base = _report(labels, probabilities, participants, ~sar_mask)
     sar_report = _report(labels, sar, participants, ~sar_mask)
@@ -321,13 +452,34 @@ def run_hera_posture_gauge(*, config_path: Path, output_directory: Path) -> dict
         "evidence_status": "reused_source_development_not_independent",
         "human_performance_claim": False,
         "claim_scope": "labelled participant-specific sitting/standing semantic calibration",
-        "input": {"path": prediction_path.as_posix(), "sha256": sha256_file(prediction_path), "probability_key": str(input_cfg["probability_key"])},
+        "input": {
+            "path": prediction_path.as_posix(),
+            "sha256": sha256_file(prediction_path),
+            "probability_key": str(input_cfg["probability_key"]),
+        },
         "config": {"path": config_path.resolve().as_posix(), "sha256": sha256_file(config_path)},
-        "implementation": {"path": Path(__file__).resolve().as_posix(), "sha256": sha256_file(Path(__file__).resolve())},
+        "implementation": {
+            "path": Path(__file__).resolve().as_posix(),
+            "sha256": sha256_file(Path(__file__).resolve()),
+        },
         "full_frozen_hera_report": full_report,
         "budgets": budget_records,
-        "fixed_sar_1_plus_1": {"total_query_count": int(sar_mask.sum()), "decision_counts": {name: sum(item["decision"] == name for item in sar_decisions) for name in ("retain_identity", "swap_sitting_standing")}, "decisions": sar_decisions, "same_remaining_window_report": sar_base, "hard_report": sar_report, "comparison": _comparison(sar_report, sar_base)},
-        "temporal_stage": {"status": "blocked", "reason": "authoritative contiguous source session/trial order is unavailable in the released prediction artifact", "no_temporal_fit_launched": True},
+        "fixed_sar_1_plus_1": {
+            "total_query_count": int(sar_mask.sum()),
+            "decision_counts": {
+                name: sum(item["decision"] == name for item in sar_decisions)
+                for name in ("retain_identity", "swap_sitting_standing")
+            },
+            "decisions": sar_decisions,
+            "same_remaining_window_report": sar_base,
+            "hard_report": sar_report,
+            "comparison": _comparison(sar_report, sar_base),
+        },
+        "temporal_stage": {
+            "status": "blocked",
+            "reason": "authoritative contiguous source session/trial order is unavailable in the released prediction artifact",
+            "no_temporal_fit_launched": True,
+        },
         "query_labels_used_only_after_query_selection": True,
         "query_windows_excluded_from_evaluation": True,
         "zero_shot_claim_allowed": False,
@@ -339,12 +491,30 @@ def run_hera_posture_gauge(*, config_path: Path, output_directory: Path) -> dict
     prediction_path_out = output_directory / "predictions.npz"
     with prediction_path_out.open("xb") as stream:
         np.savez_compressed(stream, **cast(dict[str, Any], prediction_payload))
-    result["predictions"] = {"path": prediction_path_out.as_posix(), "sha256": sha256_file(prediction_path_out)}
+    result["predictions"] = {
+        "path": prediction_path_out.as_posix(),
+        "sha256": sha256_file(prediction_path_out),
+    }
     result["record_sha256"] = canonical_json_sha256(result)
     with (output_directory / "result.json").open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(result, stream, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False)
         stream.write("\n")
-    manifest: dict[str, Any] = {"schema_version": "1.0.0", "record_kind": "hera_posture_gauge_manifest", "artifacts": [{"path": "result.json", "sha256": sha256_file(output_directory / "result.json"), "size_bytes": (output_directory / "result.json").stat().st_size}, {"path": "predictions.npz", "sha256": sha256_file(prediction_path_out), "size_bytes": prediction_path_out.stat().st_size}]}
+    manifest: dict[str, Any] = {
+        "schema_version": "1.0.0",
+        "record_kind": "hera_posture_gauge_manifest",
+        "artifacts": [
+            {
+                "path": "result.json",
+                "sha256": sha256_file(output_directory / "result.json"),
+                "size_bytes": (output_directory / "result.json").stat().st_size,
+            },
+            {
+                "path": "predictions.npz",
+                "sha256": sha256_file(prediction_path_out),
+                "size_bytes": prediction_path_out.stat().st_size,
+            },
+        ],
+    }
     manifest["record_sha256"] = canonical_json_sha256(manifest)
     with (output_directory / "manifest.json").open("x", encoding="utf-8", newline="\n") as stream:
         json.dump(manifest, stream, ensure_ascii=False, sort_keys=True, indent=2, allow_nan=False)
@@ -357,8 +527,27 @@ def main() -> int:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output-directory", type=Path, required=True)
     args = parser.parse_args()
-    result = run_hera_posture_gauge(config_path=args.config.resolve(), output_directory=args.output_directory.resolve())
-    summary = {"status": result["status"], "full_mean": result["full_frozen_hera_report"]["primary"]["mean_participant_macro_f1"], "active": [{"budget": item["maximum_queries_per_participant"], "queries": item["active"]["total_query_count"], "hard_delta": item["active"]["hard_comparison"]["paired_bootstrap"]["mean_difference"], "soft_delta": item["active"]["soft_comparison"]["paired_bootstrap"]["mean_difference"]} for item in result["budgets"]], "record_sha256": result["record_sha256"]}
+    result = run_hera_posture_gauge(
+        config_path=args.config.resolve(), output_directory=args.output_directory.resolve()
+    )
+    summary = {
+        "status": result["status"],
+        "full_mean": result["full_frozen_hera_report"]["primary"]["mean_participant_macro_f1"],
+        "active": [
+            {
+                "budget": item["maximum_queries_per_participant"],
+                "queries": item["active"]["total_query_count"],
+                "hard_delta": item["active"]["hard_comparison"]["paired_bootstrap"][
+                    "mean_difference"
+                ],
+                "soft_delta": item["active"]["soft_comparison"]["paired_bootstrap"][
+                    "mean_difference"
+                ],
+            }
+            for item in result["budgets"]
+        ],
+        "record_sha256": result["record_sha256"],
+    }
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
 

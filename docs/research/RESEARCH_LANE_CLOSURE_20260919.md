@@ -10,25 +10,25 @@ HARTH architecture tuning; retain HARTH as external mechanism evidence.
 |---|---|---|---|
 | Original InclusiveHAR, zero-query | CTGR is the robust matched improvement; HERA-v1 is the highest source-development point estimate | freeze as a new-cohort candidate | independent superiority or confirmation |
 | HERA labelled semantic gauge | A small labelled query can detect a P10-like posture-column ambiguity | retain as separate personalization diagnostic | a zero-query HERA gain |
-| HARTH binary sitting/standing | Right-thigh acceleration makes posture observable; lower-back acceleration does not | retain as sensor-placement evidence; close back-only tuning | that HERA will reproduce HARTH results or that a synthetic gyro repairs placement information |
+| HARTH binary sitting/standing | Right-thigh acceleration supports strong posture classification; lower-back acceleration is substantially weaker under the evaluated protocol | retain as sensor-placement evidence; close back-only tuning | that HERA will reproduce HARTH results, lower-back recognition is impossible, or a synthetic gyro supplies measured motion |
 | HARTH published 9/12-class replication | The project fused RF is competitive but below executed published XGBoost under this diagnostic contract | retain as reproducible external comparator | an all-published-method superiority claim |
 | Same-attachment directional reference | Algebra and software contracts are qualified on fixtures | retain as a prospective mechanism | human performance or novelty evidence before recordings |
 
 ## HARTH closure record
 
-The completed HARTH binary endpoint separates the information problem from the
-estimator problem. On the identical 22-participant binary protocol, lower-back
+The completed HARTH binary endpoint provides a matched sensor-placement comparison.
+On the identical 22-participant binary protocol, lower-back
 rich RF achieved 0.59037 participant macro-F1, while right-thigh rich RF achieved
-0.97261. Fusing the two achieved 0.97198, so the back channel did not add useful
-information to the thigh result. The train-only confidence gate reached 0.86263
+0.97261. Fusing the two achieved 0.97198, with no measured benefit from adding
+the back channel in this experiment. The train-only confidence gate reached 0.86263
 but traded precision for standing recall; the thigh-only model is the simpler
 survivor.
 
 Back-only extensions did not remove this bottleneck:
 
 - SAGE-X neural and self-supervised arms reached roughly 0.396--0.464
-  participant macro-F1 and shifted the standing/sitting boundary rather than
-  creating discriminative information.
+  participant macro-F1 without a reliable improvement in the standing/sitting
+  distinction.
 - Gravity geometry was neutral (0.58904 versus 0.59037); prior correction was
   harmful (0.44531); the temporal decoder reached 0.61600 but reduced standing
   recall and failed its uncertainty and harm gates.

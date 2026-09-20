@@ -1,11 +1,32 @@
 # Paper workspace
 
-The paper-ready structure and current v1 evidence narrative are in [`OUTLINE.md`](OUTLINE.md). The post-analysis source-development and external-evaluation extension is in [`FUSE_REFRAME_V2_ADDENDUM.md`](FUSE_REFRAME_V2_ADDENDUM.md). Machine-readable tables remain under `results/`; the paper workspace contains no copied raw data or large model artifacts.
+The current **[research report](../docs/RESEARCH_REPORT.md)** presents the
+methods, architecture, comparable results, ablations, limitations, and evidence
+links in scientific reading order. It is a repository report, not a claim of
+peer review or a submitted manuscript.
 
-Working title:
+**Files in this directory:** historical working drafts.
 
-> InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for Ability-Associated Population Shift in Smartphone Activity Recognition
+[`OUTLINE.md`](OUTLINE.md) records the original locked-benchmark narrative.
+[`FUSE_REFRAME_V2_ADDENDUM.md`](FUSE_REFRAME_V2_ADDENDUM.md) records a later
+source-development extension. Both predate the final CTGR/HERA, corrected AICOS,
+HARTH, and routing evidence and remain unchanged as part of the research history.
 
-The benchmark is the primary contribution. MoRe-HAR is retained as an unsupported secondary hypothesis. The released cohort label is not a direct measure of physical ability, and missing trial/timestamp identifiers prevent trial-boundary reconstruction. Completed few-person, stress, within-group, efficiency, signal-sensitivity, and qualified CCIL/BPD evidence is post-confirmatory. The paper should therefore center the participant-exclusive protocol, the ten-participant uncertainty, the effective DANN/CORAL tie, and the negative MoRe-HAR result.
+The current claim authority is the repository
+[evidence index](../docs/EVIDENCE_INDEX.md), read with the
+[supersession map](../docs/EVIDENCE_SUPERSESSION.md) and
+[project status](../docs/PROJECT_STATUS.md). A future manuscript must rebuild its
+tables and narrative from those records; it must not treat these drafts as the
+latest result inventory.
 
-FuSE/ReFrame v2 does not replace that conclusion. Its RMRP method improves strict source-development mean macro-F1 from 0.8292 to 0.8379 and worst-participant macro-F1 from 0.4985 to 0.5494, but misses the recorded improvement gate and lacks independent ability-cohort validation. Sparse labelled personalization and DAGHAR results are reported under their separate evidence classes.
+Machine-readable evidence remains under [`results/`](../results/). This workspace
+contains no copied raw data or large model artifacts. The historical working
+title was:
+
+> InclusiveShift-HAR: An Auditable Participant-Exclusive Benchmark for
+> Ability-Associated Population Shift in Smartphone Activity Recognition
+
+The locked benchmark remains a primary contribution. The preregistered MoRe-HAR
+hypothesis was not supported. Later RMRP, CTGR, and HERA results are reused-source
+development evidence; external AICOS and HARTH results retain their diagnostic
+and interface limitations.
