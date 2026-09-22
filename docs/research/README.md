@@ -5,6 +5,12 @@ Experiments are grouped by scientific question. Start with the
 This index is a reading guide, not a leaderboard or a new result. Frozen
 protocols, failed attempts, and historical paths remain preserved.
 
+The project-developed source-method sequence is **SpectralShape → GSP → RMRP →
+CTGR → HERA**. RMRP is an earlier contribution and the six-channel control for
+later gravity-based extensions. The [source-lineage audit](SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md)
+separates this history from external controls, labelled personalization and
+different-cohort results.
+
 ## 1. Establish the evaluation contract
 
 | Study | Purpose and outcome | Record |
@@ -18,8 +24,10 @@ protocols, failed attempts, and historical paths remain preserved.
 
 | Family | What was learned | Record |
 |---|---|---|
-| HYDRA, MultiRocket, QUANT, RIST, spectral features, neural controls and expert stacking | Strict source comparisons favored GSP/RMRP; outer-fold early-stopping diagnostics are excluded from the primary comparison | [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
-| GSP and RMRP | Denoised GSP was selected in all five folds; noise tolerance improved, temporal-gap robustness weakened, and the joint advancement gate failed | [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
+| HYDRA, MultiRocket, QUANT and budgeted RIST | External controls reached 70.711–77.195% participant macro-F1 on the shared seed-11 source evaluation; fixed settings differ from the project's nested selection budget | [Source-lineage audit](SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md), [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
+| SpectralShape and GSP | Project feature development increased seed-11 participant macro-F1 from 78.884% to 82.916%; worst-participant performance still trailed budgeted RIST | [Source-lineage audit](SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md), [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
+| RMRP | The project's denoised GSP reached 83.790%: +0.874 points over GSP; all five folds selected this view. Noise tolerance improved, temporal-gap robustness weakened, and the joint advancement gate failed | [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
+| Neural controls, feature fusion and expert stacking | No retained gain; neural diagnostics using direct outer-fold early stopping are excluded from the primary comparison | [FuSE/ReFrame report](FUSE_REFRAME_V2_RESEARCH_REPORT.md) |
 | CTGR | Native gravity plus confidence-triggered posture correction improved matched five-seed development over RMRP; nine advancement checks passed | [Protocol](CONFIDENCE_TRIGGERED_GRAVITY_RESIDUAL_PROTOCOL.md), [results](MAX_RND_SECONDARY_RESULTS.md) |
 | CAGE-HAR | The retrospective extension did not pass advancement | [Results](CAGE_HAR_RETROSPECTIVE_V1_RESULTS.md) |
 | HERA-v1 | Strict window-only variant had the highest point estimate; incremental gain and lower-tail gates failed | [Results](HERA_CTGR_RETROSPECTIVE_V1_RESULTS.md) |
@@ -33,6 +41,11 @@ Five-seed aggregates, single-seed follow-ups, and exploratory controls are
 separate comparison groups. Historical terms such as “breakthrough” in early
 reports are interpreted through the current evidence and advancement gates,
 not as independent confirmation or a novelty claim.
+
+The legitimate source-development improvement from tested controls in the 70s
+to project feature methods in the 80s must remain distinct from the locked
+target and few-person target-inclusion results. Later CTGR/HERA scores also use
+native gravity, so input information changes along that part of the sequence.
 
 ## 3. Change the information available
 
@@ -72,8 +85,12 @@ older documentation after a correction.
 ```mermaid
 flowchart TD
     V["Participant-exclusive protocol"] --> L["One-time target: hypothesis unsupported"]
-    V --> G["Source: GSP / denoised RMRP"]
-    G --> C["CTGR: +2.586 points with native gravity"]
+    V --> X["Seed 11 controls: 70.711–77.195%"]
+    V --> S["Project SpectralShape: 78.884%"]
+    S --> G["Project GSP: 82.916%"]
+    G --> R["Project denoised RMRP: 83.790%"]
+    R --> B["Five-seed RMRP base: 83.953%"]
+    B --> C["CTGR: 86.540%, + native gravity"]
     C --> H["HERA: +0.309 points, gates failed"]
     C --> U["Unconditional routing: rejected"]
     H --> Q["Labelled gauge: separate personalization"]
@@ -88,4 +105,7 @@ flowchart TD
 ```
 
 Arrows express the research sequence or resulting decisions, not causal effects
-estimated across datasets.
+estimated across datasets. Scores are participant-mean macro-F1. Seed-11
+controls used fixed configurations; project feature methods used nested
+selection. The five-seed base is a new aggregation of repeated source fits,
+not a separate independent participant cohort.

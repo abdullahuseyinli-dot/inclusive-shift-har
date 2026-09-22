@@ -1,6 +1,6 @@
 # Project status
 
-**Status date:** 2026-09-20
+**Status date:** 2026-09-22
 
 **Phase:** research freeze; current software and evidence integrated into `main`
 
@@ -12,6 +12,7 @@ finalize the repository before starting another scientific campaign.
 | Lane | Outcome | Current role |
 |---|---|---|
 | Historical locked InclusiveHAR target | Compact DANN 68.084% mean participant macro-F1; Compact CORAL effectively tied; MoRe-HAR hypothesis not supported | Immutable primary benchmark outcome |
+| Six-channel source representations, seed 11 | Tested RIST 77.195%; project SpectralShape 78.884%, GSP 82.916%, selected RMRP 83.790%; same 725 source windows | Earlier project development; controls and nested-selected methods have different selection budgets |
 | CTGR source development | 86.540%, +2.586 points over six-channel RMRP; advancement gate passed | Retained robust nine-channel control |
 | Strict HERA-v1 source development | 86.849%, +0.309 points over CTGR; interval crosses zero and promotion gates failed | Highest point-estimate ablation, not a confirmed successor |
 | HERA labelled semantic gauge | +0.611 points on matched remaining windows; only P10 improves | Optional labelled personalization diagnostic |
@@ -46,7 +47,8 @@ The intended package contains:
 
 - first-party benchmark, model, experiment, and validation code;
 - locked protocols and tracked aggregate evidence;
-- CTGR/HERA source-development summaries and negative gates;
+- SpectralShape/GSP/RMRP development and later CTGR/HERA summaries and gates;
+- hash-bound development tables and reproducible comparison and method figures;
 - corrected AICOS and HARTH diagnostic documentation;
 - benchmark, data, and model cards;
 - reproducibility, supersession, contribution, security, and release guidance;
@@ -71,7 +73,7 @@ third-party files. Those materials remain locally preserved where required.
 | Distribution build, archive inspection, and secret scan | Passed on the review candidate |
 | Current branch | `main`; integrated research history retained; exact commit and CI available in Git history and Actions |
 | Main security policy | Existing remote tags pinned to their immutable objects; complete-history, secret, licence, and quality gates required |
-| GitHub release and Zenodo deposit | Not published; no DOI claimed |
+| Latest research revision release/deposit | No new versioned release or Zenodo deposit; no DOI claimed. Historical benchmark prereleases remain separate |
 
 The [research report](RESEARCH_REPORT.md) is the scientific entry point. The
 [earlier readiness snapshot](PUBLICATION_READINESS_REPORT_20260920.md) records the

@@ -192,6 +192,7 @@
     "parquet": "50415231",
     "pdf": "25504446",
     "pe": "4d5a",
+    "png": "89504e470d0a1a0a",
     "pickle_protocol": "8002",
     "pickle_protocol_3": "8003",
     "pickle_protocol_4": "8004",
@@ -203,10 +204,12 @@
     "zip": "504b0304"
   },
   "allowed_signature_suffixes": {
-    "pdf": [".pdf"]
+    "pdf": [".pdf"],
+    "png": [".png"]
   },
   "allowed_binary_suffixes": [
-    ".pdf"
+    ".pdf",
+    ".png"
   ],
   "gitleaks": {
     "version": "8.30.1",

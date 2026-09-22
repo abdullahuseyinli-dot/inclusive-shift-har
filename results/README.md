@@ -7,6 +7,12 @@ by itself establish scientific comparability.
 Read the [research report](../docs/RESEARCH_REPORT.md) for comparable tables and
 the [experiment map](../docs/research/README.md) for the full research sequence.
 
+The source-method lineage is **SpectralShape → GSP → RMRP → CTGR → HERA**.
+The first three are project-developed six-channel feature methods; CTGR/HERA
+add native gravity and selective combination. RMRP is a project predecessor,
+not an external baseline. The seed-11 lineage and later five-seed comparison
+are separate aggregates of development on the same ten source participants.
+
 ## Evidence classes
 
 | Class | Meaning |
@@ -37,18 +43,28 @@ repeated fits on the same people and are never counted as extra participants.
 | Raw/total acceleration sensitivity | Post-confirmatory; failed v1 preserved | `postconfirmatory/raw_total_acceleration_v1_1/raw_total_acceleration_aggregate.json` |
 | SI-unit equivalence | Preprocessing equivalence, not an accuracy result | `analysis/unit_sensitivity_v1/acceleration_unit_sensitivity.json` |
 | CUDA efficiency | Post-confirmatory; 320 profiles | `efficiency/postconfirmatory-v1-attempt-002/neural_efficiency_aggregate_attempt_002.json` |
+| Source-development lineage | Seed-11 controls and project SpectralShape/GSP/RMRP methods; source development, unequal selection budgets | `research/source_development_lineage_v1.json` |
 | CTGR five-seed source development | Advancement gate passed; not confirmatory | `development/max_rnd_secondary_v1_summary.json` |
 | CAGE-HAR retrospective | Advancement failed | `development/cage_har_retrospective_v1_summary.json` |
 | HERA-CTGR v1 retrospective | Highest source point estimate; advancement failed | `development/hera_ctgr_retrospective_v1_summary.json` |
 | HERA-CTGR v2 retrospective | Calibration improved; routing did not advance | `development/hera_ctgr_v2_retrospective_v1_summary.json` |
 | External FoG correction chain | Development/diagnostic with supersessions | `research/cross_dataset_har_v4/` and linked correction records |
 | Current publication evidence index | Interpretive index; creates no new performance result | `research/current_publication_evidence_v1.json` |
+| Reported-metrics audit | Recomputed source, fixed-ablation and external diagnostic metrics; source hashes and metric definitions | `research/reported_metrics_audit_v1.json` |
+
+The [source-lineage audit](../docs/research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md)
+documents the comparable 70s-to-80s development and its participant tradeoffs.
+It does not treat legacy UCI-HAR scores, the 75.141% few-person k=4 result,
+or HARTH placement diagnostics as preceding measurements of the same endpoint.
+Both audit records summarize existing experiments; neither represents a new
+model fit or target-cohort opening.
 
 ## Recent local evidence
 
 AICOS unit correction, the 38-person fixed routing validation, HARTH placement
-diagnostics, and native-nine preparation were completed after the last tracked
-aggregate summaries. Their current human-readable authorities are indexed in
+diagnostics, and native-nine preparation were completed after the original
+development summaries. The metric audit now tracks aggregate values and input
+hashes for the reported diagnostics. Their human-readable authorities are indexed in
 [`docs/EVIDENCE_INDEX.md`](../docs/EVIDENCE_INDEX.md) and
 [`docs/EVIDENCE_SUPERSESSION.md`](../docs/EVIDENCE_SUPERSESSION.md).
 The current machine-readable role ledger is

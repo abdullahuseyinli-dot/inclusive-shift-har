@@ -10,13 +10,14 @@ names and hashes are part of the evidence chain.
 |---|---|
 | [Research report](RESEARCH_REPORT.md) | Abstract, methods, architecture, matched results, ablations, and limitations |
 | [Experiment map](research/README.md) | Studies grouped by question, with links to protocols, results, and corrections |
+| [Source development audit](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md) | Project attribution, earlier six-channel gains, matched windows and metric reconstruction |
 | [Project status](PROJECT_STATUS.md) | Current research disposition and publication-preparation state |
 | [Evidence index](EVIDENCE_INDEX.md) | Comparable result groups, canonical metrics, and allowed claims |
 | [Supersession map](EVIDENCE_SUPERSESSION.md) | Which later record governs the interpretation of an older result |
 | [Reproducibility guide](REPRODUCIBILITY.md) | Environment setup, offline checks, and artifact restoration boundaries |
 | [Publication checklist](PUBLICATION_CHECKLIST.md) | Finite Git and Zenodo preparation gates |
 | [Paper workspace status](../paper/README.md) | Explains why the retained outlines are historical drafts |
-| [Readiness report](PUBLICATION_READINESS_REPORT_20260920.md) | Candidate changes, validation, and remaining owner actions |
+| [Historical readiness snapshot](PUBLICATION_READINESS_REPORT_20260920.md) | Earlier candidate validation; does not attest later commits |
 
 ## Benchmark and data
 

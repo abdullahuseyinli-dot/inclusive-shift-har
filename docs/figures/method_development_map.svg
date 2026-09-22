@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="936pt" height="475.2pt" viewBox="0 0 936 475.2" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 475.2
+L 936 475.2
+L 936 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 32.544 222.75
+L 281.376 222.75
+Q 288.288 222.75 288.288 216.216
+L 288.288 134.541
+Q 288.288 128.007 281.376 128.007
+L 32.544 128.007
+Q 25.632 128.007 25.632 134.541
+L 25.632 216.216
+Q 25.632 222.75 32.544 222.75
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #176b87; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 333.216 222.75
+L 582.048 222.75
+Q 588.96 222.75 588.96 216.216
+L 588.96 134.541
+Q 588.96 128.007 582.048 128.007
+L 333.216 128.007
+Q 326.304 128.007 326.304 134.541
+L 326.304 216.216
+Q 326.304 222.75 333.216 222.75
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #176b87; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 630.432 222.75
+L 879.264 222.75
+Q 886.176 222.75 886.176 216.216
+L 886.176 134.541
+Q 886.176 128.007 879.264 128.007
+L 630.432 128.007
+Q 623.52 128.007 623.52 134.541
+L 623.52 216.216
+Q 623.52 222.75 630.432 222.75
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #a85c16; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 291.674306 175.7052
+Q 306.952859 175.7052 320.55436 175.7052
+" clip-path="url(#pd29cc979ee)" style="fill: none; stroke: #46566a; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 314.15436 172.5052
+L 320.55436 175.7052
+L 314.15436 178.9052
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #46566a; stroke: #46566a; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 592.343353 175.7052
+Q 605.894815 175.7052 617.769225 175.7052
+" clip-path="url(#pd29cc979ee)" style="fill: none; stroke: #46566a; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 611.369225 172.5052
+L 617.769225 175.7052
+L 611.369225 178.9052
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #46566a; stroke: #46566a; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 32.544 382.833
+L 281.376 382.833
+Q 288.288 382.833 288.288 376.299
+L 288.288 294.624
+Q 288.288 288.09 281.376 288.09
+L 32.544 288.09
+Q 25.632 288.09 25.632 294.624
+L 25.632 376.299
+Q 25.632 382.833 32.544 382.833
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #718096; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 333.216 382.833
+L 582.048 382.833
+Q 588.96 382.833 588.96 376.299
+L 588.96 294.624
+Q 588.96 288.09 582.048 288.09
+L 333.216 288.09
+Q 326.304 288.09 326.304 294.624
+L 326.304 376.299
+Q 326.304 382.833 333.216 382.833
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #718096; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 630.432 382.833
+L 879.264 382.833
+Q 886.176 382.833 886.176 376.299
+L 886.176 294.624
+Q 886.176 288.09 879.264 288.09
+L 630.432 288.09
+Q 623.52 288.09 623.52 294.624
+L 623.52 376.299
+Q 623.52 382.833 630.432 382.833
+z
+" clip-path="url(#pd29cc979ee)" style="fill: #f5f8fa; stroke: #718096; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 19px; font-family: 'DejaVu Sans'; text-anchor: start" x="32.544" y="58.0932" transform="rotate(-0 32.544 58.0932)">What the project developed</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #46566a" x="32.544" y="83.5758" transform="rotate(-0 32.544 83.5758)">Arrows show method development; separate studies do not form one numerical improvement curve.</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #176b87" x="42.912" y="156.1032" transform="rotate(-0 42.912 156.1032)">SpectralShape → GSP</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 183.491406)">Geometric and spectral features</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 198.17707)">Standard learner; inner-fold selection</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 211.991406)">Six-channel source development</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #176b87" x="343.584" y="156.1032" transform="rotate(-0 343.584 156.1032)">RMRP → denoised GSP</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 183.92707)">Raw, denoised and residual candidates</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 197.741406)">Denoised view selected in every fold</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 211.991406)">Noise gains; temporal-gap harms</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #a85c16" x="640.8" y="156.1032" transform="rotate(-0 640.8 156.1032)">CTGR → strict HERA</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 183.491406)">Add native gravity for posture</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 197.741406)">Correct uncertain predictions selectively</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 212.911719)">Then ensemble and calibrate</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start" x="32.544" y="265.221" transform="rotate(-0 32.544 265.221)">Separate evidence streams</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #718096" x="42.912" y="316.1862" transform="rotate(-0 42.912 316.1862)">Locked target benchmark</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 343.574406)">Different target participants and protocol</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 357.824406)">MoRe-HAR hypothesis unsupported</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(42.912 372.074406)">Preserved; not reopened for successors</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #718096" x="343.584" y="316.1862" transform="rotate(-0 343.584 316.1862)">Labelled personalization</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 343.574406)">SAR / ASGS / semantic-gauge studies</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 357.824406)">Query labels counted and excluded</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(343.584 372.074406)">Separate from zero-query recognition</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: start; fill: #718096" x="640.8" y="316.1862" transform="rotate(-0 640.8 316.1862)">External diagnostics</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 343.574406)">HARTH: placement and reference methods</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 358.744719)">AICOS: frozen sensor-interface transfer</text>
+    <text style="font-size: 9.5px; font-family: 'DejaVu Sans'" transform="translate(640.8 372.074406)">Explicit limitations and negative results</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: start" x="32.544" y="422.037" transform="rotate(-0 32.544 422.037)">Project contributions are representations and composite pipelines. Extra Trees, Random Forest and filtering primitives retain their established attribution.</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pd29cc979ee">
+   <rect x="18.72" y="33.264" width="898.56" height="418.176"/>
+  </clipPath>
+ </defs>
+</svg>

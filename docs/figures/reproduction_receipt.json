@@ -1,0 +1,24 @@
+{
+  "record_kind": "research_figures_reproduction",
+  "schema_version": "1.0.0",
+  "new_model_fits": 0,
+  "raw_datasets_loaded": false,
+  "prediction_archives_loaded": false,
+  "generator_sha256": "ff31c57940b89cecef21b3b24213ae775f312c9f28942a16775b0ad4c4da8b2f",
+  "libraries": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.3.5"
+  },
+  "source_record_sha256": [
+    "f6d21b54f5a2cf166e0cf23affeda0d52652e256e5dc59d1e5c67e5282dd89cd",
+    "ef51a578211551a1e68ed67e4f658228b1d7d4fd7580927e3f1b5e071521ce74"
+  ],
+  "files": {
+    "method_development_map.png": "7e127f979c9f3d4a1bffdf5607cebcea914c0e4aec378c9c12a65c7fcb0bc30b",
+    "method_development_map.svg": "d6968646d97c7f8c3bffee81ed8da02b87b5b09dd6e664fffede6b20ee5d62a7",
+    "source_development_comparison.png": "bf9820d81487b8197c035c799f41a55920603e276a631cc58e53d04b3df57998",
+    "source_development_comparison.svg": "72114892aa0482cc80e2eb8566f23b474b0c1281215b5af24f64b42803655528",
+    "source_development_tables.md": "dfc3a7d7bee211f707a95aae572a8148684bdd6dcb7ee8e91de2a7ac1134b162"
+  },
+  "record_sha256": "4f4cc3aaaed1a6a683495a371cfc3b30e7f97f3f7f629761574f7a9dd2dd8df3"
+}

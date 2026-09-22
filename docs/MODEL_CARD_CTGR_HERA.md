@@ -8,13 +8,38 @@
   report strict HERA-v1 as the highest source point estimate. Neither is an
   independently confirmed successor to the locked six-channel benchmark.
 - **Software version:** 0.1.7a0 publication candidate.
-- **Evidence date:** 2026-09-20.
+- **Evidence date:** 2026-09-22.
 
 These are composite classification methods: feature extraction, standard Extra
-Trees learners, expert routing and calibration. The project contribution is the
-combination and selective posture correction, not the underlying tree-learning
-algorithm. The separate HARTH rich-feature Random Forest models are not frozen
-CTGR/HERA evaluations.
+Trees learners, expert routing and calibration. They build on the project's own
+SpectralShape, GSP and RMRP feature-development sequence. The contribution
+includes representation design, denoising/view selection and selective posture
+correction; Extra Trees and the signal filters are established components. The
+separate HARTH rich-feature Random Forest models are not frozen CTGR/HERA
+evaluations.
+
+## Development lineage
+
+| Stage | Project contribution | Seed-11 source participant macro-F1 |
+|---|---|---:|
+| SpectralShape | Initial deterministic signal-feature pipeline | 78.884% |
+| GSP | Geometric and spectral representation | 82.916% |
+| RMRP | Raw/denoised/residual candidate family; denoised GSP selected | 83.790% |
+| CTGR | Native-gravity posture expert and confidence-triggered combination | 86.474% |
+| Strict HERA-v1 | CTGR candidate marginalization, calibration and consistency veto | 86.755% |
+
+These stages share the 725 source windows and five participant-exclusive outer
+folds. The first three use six channels; CTGR/HERA add three native gravity
+channels. The tested budgeted RIST external control reached 77.195% under this
+source evaluation, with a fixed rather than nested selection recipe. RMRP's
+6.595-point mean advantage over that control accompanied three participant harms
+and a lower worst-participant score. The [source-lineage audit](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md)
+and [research report](RESEARCH_REPORT.md#421-seed-11-development-history) give
+accuracy, controls, participant tradeoffs and provenance.
+
+RMRP is therefore an earlier project contribution used as the control for later
+extensions. The five-seed comparison below measures those later extensions; it
+does not describe the project's total improvement from its initial methods.
 
 ## Intended task
 
@@ -94,7 +119,7 @@ reopened for HERA/CTGR development.
 
 | Model | Window accuracy | Mean participant macro-F1 | Bottom 30% | Worst participant | NLL | Brier |
 |---|---:|---:|---:|---:|---:|---:|
-| RMRP | 84.579% | 83.953% | 69.941% | 54.767% | 0.36889 | 0.22512 |
+| RMRP: selected denoised GSP | 84.579% | 83.953% | 69.941% | 54.767% | 0.36889 | 0.22512 |
 | CTGR | 86.979% | 86.540% | **73.990%** | 57.512% | 0.35426 | 0.21165 |
 | Strict HERA-v1 | **87.228%** | **86.849%** | 73.933% | **58.028%** | **0.34038** | **0.20303** |
 
@@ -171,6 +196,8 @@ future confirmation execution.
 
 ## Canonical artifacts
 
+- [Source-development lineage audit](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md)
+- [GSP/RMRP development and robustness report](research/FUSE_REFRAME_V2_RESEARCH_REPORT.md)
 - [CTGR protocol](research/CONFIDENCE_TRIGGERED_GRAVITY_RESIDUAL_PROTOCOL.md)
 - [CTGR result summary](../results/development/max_rnd_secondary_v1_summary.json)
 - [HERA-v1 protocol](research/HERA_CTGR_V1_PROTOCOL.md)

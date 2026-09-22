@@ -7,13 +7,17 @@ raw file or receipt. Raw data remain outside Git and retain their source terms.
 
 ## Environment and preflight
 
-Use CPython 3.11 and the locked CUDA research environment from the repository
-root:
+Use CPython 3.11 and the locked CPU research environment from the repository
+root. Data acquisition does not require a GPU:
 
 ```powershell
-uv sync --locked --extra training-cuda --group research
-uv run inclusive-shift-har validate-manifests --json
+uv sync --locked --extra training-cpu --group research
+uv run --no-sync inclusive-shift-har validate-manifests --json
 ```
+
+Historical CUDA experiments use their recorded `training-cuda` environment;
+CPU and CUDA extras are mutually exclusive. See the current
+[reproducibility guide](REPRODUCIBILITY.md) for the pinned external-reader overlay.
 
 Create only missing directory containers. Stop if either name is already a
 non-directory; do not remove or replace existing contents.

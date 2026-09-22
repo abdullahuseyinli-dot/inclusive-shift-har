@@ -13,7 +13,9 @@ DOI, or change repository visibility.
   local `.audit` evidence, caches, and temporary third-party references outside
   the Git/Zenodo archive.
 - Retain the historical locked target outcome unchanged.
-- Present CTGR/HERA as reused-source development and AICOS/HARTH as diagnostics.
+- Attribute SpectralShape/GSP/RMRP and CTGR/HERA to the project, while crediting
+  established learners, filters and external controls. Present source results
+  as reused-source development and AICOS/HARTH as diagnostics.
 - Use [EVIDENCE_INDEX.md](EVIDENCE_INDEX.md) and
   [EVIDENCE_SUPERSESSION.md](EVIDENCE_SUPERSESSION.md) as the claim authorities.
 
@@ -50,6 +52,10 @@ substitute for these candidate-wide gates.
 
 - README, project status, results index, model cards, and supersession map agree.
 - Accuracy, pooled macro-F1, and participant macro-F1 are labelled explicitly.
+- Earlier seed-11 six-channel comparisons and later five-seed gravity results
+  are separate; source gains are not conflated with the few-person target study.
+- Regenerate the tracked development figures and tables from their bound
+  aggregate evidence; include their provenance receipt in the source package.
 - Cohort, participant count, channels, seeds, supervision, and evidence status
   accompany every headline metric.
 - `pyproject.toml`, `src/inclusive_shift_har/__init__.py`, `CITATION.cff`,
@@ -110,6 +116,8 @@ assets. Before publishing:
   under its own terms;
 - add the issued DOI to citation metadata only after deposition;
 - archive the final Zenodo record JSON and checksums as release evidence.
+- archive the candidate-bound software validation receipts alongside the exact
+  source revision, so evidence does not depend only on local files or CI retention.
 
 ## Publication-ready definition
 

@@ -1,6 +1,6 @@
 # InclusiveShift-HAR: participant-exclusive activity recognition under sensor and population shift
 
-Research report · 20 September 2026 · Software version 0.1.7a0
+Research report · 22 September 2026 · Software version 0.1.7a0
 
 ## Abstract
 
@@ -9,16 +9,22 @@ wearable inertial signals, with the participant as the unit of evaluation.
 The original locked six-channel target evaluation did not support the MoRe-HAR
 hypothesis: Compact DANN and Compact CORAL achieved approximately 68.08% mean
 participant macro-F1. Subsequent development on ten source participants produced
-Confidence-Triggered Gravity Residual (CTGR), which adds native gravity and
-selectively corrects uncertain posture predictions. Across five matched seeds,
-CTGR improved the six-channel RMRP baseline from 83.953% to 86.540%. Strict
+the project's SpectralShape, Geometric Spectral Pyramid (GSP), and Robust
+Multiscale Residual Pyramid (RMRP) feature pipelines. Under the same seed-11
+source evaluation, the selected denoised-GSP RMRP reached 83.790% participant
+macro-F1, compared with 78.884% for SpectralShape and 77.195% for the tested
+budgeted RIST control. These comparisons share participants, windows and outer
+folds, but not selection budgets. Confidence-Triggered Gravity Residual (CTGR)
+then added native gravity and selective posture correction. Across five matched
+seeds, CTGR improved the project's six-channel RMRP from 83.953% to 86.540%. Strict
 HERA-CTGR reached 86.849% macro-F1 and 87.228% accuracy, but its incremental
 advancement gates failed. On a separate binary HARTH posture diagnostic,
 right-thigh rich-feature Random Forest reached 97.261% participant macro-F1
 and 99.723% accuracy across five participant-exclusive folds.
 External studies exposed substantial placement and sensor-interface effects.
-The contribution is an implemented method, matched ablations, and an auditable
-evaluation framework; independent superiority remains unestablished.
+The contribution comprises the development of these feature and combination
+methods, matched ablations, and an auditable evaluation framework; independent
+superiority remains unestablished.
 
 ## 1. Research questions
 
@@ -26,8 +32,8 @@ The experiments address three distinct questions:
 
 1. How well do frozen inertial classifiers transfer to the original held-out
    ability-associated population?
-2. Can denoising, native gravity, and selective posture correction improve
-   participant-exclusive source development?
+2. Can feature design, denoising, native gravity, and selective posture correction
+   improve participant-exclusive source development?
 3. Which conclusions survive a change in placement, dataset, or sensor interface?
 
 These questions have different cohorts and input budgets. Results are therefore
@@ -103,15 +109,32 @@ are consumed diagnostic evidence.
 
 ## 3. Method
 
-### 3.1 Denoised geometric and spectral features
+### 3.1 Project-developed feature representations
 
-The Geometric Spectral Pyramid (GSP) summarizes axis statistics, covariance
-geometry, rotation-related scalar features, spectra, and temporal pyramids.
+SpectralShape combines robust moments, derivatives, normalized spectra,
+autocorrelation, channel correlation and rotation-related features. It is the
+project's initial feature pipeline in this source-development sequence; the
+[SpectralShape configuration](../configs/experiments/spectral_shape_nested_v1.yaml)
+records its candidate set and selection rule. The subsequent Geometric Spectral
+Pyramid (GSP) summarizes axis statistics, covariance geometry, rotation-related
+scalar features, spectra, and temporal pyramids.
 The Robust Multiscale Residual Pyramid (RMRP) evaluated raw, denoised,
 trend-residual, and concatenated views. All five original outer folds selected
 the denoised GSP view with participant/class-weighted Extra Trees. The selected
 model should therefore be described as denoised GSP; residual concatenation was
 an evaluated alternative, not the source of the retained improvement.
+
+SpectralShape, GSP and RMRP are project-developed feature and selection methods,
+as are the later CTGR/HERA combination procedures. They use established
+components, including Extra Trees and Savitzky–Golay filtering. HYDRA,
+MultiRocket, QUANT and RIST are external method families implemented as controls;
+their authorship is separate from the project's feature pipelines.
+
+![Method development and evidence boundaries](figures/method_development_map.svg)
+
+The development map distinguishes changes in representation, sensor information
+and supervision. Its arrows describe method development, not independent causal
+effects or gains that can be added across evaluation protocols.
 
 ### 3.2 Confidence-Triggered Gravity Residual
 
@@ -189,11 +212,65 @@ The target cohort is closed to subsequent model selection.
 
 ### 4.2 Matched source development
 
-All rows below use the same 725 source windows and five seeds.
+#### 4.2.1 Seed-11 development history
+
+The early source comparison used the same 725 windows, P1-P10, five outer
+participant folds and seed 11. Project feature pipelines selected candidates
+inside four inner participant folds. External controls used their recorded fixed
+configurations, including a budgeted RIST configuration. This is a comparison of
+executed recipes, not an equal-search-budget ranking of all method families.
+
+External methods retain their original attribution:
+[HYDRA](https://arxiv.org/abs/2203.13652),
+[MultiRocket](https://arxiv.org/abs/2102.00457),
+[QUANT](https://arxiv.org/abs/2308.00928), and
+[RIST](https://ecml-aaltd.github.io/aaltd2023/papers/AALTD_2023_Hybrid_Pipeline.pdf).
+The executed aeon configurations are recorded in the
+[fixed-control configuration](../configs/experiments/aeon_time_series_controls_v1.yaml);
+RIST used 256 intervals and 256 shapelets. These are locally measured results,
+not scores copied from those publications.
+
+| Method | Origin and role | Channels | Window accuracy (%) | Participant macro-F1 (%) |
+|---|---|---:|---:|---:|
+| HYDRA | External control | 6 | 73.517 | 70.711 |
+| MultiRocket | External control | 6 | 76.138 | 73.501 |
+| MultiRocket + HYDRA | External control combination | 6 | 76.000 | 73.616 |
+| QUANT | External control | 6 | 76.966 | 74.120 |
+| Budgeted RIST | External control | 6 | 78.759 | 77.195 |
+| SpectralShape | Project feature pipeline | 6 | 79.724 | 78.884 |
+| GSP | Project geometric/spectral representation | 6 | 83.448 | 82.916 |
+| RMRP: selected denoised GSP | Project denoising/view-selection development | 6 | 84.414 | 83.790 |
+| CTGR | Project selective gravity correction | 9 | 86.897 | 86.474 |
+| Strict HERA-v1 | Project CTGR extension | 9 | **87.034** | **86.755** |
+
+The comparable six-channel development moved from tested controls in the 70s to
+project representations in the 80s: RMRP exceeded budgeted RIST by 6.595 macro-F1
+points and SpectralShape by 4.906 points. RMRP improved seven participants and
+harmed three relative to RIST. The worst-participant score was 61.681% for RIST,
+49.850% for GSP and 54.936% for RMRP: the mean improvement was not uniform and did
+not establish lower-tail dominance over RIST.
+
+Within the project, denoising added 0.874 points over GSP, with five participant
+wins, four harms and one tie. Noise/dropout robustness improved, but contiguous
+temporal-gap robustness worsened and the joint advancement gate failed. The
+later CTGR/HERA rows additionally use three native gravity channels. Their
+larger scores therefore reflect both additional information and its selective
+use, not a six-channel architecture-only improvement.
+
+Sources: [audited source lineage](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md),
+[tracked lineage record](../results/research/source_development_lineage_v1.json),
+and [original FuSE/ReFrame report](research/FUSE_REFRAME_V2_RESEARCH_REPORT.md).
+
+#### 4.2.2 Five-seed comparison of the retained project methods
+
+All rows below use the same 725 source windows and seeds 11, 23, 47, 89 and 131.
+RMRP is the project's own developed predecessor and serves as the matched base
+for this later study; it is not an external baseline or the beginning of the
+project's contribution.
 
 | Method | Channels | Accuracy (%) | Participant macro-F1 (%) | Bottom 30% (%) | Worst participant (%) | NLL | Brier |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| RMRP | 6 | 84.579 | 83.953 | 69.941 | 54.767 | 0.36889 | 0.22512 |
+| RMRP: selected denoised GSP | 6 | 84.579 | 83.953 | 69.941 | 54.767 | 0.36889 | 0.22512 |
 | CTGR | 9 | 86.979 | 86.540 | **73.990** | 57.512 | 0.35426 | 0.21165 |
 | Strict HERA-v1 | 9 | **87.228** | **86.849** | 73.933 | **58.028** | **0.34038** | **0.20303** |
 
@@ -210,6 +287,12 @@ estimate therefore does not establish a reliable successor.
 Sources: [CTGR aggregate](../results/development/max_rnd_secondary_v1_summary.json),
 [HERA-v1 aggregate](../results/development/hera_ctgr_retrospective_v1_summary.json)
 and [prediction-based metric audit](../results/research/reported_metrics_audit_v1.json).
+
+![Source-development comparison, separated by seed and input budget](figures/source_development_comparison.svg)
+
+The figure separates the seed-11 six-channel comparison from the five-seed
+RMRP/CTGR/HERA comparison. All scores are participant-mean macro-F1; the panels
+must not be combined into a single equal-input, equal-selection-budget estimate.
 
 ### 4.3 Fixed source ablation
 
@@ -336,26 +419,33 @@ and the confusion matrices and artifact hashes in the
 
 ## 5. Discussion and limitations
 
-The clearest retained improvement combines useful signal information with a
-restricted intervention: native gravity helps uncertain posture decisions while
-the base retains mobility. The evidence does not support a general claim that
+The project contributions form a sequence: SpectralShape and GSP improved the
+six-channel representation; RMRP's selected denoised view added noise robustness;
+CTGR used native gravity to correct uncertain posture decisions while retaining
+the mobility output; HERA tested further candidate combination and calibration.
+The observed mean gains coexist with participant harms and failed incremental
+gates. The evidence does not support a general claim that
 more features, larger architectures, or unconditional expert replacement improve
 recognition. Participant harms and sitting/standing tradeoffs recur across
 several follow-ups.
 
 Earlier scores in the 90s came from a different UCI-HAR coursework evaluation,
-with an already reused official test set. Results in the 70s also include
-different baselines and labelled-target protocols. They are not successive
-measurements of the same model on the same task. The [legacy audit](LEGACY_AUDIT.md)
-and [evidence index](EVIDENCE_INDEX.md) preserve those distinctions.
+with an already reused official test set. The 75.141% MoRe-HAR result used the
+separate few-person k=4 target-inclusion protocol and cannot be subtracted from
+RMRP or HERA. By contrast, the 70s-to-80s source comparisons in Section 4.2.1
+share the same participants, windows, labels and outer folds, and are valid
+descriptive evidence subject to their selection-budget differences. The
+[legacy audit](LEGACY_AUDIT.md) and [evidence index](EVIDENCE_INDEX.md) preserve
+these distinctions.
 
 The source cohort is small and repeatedly used. Missing trial boundaries,
 unresolved external coordinates, and changes in sensor placement constrain
 generalization claims. Synthetic or derived channels are transformations of
 available measurements, not validation of recovered person-specific sensor
 information. The repository establishes neither state of the art nor a globally
-novel architecture. Its defensible contribution is the implemented CTGR mechanism,
-matched development evidence, and explicit evaluation and correction record.
+novel architecture. Its defensible contribution includes the implemented
+SpectralShape/GSP/RMRP representations, CTGR/HERA combination methods, measured
+development gains and tradeoffs, and explicit evaluation and correction record.
 
 Further confirmation requires new information: a fresh, qualified native-nine
 cohort for a frozen comparison, or the prespecified same-attachment reference

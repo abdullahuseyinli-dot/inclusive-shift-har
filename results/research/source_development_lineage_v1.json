@@ -1,0 +1,1585 @@
+{
+  "schema_version": "1.0.0",
+  "record_kind": "source_development_lineage_recomputation_audit",
+  "status": "complete_derived_from_preserved_evidence_no_new_experiment",
+  "created_on": "2026-09-22",
+  "computation": {
+    "new_model_fits": 0,
+    "raw_datasets_loaded": false,
+    "locked_target_loaded": false,
+    "prediction_rule": "argmax_saved_class_probabilities",
+    "accuracy": "pooled_window_accuracy_per_method_seed_11",
+    "participant_macro_f1": "equal_class_macro_f1_per_participant_then_equal_participant_mean_fixed_three_classes_zero_division_0",
+    "confusion_matrix_orientation": "rows_true_columns_predicted",
+    "identity_alignment": "sort_by_unique_window_id_then_exact_labels_and_participant_identity_comparison",
+    "shared_source_identity_hash_recipe": "canonical_json_sha256_of_object_with_window_ids_labels_participant_ids_arrays_sorted_by_window_id",
+    "public_identity_or_prediction_arrays_included": false
+  },
+  "evaluation_contract": {
+    "dataset": "InclusiveHAR",
+    "evidence_status": "repeatedly_reused_source_development_not_independent_confirmation",
+    "participants": 10,
+    "windows": 725,
+    "outer_participant_folds": 5,
+    "seed": 11,
+    "classes": [
+      "mobility",
+      "sitting",
+      "standing"
+    ],
+    "external_controls": "executed_project_configurations_not_copied_paper_results_or_exhaustively_tuned_method_families",
+    "channel_boundary": "first_eight_methods_use_six_channels_CTGR_and_HERA_add_native_gravity_three_axes",
+    "comparison_budget": "shared_observations_do_not_imply_equal_search_budgets",
+    "not_comparable_to": [
+      "legacy_random_window_split_scores",
+      "v1_few_person_target_training_scores",
+      "v1_locked_target_zero_shot_scores",
+      "labelled_personalization",
+      "external_dataset_diagnostics"
+    ]
+  },
+  "shared_source_identity_sha256": "f09753708102717c2bfc6b5223420d781b39b956f34fd1b1a08208220c5f1249",
+  "methods": [
+    {
+      "method_id": "hydra",
+      "display_name": "HYDRA",
+      "origin": "published_method_control_executed_in_project",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "fixed_recorded_external_control_configuration_no_project_inner_candidate_search",
+        "configuration": {
+          "algorithm": "hydra",
+          "n_jobs": 4,
+          "parameters": {
+            "class_weight": "balanced",
+            "n_groups": 64,
+            "n_kernels": 8
+          },
+          "preprocessing": "training-participant-only per-channel standardization",
+          "seed": 11
+        },
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/aeon-controls/hydra-001/result.json",
+      "prediction_path": ".audit/v2/aeon-controls/hydra-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 533,
+        "accuracy": 0.7351724137931035,
+        "pooled_macro_f1": 0.7291151234006428,
+        "confusion_matrix": [
+          [
+            240,
+            14,
+            4
+          ],
+          [
+            10,
+            147,
+            77
+          ],
+          [
+            4,
+            83,
+            146
+          ]
+        ],
+        "class_recall": [
+          0.9302325581395349,
+          0.6282051282051282,
+          0.6266094420600858
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.5022921522921523,
+          0.5295715992490186,
+          0.5896097679962814,
+          0.6111613648927082,
+          0.7027979902979903,
+          0.7491525423728813,
+          0.7824009324009324,
+          0.8340874811463047,
+          0.8740787094979835,
+          0.8959904474610356
+        ],
+        "mean_participant_macro_f1": 0.7071142987607288,
+        "worst_participant_macro_f1": 0.5022921522921523,
+        "bottom_30_percent_participant_macro_f1": 0.5404911731791509
+      }
+    },
+    {
+      "method_id": "multirocket",
+      "display_name": "MultiRocket",
+      "origin": "published_method_control_executed_in_project",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "fixed_recorded_external_control_configuration_no_project_inner_candidate_search",
+        "configuration": {
+          "max_dilations_per_kernel": 32,
+          "n_features_per_kernel": 4,
+          "n_jobs": 1,
+          "n_kernels": 10000,
+          "seed": 11
+        },
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/multirocket/formal-001/result.json",
+      "prediction_path": ".audit/v2/multirocket/formal-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 552,
+        "accuracy": 0.7613793103448275,
+        "pooled_macro_f1": 0.753259549146593,
+        "confusion_matrix": [
+          [
+            249,
+            6,
+            3
+          ],
+          [
+            12,
+            155,
+            67
+          ],
+          [
+            4,
+            81,
+            148
+          ]
+        ],
+        "class_recall": [
+          0.9651162790697675,
+          0.6623931623931624,
+          0.6351931330472103
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.5206349206349207,
+          0.5799396681749623,
+          0.6124374864100891,
+          0.6168545356951154,
+          0.6265432098765432,
+          0.8184974944378599,
+          0.839002267573696,
+          0.8461870255348516,
+          0.9311320754716981,
+          0.9588888888888888
+        ],
+        "mean_participant_macro_f1": 0.7350117572698625,
+        "worst_participant_macro_f1": 0.5206349206349207,
+        "bottom_30_percent_participant_macro_f1": 0.571004025073324
+      }
+    },
+    {
+      "method_id": "multirocket_hydra",
+      "display_name": "MultiRocket+HYDRA",
+      "origin": "published_method_control_executed_in_project",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "fixed_recorded_external_control_configuration_no_project_inner_candidate_search",
+        "configuration": {
+          "algorithm": "multirocket_hydra",
+          "n_jobs": 4,
+          "parameters": {
+            "class_weight": "balanced",
+            "n_groups": 64,
+            "n_kernels": 8
+          },
+          "preprocessing": "training-participant-only per-channel standardization",
+          "seed": 11
+        },
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/aeon-controls/multirocket-hydra-001/result.json",
+      "prediction_path": ".audit/v2/aeon-controls/multirocket-hydra-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 551,
+        "accuracy": 0.76,
+        "pooled_macro_f1": 0.7515908537675388,
+        "confusion_matrix": [
+          [
+            249,
+            6,
+            3
+          ],
+          [
+            12,
+            157,
+            65
+          ],
+          [
+            5,
+            83,
+            145
+          ]
+        ],
+        "class_recall": [
+          0.9651162790697675,
+          0.6709401709401709,
+          0.6223175965665236
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.526029526029526,
+          0.5497737556561086,
+          0.6164799253034547,
+          0.634963304318143,
+          0.6530718954248366,
+          0.8178053830227743,
+          0.8536099159199463,
+          0.8650075414781296,
+          0.9137529137529139,
+          0.9311320754716981
+        ],
+        "mean_participant_macro_f1": 0.7361626236377532,
+        "worst_participant_macro_f1": 0.526029526029526,
+        "bottom_30_percent_participant_macro_f1": 0.5640944023296964
+      }
+    },
+    {
+      "method_id": "quant",
+      "display_name": "QUANT",
+      "origin": "published_method_control_executed_in_project",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "fixed_recorded_external_control_configuration_no_project_inner_candidate_search",
+        "configuration": {
+          "algorithm": "quant",
+          "n_jobs": 4,
+          "parameters": {
+            "interval_depth": 6,
+            "quantile_divisor": 4
+          },
+          "preprocessing": "training-participant-only per-channel standardization",
+          "seed": 11
+        },
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/aeon-controls/quant-001/result.json",
+      "prediction_path": ".audit/v2/aeon-controls/quant-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 558,
+        "accuracy": 0.7696551724137931,
+        "pooled_macro_f1": 0.7615382687128842,
+        "confusion_matrix": [
+          [
+            251,
+            5,
+            2
+          ],
+          [
+            10,
+            146,
+            78
+          ],
+          [
+            2,
+            70,
+            161
+          ]
+        ],
+        "class_recall": [
+          0.9728682170542635,
+          0.6239316239316239,
+          0.6909871244635193
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.5460830288416495,
+          0.552341631248735,
+          0.5922363769759221,
+          0.673530436207921,
+          0.6938284703801946,
+          0.7383357383357384,
+          0.7656984592468463,
+          0.9209401709401709,
+          0.9586946386946388,
+          0.9703557312252965
+        ],
+        "mean_participant_macro_f1": 0.7412044682097114,
+        "worst_participant_macro_f1": 0.5460830288416495,
+        "bottom_30_percent_participant_macro_f1": 0.5635536790221023
+      }
+    },
+    {
+      "method_id": "rist_budgeted",
+      "display_name": "RIST (budgeted)",
+      "origin": "published_method_control_executed_in_project",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "fixed_recorded_external_control_configuration_no_project_inner_candidate_search",
+        "configuration": {
+          "algorithm": "rist_budgeted",
+          "input_dtype": "float64_aeon_numba_compatibility",
+          "n_jobs": 4,
+          "parameters": {
+            "n_intervals": 256,
+            "n_shapelets": 256
+          },
+          "preprocessing": "training-participant-only per-channel standardization",
+          "seed": 11
+        },
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/aeon-controls/rist-budgeted-003/result.json",
+      "prediction_path": ".audit/v2/aeon-controls/rist-budgeted-003/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 571,
+        "accuracy": 0.7875862068965517,
+        "pooled_macro_f1": 0.7785586230305813,
+        "confusion_matrix": [
+          [
+            254,
+            1,
+            3
+          ],
+          [
+            14,
+            151,
+            69
+          ],
+          [
+            5,
+            62,
+            166
+          ]
+        ],
+        "class_recall": [
+          0.9844961240310077,
+          0.6452991452991453,
+          0.7124463519313304
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.6168091168091168,
+          0.6702713408595762,
+          0.6817424405659699,
+          0.7196969696969697,
+          0.7679012345679013,
+          0.7737769526415218,
+          0.8314483688212126,
+          0.8448637316561843,
+          0.8962962962962964,
+          0.9166855753175199
+        ],
+        "mean_participant_macro_f1": 0.7719492027232269,
+        "worst_participant_macro_f1": 0.6168091168091168,
+        "bottom_30_percent_participant_macro_f1": 0.6562742994115544
+      }
+    },
+    {
+      "method_id": "spectral_shape",
+      "display_name": "SpectralShape",
+      "origin": "project_developed_feature_pipeline_with_established_estimators",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "five_outer_participant_folds_four_inner_participant_folds",
+        "candidate_count": 8,
+        "selected_candidates_by_outer_fold": [
+          {
+            "outer_fold": "source_cv_01",
+            "candidate_id": "extra_trees_leaf3",
+            "candidate_count": 8
+          },
+          {
+            "outer_fold": "source_cv_02",
+            "candidate_id": "extra_trees_leaf3",
+            "candidate_count": 8
+          },
+          {
+            "outer_fold": "source_cv_03",
+            "candidate_id": "extra_trees_leaf3",
+            "candidate_count": 8
+          },
+          {
+            "outer_fold": "source_cv_04",
+            "candidate_id": "extra_trees_leaf1",
+            "candidate_count": 8
+          },
+          {
+            "outer_fold": "source_cv_05",
+            "candidate_id": "extra_trees_leaf1",
+            "candidate_count": 8
+          }
+        ],
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/spectral-shape/nested-001/result.json",
+      "prediction_path": ".audit/v2/spectral-shape/nested-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 578,
+        "accuracy": 0.7972413793103448,
+        "pooled_macro_f1": 0.7894270378296637,
+        "confusion_matrix": [
+          [
+            254,
+            4,
+            0
+          ],
+          [
+            11,
+            156,
+            67
+          ],
+          [
+            2,
+            63,
+            168
+          ]
+        ],
+        "class_recall": [
+          0.9844961240310077,
+          0.6666666666666666,
+          0.721030042918455
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.4585204129961163,
+          0.6295705768071279,
+          0.7082066869300911,
+          0.7563636363636363,
+          0.8365439743148722,
+          0.87156432748538,
+          0.8856600189933523,
+          0.8962962962962964,
+          0.9137529137529139,
+          0.9319669548780061
+        ],
+        "mean_participant_macro_f1": 0.7888445798817793,
+        "worst_participant_macro_f1": 0.4585204129961163,
+        "bottom_30_percent_participant_macro_f1": 0.5987658922444451
+      }
+    },
+    {
+      "method_id": "gsp",
+      "display_name": "GSP",
+      "origin": "project_developed_feature_pipeline_with_established_estimators",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "five_outer_participant_folds_four_inner_participant_folds",
+        "candidate_count": 7,
+        "selected_candidates_by_outer_fold": [
+          {
+            "outer_fold": "source_cv_01",
+            "candidate_id": "extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_02",
+            "candidate_id": "participant_jackknife_leaf3",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_03",
+            "candidate_id": "extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_04",
+            "candidate_id": "participant_jackknife_leaf3",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_05",
+            "candidate_id": "extra_trees_leaf1",
+            "candidate_count": 7
+          }
+        ],
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/geometric-pyramid/nested-001/result.json",
+      "prediction_path": ".audit/v2/geometric-pyramid/nested-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 605,
+        "accuracy": 0.8344827586206897,
+        "pooled_macro_f1": 0.8283834900358853,
+        "confusion_matrix": [
+          [
+            253,
+            4,
+            1
+          ],
+          [
+            9,
+            165,
+            60
+          ],
+          [
+            2,
+            44,
+            187
+          ]
+        ],
+        "class_recall": [
+          0.9806201550387597,
+          0.7051282051282052,
+          0.8025751072961373
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.4985047026940858,
+          0.7637863656100738,
+          0.7690988835725677,
+          0.8430045132172791,
+          0.8722921522921524,
+          0.879696342305038,
+          0.9024283717679943,
+          0.9110671936758893,
+          0.9121572871572871,
+          0.9395918367346939
+        ],
+        "mean_participant_macro_f1": 0.8291627649027061,
+        "worst_participant_macro_f1": 0.4985047026940858,
+        "bottom_30_percent_participant_macro_f1": 0.6771299839589092
+      }
+    },
+    {
+      "method_id": "rmrp",
+      "display_name": "RMRP (selected denoised GSP)",
+      "origin": "project_developed_feature_pipeline_with_established_estimators",
+      "input_channels": 6,
+      "signal_information": "three_user_acceleration_axes_and_three_rotation_rate_axes",
+      "selection_budget": {
+        "scheme": "five_outer_participant_folds_four_inner_participant_folds",
+        "candidate_count": 7,
+        "selected_candidates_by_outer_fold": [
+          {
+            "outer_fold": "source_cv_01",
+            "candidate_id": "denoised_extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_02",
+            "candidate_id": "denoised_extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_03",
+            "candidate_id": "denoised_extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_04",
+            "candidate_id": "denoised_extra_trees_leaf1",
+            "candidate_count": 7
+          },
+          {
+            "outer_fold": "source_cv_05",
+            "candidate_id": "denoised_extra_trees_leaf1",
+            "candidate_count": 7
+          }
+        ],
+        "outer_labels_used_for_selection": false
+      },
+      "seed": 11,
+      "result_path": ".audit/v2/robust-multiscale/publication-001/result.json",
+      "prediction_path": ".audit/v2/robust-multiscale/publication-001/all_outer_predictions.npz",
+      "prediction_key": "probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 612,
+        "accuracy": 0.8441379310344828,
+        "pooled_macro_f1": 0.8384046153701554,
+        "confusion_matrix": [
+          [
+            251,
+            5,
+            2
+          ],
+          [
+            11,
+            166,
+            57
+          ],
+          [
+            3,
+            35,
+            195
+          ]
+        ],
+        "class_recall": [
+          0.9728682170542635,
+          0.7094017094017094,
+          0.8369098712446352
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.5493636050911592,
+          0.7482517482517482,
+          0.7851563530808813,
+          0.8269914688046048,
+          0.889550095530162,
+          0.8960910440376052,
+          0.9015752765752766,
+          0.9113294366372342,
+          0.9311320754716981,
+          0.9395918367346939
+        ],
+        "mean_participant_macro_f1": 0.8379032940215063,
+        "worst_participant_macro_f1": 0.5493636050911592,
+        "bottom_30_percent_participant_macro_f1": 0.6942572354745962
+      }
+    },
+    {
+      "method_id": "ctgr",
+      "display_name": "CTGR",
+      "origin": "project_developed_selective_gravity_pipeline",
+      "input_channels": 9,
+      "signal_information": "six_base_channels_plus_three_native_gravity_axes",
+      "selection_budget": {
+        "scheme": "five_outer_participant_folds_four_inner_participant_folds_with_train_only_selection_and_calibration",
+        "outer_labels_used_for_selection": false,
+        "reference": "configs/experiments/confidence_triggered_gravity_residual_v1.yaml",
+        "selected_ctgr_candidates_by_outer_fold": [
+          {
+            "outer_fold": "source_cv_01",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t060__w100"
+          },
+          {
+            "outer_fold": "source_cv_02",
+            "candidate_id": "physics__extra_trees_leaf3__t055__w075"
+          },
+          {
+            "outer_fold": "source_cv_03",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t060__w050"
+          },
+          {
+            "outer_fold": "source_cv_04",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t055__w050"
+          },
+          {
+            "outer_fold": "source_cv_05",
+            "candidate_id": "dual_gsp__extra_trees_leaf3__t060__w100"
+          }
+        ]
+      },
+      "seed": 11,
+      "result_path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/result.json",
+      "prediction_path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/cross_fitted_predictions.npz",
+      "prediction_key": "seed_11__frozen_ctgr_probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 630,
+        "accuracy": 0.8689655172413793,
+        "pooled_macro_f1": 0.8645323720179917,
+        "confusion_matrix": [
+          [
+            253,
+            3,
+            2
+          ],
+          [
+            11,
+            182,
+            41
+          ],
+          [
+            3,
+            35,
+            195
+          ]
+        ],
+        "class_recall": [
+          0.9806201550387597,
+          0.7777777777777778,
+          0.8369098712446352
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.6131221719457013,
+          0.8052173913043479,
+          0.8351515151515153,
+          0.8528591616826912,
+          0.8567646445695226,
+          0.8800033268874888,
+          0.9146770490166717,
+          0.9455723970548768,
+          0.9588888888888888,
+          0.9851558634339436
+        ],
+        "mean_participant_macro_f1": 0.8647412409935648,
+        "worst_participant_macro_f1": 0.6131221719457013,
+        "bottom_30_percent_participant_macro_f1": 0.7511636928005215
+      }
+    },
+    {
+      "method_id": "hera_strict",
+      "display_name": "Strict HERA-v1",
+      "origin": "project_developed_ctgr_extension",
+      "input_channels": 9,
+      "signal_information": "six_base_channels_plus_three_native_gravity_axes",
+      "selection_budget": {
+        "scheme": "five_outer_participant_folds_four_inner_participant_folds_with_train_only_selection_and_calibration",
+        "outer_labels_used_for_selection": false,
+        "reference": "configs/experiments/hera_ctgr_retrospective_v1.yaml",
+        "selected_ctgr_candidates_by_outer_fold": [
+          {
+            "outer_fold": "source_cv_01",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t060__w100"
+          },
+          {
+            "outer_fold": "source_cv_02",
+            "candidate_id": "physics__extra_trees_leaf3__t055__w075"
+          },
+          {
+            "outer_fold": "source_cv_03",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t060__w050"
+          },
+          {
+            "outer_fold": "source_cv_04",
+            "candidate_id": "total_gsp__extra_trees_leaf3__t055__w050"
+          },
+          {
+            "outer_fold": "source_cv_05",
+            "candidate_id": "dual_gsp__extra_trees_leaf3__t060__w100"
+          }
+        ]
+      },
+      "seed": 11,
+      "result_path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/result.json",
+      "prediction_path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/cross_fitted_predictions.npz",
+      "prediction_key": "seed_11__hera_ctgr_strict_probabilities",
+      "metrics": {
+        "observation_count": 725,
+        "correct_count": 631,
+        "accuracy": 0.8703448275862069,
+        "pooled_macro_f1": 0.8663541335554167,
+        "confusion_matrix": [
+          [
+            251,
+            5,
+            2
+          ],
+          [
+            10,
+            183,
+            41
+          ],
+          [
+            3,
+            33,
+            197
+          ]
+        ],
+        "class_recall": [
+          0.9728682170542635,
+          0.782051282051282,
+          0.8454935622317596
+        ],
+        "participant_count": 10,
+        "participant_macro_f1_values_sorted": [
+          0.6131221719457013,
+          0.7915762049500651,
+          0.8351515151515153,
+          0.8450889127580856,
+          0.8713341421578882,
+          0.8800033268874888,
+          0.9146770490166717,
+          0.9455723970548768,
+          0.9789712986643933,
+          1.0
+        ],
+        "mean_participant_macro_f1": 0.8675497018586686,
+        "worst_participant_macro_f1": 0.6131221719457013,
+        "bottom_30_percent_participant_macro_f1": 0.7466166306824272
+      }
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "treatment": "gsp",
+      "control": "rist_budgeted",
+      "participant_count": 10,
+      "mean_participant_macro_f1_gain_pp": 5.721356217947925,
+      "participant_wins": 7,
+      "participant_harms": 3,
+      "participant_ties": 0,
+      "participant_delta_values_sorted_pp": [
+        -11.830441411503095,
+        -1.4257203549525643,
+        -0.9990587031447951,
+        1.4770897379592918,
+        4.824797348382537,
+        7.510327864937782,
+        9.472810507850959,
+        9.882754271299154,
+        19.054971172618252,
+        19.246031746031733
+      ],
+      "interpretation": "descriptive_seed_11_paired_development_comparison_no_new_significance_test",
+      "same_signal_information": true,
+      "selection_budget_caveat": "fixed_external_control_vs_nested_project_selection"
+    },
+    {
+      "treatment": "rmrp",
+      "control": "rist_budgeted",
+      "participant_count": 10,
+      "mean_participant_macro_f1_gain_pp": 6.595409129827947,
+      "participant_wins": 7,
+      "participant_harms": 3,
+      "participant_ties": 0,
+      "participant_delta_values_sorted_pp": [
+        -6.744551171795754,
+        -2.552520438977357,
+        -0.02052522586911687,
+        1.4446500154178143,
+        5.909023423670357,
+        7.988106781602156,
+        9.472810507850959,
+        11.488501222130509,
+        18.187830687830687,
+        20.780765496419207
+      ],
+      "interpretation": "descriptive_seed_11_paired_development_comparison_no_new_significance_test",
+      "same_signal_information": true,
+      "selection_budget_caveat": "fixed_external_control_vs_nested_project_selection"
+    },
+    {
+      "treatment": "rmrp",
+      "control": "gsp",
+      "participant_count": 10,
+      "mean_participant_macro_f1_gain_pp": 0.8740529118800207,
+      "participant_wins": 5,
+      "participant_harms": 4,
+      "participant_ties": 1,
+      "participant_delta_values_sorted_pp": [
+        -1.601304441267426,
+        -1.553461735832562,
+        -1.4976149638284086,
+        -1.058201058201047,
+        0.0,
+        1.6057469508313549,
+        1.7257943238009554,
+        2.8703703703703787,
+        3.1633094332196188,
+        5.085890239707341
+      ],
+      "interpretation": "descriptive_seed_11_paired_development_comparison_no_new_significance_test",
+      "same_signal_information": true,
+      "selection_budget_caveat": "nested_method_families_have_different_candidate_sets"
+    },
+    {
+      "treatment": "ctgr",
+      "control": "rmrp",
+      "participant_count": 10,
+      "mean_participant_macro_f1_gain_pp": 2.6837946972058444,
+      "participant_wins": 8,
+      "participant_harms": 2,
+      "participant_ties": 0,
+      "participant_delta_values_sorted_pp": [
+        -3.6690933847470797,
+        -3.1326109749745368,
+        1.3101772441395099,
+        1.4440321583178761,
+        1.929705215419486,
+        2.977317576491778,
+        4.999516207063404,
+        5.696564305259965,
+        6.375856685454206,
+        8.906481939633837
+      ],
+      "interpretation": "descriptive_seed_11_paired_development_comparison_no_new_significance_test",
+      "same_signal_information": false,
+      "selection_budget_caveat": "nested_method_families_have_different_candidate_sets"
+    },
+    {
+      "treatment": "hera_strict",
+      "control": "ctgr",
+      "participant_count": 10,
+      "mean_participant_macro_f1_gain_pp": 0.28084608651038123,
+      "participant_wins": 3,
+      "participant_harms": 2,
+      "participant_ties": 5,
+      "participant_delta_values_sorted_pp": [
+        -1.3641186354282797,
+        -0.7770248924605538,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.4569497588365565,
+        1.4844136566056432,
+        2.008240977550446
+      ],
+      "interpretation": "descriptive_seed_11_paired_development_comparison_no_new_significance_test",
+      "same_signal_information": true,
+      "selection_budget_caveat": "nested_method_families_have_different_candidate_sets"
+    }
+  ],
+  "input_files": [
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/result.json",
+      "sha256": "d6aa9b260f02d0c83a710547e54b7a6804dba646e28c2076a0a077c57de03b64",
+      "size_bytes": 84230,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/all_outer_predictions.npz",
+      "sha256": "68e29e443d6a928a16e43874e83c7ad67912caad03add8c1f8cec3597480ce2a",
+      "size_bytes": 37339,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": "configs/experiments/aeon_time_series_controls_v1.yaml",
+      "sha256": "90f67fa560080100e28a3fad241da873b8a10aafb42affa4d91142f86134be8a",
+      "size_bytes": 731,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_01/result.json",
+      "sha256": "b6e2bb6aaa801586dcbc44bca1b5ff3a4c9e53476c93fe4126cde2217ec8d81f",
+      "size_bytes": 14002,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_01/predictions.npz",
+      "sha256": "2d00025c7a8aa1d6b68aef800bc08a8e099d0fc79b40d6f5872f229080a9c5b8",
+      "size_bytes": 8633,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_02/result.json",
+      "sha256": "8d83a2fb6cf499c82071cde8e91d4ce00d2e8eba818245bcb25c478a760a416b",
+      "size_bytes": 14145,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_02/predictions.npz",
+      "sha256": "21a2b5e3ed1cc121920ef058e133ea0edf831db77eb39f9c53cd057766f586c1",
+      "size_bytes": 8593,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_03/result.json",
+      "sha256": "78c6c0286d8fd2802e0527b1ec0d45b63facb674b1beba680c5043871f68ff83",
+      "size_bytes": 14103,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_03/predictions.npz",
+      "sha256": "dd399e7e7afc5ecff737b7f60fbce03edcecc4221734910cb2d6d0542698b0d5",
+      "size_bytes": 7716,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_04/result.json",
+      "sha256": "e139e4eec3892cc05f23759a992269d0cd4f6cd25ea896825c8fabecc9d3f4c9",
+      "size_bytes": 14024,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_04/predictions.npz",
+      "sha256": "e73fbaf767d62068c56400d0d1c63610d3849ee464ee4553dc178e547b0d369c",
+      "size_bytes": 8481,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_05/result.json",
+      "sha256": "e9bcb382957640eedbef8e4f3b690ecdb267499deebafa954d8d8ab3af359588",
+      "size_bytes": 13955,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/hydra-001/source_cv_05/predictions.npz",
+      "sha256": "0960656129c889b7a8f74b0b75d917c8c8d94ab3d73a835dff7f6b8e1a5d3872",
+      "size_bytes": 8240,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/result.json",
+      "sha256": "fb99e02ca73eec787909646c94f957e47fa0fab7af2105f279e50d77736104a0",
+      "size_bytes": 83697,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/all_outer_predictions.npz",
+      "sha256": "7c180bfed71d9af41ec0f00f46c6639ec1201b01989b3e6018962c2cf89a1be3",
+      "size_bytes": 37316,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_01/result.json",
+      "sha256": "5f7faf73ef367cfada9c7bf7437457c49d7f237b2ce27d0a4ad2f1f5c20d3b35",
+      "size_bytes": 13919,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_01/predictions.npz",
+      "sha256": "5b4ed34ad699bfae8a221ddf21514f2911f06263b30763a74db332fad5a676ae",
+      "size_bytes": 8637,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_02/result.json",
+      "sha256": "49ef2d4a9cc70eb272e9de52bf2198b98abc8872256a275aae88950c61907f67",
+      "size_bytes": 13964,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_02/predictions.npz",
+      "sha256": "643e1804afb6a2bf41cd5d3a6b1ba9673f3a66b9363a7cdc53fd2ea07273e6c8",
+      "size_bytes": 8574,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_03/result.json",
+      "sha256": "91782f635deb8d6adfe9486f6259858442d0f42e8f8febf6af5a3a89c344330c",
+      "size_bytes": 14019,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_03/predictions.npz",
+      "sha256": "e2eb6f3ea254f700f3d56f54139c6e74dd983f26db22f00438cc4dcbe1973d3e",
+      "size_bytes": 7720,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_04/result.json",
+      "sha256": "637961891bb6dff96f7242b3093e2c0c1338a9ff5b14b82d4417d9b93b50289d",
+      "size_bytes": 13953,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_04/predictions.npz",
+      "sha256": "976edcd64c471b0b6f00b9f85e21c554c351572181615c92c6523eaaa368dd78",
+      "size_bytes": 8476,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_05/result.json",
+      "sha256": "e1190a925b94d1e3b53938f4e4a4ce99977aec64a260bd308bfe944b913c3f03",
+      "size_bytes": 13798,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/multirocket/formal-001/source_cv_05/predictions.npz",
+      "sha256": "6af4e1fb6928394ca3b111c8a08821351cb55065692199a8f214fd6c7debf4d5",
+      "size_bytes": 8239,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/result.json",
+      "sha256": "9209c45efed4fbffd3b9461b061be00bd07a449e7971ea82103d1e50151eb576",
+      "size_bytes": 84128,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/all_outer_predictions.npz",
+      "sha256": "b01a00e464e9c60a3bbf0a9a409817c3f256f7c5fb1a276ac968985e98b14448",
+      "size_bytes": 37322,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_01/result.json",
+      "sha256": "e4ff590057070f2ad532e8570f690055280c0774e27648f2f9731dce2c319fd3",
+      "size_bytes": 13980,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_01/predictions.npz",
+      "sha256": "df690bd9563a8f868b3727e72eeb5dc6cf84d53b5bb1336298ab2ddf55909c73",
+      "size_bytes": 8639,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_02/result.json",
+      "sha256": "0691aa22958db3f536a24c1c13fb3b3584fb19c89335bada5db38cddf8d871f5",
+      "size_bytes": 14097,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_02/predictions.npz",
+      "sha256": "c2c1b7e4078b3cae6dd542ac474688bd32025955d0751423e496743c423d6a46",
+      "size_bytes": 8574,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_03/result.json",
+      "sha256": "0b3493333cd7cef2d0a70a110a54d6a1009ddd1124680ebb53c3feb5864d70df",
+      "size_bytes": 14101,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_03/predictions.npz",
+      "sha256": "9b523c42f4805631fc44af781f2837ee9938fc1122c487e5826bb0aa961393ea",
+      "size_bytes": 7719,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_04/result.json",
+      "sha256": "8bb8e877af05db119be42f057b6ae8479d379cb0c99823f7730590b31d4b622d",
+      "size_bytes": 14067,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_04/predictions.npz",
+      "sha256": "2cf0a0df39dfcfc6d59528dc933c8cc7a67d76c28e1f442fbe156310fd238070",
+      "size_bytes": 8473,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_05/result.json",
+      "sha256": "f6622475bddc48c0b720a06015b54500ddfb8a8403049cadb7294f7e99069fb0",
+      "size_bytes": 14048,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/multirocket-hydra-001/source_cv_05/predictions.npz",
+      "sha256": "cb531c6d504234d994ef605af0f62c7cbc5b3928947734284b3e981095426a8f",
+      "size_bytes": 8240,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/result.json",
+      "sha256": "a023003e4569b37d78a362044c6d870dbc6fe890475636c5e1c293c8c15876ae",
+      "size_bytes": 80809,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/all_outer_predictions.npz",
+      "sha256": "5c8dbcd16461547a6e055d61e027652d0e55ec5f182c9b8f3bbb10975690b9f1",
+      "size_bytes": 39995,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_01/result.json",
+      "sha256": "95dab15c27fa245ef69dfb02a41228706ba7db1dbe0d5d4862a77d3224769a7c",
+      "size_bytes": 13442,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_01/predictions.npz",
+      "sha256": "599ea4891a7a4eba552b2f1d9fd4a3d2a3fb88983687b2b09e883d4ddcfc94e6",
+      "size_bytes": 9355,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_02/result.json",
+      "sha256": "4be9b07bc09977007972fdc5d8ad1c66f55e31f805ab95e5ceb185c69a359f05",
+      "size_bytes": 13713,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_02/predictions.npz",
+      "sha256": "4350d9a5e32f350f47d0200da8291f426c6f5fabcd3fdd9015d2a225a242c73e",
+      "size_bytes": 9433,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_03/result.json",
+      "sha256": "acf00b035993e10cb9d0a5e6769cd30ffeeca0aa66a79368a766e89343187cf2",
+      "size_bytes": 12908,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_03/predictions.npz",
+      "sha256": "f1a751ece0b1631ff5181a3f5a036916ee03ca9b6265f793a7ec21846400f404",
+      "size_bytes": 8444,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_04/result.json",
+      "sha256": "35d6c81f6fde52e6c2696d4e2f31f4f22084249ee75b13ce7d28f14b9357895f",
+      "size_bytes": 13311,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_04/predictions.npz",
+      "sha256": "dd09918a8748478387601f9752686028584bb1604de8edeec4da8d2fb07585bf",
+      "size_bytes": 9196,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_05/result.json",
+      "sha256": "e9d159637cce6343a4e8908da999da2fc6a0eea8e32b04e7164fafe8e6aa8f73",
+      "size_bytes": 13792,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/quant-001/source_cv_05/predictions.npz",
+      "sha256": "a13f3b1f88db1d8cde6f422e44136531d5aae96a203c92b44725c656da1a218b",
+      "size_bytes": 8987,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/result.json",
+      "sha256": "8fd3352f0c95e8c49f8fbf1bdffd267c71c74c3e72dffa0546d06c4f952517ec",
+      "size_bytes": 82196,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/all_outer_predictions.npz",
+      "sha256": "49101a4802ed0c4a4f0a74a84a35e367586685651af659622a0013ef6b3c7d1d",
+      "size_bytes": 40230,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_01/result.json",
+      "sha256": "d8e4b1b85dbdaee1ad95688fd4e1e6f6f10f1d3666ee6e7e7310128575070293",
+      "size_bytes": 13810,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_01/predictions.npz",
+      "sha256": "700d3cc04deff7d124b29a9e7da167582089b5bd3f1851019cb67bfdc9102ddc",
+      "size_bytes": 9482,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_02/result.json",
+      "sha256": "9a2435fe129f72619ad54191244ed7a4e15a6d071ac1ceddef6453e20040c555",
+      "size_bytes": 14025,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_02/predictions.npz",
+      "sha256": "a935be692f68878dcc5733f56347542309de57ad36123918653ec47ca2e5f249",
+      "size_bytes": 9468,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_03/result.json",
+      "sha256": "c232fc897a9633fcae7efecd7d618abd6912c27ba19cfb483ff1b20bc03e5a30",
+      "size_bytes": 13480,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_03/predictions.npz",
+      "sha256": "937ab71b8c937216a1ef11cb588564edeedc6a54a659e33e13ab84d95fbf114d",
+      "size_bytes": 8481,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_04/result.json",
+      "sha256": "b8a2f745189c24bdbd3c498bdbfae213e294821eda2e1aaf84dcfb8d27863a41",
+      "size_bytes": 13477,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_04/predictions.npz",
+      "sha256": "a7852d7cb363acd79fa16ce07f7a52d16eab3de2a466af51aeb11f15f5680ad0",
+      "size_bytes": 9243,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_05/result.json",
+      "sha256": "de8d4e88940ec7729402f621c5b8b032a9f70b08481a9cb173c06f407b85319d",
+      "size_bytes": 13855,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/aeon-controls/rist-budgeted-003/source_cv_05/predictions.npz",
+      "sha256": "8e2af9e63d13b4be1bd420db0ef766686a1a6e4c17513a2bbea711bec71d72e6",
+      "size_bytes": 9033,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/result.json",
+      "sha256": "38a3e740533c6997563eea28df1fd480296786501ac3f1db8025eb555fc061f7",
+      "size_bytes": 81133,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/all_outer_predictions.npz",
+      "sha256": "3a1ae3152cbd9c29cbd68e8a8b153a602e8895fa7ed92ea130c282bf43dcc95c",
+      "size_bytes": 48983,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": "configs/experiments/spectral_shape_nested_v1.yaml",
+      "sha256": "168644d0184e9f473a14f6df63e13574fc9060515c13e0500dac812875f71997",
+      "size_bytes": 1415,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_01/result.json",
+      "sha256": "ad8ee91028abf69434d5459fb4a0ffdd4b65dcce798710ecbdb6ee57374dcfc1",
+      "size_bytes": 14804,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_01/predictions.npz",
+      "sha256": "a77b708cefda5dd2626c44221b2ba964305ebb06c4b0afde7118b02459318241",
+      "size_bytes": 11905,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_02/result.json",
+      "sha256": "5e5de5fb97744e208e2aab88cb12642b24853534b5a20fdbd501b09bed091759",
+      "size_bytes": 14829,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_02/predictions.npz",
+      "sha256": "82a8b16d04d975af595830f1d5c74f69931e0b666e8aa4d107e594fcf1ef14a3",
+      "size_bytes": 11884,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_03/result.json",
+      "sha256": "311896fcf986861377490830ab1276bffeff5d90f46a90dd340b9dde29d35cb5",
+      "size_bytes": 14213,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_03/predictions.npz",
+      "sha256": "c6927012c9ab0dbff7bb8bd48b3ec7d6d123c9cf8cbb90fa051fd84ee835f79a",
+      "size_bytes": 10596,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_04/result.json",
+      "sha256": "4cc6e22511f9d6edf5281d17aef98f3dcbfe7268e49991cb5554f2b4f4e99b3e",
+      "size_bytes": 14583,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_04/predictions.npz",
+      "sha256": "301af16ee5b7ac3cbaf7e55458b9685982f218313a63341142a3d5d73d8ae1d7",
+      "size_bytes": 9683,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_05/result.json",
+      "sha256": "ca6c8fb3dbf6bbc3014cca755f246d396b9aa827a8b976d59bf47c402b527981",
+      "size_bytes": 14742,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/spectral-shape/nested-001/source_cv_05/predictions.npz",
+      "sha256": "5b321203e665166e5496f0db298525600f11c0ee3bc4c1478db8005f333a27ad",
+      "size_bytes": 9491,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/result.json",
+      "sha256": "27fbdf69998c8e617610df8e363b70c6310df783768b1ed103bf32e458949ee5",
+      "size_bytes": 80789,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/all_outer_predictions.npz",
+      "sha256": "b69b302ddb4c0aa880a0d053aff45717165ee1dd05d8c470cbf622f547603171",
+      "size_bytes": 47133,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": "configs/experiments/geometric_spectral_pyramid_nested_v1.yaml",
+      "sha256": "9345321fcea2f739a3ed1038e0bbba63a94dadedfce5da70aff7ec26ebba7405",
+      "size_bytes": 1731,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_01/result.json",
+      "sha256": "5eb8bf908dbe5179302c4f08c19e67ad9210dc573a8f6479fa4cad3fdeab6a03",
+      "size_bytes": 14776,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_01/predictions.npz",
+      "sha256": "64402591a66bf9a65325e302f4892752768bbf80ee788c97c33ce69fe2caf2e0",
+      "size_bytes": 9937,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_02/result.json",
+      "sha256": "4d426c803d928fd481595176d1e88c517653186a5f3bd53f5e7e1a5b2c85277d",
+      "size_bytes": 15006,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_02/predictions.npz",
+      "sha256": "03350f264d1f2a6614664c9ee75bc3774f88400b05158e0b48bc264201f67687",
+      "size_bytes": 11919,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_03/result.json",
+      "sha256": "aa54df1d89ed2130fb29dc5f56be2959c51467d78e801843828a1f9037e33d48",
+      "size_bytes": 14176,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_03/predictions.npz",
+      "sha256": "5f52db05be846cde1d89d379e91733780b5f5824f07f960cba2baef41bbd9cb8",
+      "size_bytes": 8897,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_04/result.json",
+      "sha256": "a71ec5c2a7f8375b7bd27026934a02f1f6a9cc56c9f9d3300b5553dd26c382e8",
+      "size_bytes": 14352,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_04/predictions.npz",
+      "sha256": "3e3d9d62f4e01fed2e2e4747acf572321d41dd65520387ddb3df58ee75716c47",
+      "size_bytes": 11777,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_05/result.json",
+      "sha256": "60d645767ca6679a9b57309aab42ff7592c66c31b53f57d46d7f4b1d44944745",
+      "size_bytes": 14720,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/geometric-pyramid/nested-001/source_cv_05/predictions.npz",
+      "sha256": "70dbff9834eb033d0a34a63969c7aef26c456640a6de813ceff1d89c58c3441b",
+      "size_bytes": 9465,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/result.json",
+      "sha256": "d5fdbb4b30f91453a6511e0e0e3163c9f10db2fdeb687fac6f415c8c3c31bcee",
+      "size_bytes": 81672,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/all_outer_predictions.npz",
+      "sha256": "8d763fcbead2227228a7e546c2524148b4b67fe14fceedae61c5a041cf5ac838",
+      "size_bytes": 41444,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": "configs/experiments/robust_multiscale_residual_pyramid_nested_v1.yaml",
+      "sha256": "1b4cdbcae30557599684d51ed6166f881c04ebf0d9e68cee36a9c4baf1916713",
+      "size_bytes": 2299,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_01/result.json",
+      "sha256": "97547d17d43a8a05da6db3c3788b3baa4394c9513c277abddce064586f87fc56",
+      "size_bytes": 15329,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_01/predictions.npz",
+      "sha256": "f080536adf780347fb553b8bfc4768456e0997312669ebbc91135fa2956d798d",
+      "size_bytes": 9873,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_02/result.json",
+      "sha256": "7a523b90d676416a7ed4f2b5b99785fe8e3711e197f60ce54823b2ef114a7a90",
+      "size_bytes": 15583,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_02/predictions.npz",
+      "sha256": "d6df959f57445a6ad98bf4c403cd3804ceee1d88f0e56ffc56622b29f5c1d348",
+      "size_bytes": 9903,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_03/result.json",
+      "sha256": "76d4bd88c3835fd4c81483da403b4f0501dd7e3b4e87774fb80acab4d326562a",
+      "size_bytes": 14764,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_03/predictions.npz",
+      "sha256": "5dd7242790c981f1a72986a36af82525b5ae97a65e8b15d404ae29ff9b70c36f",
+      "size_bytes": 8877,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_04/result.json",
+      "sha256": "e7bd37771740ed836221d437202c8452dab710567c0f5a872bae47e2ebdcc0ae",
+      "size_bytes": 14948,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_04/predictions.npz",
+      "sha256": "029f515fcd8bdca82f7d669b9d15ac28c2b6bedacb1343a6a88c9b2b5359b0ea",
+      "size_bytes": 9716,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_05/result.json",
+      "sha256": "49a10a0f431939b13d9f22df005102af6795c3d8dd95dbb376a5585eddc1ce1d",
+      "size_bytes": 15323,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v2/robust-multiscale/publication-001/source_cv_05/predictions.npz",
+      "sha256": "8f2944a465588d0b0fc6c51be35147969ef272aceb6fb93a521ac7e4eaab3e1e",
+      "size_bytes": 9461,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/result.json",
+      "sha256": "ef228971eb8605303c1ea31afb7c42c5dc52c602faf2664906fb7749758ffc98",
+      "size_bytes": 1168159,
+      "role": "result_record"
+    },
+    {
+      "path": "configs/experiments/hera_ctgr_retrospective_v1.yaml",
+      "sha256": "38186ad345687e0c30143b6668a152fef65d4a02cfaf9fc1c07ced7536b8bc18",
+      "size_bytes": 4132,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v3/max-rnd/ctgr-evaluation-seed-11-001/result.json",
+      "sha256": "a7b9331c8a645f381c2982882cfced6e82afad38b113bc1388395aefac170d50",
+      "size_bytes": 254908,
+      "role": "result_record"
+    },
+    {
+      "path": ".audit/v3/max-rnd/ctgr-evaluation-seed-11-001/all_outer_predictions.npz",
+      "sha256": "5033a819beb8d03943535578ac7701b73fd9cc517dd9f01bad16da09041c74c8",
+      "size_bytes": 60167,
+      "role": "preserved_predictions"
+    },
+    {
+      "path": "configs/experiments/confidence_triggered_gravity_residual_v1.yaml",
+      "sha256": "50492a761da31b3ea142b48f4f88fbe1a497c18c994f2b65b3ca8fc0944aacfa",
+      "size_bytes": 3281,
+      "role": "experiment_configuration"
+    },
+    {
+      "path": ".audit/v5/hera-ctgr/retrospective-source-v1-001/cross_fitted_predictions.npz",
+      "sha256": "8df7fa091abddc34c183d0f4855be8609f0db2ff0828dabdf257575b905660ad",
+      "size_bytes": 641336,
+      "role": "preserved_predictions"
+    }
+  ],
+  "validation": {
+    "status": "pass",
+    "absolute_metric_tolerance": 1e-12,
+    "check_count": 1388,
+    "source_observations_aligned_all_methods": true,
+    "outer_partitions_match_all_methods": true,
+    "result_record_self_hashes_verified": true,
+    "prediction_file_hashes_verified": true,
+    "historical_metrics_reproduced": true
+  },
+  "record_sha256": "f6d21b54f5a2cf166e0cf23affeda0d52652e256e5dc59d1e5c67e5282dd89cd"
+}

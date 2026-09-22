@@ -1,6 +1,6 @@
 # Current evidence index
 
-**Status date:** 2026-09-20
+**Status date:** 2026-09-22
 
 **Purpose:** authoritative navigation and claim scope for the publication
 candidate. This index does not modify any locked protocol or historical result.
@@ -14,9 +14,9 @@ participant macro-F1 are different estimands and are never substituted for one
 another in this index.
 
 Seeds measure model-fitting variation on the same people. They do not increase
-the independent participant count. Results are comparable only inside a row
-group with the same cohort, endpoint, channels, supervision, partitions, and
-aggregation.
+the independent participant count. A comparison must state its cohort, endpoint,
+channels, supervision, partitions, aggregation and selection budget. When one of
+these changes, the effect cannot be attributed to architecture alone.
 
 ## A. Historical locked target opening
 
@@ -39,20 +39,61 @@ Canonical evidence:
 
 ## B. Matched InclusiveHAR source development
 
-These results use 725 functional-core windows from source participants P1-P10,
+### B.1 Earlier controls and the project's six-channel development
+
+The following results use 725 functional-core windows, P1-P10, five outer
+participant folds and seed 11. SpectralShape, GSP and RMRP are project-developed
+methods. The external control configurations were fixed; project feature
+pipelines used four inner participant folds for candidate selection.
+
+| Method | Origin | Window accuracy | Mean participant macro-F1 |
+|---|---|---:|---:|
+| HYDRA | External control | 73.517% | 70.711% |
+| MultiRocket | External control | 76.138% | 73.501% |
+| MultiRocket + HYDRA | External control combination | 76.000% | 73.616% |
+| QUANT | External control | 76.966% | 74.120% |
+| Budgeted RIST | External control | 78.759% | 77.195% |
+| SpectralShape | Project feature pipeline | 79.724% | 78.884% |
+| GSP | Project geometric/spectral representation | 83.448% | 82.916% |
+| RMRP: selected denoised GSP | Project denoising/view-selection development | **84.414%** | **83.790%** |
+
+RMRP exceeded the tested RIST configuration by 6.595 points and SpectralShape by
+4.906 points. This establishes observed development improvement from the 70s to
+the 80s under the shared source evaluation, with unequal selection budgets.
+Against RIST, seven participants improved and three declined. RMRP's worst
+participant remained below RIST's: 54.936% versus 61.681%.
+
+RMRP added 0.874 points over GSP, with five participant wins, four harms and one
+tie. Its selected model was denoised GSP; no residual-containing view was
+selected. Noise/dropout tolerance improved, temporal-gap robustness worsened and
+the joint advancement gate failed. This modest denoising increment is one part
+of the earlier representation development, not the entire contribution.
+
+Canonical evidence: [source-lineage audit](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md),
+[tracked aggregate record](../results/research/source_development_lineage_v1.json)
+and [FuSE/ReFrame report](research/FUSE_REFRAME_V2_RESEARCH_REPORT.md).
+
+### B.2 Five-seed development of the project's retained methods
+
+These results use the same 725 functional-core windows from P1-P10,
 five participant outer folds, four inner folds, and seeds 11, 23, 47, 89, and
 131. The participants were reused during method invention, so this is development
 evidence.
 
 | Method | Channels | Window accuracy | Mean participant macro-F1 | Change versus CTGR | Evidence decision |
 |---|---:|---:|---:|---:|---|
-| RMRP | 6 | 84.579% | 83.953% | -2.586 points | Matched six-channel base |
+| RMRP: selected denoised GSP | 6 | 84.579% | 83.953% | -2.586 points | Project-developed six-channel predecessor |
 | CTGR | 9 | 86.979% | 86.540% | reference | Retained advancement; eight of ten participants improve versus RMRP |
 | Strict HERA-CTGR v1 | 9 | **87.228%** | **86.849%** | +0.309 points | Highest matched mean; incremental gates failed |
 
 Accuracy and participant macro-F1 are each averaged over the five seeds, without
 ensembling their predictions. HERA-v2 full reached 86.749% participant macro-F1;
 it remains a calibration ablation and was not promoted over v1.
+
+The matching seed-11 CTGR and HERA rows are 86.897% / 86.474% and
+87.034% / 86.755% respectively (accuracy / participant macro-F1). These appear
+with the earlier methods in the [development-history table](RESEARCH_REPORT.md#421-seed-11-development-history).
+Do not substitute a single-seed value for the five-seed aggregate.
 
 CTGR adds native gravity channels, so its RMRP comparison is a sensor-sufficiency
 and method comparison rather than a fixed-input architecture-only effect. Its
@@ -167,6 +208,13 @@ pending from this experiment.
 
 ## Supported publication statements
 
+- SpectralShape, GSP and RMRP are project-developed representations and selection
+  procedures built from established components. Seed-11 RMRP exceeded the tested
+  budgeted RIST control by 6.595 participant macro-F1 points, with a lower worst
+  participant score and a different selection budget.
+- The project improved its six-channel source-development mean from SpectralShape
+  78.884% to GSP 82.916% and selected denoised-GSP RMRP 83.790% under the same
+  seed-11 evaluation. Subsequent gravity-based gains have a different input budget.
 - CTGR passed its predeclared source-development advancement gate and improved
   matched RMRP by 2.586 participant macro-F1 points under a nine-channel protocol.
 - Strict HERA-v1 has the highest matched source-development point estimate, while
@@ -182,7 +230,10 @@ pending from this experiment.
 
 - CTGR or HERA is independently confirmed, universally generalizable, or the
   best published HAR method.
-- Results in the 60s, 70s, 80s, and 90s form one improvement trajectory.
+- Locked target scores, few-person target-inclusion scores, source development,
+  labelled personalization and HARTH diagnostics form one interchangeable
+  improvement trajectory. Only comparisons within their declared contracts are
+  valid; the shared source comparison in Section B.1 is one such comparison.
 - AICOS establishes ability-associated transfer or a fully qualified coordinate
   interface.
 - Synthetic gyro recovers unmeasured person-specific motion.

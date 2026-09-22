@@ -8,6 +8,8 @@ their original records and Git history.
 
 ### Added
 
+- A hash-bound ten-method source-development audit, aligned prediction checks,
+  and reproducible SVG/PNG figures and tables from tracked aggregate records.
 - A structured research report and experiment map separating locked target,
   source-development, personalization, and external diagnostic results.
 - A current evidence index, supersession map, documentation map, CTGR/HERA model
@@ -20,6 +22,14 @@ their original records and Git history.
 
 ### Changed
 
+- Restored the full project contribution history from SpectralShape through
+  GSP/RMRP to CTGR/HERA. Separated seed-11 six-channel development from five-seed
+  gravity extensions and distinguished valid source gains from incomparable
+  target-personalization and legacy scores.
+- Clarified fixed-control selection budgets, standard-component attribution,
+  participant harms, historical prereleases and the CPU acquisition path.
+- Added SVG text and PNG signature support to the release-content checks for
+  generated research figures, retaining rejection of disguised binary payloads.
 - Recomputed source, fixed-ablation, HARTH posture and AICOS metrics from saved
   predictions; added accuracy, denominators, aggregate confusion matrices and
   source hashes. Corrected the HARTH binary fold label from leave-one-out to

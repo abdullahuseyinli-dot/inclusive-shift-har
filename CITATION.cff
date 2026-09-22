@@ -14,7 +14,8 @@ authors:
 abstract: >-
   Evidence-gated research software for participant-exclusive inertial human
   activity recognition. The package contains the locked InclusiveHAR benchmark,
-  participant-level evaluation, RMRP/CTGR/HERA source-development methods,
+  participant-level evaluation, project-developed SpectralShape and GSP feature
+  representations, RMRP denoising studies, CTGR/HERA selective posture pipelines,
   external sensor-interface diagnostics, and append-only records of corrections,
   negative outcomes and participant harms. InclusiveHAR trial boundaries remain
   unrecoverable. Later CTGR/HERA results are development evidence and do not

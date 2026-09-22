@@ -40,7 +40,7 @@ from inclusive_shift_har.artifacts.release_inventory import FORBIDDEN_ARTIFACT_S
 from inclusive_shift_har.manifests.canonical import canonical_json_sha256
 
 
-@pytest.mark.parametrize("suffix", [".in", ".xml"])
+@pytest.mark.parametrize("suffix", [".in", ".xml", ".svg"])
 def test_text_evidence_extensions_do_not_disable_binary_detection(suffix: str) -> None:
     def violations(payload: bytes) -> list[tuple[str, str]]:
         return _blob_content_violations(
@@ -54,6 +54,38 @@ def test_text_evidence_extensions_do_not_disable_binary_detection(suffix: str) -
     assert not violations(b"<testsuite tests='1'/>\n")
     assert any(code == "disguised_binary_nul" for code, _ in violations(b"data\x00"))
     assert any(code == "disguised_binary_signature" for code, _ in violations(b"PK\x03\x04"))
+
+
+@pytest.mark.parametrize(
+    ("path", "payload", "expected"),
+    [
+        ("figure.png", b"\x89PNG\r\n\x1a\n", None),
+        ("figure.png", b"PK\x03\x04", "invalid_allowed_binary_signature"),
+        ("figure.md", b"\x89PNG\r\n\x1a\n", "disguised_binary_signature"),
+        ("figure.gif", b"GIF89a", "unsupported_binary_extension"),
+    ],
+)
+def test_research_png_admission_retains_signature_checks(
+    path: str, payload: bytes, expected: str | None
+) -> None:
+    root = Path(__file__).resolve().parents[1]
+    policy = json.loads((root / "configs/release/release_gate_policy_v1.json").read_text())
+    violations = _blob_content_violations(
+        payload,
+        path=path,
+        signatures={
+            name: bytes.fromhex(value)
+            for name, value in policy["disguised_binary_signatures"].items()
+        },
+        allowed_signatures={
+            name: set(suffixes) for name, suffixes in policy["allowed_signature_suffixes"].items()
+        },
+        allowed_binary_suffixes=set(policy["allowed_binary_suffixes"]),
+    )
+    if expected is None:
+        assert not violations
+    else:
+        assert any(code == expected for code, _ in violations)
 
 
 def _git(root: Path, *arguments: str) -> str:

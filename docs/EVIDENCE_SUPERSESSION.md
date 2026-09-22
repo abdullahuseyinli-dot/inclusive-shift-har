@@ -1,6 +1,6 @@
 # Evidence supersession map
 
-**Status date:** 2026-09-20
+**Status date:** 2026-09-22
 
 InclusiveShift-HAR uses append-only evidence. A later correction narrows or
 replaces the interpretation of an earlier record; it does not delete, relabel,
@@ -12,6 +12,7 @@ The machine-readable companion is
 
 | Earlier record | Reason it is historical or incomplete | Current governing record |
 |---|---|---|
+| README/report presentation beginning at RMRP 83.953% | Incomplete contribution history: RMRP and its SpectralShape/GSP predecessors were developed within this project; some earlier scores in the 70s are valid same-source controls | [Source development audit](research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md) and the expanded current report; historical scores and gates are unchanged |
 | The former README checkpoint dated 2026-09-05 | Described the canceled external queue as pending and predates HERA, HARTH, AICOS, and final routing evidence | [Evidence index](EVIDENCE_INDEX.md) and [project status](PROJECT_STATUS.md) |
 | `docs/PROJECT_STATUS.md` snapshot dated 2026-09-04 | Predates the later source methods and external diagnostics | Current version of [project status](PROJECT_STATUS.md) |
 | `configs/datasets/external_har_portfolio_v1.yaml` AICOS entry labelled `unconsumed` | Acquisition-time role recorded before both provider test and development folds were evaluated; its bytes are retained for provenance | [AICOS posture review](research/AICOS_POSTURE_REVIEW_20260919.md) followed by [routing validation](research/CTGR_ROUTING_VALIDATION_20260919.md) |
@@ -32,6 +33,8 @@ The following are immutable within their declared scope:
 - The one-time InclusiveHAR target opening and its negative MoRe-HAR decision.
 - The locked ontology, participant split, target seal, and released-block risk
   statement.
+- Original SpectralShape/GSP/RMRP results, including their rejected alternatives,
+  denoising tradeoffs and failed RMRP advancement gate.
 - CTGR's five-seed source-development aggregate and predeclared advancement gate.
 - HERA-v1 and HERA-v2 retrospective numerical records.
 - Failed attempts, participant harms, interface limitations, and quarantine

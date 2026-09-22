@@ -9,13 +9,19 @@ recognition under population and sensor-interface shift.
 
 ## Research overview
 
-The project develops selective gravity-based correction of posture errors and
-tests population transfer and generalization across sensor interfaces. The
-current method combines a denoised geometric/spectral base with a
-confidence-triggered sitting/standing expert.
+The project develops inertial feature representations, denoising and selective
+gravity-based correction of posture errors, then tests population transfer and
+generalization across sensor interfaces. **SpectralShape, GSP, RMRP, CTGR and
+HERA are project-developed methods**, built using established learning and
+signal-processing components.
 
-**CTGR improved source participant macro-F1 from 83.953% to 86.540%** across five
-fixed seeds, passing the prespecified development advancement checks. Strict
+On the six-channel source benchmark, the tested budgeted RIST control reached
+77.195% participant macro-F1; project GSP reached **82.916%** and RMRP's selected
+denoised GSP reached **83.790%**. These seed-11 results share the same evaluation
+windows and participants, with different model-selection budgets.
+
+In the later five-seed comparison, **CTGR improved our RMRP base from 83.953% to
+86.540%**, passing the prespecified development advancement checks. Strict
 HERA-v1 reached the highest matched mean, **86.849% macro-F1 and 87.228%
 accuracy**. A separate HARTH placement study reached **97.261% participant
 macro-F1 and 99.723% accuracy** for binary posture recognition from the right
@@ -34,14 +40,49 @@ disposition and publication boundaries are defined in the
 [project status](docs/PROJECT_STATUS.md), and
 [publication checklist](docs/PUBLICATION_CHECKLIST.md).
 
-CTGR and HERA are project-developed feature, expert-routing, and calibration
-pipelines built around standard Extra Trees classifiers. The HARTH studies use
+GSP/RMRP contribute feature and signal-view designs; CTGR/HERA add selective
+expert combination and calibration around standard Extra Trees classifiers.
+RMRP is an internal developed control, not an external off-the-shelf baseline.
+The HARTH studies use
 a separate engineered-feature pipeline with standard Random Forest classifiers,
 trained within HARTH. Their scores describe different methods and tasks.
 
 ## Results at a glance
 
-### Matched source development
+### Six-channel representation development
+
+All rows use seed 11, the same 725 windows from ten source participants, and
+five participant-exclusive outer folds. The endpoint has three classes:
+mobility, sitting and standing. Accuracy is pooled window accuracy; macro-F1
+is the equal-participant mean. External controls are fixed configurations;
+project feature pipelines use four inner folds for candidate selection.
+
+| Method | Origin | Accuracy | Participant macro-F1 |
+|---|---|---:|---:|
+| HYDRA | External control | 73.517% | 70.711% |
+| MultiRocket | External control | 76.138% | 73.501% |
+| MultiRocket + HYDRA | External control | 76.000% | 73.616% |
+| QUANT | External control | 76.966% | 74.120% |
+| RIST, budgeted | External control | 78.759% | 77.195% |
+| SpectralShape | Project representation | 79.724% | 78.884% |
+| Geometric Spectral Pyramid (GSP) | Project representation | 83.448% | 82.916% |
+| RMRP: selected denoised GSP | Project signal-view family | **84.414%** | **83.790%** |
+
+RMRP exceeded the tested RIST configuration by **6.595 macro-F1 points** and
+our earlier SpectralShape pipeline by **4.906 points**. The RIST comparison
+helped seven participants and harmed three; worst-participant F1 was 61.681%
+for RIST versus 54.936% for RMRP. GSP accounts for most of the mean gain, while
+denoising adds 0.874 points. These are useful development comparisons, not an
+equal-tuning-budget ranking of algorithm families. The
+[lineage audit](docs/research/SOURCE_DEVELOPMENT_LINEAGE_AUDIT_20260922.md)
+records prediction alignment, metrics and provenance.
+
+![Six-channel source comparisons and the separately aggregated five-seed gravity extension](docs/figures/source_development_comparison.svg)
+
+The panels use different seed aggregation. Both concern the same reused source
+cohort; the later CTGR/HERA methods also receive native gravity channels.
+
+### Later matched gravity extension
 
 Ten source participants, 725 windows, five participant-exclusive outer folds,
 and five fixed seeds; three classes: mobility, sitting, and standing. Accuracy
@@ -50,7 +91,7 @@ is calculated per participant, then averaged over participants and seeds.
 
 | Method | Channels | Accuracy | Participant macro-F1 | Matched interpretation |
 |---|---:|---:|---:|---|
-| RMRP: denoised GSP + Extra Trees | 6 | 84.579% | 83.953% | Matched base |
+| RMRP: denoised GSP + Extra Trees | 6 | 84.579% | 83.953% | Project-developed matched base |
 | CTGR: base + confidence-triggered gravity expert | 9 | 86.979% | 86.540% | +2.586 macro-F1 points over RMRP; development gates passed |
 | Strict HERA-v1: CTGR candidate ensemble, calibration and consistency veto | 9 | **87.228%** | **86.849%** | +0.309 points over CTGR; incremental advancement gates failed |
 
@@ -59,6 +100,9 @@ These ten people were reused for development; training seeds are not additional
 independent participants. Both paired gain intervals cross zero. These are
 five-seed means, rather than the best individual seed. See the
 [matched evidence](docs/EVIDENCE_INDEX.md) for uncertainty and participant harms.
+The difference between RMRP's 83.790% above and 83.953% here is seed aggregation,
+not another method improvement. The older 75.141% few-person target result and
+legacy UCI-HAR scores in the 90s use different protocols and are kept separate.
 
 A separate seed-11 ablation also favored structured gravity use: CTGR reached
 86.474% participant macro-F1 versus 78.653% for flat nine-channel Extra Trees,
@@ -134,8 +178,10 @@ It is not a target evaluation of CTGR or HERA.
   where the dataset does not provide trial or timestamp boundaries.
 - A one-time, evidence-gated target evaluation with participant-level uncertainty,
   lower-tail outcomes, calibration, and preserved negative results.
-- RMRP, CTGR, CAGE-HAR, and HERA-CTGR research implementations with matched
-  controls and explicit promotion gates.
+- SpectralShape and GSP feature representations; the RMRP signal-view study
+  that selected denoised GSP; and CTGR/HERA selective posture pipelines.
+- Executed external-method controls, matched ablations and promotion gates,
+  including rejected CAGE-HAR, microstate, routing and fusion interventions.
 - Reproducible audits for boundary leakage, unit conversion, annotation-dependent
   preprocessing, external transfer, robustness, and participant harms.
 - A publication-oriented evidence policy that separates locked confirmation,
@@ -146,6 +192,8 @@ The project does not establish state-of-the-art performance, clinical validity,
 universal disability generalization, or independent superiority of CTGR/HERA.
 The MoRe-HAR preregistered target hypothesis was not supported and remains part
 of the preserved evidence record.
+
+![Method development and the separate locked-target, personalization and external evidence streams](docs/figures/method_development_map.svg)
 
 ## Quick start
 

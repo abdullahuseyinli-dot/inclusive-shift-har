@@ -151,6 +151,7 @@ TEXT_SUFFIXES = {
     ".lock",
     ".md",
     ".py",
+    ".svg",
     ".toml",
     ".txt",
     ".typed",
